@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.ui.theme
+package ru.kima.intelligentchat.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
