@@ -19,7 +19,7 @@ interface CharacterCardDao {
     suspend fun selectCharacterCards(): List<CharacterCardEntity>
 
     @Query("SELECT * FROM $CHARACTERS_TABLE_NAME WHERE id = :id")
-    suspend fun selectCharacterCard(id: Int): List<CharacterCardEntity>
+    suspend fun selectCharacterCard(id: Int): CharacterCardEntity
 
     @Query("DELETE FROM $CHARACTERS_TABLE_NAME WHERE id = :id")
     suspend fun deleteCharacterCardById(id: Int)

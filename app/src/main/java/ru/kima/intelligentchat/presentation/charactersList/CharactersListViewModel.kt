@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.charactersList
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,9 @@ import ru.kima.intelligentchat.domain.model.CharacterCard
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardsUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.PutCardUseCase
 
-class CharactersListViewModel : ViewModel(), KoinComponent {
+class CharactersListViewModel(
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel(), KoinComponent {
     private val _state = MutableStateFlow(CharactersListState(emptyList()))
     val state = _state.asStateFlow()
 

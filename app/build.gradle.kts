@@ -62,6 +62,9 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
+    val navVersion = "2.7.5"
+    implementation("androidx.navigation:navigation-compose:$navVersion")
+
     val koinVersion = "3.5.0"
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 

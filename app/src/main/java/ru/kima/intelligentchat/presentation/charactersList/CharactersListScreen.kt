@@ -9,10 +9,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import ru.kima.intelligentchat.presentation.charactersList.components.CardItem
 
 @Composable
-fun CharactersListScreen(viewModel: CharactersListViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun CharactersListScreen(
+    navController: NavController,
+    viewModel: CharactersListViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     val state by viewModel.state.collectAsState()
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -22,7 +26,9 @@ fun CharactersListScreen(viewModel: CharactersListViewModel = androidx.lifecycle
             CardItem(
                 card = card,
                 modifier = Modifier.padding()
-            )
+            ) {
+                navController.navigate("cards/${card.id}")
+            }
         }
     }
 }

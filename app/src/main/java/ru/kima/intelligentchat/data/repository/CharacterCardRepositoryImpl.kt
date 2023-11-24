@@ -20,6 +20,9 @@ class CharacterCardRepositoryImpl(context: Context) : CharacterCardRepository {
     override suspend fun getCharactersCards() =
         database.characterCardDao().selectCharacterCards().map { it.toCharacterCard() }
 
+    override suspend fun getCharacterCard(id: Int) =
+        database.characterCardDao().selectCharacterCard(id).toCharacterCard()
+
     override suspend fun putCharacterCard(characterCard: CharacterCard) {
         val entity = CharacterCardEntity.fromCharacterCard(characterCard)
         database.characterCardDao().insertCharacterCard(entity)
