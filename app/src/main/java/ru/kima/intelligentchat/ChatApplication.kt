@@ -1,8 +1,8 @@
 package ru.kima.intelligentchat
 
 import android.app.Application
-import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -11,6 +11,8 @@ import ru.kima.intelligentchat.domain.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardsUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.PutCardUseCase
+import ru.kima.intelligentchat.presentation.cardDetails.CardDetailsViewModel
+import ru.kima.intelligentchat.presentation.charactersList.CharactersListViewModel
 
 
 class ChatApplication : Application() {
@@ -23,13 +25,18 @@ class ChatApplication : Application() {
             singleOf(::PutCardUseCase)
         }
 
+        val viewModels = module {
+            viewModelOf(::CharactersListViewModel)
+            viewModelOf(::CardDetailsViewModel)
+        }
+
         startKoin {
             androidLogger()
-            androidContext(this@ChatApplication)
             modules(
                 useCases,
+                viewModels,
                 module {
-                    single<CharacterCardRepository> { CharacterCardRepositoryImpl(get()) }
+                    single<CharacterCardRepository> { CharacterCardRepositoryImpl(this@ChatApplication) }
                 }
             )
         }

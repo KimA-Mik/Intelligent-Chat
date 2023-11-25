@@ -1,22 +1,35 @@
 package ru.kima.intelligentchat.presentation.cardDetails
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import ru.kima.intelligentchat.common.Resource
+import ru.kima.intelligentchat.domain.model.CharacterCard
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardUseCase
 
-class CardDetailsViewModel : ViewModel(), KoinComponent {
-    private val _state = MutableStateFlow(CardDetailsState())
-    val state = _state.asStateFlow()
+class CardDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
+    KoinComponent {
+    private val cardTitle = savedStateHandle.getStateFlow("cardTitle", "Title")
+    private val cardDescription = savedStateHandle.getStateFlow("cardDescription", "Description")
+
+    val state = combine(cardTitle, cardDescription) { cardTitle, cardDescription ->
+        CardDetailsState(card = CharacterCard(name = cardTitle, description = cardDescription))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
     private val getCard: GetCardUseCase by inject()
+
+    init {
+        savedStateHandle.get<Int>("cardId")?.let {
+            loadCard(it)
+        }
+    }
 
     fun loadCard(id: Int) {
         getCard(id).onEach { resource ->
@@ -24,11 +37,9 @@ class CardDetailsViewModel : ViewModel(), KoinComponent {
                 is Resource.Error -> {}
                 is Resource.Loading -> {}
                 is Resource.Success -> {
-                    _state.update {
-                        it.copy(
-                            card = resource.data!!
-                        )
-                    }
+                    val card = resource.data!!
+                    savedStateHandle["cardTitle"] = card.name
+                    savedStateHandle["cardDescription"] = card.description
                 }
             }
         }.launchIn(viewModelScope)

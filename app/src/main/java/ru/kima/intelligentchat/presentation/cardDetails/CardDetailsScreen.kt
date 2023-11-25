@@ -2,33 +2,31 @@ package ru.kima.intelligentchat.presentation.cardDetails
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun CardDetailsScreen(
-    cardId: Int,
     navController: NavController,
-    viewModel: CardDetailsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: CardDetailsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    LaunchedEffect(key1 = true) {
-        viewModel.loadCard(cardId)
-    }
 
     Column(
         modifier = Modifier
@@ -56,8 +54,14 @@ fun CardDetailsScreen(
 @Composable
 fun PreviewCardDetails() {
     IntelligentChatTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            CardDetailsScreen(1, rememberNavController())
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val savedStateHandle = SavedStateHandle()
+            savedStateHandle["cardTitle"] = "Title"
+            savedStateHandle["cardDescription"] = "Description"
+            CardDetailsScreen(rememberNavController(), CardDetailsViewModel(savedStateHandle))
         }
     }
 }
