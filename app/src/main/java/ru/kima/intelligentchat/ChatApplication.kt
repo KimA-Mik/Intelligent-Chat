@@ -11,6 +11,7 @@ import ru.kima.intelligentchat.domain.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardsUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.PutCardUseCase
+import ru.kima.intelligentchat.domain.useCase.characterCard.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.presentation.cardDetails.CardDetailsViewModel
 import ru.kima.intelligentchat.presentation.charactersList.CharactersListViewModel
 
@@ -23,6 +24,7 @@ class ChatApplication : Application() {
             singleOf(::GetCardsUseCase)
             singleOf(::GetCardUseCase)
             singleOf(::PutCardUseCase)
+            singleOf(::UpdateCardAvatarUseCase)
         }
 
         val viewModels = module {

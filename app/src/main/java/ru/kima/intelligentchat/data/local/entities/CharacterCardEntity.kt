@@ -9,6 +9,7 @@ import ru.kima.intelligentchat.domain.model.CharacterCard
 data class CharacterCardEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
+    val photoFilePath: String?,
     val name: String,
     val description: String,
     val personality: String,
@@ -26,6 +27,7 @@ data class CharacterCardEntity(
     fun toCharacterCard(tags: List<String> = emptyList()): CharacterCard {
         return CharacterCard(
             id,
+            photoFilePath,
             name,
             description,
             personality,
@@ -47,6 +49,7 @@ data class CharacterCardEntity(
         fun fromCharacterCard(card: CharacterCard): CharacterCardEntity {
             return CharacterCardEntity(
                 id = card.id,
+                photoFilePath = card.photoFilePath,
                 name = card.name,
                 description = card.description,
                 personality = card.personality,

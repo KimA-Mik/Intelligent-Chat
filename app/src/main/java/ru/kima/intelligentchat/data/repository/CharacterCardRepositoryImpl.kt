@@ -27,4 +27,9 @@ class CharacterCardRepositoryImpl(context: Context) : CharacterCardRepository {
         val entity = CharacterCardEntity.fromCharacterCard(characterCard)
         database.characterCardDao().insertCharacterCard(entity)
     }
+
+    override suspend fun updateCharacterCard(characterCard: CharacterCard) {
+        val entity = CharacterCardEntity.fromCharacterCard(characterCard)
+        database.characterCardDao().updateCharacterCard(entity)
+    }
 }

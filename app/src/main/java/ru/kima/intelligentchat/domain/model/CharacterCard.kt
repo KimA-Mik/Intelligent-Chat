@@ -3,6 +3,8 @@ package ru.kima.intelligentchat.domain.model
 data class CharacterCard(
     val id: Int = 0,
 
+    val photoFilePath: String? = null,
+
     val name: String = String(),
     val description: String = String(),
     val personality: String = String(),
