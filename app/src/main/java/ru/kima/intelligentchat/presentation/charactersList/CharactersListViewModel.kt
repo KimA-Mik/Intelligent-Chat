@@ -3,7 +3,9 @@ package ru.kima.intelligentchat.presentation.charactersList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -13,12 +15,17 @@ import ru.kima.intelligentchat.common.Resource
 import ru.kima.intelligentchat.domain.model.CharacterCard
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardsUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.PutCardUseCase
+import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUiEvent
+import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
 
 open class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(), KoinComponent {
     private val _state = MutableStateFlow(CharactersListState())
     val state = _state.asStateFlow()
+
+    private val _uiEvents = MutableSharedFlow<CharactersListUiEvent>()
+    val uiEvents = _uiEvents.asSharedFlow()
 
     private val getCards: GetCardsUseCase by inject()
     private val putCards: PutCardUseCase by inject()
@@ -46,5 +53,15 @@ open class CharactersListViewModel(
                 }
             }
         }
+    }
+
+    fun onUserEvent(event: CharactersListUserEvent) {
+        when (event) {
+            is CharactersListUserEvent.CardSelected -> onCardSelected(event.cardId)
+        }
+    }
+
+    private fun onCardSelected(cardId: Int) {
+        viewModelScope.launch { _uiEvents.emit(CharactersListUiEvent.NavigateTo(cardId)) }
     }
 }
