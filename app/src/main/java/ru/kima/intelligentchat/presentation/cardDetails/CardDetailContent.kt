@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,7 +32,10 @@ fun CardDetailContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)) {
-            CardImage(state.card.photoBytes) {
+            CardImage(
+                state.card.photoBytes,
+                modifier = Modifier.size(100.dp)
+            ) {
                 onEvent(CardDetailUserEvent.SelectImageClicked)
             }
             Text(

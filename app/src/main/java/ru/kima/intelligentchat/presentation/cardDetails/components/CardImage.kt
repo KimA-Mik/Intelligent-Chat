@@ -5,8 +5,6 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person4
@@ -31,51 +29,49 @@ fun CardImage(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Box(modifier = modifier) {
-        val bitmap = remember(photoBytes) {
-            if (photoBytes != null)
-                BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size).asImageBitmap()
-            else
-                null
-        }
-        if (bitmap == null) {
-            val iconBgColor = MaterialTheme.colorScheme.primaryContainer
-            Icon(
-                Icons.Filled.Person4,
-                contentDescription = "",
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier
-                    .size(100.dp)
-                    .border(
-                        1.5.dp,
-                        MaterialTheme.colorScheme.onPrimaryContainer,
-                        CircleShape
-                    )
-                    .drawBehind {
-                        drawCircle(color = iconBgColor)
-                    }
-                    .clickable {
-                        onClick()
-                    }
-            )
-        } else {
-            Image(
-                painter = BitmapPainter(bitmap), contentDescription = "",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .border(
-                        1.5.dp,
-                        MaterialTheme.colorScheme.onPrimaryContainer,
-                        CircleShape
-                    )
-                    .clickable {
-                        onClick()
-                    },
-                contentScale = ContentScale.Crop
-            )
-        }
+    val bitmap = remember(photoBytes) {
+        if (photoBytes != null)
+            BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size).asImageBitmap()
+        else
+            null
     }
+    if (bitmap == null) {
+        val iconBgColor = MaterialTheme.colorScheme.primaryContainer
+        Icon(
+            Icons.Filled.Person4,
+            contentDescription = "",
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            modifier = modifier
+                .clip(CircleShape)
+                .border(
+                    1.5.dp,
+                    MaterialTheme.colorScheme.onPrimaryContainer,
+                    CircleShape
+                )
+                .drawBehind {
+                    drawCircle(color = iconBgColor)
+                }
+                .clickable {
+                    onClick()
+                }
+        )
+    } else {
+        Image(
+            painter = BitmapPainter(bitmap), contentDescription = "",
+            modifier = modifier
+                .clip(CircleShape)
+                .border(
+                    1.5.dp,
+                    MaterialTheme.colorScheme.onPrimaryContainer,
+                    CircleShape
+                )
+                .clickable {
+                    onClick()
+                },
+            contentScale = ContentScale.Crop
+        )
+    }
+
 }
 
 @Preview(name = "CardImage preview light theme")

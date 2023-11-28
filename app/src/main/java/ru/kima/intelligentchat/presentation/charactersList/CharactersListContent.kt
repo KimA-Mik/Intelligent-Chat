@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.charactersList
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,7 +37,11 @@ fun CharactersListContent(
     }
 }
 
-@Preview
+@Preview(name = "Characters List Preview light theme")
+@Preview(
+    name = "Characters List Preview dark theme",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 fun CharactersListPreview() {
     IntelligentChatTheme {
