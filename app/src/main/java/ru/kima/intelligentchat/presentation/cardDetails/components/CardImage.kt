@@ -14,32 +14,38 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun CardImage(
-    photoFilePath: String?,
+    photoBytes: ByteArray?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Box(modifier = modifier) {
-        if (photoFilePath == null) {
+        val bitmap = remember(photoBytes) {
+            if (photoBytes != null)
+                BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size).asImageBitmap()
+            else
+                null
+        }
+        if (bitmap == null) {
             val iconBgColor = MaterialTheme.colorScheme.primaryContainer
             Icon(
                 Icons.Filled.Person4,
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier
-                    .size(72.dp)
+                    .size(100.dp)
                     .border(
                         1.5.dp,
                         MaterialTheme.colorScheme.onPrimaryContainer,
@@ -53,14 +59,11 @@ fun CardImage(
                     }
             )
         } else {
-            val bitmap by remember {
-                mutableStateOf(
-                    BitmapFactory.decodeFile(photoFilePath).asImageBitmap()
-                )
-            }
-            Image(painter = BitmapPainter(bitmap), contentDescription = "",
+            Image(
+                painter = BitmapPainter(bitmap), contentDescription = "",
                 modifier = Modifier
-                    .size(72.dp)
+                    .size(100.dp)
+                    .clip(CircleShape)
                     .border(
                         1.5.dp,
                         MaterialTheme.colorScheme.onPrimaryContainer,
@@ -68,7 +71,9 @@ fun CardImage(
                     )
                     .clickable {
                         onClick()
-                    })
+                    },
+                contentScale = ContentScale.Crop
+            )
         }
     }
 }
@@ -82,7 +87,7 @@ fun CardImage(
 fun CardImagePreview() {
     IntelligentChatTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            CardImage(photoFilePath = null) {
+            CardImage(photoBytes = null) {
 
             }
         }

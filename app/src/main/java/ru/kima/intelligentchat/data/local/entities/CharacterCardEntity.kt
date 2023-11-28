@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.data.local.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import ru.kima.intelligentchat.data.local.CHARACTERS_TABLE_NAME
+import ru.kima.intelligentchat.data.local.dataSource.ImageStorage
 import ru.kima.intelligentchat.domain.model.CharacterCard
 
 @Entity(CHARACTERS_TABLE_NAME)
@@ -24,10 +25,13 @@ data class CharacterCardEntity(
     val characterVersion: String,
 //    val extensions: Record<string, any> // see details for explanation
 ) {
-    fun toCharacterCard(tags: List<String> = emptyList()): CharacterCard {
+    suspend fun toCharacterCard(
+        imageStorage: ImageStorage,
+        tags: List<String> = emptyList()
+    ): CharacterCard {
         return CharacterCard(
             id,
-            photoFilePath,
+            photoFilePath?.let { imageStorage.getImage(it) },
             name,
             description,
             personality,
@@ -49,7 +53,7 @@ data class CharacterCardEntity(
         fun fromCharacterCard(card: CharacterCard): CharacterCardEntity {
             return CharacterCardEntity(
                 id = card.id,
-                photoFilePath = card.photoFilePath,
+                photoFilePath = card.photoBytes?.let { "avatar-${card.id}.png" },
                 name = card.name,
                 description = card.description,
                 personality = card.personality,

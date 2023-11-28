@@ -13,7 +13,8 @@ import ru.kima.intelligentchat.presentation.charactersList.CharactersListScreen
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun ApplicationScreen() {
+fun ApplicationScreen(
+) {
     KoinAndroidContext {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "cards") {
@@ -27,7 +28,7 @@ fun ApplicationScreen() {
                     }
                 )
             ) {
-                CardDetailsScreen(navController = navController)
+                CardDetailsScreen(navController)
             }
         }
     }
