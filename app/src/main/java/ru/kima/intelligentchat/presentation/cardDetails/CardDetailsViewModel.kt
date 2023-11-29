@@ -23,7 +23,7 @@ import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
 
 class CardDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
     KoinComponent {
-    private val cardId = savedStateHandle.getStateFlow("cardId", 0)
+    private val cardId = savedStateHandle.getStateFlow("cardId", 0L)
     private val cardTitle = savedStateHandle.getStateFlow("cardTitle", "Title")
     private val cardDescription = savedStateHandle.getStateFlow("cardDescription", "Description")
     private val photoBytes = MutableStateFlow<ByteArray?>(null)
@@ -51,7 +51,7 @@ class CardDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     val uiEvents = _uiEvents.asSharedFlow()
 
     init {
-        savedStateHandle.get<Int>("cardId")?.let {
+        savedStateHandle.get<Long>("cardId")?.let {
             loadCard(it)
         }
     }
@@ -63,7 +63,7 @@ class CardDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         }
     }
 
-    private fun loadCard(id: Int) {
+    private fun loadCard(id: Long) {
         getCard(id).onEach { resource ->
             when (resource) {
                 is Resource.Error -> {}

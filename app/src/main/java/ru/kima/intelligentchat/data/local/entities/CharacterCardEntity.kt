@@ -9,20 +9,20 @@ import ru.kima.intelligentchat.domain.model.CharacterCard
 @Entity(CHARACTERS_TABLE_NAME)
 data class CharacterCardEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
-    val photoFilePath: String?,
-    val name: String,
-    val description: String,
-    val personality: String,
-    val scenario: String,
-    val firstMes: String,
-    val mesExample: String,
-    val creatorNotes: String,
-    val systemPrompt: String,
-    val postHistoryInstructions: String,
+    val id: Long = 0L,
+    val photoFilePath: String? = null,
+    val name: String = String(),
+    val description: String = String(),
+    val personality: String = String(),
+    val scenario: String = String(),
+    val firstMes: String = String(),
+    val mesExample: String = String(),
+    val creatorNotes: String = String(),
+    val systemPrompt: String = String(),
+    val postHistoryInstructions: String = String(),
 //    val alternateGreetings: List<String>,
-    val creator: String,
-    val characterVersion: String,
+    val creator: String = String(),
+    val characterVersion: String = String(),
 //    val extensions: Record<string, any> // see details for explanation
 ) {
     suspend fun toCharacterCard(

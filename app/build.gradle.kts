@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -75,8 +76,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-imaging
-    implementation("org.apache.commons:commons-imaging:1.0-alpha3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

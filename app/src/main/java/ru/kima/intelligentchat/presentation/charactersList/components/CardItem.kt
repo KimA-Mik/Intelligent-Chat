@@ -1,12 +1,12 @@
 package ru.kima.intelligentchat.presentation.charactersList.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,38 +25,35 @@ fun CardItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
-            )
-            .clickable { onClick() }
-            .then(modifier)
-    ) {
-        Row {
-            CardImage(
-                photoBytes = card.photoBytes,
-                modifier = Modifier
-                    .size(64.dp)
-                    .padding(8.dp)
-            ) {
+    Card(modifier = modifier) {
+        Column(
+            modifier = Modifier.clickable { onClick() }
+        ) {
+            Row {
+                CardImage(
+                    photoBytes = card.photoBytes,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .padding(8.dp)
+                ) {
 
+                }
+
+                Text(
+                    text = card.name,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(8.dp)
+                )
             }
-
             Text(
-                text = card.name,
-                textAlign = TextAlign.Start,
+                text = card.description,
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxWidth()
                     .padding(8.dp)
             )
         }
-        Text(
-            text = card.description,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
     }
 }
 

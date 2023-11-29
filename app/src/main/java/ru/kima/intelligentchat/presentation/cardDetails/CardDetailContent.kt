@@ -1,12 +1,12 @@
 package ru.kima.intelligentchat.presentation.cardDetails
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,33 +27,37 @@ fun CardDetailContent(
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
-    Column(
+    LazyColumn(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)) {
-            CardImage(
-                state.card.photoBytes,
-                modifier = Modifier.size(100.dp)
-            ) {
-                onEvent(CardDetailUserEvent.SelectImageClicked)
+        item {
+            Row(modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)) {
+                CardImage(
+                    state.card.photoBytes,
+                    modifier = Modifier.size(100.dp)
+                ) {
+                    onEvent(CardDetailUserEvent.SelectImageClicked)
+                }
+                Text(
+                    text = state.card.name,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .weight(1f)
+                )
             }
+        }
+
+        item {
             Text(
-                text = state.card.name,
-                textAlign = TextAlign.Start,
+                text = state.card.description,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .weight(1f)
             )
         }
-
-        Text(
-            text = state.card.description,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
     }
 }
 

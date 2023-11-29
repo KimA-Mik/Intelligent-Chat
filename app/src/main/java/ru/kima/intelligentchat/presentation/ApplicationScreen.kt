@@ -23,8 +23,8 @@ fun ApplicationScreen(
                 route = "cards/{cardId}",
                 arguments = listOf(
                     navArgument(name = "cardId") {
-                        type = NavType.IntType
-                        defaultValue = -1
+                        type = NavType.LongType
+                        defaultValue = -1L
                     }
                 )
             ) {

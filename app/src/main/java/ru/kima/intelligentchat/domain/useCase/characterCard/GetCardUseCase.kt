@@ -9,7 +9,7 @@ import ru.kima.intelligentchat.domain.repository.CharacterCardRepository
 class GetCardUseCase : KoinComponent {
     private val cardRepository: CharacterCardRepository by inject()
 
-    operator fun invoke(id: Int) = flow {
+    operator fun invoke(id: Long) = flow {
         emit(Resource.Loading())
         val result = cardRepository.getCharacterCard(id)
         emit(Resource.Success(result))

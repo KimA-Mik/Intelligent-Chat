@@ -1,6 +1,7 @@
 package ru.kima.intelligentchat
 
 import android.app.Application
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
@@ -9,6 +10,7 @@ import org.koin.dsl.module
 import ru.kima.intelligentchat.data.local.dataSource.ImageStorage
 import ru.kima.intelligentchat.data.repository.CharacterCardRepositoryImpl
 import ru.kima.intelligentchat.domain.repository.CharacterCardRepository
+import ru.kima.intelligentchat.domain.useCase.characterCard.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardsUseCase
 import ru.kima.intelligentchat.domain.useCase.characterCard.PutCardUseCase
@@ -27,6 +29,7 @@ class ChatApplication : Application() {
             singleOf(::GetCardUseCase)
             singleOf(::PutCardUseCase)
             singleOf(::UpdateCardAvatarUseCase)
+            singleOf(::AddCardFromPngUseCase)
         }
 
         val viewModels = module {
@@ -43,11 +46,18 @@ class ChatApplication : Application() {
                     single<CharacterCardRepository> {
                         CharacterCardRepositoryImpl(
                             this@ChatApplication,
+                            get(),
                             get()
                         )
                     }
                     single { ImageStorage(this@ChatApplication) }
                     single { ImagePicker(this@ChatApplication) }
+                    single {
+                        Json {
+                            ignoreUnknownKeys = true
+                            encodeDefaults = true
+                        }
+                    }
                 }
             )
         }

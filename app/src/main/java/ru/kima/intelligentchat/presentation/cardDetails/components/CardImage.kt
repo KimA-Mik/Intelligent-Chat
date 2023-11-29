@@ -36,16 +36,16 @@ fun CardImage(
             null
     }
     if (bitmap == null) {
-        val iconBgColor = MaterialTheme.colorScheme.primaryContainer
+        val iconBgColor = MaterialTheme.colorScheme.secondaryContainer
         Icon(
             Icons.Filled.Person4,
             contentDescription = "",
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = modifier
                 .clip(CircleShape)
                 .border(
                     1.5.dp,
-                    MaterialTheme.colorScheme.onPrimaryContainer,
+                    MaterialTheme.colorScheme.onSecondaryContainer,
                     CircleShape
                 )
                 .drawBehind {
@@ -62,7 +62,7 @@ fun CardImage(
                 .clip(CircleShape)
                 .border(
                     1.5.dp,
-                    MaterialTheme.colorScheme.onPrimaryContainer,
+                    MaterialTheme.colorScheme.onSecondaryContainer,
                     CircleShape
                 )
                 .clickable {

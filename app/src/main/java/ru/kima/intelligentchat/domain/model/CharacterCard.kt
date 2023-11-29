@@ -1,7 +1,7 @@
 package ru.kima.intelligentchat.domain.model
 
 data class CharacterCard(
-    val id: Int = 0,
+    val id: Long = 0,
 
     val photoBytes: ByteArray? = null,
 
@@ -24,4 +24,7 @@ data class CharacterCard(
     val creator: String = String(),
     val characterVersion: String = String(),
 //    val extensions: Record<string, any> // see details for explanation
-)
+) {
+    companion object
+}
+

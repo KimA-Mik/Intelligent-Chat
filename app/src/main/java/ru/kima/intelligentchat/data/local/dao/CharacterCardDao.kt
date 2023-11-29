@@ -10,7 +10,7 @@ import ru.kima.intelligentchat.data.local.entities.CharacterCardEntity
 @Dao
 interface CharacterCardDao {
     @Insert
-    suspend fun insertCharacterCard(characterCard: CharacterCardEntity)
+    suspend fun insertCharacterCard(characterCard: CharacterCardEntity): Long
 
     @Update
     suspend fun updateCharacterCard(characterCard: CharacterCardEntity)
@@ -19,8 +19,8 @@ interface CharacterCardDao {
     suspend fun selectCharacterCards(): List<CharacterCardEntity>
 
     @Query("SELECT * FROM $CHARACTERS_TABLE_NAME WHERE id = :id")
-    suspend fun selectCharacterCard(id: Int): CharacterCardEntity
+    suspend fun selectCharacterCard(id: Long): CharacterCardEntity
 
     @Query("DELETE FROM $CHARACTERS_TABLE_NAME WHERE id = :id")
-    suspend fun deleteCharacterCardById(id: Int)
+    suspend fun deleteCharacterCardById(id: Long)
 }
