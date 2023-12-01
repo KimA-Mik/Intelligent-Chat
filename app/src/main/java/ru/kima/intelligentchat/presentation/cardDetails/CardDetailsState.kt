@@ -1,7 +1,5 @@
 package ru.kima.intelligentchat.presentation.cardDetails
 
-import ru.kima.intelligentchat.domain.model.CharacterCard
-
 data class CardDetailsState(
-    val card: CharacterCard = CharacterCard()
+    val card: ru.kima.intelligentchat.domain.card.model.CharacterCard = ru.kima.intelligentchat.domain.card.model.CharacterCard()
 )

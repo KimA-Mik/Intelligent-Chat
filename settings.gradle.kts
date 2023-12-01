@@ -15,4 +15,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Intelligent Chat"
 include(":app")
- 
+include(":data")
+include(":data")
+include(":core")
+include(":domain")

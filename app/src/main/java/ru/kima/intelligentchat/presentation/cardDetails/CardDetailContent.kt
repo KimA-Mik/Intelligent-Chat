@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.kima.intelligentchat.domain.model.CharacterCard
 import ru.kima.intelligentchat.presentation.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -73,7 +72,10 @@ fun PreviewCardDetails() {
             color = MaterialTheme.colorScheme.background,
             modifier = Modifier.fillMaxSize()
         ) {
-            val card = CharacterCard(name = "Name", description = "Description")
+            val card = ru.kima.intelligentchat.domain.card.model.CharacterCard(
+                name = "Name",
+                description = "Description"
+            )
             CardDetailContent(CardDetailsState(card)) {
 
             }

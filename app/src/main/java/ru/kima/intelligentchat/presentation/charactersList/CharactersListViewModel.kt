@@ -13,11 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import ru.kima.intelligentchat.common.Resource
-import ru.kima.intelligentchat.domain.model.CharacterCard
-import ru.kima.intelligentchat.domain.useCase.characterCard.AddCardFromPngUseCase
-import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardsUseCase
-import ru.kima.intelligentchat.domain.useCase.characterCard.PutCardUseCase
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
 
@@ -30,9 +25,9 @@ class CharactersListViewModel(
     private val _uiEvents = MutableSharedFlow<CharactersListUiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
 
-    private val getCards: GetCardsUseCase by inject()
-    private val putCards: PutCardUseCase by inject()
-    private val putCardFromImage: AddCardFromPngUseCase by inject()
+    private val getCards: ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase by inject()
+    private val putCards: ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase by inject()
+    private val putCardFromImage: ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase by inject()
 
     init {
         loadCards()
@@ -40,7 +35,7 @@ class CharactersListViewModel(
 
     private fun loadCards() = viewModelScope.launch {
         getCards().collect { result ->
-            if (result is Resource.Success) {
+            if (result is ru.kima.intelligentchat.core.common.Resource.Success) {
                 _state.update {
                     it.copy(
                         cards = result.data!!
@@ -51,7 +46,11 @@ class CharactersListViewModel(
                     repeat(100) { index ->
                         val i = index + 1L
                         val card =
-                            CharacterCard(id = i, name = "Name $i", description = "Descriptione $i")
+                            ru.kima.intelligentchat.domain.card.model.CharacterCard(
+                                id = i,
+                                name = "Name $i",
+                                description = "Descriptione $i"
+                            )
                         putCards(card)
                     }
                 }
@@ -74,12 +73,12 @@ class CharactersListViewModel(
     private fun addCardFromPng(png: ByteArray) {
         putCardFromImage(png).onEach { resource ->
             when (resource) {
-                is Resource.Error -> {
+                is ru.kima.intelligentchat.core.common.Resource.Error -> {
                     _uiEvents.emit(CharactersListUiEvent.SnackbarMessage(resource.message!!))
                 }
 
-                is Resource.Loading -> {}
-                is Resource.Success -> {
+                is ru.kima.intelligentchat.core.common.Resource.Loading -> {}
+                is ru.kima.intelligentchat.core.common.Resource.Success -> {
                     _uiEvents.emit(CharactersListUiEvent.NavigateTo(resource.data!!))
                 }
             }

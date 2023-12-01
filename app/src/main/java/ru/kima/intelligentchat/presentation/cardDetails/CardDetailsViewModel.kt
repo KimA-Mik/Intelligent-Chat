@@ -14,10 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import ru.kima.intelligentchat.common.Resource
-import ru.kima.intelligentchat.domain.model.CharacterCard
-import ru.kima.intelligentchat.domain.useCase.characterCard.GetCardUseCase
-import ru.kima.intelligentchat.domain.useCase.characterCard.UpdateCardAvatarUseCase
+import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
 
@@ -35,7 +32,7 @@ class CardDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         photoBytes
     ) { cardId, cardTitle, cardDescription, photoBytes ->
         CardDetailsState(
-            card = CharacterCard(
+            card = ru.kima.intelligentchat.domain.card.model.CharacterCard(
                 id = cardId,
                 name = cardTitle,
                 description = cardDescription,
@@ -44,8 +41,8 @@ class CardDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
-    private val getCard: GetCardUseCase by inject()
-    private val updateCardAvatar: UpdateCardAvatarUseCase by inject()
+    private val getCard: ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase by inject()
+    private val updateCardAvatar: ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase by inject()
 
     private val _uiEvents = MutableSharedFlow<UiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
