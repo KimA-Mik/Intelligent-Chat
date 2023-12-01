@@ -25,7 +25,7 @@ fun CharactersListContent(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.padding(start = 8.dp, end = 8.dp)
     ) {
-        items(state.cards) { card ->
+        items(state.cards, key = { item -> item.id }) { card ->
             //TODO: decode image from bytes cause lags
             CardItem(
                 card = card,

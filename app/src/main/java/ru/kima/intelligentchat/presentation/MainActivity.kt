@@ -11,7 +11,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            IntelligentChatTheme {
+            IntelligentChatTheme(dynamicColor = false) {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     ApplicationScreen()
                 }
