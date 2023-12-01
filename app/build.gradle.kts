@@ -72,7 +72,7 @@ dependencies {
     val koinVersion = "3.5.0"
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
