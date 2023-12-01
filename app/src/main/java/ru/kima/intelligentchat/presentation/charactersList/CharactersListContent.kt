@@ -26,6 +26,7 @@ fun CharactersListContent(
         modifier = Modifier.padding(start = 8.dp, end = 8.dp)
     ) {
         items(state.cards) { card ->
+            //TODO: decode image from bytes cause lags
             CardItem(
                 card = card,
                 modifier = Modifier.padding()

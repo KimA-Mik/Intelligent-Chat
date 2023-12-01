@@ -12,10 +12,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
@@ -29,12 +34,24 @@ fun CardImage(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val bitmap = remember(photoBytes) {
-        if (photoBytes != null)
-            BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size).asImageBitmap()
-        else
-            null
+//    val bitmap = remember(photoBytes) {
+//        if (photoBytes != null)
+//            BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size).asImageBitmap()
+//        else
+//            null
+//    }
+
+    var bitmap by remember {
+        mutableStateOf<ImageBitmap?>(null)
     }
+
+    LaunchedEffect(photoBytes) {
+        if (photoBytes != null) {
+            bitmap = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size).asImageBitmap()
+        }
+    }
+
+
     if (bitmap == null) {
         val iconBgColor = MaterialTheme.colorScheme.secondaryContainer
         Icon(
@@ -57,7 +74,7 @@ fun CardImage(
         )
     } else {
         Image(
-            painter = BitmapPainter(bitmap), contentDescription = "",
+            painter = BitmapPainter(bitmap!!), contentDescription = "",
             modifier = modifier
                 .clip(CircleShape)
                 .border(
