@@ -10,6 +10,7 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
+import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.image.repository.ImageRepository
 
 fun domain(context: Context) = module {
@@ -21,5 +22,6 @@ fun domain(context: Context) = module {
     single { PutCardUseCase(get()) }
     single { UpdateCardAvatarUseCase(get(), get()) }
     single { AddCardFromPngUseCase(get(), get()) }
+    single { UpdateCardUseCase(get()) }
 
 }

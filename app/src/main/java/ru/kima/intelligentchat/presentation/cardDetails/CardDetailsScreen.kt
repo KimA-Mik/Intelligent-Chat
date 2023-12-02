@@ -5,9 +5,12 @@ import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +38,7 @@ import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEve
 import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun CardDetailsScreen(
     navController: NavController,
@@ -105,7 +108,8 @@ fun CardDetailsScreen(
             SnackbarHost(hostState = snackbarHostState)
         },
         topBar = {
-            TopAppBar(title = {},
+            TopAppBar(
+                title = {},
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
@@ -113,12 +117,27 @@ fun CardDetailsScreen(
                 ),
                 navigationIcon = {
                     IconButton(onClick = { navigateBack(navController) }) {
-                        Icon(Icons.Filled.ArrowBack, "")
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Navigate back"
+                        )
                     }
-                })
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.SaveCard) }) {
+                        Icon(imageVector = Icons.Filled.Save, contentDescription = "Save card")
+                    }
+                },
+            )
+
         }
     ) { contentPadding ->
-        CardDetailContent(state, Modifier.padding(contentPadding)) { event ->
+        CardDetailContent(
+            state,
+            Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+        ) { event ->
             viewModel.onEvent(event)
         }
     }

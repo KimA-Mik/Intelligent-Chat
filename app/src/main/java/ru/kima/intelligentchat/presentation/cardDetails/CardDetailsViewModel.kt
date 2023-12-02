@@ -17,31 +17,34 @@ import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
+import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
 
 class CardDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val getCard: GetCardUseCase,
-    private val updateCardAvatar: UpdateCardAvatarUseCase
+    private val updateCardAvatar: UpdateCardAvatarUseCase,
+    private val updateCard: UpdateCardUseCase
 ) : ViewModel() {
-    private val cardId = savedStateHandle.getStateFlow("cardId", 0L)
+    private val cardId = savedStateHandle.getStateFlow(CardField.Id.string, 0L)
     private val photoBytes = MutableStateFlow<Bitmap?>(null)
-    private val cardName = savedStateHandle.getStateFlow("cardName", "")
-    private val cardDescription = savedStateHandle.getStateFlow("cardDescription", "")
-    private val cardPersonality = savedStateHandle.getStateFlow("cardPersonality", "")
-    private val cardScenario = savedStateHandle.getStateFlow("cardScenario", "")
-    private val cardFirstMes = savedStateHandle.getStateFlow("cardFirstMes", "")
-    private val cardMesExample = savedStateHandle.getStateFlow("cardMesExample", "")
-    private val cardCreatorNotes = savedStateHandle.getStateFlow("cardCreatorNotes", "")
-    private val cardSystemPrompt = savedStateHandle.getStateFlow("cardSystemPrompt", "")
+    private val cardName = savedStateHandle.getStateFlow(CardField.Name.string, "")
+    private val cardDescription = savedStateHandle.getStateFlow(CardField.Description.string, "")
+    private val cardPersonality = savedStateHandle.getStateFlow(CardField.Personality.string, "")
+    private val cardScenario = savedStateHandle.getStateFlow(CardField.Scenario.string, "")
+    private val cardFirstMes = savedStateHandle.getStateFlow(CardField.FirstMes.string, "")
+    private val cardMesExample = savedStateHandle.getStateFlow(CardField.MesExample.string, "")
+    private val cardCreatorNotes = savedStateHandle.getStateFlow(CardField.CreatorNotes.string, "")
+    private val cardSystemPrompt = savedStateHandle.getStateFlow(CardField.SystemPrompt.string, "")
     private val cardPostHistoryInstructions =
-        savedStateHandle.getStateFlow("cardPostHistoryInstructions", "")
+        savedStateHandle.getStateFlow(CardField.PostHistoryInstructions.string, "")
     private val cardAlternateGreetings =
-        savedStateHandle.getStateFlow("cardAlternateGreetings", emptyList<String>())
-    private val cardTags = savedStateHandle.getStateFlow("cardTags", emptyList<String>())
-    private val cardCreator = savedStateHandle.getStateFlow("cardCreator", "")
-    private val cardCharacterVersion = savedStateHandle.getStateFlow("cardCharacterVersion", "")
+        savedStateHandle.getStateFlow(CardField.AlternateGreetings.string, emptyList<String>())
+    private val cardTags = savedStateHandle.getStateFlow(CardField.Tags.string, emptyList<String>())
+    private val cardCreator = savedStateHandle.getStateFlow(CardField.Creator.string, "")
+    private val cardCharacterVersion =
+        savedStateHandle.getStateFlow(CardField.CharacterVersion.string, "")
 
     val state = combine(
         cardId,
@@ -91,7 +94,7 @@ class CardDetailsViewModel(
         val isLoaded = savedStateHandle.get<Boolean>("isLoaded")
 
         if (isLoaded == null || !isLoaded) {
-            savedStateHandle.get<Long>("cardId")?.let {
+            savedStateHandle.get<Long>(CardField.Id.string)?.let {
                 loadCard(it)
                 savedStateHandle["isLoaded"] = true
             }
@@ -100,8 +103,10 @@ class CardDetailsViewModel(
 
     fun onEvent(event: CardDetailUserEvent) {
         when (event) {
+            is CardDetailUserEvent.FieldUpdate -> onFieldUpdate(event.field, event.updatedString)
             CardDetailUserEvent.SelectImageClicked -> onSelectImageClicked()
-            is CardDetailUserEvent.UpdateCardImage -> updateCardImage(event.bytes)
+            is CardDetailUserEvent.UpdateCardImage -> onUpdateCardImage(event.bytes)
+            CardDetailUserEvent.SaveCard -> onSaveCard()
         }
     }
 
@@ -113,20 +118,21 @@ class CardDetailsViewModel(
                 is Resource.Success -> {
                     val card = resource.data!!
 
-                    savedStateHandle["cardName"] = card.name
+                    savedStateHandle[CardField.Name.string] = card.name
                     photoBytes.value = card.photoBytes
-                    savedStateHandle["cardDescription"] = card.description
-                    savedStateHandle["cardPersonality"] = card.personality
-                    savedStateHandle["cardScenario"] = card.scenario
-                    savedStateHandle["cardFirstMes"] = card.firstMes
-                    savedStateHandle["cardMesExample"] = card.mesExample
-                    savedStateHandle["cardCreatorNotes"] = card.creatorNotes
-                    savedStateHandle["cardSystemPrompt"] = card.systemPrompt
-                    savedStateHandle["cardPostHistoryInstructions"] = card.postHistoryInstructions
-                    savedStateHandle["cardAlternateGreetings"] = card.alternateGreetings
-                    savedStateHandle["cardTags"] = card.tags
-                    savedStateHandle["cardCreator"] = card.creator
-                    savedStateHandle["cardCharacterVersion"] = card.characterVersion
+                    savedStateHandle[CardField.Description.string] = card.description
+                    savedStateHandle[CardField.Personality.string] = card.personality
+                    savedStateHandle[CardField.Scenario.string] = card.scenario
+                    savedStateHandle[CardField.FirstMes.string] = card.firstMes
+                    savedStateHandle[CardField.MesExample.string] = card.mesExample
+                    savedStateHandle[CardField.CreatorNotes.string] = card.creatorNotes
+                    savedStateHandle[CardField.SystemPrompt.string] = card.systemPrompt
+                    savedStateHandle[CardField.PostHistoryInstructions.string] =
+                        card.postHistoryInstructions
+                    savedStateHandle[CardField.AlternateGreetings.string] = card.alternateGreetings
+                    savedStateHandle[CardField.Tags.string] = card.tags
+                    savedStateHandle[CardField.Creator.string] = card.creator
+                    savedStateHandle[CardField.CharacterVersion.string] = card.characterVersion
                 }
             }
         }.launchIn(viewModelScope)
@@ -138,7 +144,7 @@ class CardDetailsViewModel(
         }
     }
 
-    private fun updateCardImage(bytes: ByteArray) {
+    private fun onUpdateCardImage(bytes: ByteArray) {
         if (bytes.isNotEmpty()) {
             updateCardAvatar(state.value.card, bytes).onEach { resource ->
                 when (resource) {
@@ -154,5 +160,38 @@ class CardDetailsViewModel(
 
             }.launchIn(viewModelScope)
         }
+    }
+
+    private fun onFieldUpdate(field: CardField, update: String) {
+        savedStateHandle[field.string] = update
+    }
+
+    private fun onSaveCard() {
+        viewModelScope.launch {
+            updateCard(state.value.card).onEach { resource ->
+                when (resource) {
+                    is Resource.Error -> _uiEvents.emit(UiEvent.SnackbarMessage(resource.message!!))
+                    is Resource.Loading -> {}
+                    is Resource.Success -> _uiEvents.emit(UiEvent.SnackbarMessage("The card has been saved"))
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
+    enum class CardField(val string: String) {
+        Id("cardId"),
+        Name("cardName"),
+        Description("cardDescription"),
+        Personality("cardPersonality"),
+        Scenario("cardScenario"),
+        FirstMes("cardFirstMes"),
+        MesExample("cardMesExample"),
+        CreatorNotes("cardCreatorNotes"),
+        SystemPrompt("cardSystemPrompt"),
+        PostHistoryInstructions("cardPostHistoryInstructions"),
+        AlternateGreetings("cardAlternateGreetings"),
+        Tags("cardTags"),
+        Creator("cardCreator"),
+        CharacterVersion("cardCharacterVersion")
     }
 }

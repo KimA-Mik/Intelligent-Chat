@@ -1,16 +1,32 @@
 package ru.kima.intelligentchat.presentation.cardDetails
 
 import android.content.res.Configuration
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -27,36 +43,168 @@ fun CardDetailContent(
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier,
+    var isDescriptionExpanded by remember { mutableStateOf(true) }
+    var isFirstMesExpanded by remember { mutableStateOf(true) }
+    var isPersonalityExpanded by remember { mutableStateOf(false) }
+    var isScenarioExpanded by remember { mutableStateOf(false) }
+
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .verticalScroll(scrollState)
+            .animateContentSize()
+            .then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        item {
-            Row(modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)) {
-                CardImage(
-                    state.card.photoBytes,
-                    modifier = Modifier.size(100.dp)
-                ) {
-                    onEvent(CardDetailUserEvent.SelectImageClicked)
-                }
+        HeadArea(
+            card = state.card,
+            onEvent = onEvent
+        )
+
+        GeneralInfo(
+            text = state.card.description,
+            modifier = Modifier.padding(8.dp),
+            title = "Description",
+            field = CardDetailsViewModel.CardField.Description,
+            isExpanded = isDescriptionExpanded,
+            onEvent = onEvent,
+            onExpand = { isDescriptionExpanded = !isDescriptionExpanded }
+        )
+
+        GeneralInfo(
+            text = state.card.firstMes,
+            modifier = Modifier.padding(8.dp),
+            title = "First message",
+            field = CardDetailsViewModel.CardField.FirstMes,
+            isExpanded = isFirstMesExpanded,
+            onEvent = onEvent,
+            onExpand = { isFirstMesExpanded = !isFirstMesExpanded }
+        )
+
+        GeneralInfo(
+            text = state.card.personality,
+            modifier = Modifier.padding(8.dp),
+            title = "Personality",
+            field = CardDetailsViewModel.CardField.Personality,
+            isExpanded = isPersonalityExpanded,
+            onEvent = onEvent,
+            onExpand = { isPersonalityExpanded = !isPersonalityExpanded }
+        )
+
+        GeneralInfo(
+            text = state.card.scenario,
+            modifier = Modifier.padding(8.dp),
+            title = "Scenario",
+            field = CardDetailsViewModel.CardField.Scenario,
+            isExpanded = isScenarioExpanded,
+            onEvent = onEvent,
+            onExpand = { isScenarioExpanded = !isScenarioExpanded }
+        )
+    }
+}
+
+@Composable
+fun HeadArea(
+    card: CharacterCard,
+    modifier: Modifier = Modifier,
+    onEvent: (CardDetailUserEvent) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .padding(top = 16.dp, start = 8.dp, end = 8.dp)
+            .then(modifier)
+    ) {
+        CardImage(
+            card.photoBytes,
+            modifier = Modifier.size(100.dp)
+        ) {
+            onEvent(CardDetailUserEvent.SelectImageClicked)
+        }
+
+
+        TextField(
+            label = {
+                Text(text = "Name")
+            },
+            value = card.name, onValueChange = { newValue ->
+                onEvent(
+                    CardDetailUserEvent.FieldUpdate(
+                        CardDetailsViewModel.CardField.Name,
+                        newValue
+                    )
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .weight(1f),
+            maxLines = 3
+        )
+
+    }
+}
+
+@Composable
+fun GeneralInfo(
+    text: String,
+    title: String,
+    field: CardDetailsViewModel.CardField,
+    modifier: Modifier = Modifier,
+    isExpanded: Boolean,
+    onExpand: () -> Unit,
+    onEvent: (CardDetailUserEvent) -> Unit
+) {
+    Card(
+        modifier = modifier
+            .animateContentSize()
+            .padding(1.dp),
+        shape = MaterialTheme.shapes.medium,
+    ) {
+        Column(
+            Modifier.imePadding()
+        ) {
+            Row {
                 Text(
-                    text = state.card.name,
-                    textAlign = TextAlign.Start,
+                    text = title,
+                    style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(8.dp)
                         .weight(1f)
                 )
-            }
-        }
 
-        item {
-            Text(
-                text = state.card.description,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            )
+                IconButton(
+                    onClick = onExpand
+                ) {
+                    Icon(
+                        imageVector = if (isExpanded)
+                            Icons.Filled.ArrowDropUp
+                        else
+                            Icons.Filled.ArrowDropDown,
+                        contentDescription = ""
+                    )
+                }
+            }
+
+            if (isExpanded) {
+                TextField(
+                    value = text,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    onValueChange = { updated ->
+                        onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
+                    })
+
+                Text(
+                    text = text.length.toString(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
