@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.data.card.entities
 
+import android.graphics.BitmapFactory
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import ru.kima.intelligentchat.data.CHARACTERS_TABLE_NAME
@@ -31,7 +32,10 @@ data class CharacterCardEntity(
     ): CharacterCard {
         return CharacterCard(
             id,
-            photoFilePath?.let { imageStorage.getImage(it) },
+            photoFilePath?.let {
+                val image = imageStorage.getImage(it)
+                BitmapFactory.decodeByteArray(image, 0, image.size)
+            },
             name,
             description,
             personality,

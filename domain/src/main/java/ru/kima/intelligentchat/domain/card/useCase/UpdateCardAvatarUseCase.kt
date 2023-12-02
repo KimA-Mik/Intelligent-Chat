@@ -30,8 +30,9 @@ class UpdateCardAvatarUseCase(
         }
 
         val photoBytes = outputStream.toByteArray()
+        val photo = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)
         imageRepository.saveImage(fileName, photoBytes)
-        val newCard = card.copy(photoBytes = photoBytes)
+        val newCard = card.copy(photoBytes = photo)
         characterRepository.updateCharacterCard(newCard)
         emit(Resource.Success(newCard))
     }

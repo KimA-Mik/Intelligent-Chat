@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.cardDetails
 
+import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,7 +26,7 @@ class CardDetailsViewModel(
     private val updateCardAvatar: UpdateCardAvatarUseCase
 ) : ViewModel() {
     private val cardId = savedStateHandle.getStateFlow("cardId", 0L)
-    private val photoBytes = MutableStateFlow<ByteArray?>(null)
+    private val photoBytes = MutableStateFlow<Bitmap?>(null)
     private val cardName = savedStateHandle.getStateFlow("cardName", "")
     private val cardDescription = savedStateHandle.getStateFlow("cardDescription", "")
     private val cardPersonality = savedStateHandle.getStateFlow("cardPersonality", "")
@@ -64,7 +65,7 @@ class CardDetailsViewModel(
         CardDetailsState(
             card = CharacterCard(
                 id = args[0] as Long,
-                photoBytes = args[1]?.let { it as ByteArray },
+                photoBytes = args[1]?.let { it as Bitmap },
                 name = args[2] as String,
                 description = args[3] as String,
                 personality = args[4] as String,

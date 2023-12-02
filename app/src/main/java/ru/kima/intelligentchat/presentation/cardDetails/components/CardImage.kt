@@ -1,7 +1,7 @@
 package ru.kima.intelligentchat.presentation.cardDetails.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,7 +30,7 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun CardImage(
-    photoBytes: ByteArray?,
+    photoBytes: Bitmap?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -46,9 +46,7 @@ fun CardImage(
     }
 
     LaunchedEffect(photoBytes) {
-        if (photoBytes != null) {
-            bitmap = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size).asImageBitmap()
-        }
+        bitmap = photoBytes?.asImageBitmap()
     }
 
 
