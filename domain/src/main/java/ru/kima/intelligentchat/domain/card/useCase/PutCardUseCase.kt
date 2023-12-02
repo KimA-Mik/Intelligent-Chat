@@ -6,7 +6,7 @@ import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 class PutCardUseCase(
     private val cardRepository: CharacterCardRepository
 ) {
-    suspend operator fun invoke(card: CharacterCard) {
-        cardRepository.putCharacterCard(card)
+    suspend operator fun invoke(card: CharacterCard): Long {
+        return cardRepository.putCharacterCard(card)
     }
 }

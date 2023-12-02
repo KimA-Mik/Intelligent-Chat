@@ -12,44 +12,88 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.card.model.CharacterCard
+import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
+import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
 
-class CardDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
-    KoinComponent {
+class CardDetailsViewModel(
+    private val savedStateHandle: SavedStateHandle,
+    private val getCard: GetCardUseCase,
+    private val updateCardAvatar: UpdateCardAvatarUseCase
+) : ViewModel() {
     private val cardId = savedStateHandle.getStateFlow("cardId", 0L)
-    private val cardTitle = savedStateHandle.getStateFlow("cardTitle", "Title")
-    private val cardDescription = savedStateHandle.getStateFlow("cardDescription", "Description")
     private val photoBytes = MutableStateFlow<ByteArray?>(null)
+    private val cardName = savedStateHandle.getStateFlow("cardName", "")
+    private val cardDescription = savedStateHandle.getStateFlow("cardDescription", "")
+    private val cardPersonality = savedStateHandle.getStateFlow("cardPersonality", "")
+    private val cardScenario = savedStateHandle.getStateFlow("cardScenario", "")
+    private val cardFirstMes = savedStateHandle.getStateFlow("cardFirstMes", "")
+    private val cardMesExample = savedStateHandle.getStateFlow("cardMesExample", "")
+    private val cardCreatorNotes = savedStateHandle.getStateFlow("cardCreatorNotes", "")
+    private val cardSystemPrompt = savedStateHandle.getStateFlow("cardSystemPrompt", "")
+    private val cardPostHistoryInstructions =
+        savedStateHandle.getStateFlow("cardPostHistoryInstructions", "")
+    private val cardAlternateGreetings =
+        savedStateHandle.getStateFlow("cardAlternateGreetings", emptyList<String>())
+    private val cardTags = savedStateHandle.getStateFlow("cardTags", emptyList<String>())
+    private val cardCreator = savedStateHandle.getStateFlow("cardCreator", "")
+    private val cardCharacterVersion = savedStateHandle.getStateFlow("cardCharacterVersion", "")
 
     val state = combine(
         cardId,
-        cardTitle,
+        photoBytes,
+        cardName,
         cardDescription,
-        photoBytes
-    ) { cardId, cardTitle, cardDescription, photoBytes ->
+        cardPersonality,
+        cardScenario,
+        cardFirstMes,
+        cardMesExample,
+        cardCreatorNotes,
+        cardSystemPrompt,
+        cardPostHistoryInstructions,
+        cardAlternateGreetings,
+        cardTags,
+        cardCreator,
+        cardCharacterVersion
+    ) { args ->
+
+        @Suppress("UNCHECKED_CAST")
         CardDetailsState(
-            card = ru.kima.intelligentchat.domain.card.model.CharacterCard(
-                id = cardId,
-                name = cardTitle,
-                description = cardDescription,
-                photoBytes = photoBytes
+            card = CharacterCard(
+                id = args[0] as Long,
+                photoBytes = args[1]?.let { it as ByteArray },
+                name = args[2] as String,
+                description = args[3] as String,
+                personality = args[4] as String,
+                scenario = args[5] as String,
+                firstMes = args[6] as String,
+                mesExample = args[7] as String,
+                creatorNotes = args[8] as String,
+                systemPrompt = args[9] as String,
+                postHistoryInstructions = args[10] as String,
+                alternateGreetings = args[11] as List<String>,
+                tags = args[12].let { if (it is List<*>) it.filterIsInstance<String>() else emptyList() },
+                creator = args[13] as String,
+                characterVersion = args[14] as String
             )
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
-    private val getCard: ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase by inject()
-    private val updateCardAvatar: ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase by inject()
 
     private val _uiEvents = MutableSharedFlow<UiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
 
     init {
-        savedStateHandle.get<Long>("cardId")?.let {
-            loadCard(it)
+        val isLoaded = savedStateHandle.get<Boolean>("isLoaded")
+
+        if (isLoaded == null || !isLoaded) {
+            savedStateHandle.get<Long>("cardId")?.let {
+                loadCard(it)
+                savedStateHandle["isLoaded"] = true
+            }
         }
     }
 
@@ -67,9 +111,21 @@ class CardDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 is Resource.Loading -> {}
                 is Resource.Success -> {
                     val card = resource.data!!
-                    savedStateHandle["cardTitle"] = card.name
-                    savedStateHandle["cardDescription"] = card.description
+
+                    savedStateHandle["cardName"] = card.name
                     photoBytes.value = card.photoBytes
+                    savedStateHandle["cardDescription"] = card.description
+                    savedStateHandle["cardPersonality"] = card.personality
+                    savedStateHandle["cardScenario"] = card.scenario
+                    savedStateHandle["cardFirstMes"] = card.firstMes
+                    savedStateHandle["cardMesExample"] = card.mesExample
+                    savedStateHandle["cardCreatorNotes"] = card.creatorNotes
+                    savedStateHandle["cardSystemPrompt"] = card.systemPrompt
+                    savedStateHandle["cardPostHistoryInstructions"] = card.postHistoryInstructions
+                    savedStateHandle["cardAlternateGreetings"] = card.alternateGreetings
+                    savedStateHandle["cardTags"] = card.tags
+                    savedStateHandle["cardCreator"] = card.creator
+                    savedStateHandle["cardCharacterVersion"] = card.characterVersion
                 }
             }
         }.launchIn(viewModelScope)

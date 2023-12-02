@@ -2,6 +2,7 @@ package ru.kima.intelligentchat.presentation.cardDetails
 
 import android.Manifest
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
@@ -41,6 +42,9 @@ fun CardDetailsScreen(
     imagePicker: ImagePicker = koinInject(),
     viewModel: CardDetailsViewModel = koinViewModel()
 ) {
+    BackHandler(onBack = {
+        navigateBack(navController)
+    })
     val state by viewModel.state.collectAsState()
     imagePicker.registerPicker { imageBytes ->
         viewModel.onEvent(CardDetailUserEvent.UpdateCardImage(imageBytes))
@@ -80,7 +84,8 @@ fun CardDetailsScreen(
             when (uiEvent) {
                 UiEvent.SelectImage -> {
 //                    imagePicker.launch("image/*")
-                    imagePickerCheck.launch(actualPhotoPermission)
+//                    imagePickerCheck.launch(actualPhotoPermission)
+                    imagePicker.pickImage()
                 }
 
                 is UiEvent.SnackbarMessage -> {
@@ -107,7 +112,7 @@ fun CardDetailsScreen(
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { navigateBack(navController) }) {
                         Icon(Icons.Filled.ArrowBack, "")
                     }
                 })
@@ -117,4 +122,12 @@ fun CardDetailsScreen(
             viewModel.onEvent(event)
         }
     }
+}
+
+internal fun navigateBack(navController: NavController) {
+    navController.previousBackStackEntry?.savedStateHandle?.set(
+        "shouldUpdate",
+        true
+    )
+    navController.popBackStack()
 }
