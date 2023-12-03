@@ -5,11 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
@@ -25,8 +26,15 @@ class CharactersListViewModel(
     private val putCard: PutCardUseCase,
     private val putCardFromImage: AddCardFromPngUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow(CharactersListState())
-    val state = _state.asStateFlow()
+    private val cards = MutableStateFlow(emptyList<CharacterCard>())
+    private val query = savedStateHandle.getStateFlow("query", String())
+
+    val state = combine(
+        cards,
+        query
+    ) { cards, query ->
+        CharactersListState(cards = cards, searchText = query)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CharactersListState())
 
     private val _uiEvents = MutableSharedFlow<CharactersListUiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
@@ -36,13 +44,9 @@ class CharactersListViewModel(
     }
 
     fun loadCards() = viewModelScope.launch {
-        getCards().collect { result ->
+        getCards(query.value).collect { result ->
             if (result is Resource.Success) {
-                _state.update {
-                    it.copy(
-                        cards = result.data!!
-                    )
-                }
+                cards.value = result.data!!
             }
         }
     }
@@ -53,6 +57,7 @@ class CharactersListViewModel(
             is CharactersListUserEvent.AddCardFromImage -> addCardFromPng(event.imageBytes)
             CharactersListUserEvent.AddCardFromImageClicked -> onAddCardFromImageClicked()
             CharactersListUserEvent.CreateCardClicked -> createEmptyCardClicked()
+            is CharactersListUserEvent.SearchQueryChanged -> onSearchQueryChanger(event.query)
         }
     }
 
@@ -86,5 +91,10 @@ class CharactersListViewModel(
             val cardId = putCard(CharacterCard())
             _uiEvents.emit(CharactersListUiEvent.NavigateTo(cardId))
         }
+    }
+
+    private fun onSearchQueryChanger(query: String) {
+        savedStateHandle["query"] = query
+        loadCards()
     }
 }

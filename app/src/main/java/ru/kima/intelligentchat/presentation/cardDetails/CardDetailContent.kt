@@ -1,6 +1,7 @@
 package ru.kima.intelligentchat.presentation.cardDetails
 
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -58,7 +59,8 @@ fun CardDetailContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         HeadArea(
-            card = state.card,
+            name = state.card.name,
+            photo = state.card.photoBytes,
             onEvent = onEvent
         )
 
@@ -106,7 +108,8 @@ fun CardDetailContent(
 
 @Composable
 fun HeadArea(
-    card: CharacterCard,
+    name: String,
+    photo: Bitmap?,
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
@@ -116,7 +119,7 @@ fun HeadArea(
             .then(modifier)
     ) {
         CardImage(
-            card.photoBytes,
+            photo,
             modifier = Modifier.size(100.dp)
         ) {
             onEvent(CardDetailUserEvent.SelectImageClicked)
@@ -127,7 +130,7 @@ fun HeadArea(
             label = {
                 Text(text = "Name")
             },
-            value = card.name, onValueChange = { newValue ->
+            value = name, onValueChange = { newValue ->
                 onEvent(
                     CardDetailUserEvent.FieldUpdate(
                         CardDetailsViewModel.CardField.Name,

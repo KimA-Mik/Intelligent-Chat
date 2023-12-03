@@ -4,6 +4,7 @@ sealed interface CharactersListUserEvent {
     data class CardSelected(val cardId: Long) : CharactersListUserEvent
     data object AddCardFromImageClicked : CharactersListUserEvent
     data object CreateCardClicked : CharactersListUserEvent
+    data class SearchQueryChanged(val query: String) : CharactersListUserEvent
     data class AddCardFromImage(val imageBytes: ByteArray) : CharactersListUserEvent {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
