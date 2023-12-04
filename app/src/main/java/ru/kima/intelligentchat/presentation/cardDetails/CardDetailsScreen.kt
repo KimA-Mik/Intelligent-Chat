@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -36,7 +35,7 @@ import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEve
 import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardDetailsScreen(
     navController: NavController,

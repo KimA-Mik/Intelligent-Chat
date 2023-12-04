@@ -3,6 +3,10 @@ package ru.kima.intelligentchat.data.card.entities
 import android.graphics.BitmapFactory
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import ru.kima.intelligentchat.data.CHARACTERS_TABLE_NAME
 import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
@@ -33,8 +37,13 @@ data class CharacterCardEntity(
         return CharacterCard(
             id,
             photoFilePath?.let {
-                val image = imageStorage.getImage(it)
-                BitmapFactory.decodeByteArray(image, 0, image.size)
+                coroutineScope {
+                    val job = async(Dispatchers.Unconfined, start = CoroutineStart.LAZY) {
+                        val image = imageStorage.getImage(it)
+                        BitmapFactory.decodeByteArray(image, 0, image.size)
+                    }
+                    job.await()
+                }
             },
             name,
             description,
