@@ -2,7 +2,9 @@ package ru.kima.intelligentchat.presentation.cardDetails
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -158,6 +160,11 @@ fun GeneralInfo(
     onExpand: () -> Unit,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
+    val rotation by animateFloatAsState(
+        targetValue = if (isExpanded) 180f else 0f,
+        label = "rotation"
+    )
+
     Card(
         modifier = modifier
             .animateContentSize()
@@ -180,33 +187,36 @@ fun GeneralInfo(
                     onClick = onExpand
                 ) {
                     Icon(
-                        imageVector = if (isExpanded)
-                            Icons.Filled.ArrowDropUp
-                        else
-                            Icons.Filled.ArrowDropDown,
+                        modifier = Modifier.graphicsLayer(
+                            rotationZ = rotation
+                        ),
+                        imageVector = Icons.Filled.ArrowDropUp,
                         contentDescription = ""
                     )
                 }
             }
 
-            if (isExpanded) {
-                TextField(
-                    value = text,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    onValueChange = { updated ->
-                        onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
-                    })
+            AnimatedVisibility(isExpanded) {
+                Column {
 
-                Text(
-                    text = text.length.toString(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    textAlign = TextAlign.End,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                    TextField(
+                        value = text,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        onValueChange = { updated ->
+                            onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
+                        })
+
+                    Text(
+                        text = text.length.toString(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     }
