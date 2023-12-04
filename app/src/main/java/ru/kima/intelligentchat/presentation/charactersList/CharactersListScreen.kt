@@ -13,7 +13,6 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -25,11 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
@@ -37,34 +36,41 @@ import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 @Composable
 fun CharactersListScreen(
     navController: NavController,
-    imagePicker: ImagePicker = koinInject(),
-    viewModel: CharactersListViewModel = koinViewModel()
+    snackbarHostState: SnackbarHostState,
+    imagePicker: ImagePicker,
+    viewModel: CharactersListViewModel
 ) {
+    val content = LocalContext.current
     val state by viewModel.state.collectAsState()
     imagePicker.registerPicker { imageBytes ->
         viewModel.onUserEvent(CharactersListUserEvent.AddCardFromImage(imageBytes))
     }
 
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(true) {
         viewModel.uiEvents.collect { event ->
             when (event) {
-                is CharactersListUiEvent.NavigateTo -> {
+                is CharactersListUiEvent.NavigateToCard ->
                     navController.navigate("cards/${event.cardId}")
-                }
 
                 is CharactersListUiEvent.SnackbarMessage ->
                     scope.launch {
-                        snackbarHostState.showSnackbar(
-                            event.message,
-                            duration = SnackbarDuration.Short
-                        )
+                        snackbarHostState.showSnackbar(event.message)
                     }
 
-                CharactersListUiEvent.SelectPngImage -> {
+                CharactersListUiEvent.SelectPngImage ->
                     imagePicker.pickImage("image/png")
+
+                is CharactersListUiEvent.ShowImage ->
+                    navController.navigate("image/${event.imageName}")
+
+                CharactersListUiEvent.NoCardPhoto -> scope.launch {
+                    snackbarHostState.showSnackbar(content.getString(R.string.no_card_photo))
+                }
+
+                CharactersListUiEvent.NoSuchCard -> scope.launch {
+                    snackbarHostState.showSnackbar(content.getString(R.string.no_such_card))
                 }
             }
         }

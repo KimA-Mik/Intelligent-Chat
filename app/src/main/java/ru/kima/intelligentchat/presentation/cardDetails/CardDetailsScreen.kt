@@ -32,8 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
@@ -42,8 +40,9 @@ import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 @Composable
 fun CardDetailsScreen(
     navController: NavController,
-    imagePicker: ImagePicker = koinInject(),
-    viewModel: CardDetailsViewModel = koinViewModel()
+    snackbarHostState: SnackbarHostState,
+    imagePicker: ImagePicker,
+    viewModel: CardDetailsViewModel
 ) {
     BackHandler(onBack = {
         navController.popBackStack()
@@ -54,7 +53,6 @@ fun CardDetailsScreen(
     }
 
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     val actualPhotoPermission = remember {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

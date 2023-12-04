@@ -17,6 +17,7 @@ import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
+import ru.kima.intelligentchat.domain.card.util.getCardPhotoName
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
 
@@ -43,7 +44,7 @@ class CharactersListViewModel(
         loadCards()
     }
 
-    fun loadCards() = viewModelScope.launch {
+    private fun loadCards() = viewModelScope.launch {
         getCards(query.value).collect { result ->
             cards.value = result
         }
@@ -56,11 +57,12 @@ class CharactersListViewModel(
             CharactersListUserEvent.AddCardFromImageClicked -> onAddCardFromImageClicked()
             CharactersListUserEvent.CreateCardClicked -> createEmptyCardClicked()
             is CharactersListUserEvent.SearchQueryChanged -> onSearchQueryChanger(event.query)
+            is CharactersListUserEvent.ShowCardAvatar -> onShowCardAvatar(event.cardId)
         }
     }
 
     private fun onCardSelected(cardId: Long) {
-        viewModelScope.launch { _uiEvents.emit(CharactersListUiEvent.NavigateTo(cardId)) }
+        viewModelScope.launch { _uiEvents.emit(CharactersListUiEvent.NavigateToCard(cardId)) }
     }
 
     private fun addCardFromPng(png: ByteArray) {
@@ -72,7 +74,7 @@ class CharactersListViewModel(
 
                 is Resource.Loading -> {}
                 is Resource.Success -> {
-                    _uiEvents.emit(CharactersListUiEvent.NavigateTo(resource.data!!))
+                    _uiEvents.emit(CharactersListUiEvent.NavigateToCard(resource.data!!))
                 }
             }
         }.launchIn(viewModelScope)
@@ -87,12 +89,27 @@ class CharactersListViewModel(
     private fun createEmptyCardClicked() {
         viewModelScope.launch {
             val cardId = putCard(CharacterCard())
-            _uiEvents.emit(CharactersListUiEvent.NavigateTo(cardId))
+            _uiEvents.emit(CharactersListUiEvent.NavigateToCard(cardId))
         }
     }
 
     private fun onSearchQueryChanger(query: String) {
         savedStateHandle["query"] = query
         loadCards()
+    }
+
+    private fun onShowCardAvatar(cardId: Long) = viewModelScope.launch {
+        val card = cards.value.find { it.id == cardId }
+        if (card == null) {
+            _uiEvents.emit(CharactersListUiEvent.NoSuchCard)
+            return@launch
+        }
+        if (card.photoBytes == null) {
+            _uiEvents.emit(CharactersListUiEvent.NoCardPhoto)
+            return@launch
+        }
+
+        val photoName = getCardPhotoName(card)
+        _uiEvents.emit(CharactersListUiEvent.ShowImage(photoName))
     }
 }

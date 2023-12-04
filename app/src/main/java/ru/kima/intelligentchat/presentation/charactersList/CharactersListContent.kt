@@ -78,10 +78,13 @@ private fun CharactersList(
                 card = card,
                 modifier = Modifier
                     .padding()
-                    .animateItemPlacement()
-            ) {
-                onEvent(CharactersListUserEvent.CardSelected(card.id))
-            }
+                    .animateItemPlacement(),
+                onAvatarClick = {
+                    onEvent(CharactersListUserEvent.ShowCardAvatar(card.id))
+                },
+                onCardClick = {
+                    onEvent(CharactersListUserEvent.CardSelected(card.id))
+                })
         }
     }
 }

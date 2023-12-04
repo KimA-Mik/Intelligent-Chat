@@ -10,6 +10,7 @@ import ru.kima.intelligentchat.di.domain
 import ru.kima.intelligentchat.presentation.cardDetails.CardDetailsViewModel
 import ru.kima.intelligentchat.presentation.charactersList.CharactersListViewModel
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
+import ru.kima.intelligentchat.presentation.showImage.ShowImageViewModel
 
 
 class ChatApplication : Application() {
@@ -20,6 +21,7 @@ class ChatApplication : Application() {
             single { ImagePicker(this@ChatApplication) }
             viewModelOf(::CharactersListViewModel)
             viewModelOf(::CardDetailsViewModel)
+            viewModelOf(::ShowImageViewModel)
         }
 
         startKoin {

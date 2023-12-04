@@ -23,21 +23,21 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 fun CardItem(
     card: CharacterCard,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onAvatarClick: () -> Unit,
+    onCardClick: () -> Unit
 ) {
     Card(modifier = modifier) {
         Column(
-            modifier = Modifier.clickable { onClick() }
+            modifier = Modifier.clickable { onCardClick() }
         ) {
             Row {
                 CardImage(
                     photoBytes = card.photoBytes,
                     modifier = Modifier
                         .size(72.dp)
-                        .padding(8.dp)
-                ) {
-
-                }
+                        .padding(8.dp),
+                    onClick = onAvatarClick
+                )
 
                 Text(
                     text = card.name,
@@ -67,10 +67,10 @@ fun PreviewCardItem() {
                     name = "Name",
                     description = "Description"
                 ),
-                modifier = Modifier.padding(8.dp)
-            ) {
-
-            }
+                modifier = Modifier.padding(8.dp),
+                onAvatarClick = {},
+                onCardClick = {}
+            )
         }
     }
 }
