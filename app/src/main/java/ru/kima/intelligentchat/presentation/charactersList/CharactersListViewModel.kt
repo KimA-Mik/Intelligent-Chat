@@ -45,9 +45,7 @@ class CharactersListViewModel(
 
     fun loadCards() = viewModelScope.launch {
         getCards(query.value).collect { result ->
-            if (result is Resource.Success) {
-                cards.value = result.data!!
-            }
+            cards.value = result
         }
     }
 

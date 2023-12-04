@@ -46,7 +46,7 @@ fun CardDetailsScreen(
     viewModel: CardDetailsViewModel = koinViewModel()
 ) {
     BackHandler(onBack = {
-        navigateBack(navController)
+        navController.popBackStack()
     })
     val state by viewModel.state.collectAsState()
     imagePicker.registerPicker { imageBytes ->
@@ -116,7 +116,7 @@ fun CardDetailsScreen(
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { navigateBack(navController) }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Navigate back"
@@ -141,12 +141,4 @@ fun CardDetailsScreen(
             viewModel.onEvent(event)
         }
     }
-}
-
-internal fun navigateBack(navController: NavController) {
-    navController.previousBackStackEntry?.savedStateHandle?.set(
-        "shouldUpdate",
-        true
-    )
-    navController.popBackStack()
 }

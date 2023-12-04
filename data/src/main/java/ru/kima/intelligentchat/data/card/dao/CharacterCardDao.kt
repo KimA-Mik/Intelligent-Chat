@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import ru.kima.intelligentchat.data.CHARACTERS_TABLE_NAME
 import ru.kima.intelligentchat.data.card.entities.CharacterCardEntity
 
@@ -16,7 +17,7 @@ interface CharacterCardDao {
     suspend fun updateCharacterCard(characterCard: CharacterCardEntity)
 
     @Query("SELECT * FROM $CHARACTERS_TABLE_NAME")
-    suspend fun selectCharacterCards(): List<CharacterCardEntity>
+    fun selectCharacterCards(): Flow<List<CharacterCardEntity>>
 
     @Query("SELECT * FROM $CHARACTERS_TABLE_NAME WHERE id = :id")
     suspend fun selectCharacterCard(id: Long): CharacterCardEntity

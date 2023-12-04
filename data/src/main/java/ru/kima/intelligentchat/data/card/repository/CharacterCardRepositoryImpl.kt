@@ -2,6 +2,7 @@ package ru.kima.intelligentchat.data.card.repository
 
 import android.content.Context
 import androidx.room.Room
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import ru.kima.intelligentchat.data.DATABASE_NAME
 import ru.kima.intelligentchat.data.Database
@@ -27,8 +28,12 @@ class CharacterCardRepositoryImpl(
 
     private val jsonDeserializer = CardDeserializer(json)
 
-    override suspend fun getCharactersCards() =
-        database.characterCardDao().selectCharacterCards().map { it.toCharacterCard(imageStorage) }
+    override fun getCharactersCards() =
+        database.characterCardDao().selectCharacterCards().map { cards ->
+            cards.map { entity ->
+                entity.toCharacterCard(imageStorage)
+            }
+        }
 
     override suspend fun getCharacterCard(id: Long) =
         database.characterCardDao().selectCharacterCard(id).toCharacterCard(imageStorage)

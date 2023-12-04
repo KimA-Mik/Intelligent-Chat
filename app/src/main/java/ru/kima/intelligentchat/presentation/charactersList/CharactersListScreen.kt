@@ -45,17 +45,6 @@ fun CharactersListScreen(
         viewModel.onUserEvent(CharactersListUserEvent.AddCardFromImage(imageBytes))
     }
 
-    val update =
-        navController.currentBackStackEntry?.savedStateHandle
-            ?.getStateFlow("shouldUpdate", false)?.collectAsState()
-
-    update?.let {
-        if (it.value) {
-            viewModel.loadCards()
-            navController.currentBackStackEntry?.savedStateHandle?.set("shouldUpdate", false)
-        }
-    }
-
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
