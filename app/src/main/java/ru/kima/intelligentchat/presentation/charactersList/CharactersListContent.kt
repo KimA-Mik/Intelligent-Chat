@@ -26,10 +26,11 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun CharactersListContent(
+    modifier: Modifier = Modifier,
     state: CharactersListState,
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
-    BoxWithConstraints {
+    BoxWithConstraints(modifier) {
         SearchField(state.searchText, onEvent)
         CharactersList(state.cards, onEvent)
     }
@@ -44,7 +45,7 @@ fun SearchField(
     SearchBar(
         query = query,
         modifier = Modifier
-            .padding(8.dp)
+            .padding(horizontal = 16.dp)
             .height(56.dp),
         onQueryChange = { newQuery ->
             onEvent(CharactersListUserEvent.SearchQueryChanged(newQuery))
@@ -68,9 +69,9 @@ private fun CharactersList(
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
-            .padding(start = 8.dp, end = 8.dp, top = 36.dp)
+            .padding(start = 8.dp, end = 8.dp, top = 52.dp)
             .fillMaxSize(),
-        contentPadding = PaddingValues(top = 44.dp, bottom = 16.dp)
+        contentPadding = PaddingValues(top = 32.dp, bottom = 16.dp)
     ) {
         items(cards, key = { item -> item.id }) { card ->
             //TODO: decode image from bytes cause lags
@@ -109,7 +110,7 @@ fun CharactersListPreview() {
                     description = "Description $index"
                 )
             }
-            CharactersListContent(CharactersListState(cards)) {
+            CharactersListContent(state = CharactersListState(cards)) {
 
             }
         }

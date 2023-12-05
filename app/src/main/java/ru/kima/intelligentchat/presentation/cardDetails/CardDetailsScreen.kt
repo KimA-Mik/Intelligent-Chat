@@ -13,14 +13,13 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,7 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
@@ -100,18 +99,18 @@ fun CardDetailsScreen(
         }
     }
 
+    val scrollBehavior =
+        TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
         topBar = {
             TopAppBar(
                 title = {},
-                scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
+                scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -122,20 +121,22 @@ fun CardDetailsScreen(
                 },
                 actions = {
                     IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.SaveCard) }) {
-                        Icon(imageVector = Icons.Filled.Save, contentDescription = "Save card")
+                        Icon(
+                            imageVector = Icons.Filled.Save,
+                            contentDescription = "Save card",
+                        )
                     }
                 },
             )
-
-        }
+        },
     ) { contentPadding ->
         CardDetailContent(
             state,
-            Modifier
+            onEvent = viewModel::onEvent,
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-        ) { event ->
-            viewModel.onEvent(event)
-        }
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+        )
     }
 }

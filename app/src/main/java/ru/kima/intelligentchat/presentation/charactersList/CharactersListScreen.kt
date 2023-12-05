@@ -1,7 +1,7 @@
 package ru.kima.intelligentchat.presentation.charactersList
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -97,11 +97,13 @@ fun CharactersListScreen(
                 })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            CharactersListContent(state) { event ->
-                viewModel.onUserEvent(event)
-            }
-        }
+        CharactersListContent(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            state = state, onEvent = viewModel::onUserEvent
+        )
+
     }
 }
 

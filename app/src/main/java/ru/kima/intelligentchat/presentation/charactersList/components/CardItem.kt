@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,34 +25,41 @@ fun CardItem(
     onAvatarClick: () -> Unit,
     onCardClick: () -> Unit
 ) {
-    Card(modifier = modifier) {
-        Column(
-            modifier = Modifier.clickable { onCardClick() }
-        ) {
-            Row {
-                CardImage(
-                    photoBytes = card.photoBytes,
-                    modifier = Modifier
-                        .size(72.dp)
-                        .padding(8.dp),
-                    onClick = onAvatarClick
-                )
-
-                Text(
-                    text = card.name,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp)
-                )
-            }
-            Text(
-                text = card.creatorNotes,
+    Column(
+        modifier = modifier.clickable { onCardClick() },
+    ) {
+        Row {
+            CardImage(
+                photoBytes = card.photoBytes,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
+                    .size(72.dp)
+                    .padding(8.dp),
+                onClick = onAvatarClick
+            )
+
+            Text(
+                text = card.name,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = card.characterVersion,
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        Text(
+            text = card.creatorNotes,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -65,7 +71,9 @@ fun PreviewCardItem() {
             CardItem(
                 card = CharacterCard(
                     name = "Name",
-                    description = "Description"
+                    description = "Description",
+                    creatorNotes = "This is a character",
+                    characterVersion = "main"
                 ),
                 modifier = Modifier.padding(8.dp),
                 onAvatarClick = {},

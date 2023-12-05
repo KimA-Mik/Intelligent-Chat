@@ -3,21 +3,18 @@ package ru.kima.intelligentchat.presentation.cardDetails
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,11 +50,9 @@ fun CardDetailContent(
 
     val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxHeight()
-            .verticalScroll(scrollState)
-            .animateContentSize()
-            .then(modifier),
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         HeadArea(
@@ -165,61 +160,53 @@ fun GeneralInfo(
         label = "rotation"
     )
 
-    Card(
-        modifier = modifier
-            .animateContentSize()
-            .padding(1.dp),
-        shape = MaterialTheme.shapes.medium,
-    ) {
-        Column(
-            Modifier.imePadding()
-        ) {
-            Row {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .weight(1f)
+    Column(modifier) {
+        Row {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(1f)
+            )
+
+            IconButton(
+                onClick = onExpand
+            ) {
+                Icon(
+                    modifier = Modifier.graphicsLayer(
+                        rotationZ = rotation
+                    ),
+                    imageVector = Icons.Filled.ArrowDropUp,
+                    contentDescription = ""
                 )
-
-                IconButton(
-                    onClick = onExpand
-                ) {
-                    Icon(
-                        modifier = Modifier.graphicsLayer(
-                            rotationZ = rotation
-                        ),
-                        imageVector = Icons.Filled.ArrowDropUp,
-                        contentDescription = ""
-                    )
-                }
             }
+        }
 
-            AnimatedVisibility(isExpanded) {
-                Column {
+        AnimatedVisibility(isExpanded) {
+            Column {
 
-                    TextField(
-                        value = text,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        onValueChange = { updated ->
-                            onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
-                        })
+                TextField(
+                    value = text,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    onValueChange = { updated ->
+                        onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
+                    })
 
-                    Text(
-                        text = text.length.toString(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        textAlign = TextAlign.End,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                Text(
+                    text = text.length.toString(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
+
 }
 
 @Preview(name = "Card details light mode")
