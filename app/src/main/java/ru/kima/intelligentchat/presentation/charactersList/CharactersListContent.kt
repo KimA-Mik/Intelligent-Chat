@@ -69,7 +69,7 @@ private fun CharactersList(
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
-            .padding(start = 8.dp, end = 8.dp, top = 52.dp)
+            .padding(top = 52.dp)
             .fillMaxSize(),
         contentPadding = PaddingValues(top = 32.dp, bottom = 16.dp)
     ) {
@@ -78,7 +78,7 @@ private fun CharactersList(
             CardItem(
                 card = card,
                 modifier = Modifier
-                    .padding()
+                    .padding(horizontal = 8.dp)
                     .animateItemPlacement(),
                 onAvatarClick = {
                     onEvent(CharactersListUserEvent.ShowCardAvatar(card.id))

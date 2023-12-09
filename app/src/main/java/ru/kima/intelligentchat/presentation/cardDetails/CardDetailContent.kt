@@ -18,9 +18,9 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -123,7 +123,7 @@ fun HeadArea(
         }
 
 
-        TextField(
+        OutlinedTextField(
             label = {
                 Text(text = "Name")
             },
@@ -184,26 +184,25 @@ fun GeneralInfo(
         }
 
         AnimatedVisibility(isExpanded) {
-            Column {
 
-                TextField(
-                    value = text,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    onValueChange = { updated ->
-                        onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
-                    })
-
-                Text(
-                    text = text.length.toString(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    textAlign = TextAlign.End,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            OutlinedTextField(
+                value = text,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                onValueChange = { updated ->
+                    onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
+                },
+                supportingText = {
+                    Text(
+                        text = text.length.toString(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                })
         }
     }
 

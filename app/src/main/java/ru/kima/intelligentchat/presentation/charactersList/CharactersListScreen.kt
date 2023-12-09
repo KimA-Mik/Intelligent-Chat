@@ -1,5 +1,12 @@
 package ru.kima.intelligentchat.presentation.charactersList
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -107,6 +115,7 @@ fun CharactersListScreen(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ActionButtons(
     isExpanded: Boolean,
@@ -116,20 +125,22 @@ fun ActionButtons(
     onControlButtonClick: () -> Unit
 ) {
     Column(modifier = modifier) {
-        if (isExpanded) {
+        AnimatedVisibility(isExpanded) {
             val padding = Modifier.padding(bottom = 16.dp)
-            SmallFab(
-                onClick = onImageButtonClick,
-                modifier = padding
-            ) {
-                Icon(Icons.Filled.Image, contentDescription = "From image")
-            }
+            Column {
+                SmallFab(
+                    onClick = onImageButtonClick,
+                    modifier = padding
+                ) {
+                    Icon(Icons.Filled.Image, contentDescription = "From image")
+                }
 
-            SmallFab(
-                onClick = onCreateButtonClick,
-                modifier = padding
-            ) {
-                Icon(Icons.Filled.Create, contentDescription = "Create Card")
+                SmallFab(
+                    onClick = onCreateButtonClick,
+                    modifier = padding
+                ) {
+                    Icon(Icons.Filled.Create, contentDescription = "Create Card")
+                }
             }
         }
 
@@ -137,10 +148,17 @@ fun ActionButtons(
             onClick = onControlButtonClick,
             shape = MaterialTheme.shapes.medium
         ) {
-            if (isExpanded) {
-                Icon(Icons.Filled.Close, contentDescription = "Collapse actions")
-            } else {
-                Icon(Icons.Filled.Add, contentDescription = "Expand actions")
+            AnimatedContent(
+                isExpanded,
+                transitionSpec = {
+                    expandIn(expandFrom = Alignment.TopStart) togetherWith
+                            fadeOut(animationSpec = tween(100))
+                }, label = "Fab icon"
+            ) { targetState ->
+                Icon(
+                    if (targetState) Icons.Filled.Close else Icons.Filled.Add,
+                    contentDescription = null,
+                )
             }
         }
     }
