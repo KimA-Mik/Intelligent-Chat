@@ -9,4 +9,5 @@ interface CharacterCardRepository {
     suspend fun putCharacterCard(characterCard: CharacterCard): Long
     suspend fun putCharacterCardFromJson(serialized: String): Long
     suspend fun updateCharacterCard(characterCard: CharacterCard)
+    suspend fun deleteCard(cardId: Long)
 }

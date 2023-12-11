@@ -8,4 +8,6 @@ sealed interface CardDetailUserEvent {
     data object SaveCard : CardDetailUserEvent
     data class FieldUpdate(val field: CardDetailsViewModel.CardField, val updatedString: String) :
         CardDetailUserEvent
+
+    data object DeleteCard : CardDetailUserEvent
 }

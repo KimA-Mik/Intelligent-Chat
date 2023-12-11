@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
+import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
@@ -25,7 +26,8 @@ class CardDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val getCard: GetCardUseCase,
     private val updateCardAvatar: UpdateCardAvatarUseCase,
-    private val updateCard: UpdateCardUseCase
+    private val updateCard: UpdateCardUseCase,
+    private val deleteCard: DeleteCardUseCase
 ) : ViewModel() {
     private val cardId = savedStateHandle.getStateFlow(CardField.Id.string, 0L)
     private val photoBytes = MutableStateFlow<Bitmap?>(null)
@@ -107,6 +109,7 @@ class CardDetailsViewModel(
             CardDetailUserEvent.SelectImageClicked -> onSelectImageClicked()
             is CardDetailUserEvent.UpdateCardImage -> onUpdateCardImage(event.bytes)
             CardDetailUserEvent.SaveCard -> onSaveCard()
+            CardDetailUserEvent.DeleteCard -> onDeleteCard()
         }
     }
 
@@ -175,6 +178,13 @@ class CardDetailsViewModel(
                     is Resource.Success -> _uiEvents.emit(UiEvent.SnackbarMessage("The card has been saved"))
                 }
             }.launchIn(viewModelScope)
+        }
+    }
+
+    private fun onDeleteCard() {
+        viewModelScope.launch {
+            deleteCard(state.value.card)
+            _uiEvents.emit(UiEvent.PopBack)
         }
     }
 

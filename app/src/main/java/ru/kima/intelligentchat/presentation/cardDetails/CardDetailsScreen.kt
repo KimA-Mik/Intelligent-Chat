@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -95,6 +96,8 @@ fun CardDetailsScreen(
                         )
                     }
                 }
+
+                UiEvent.PopBack -> navController.popBackStack()
             }
         }
     }
@@ -120,9 +123,17 @@ fun CardDetailsScreen(
                     }
                 },
                 actions = {
+                    //TODO: Implement proper menu
                     IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.SaveCard) }) {
                         Icon(
                             imageVector = Icons.Filled.Save,
+                            contentDescription = "Save card",
+                        )
+                    }
+                    //TODO: implement confirmation dialog
+                    IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.DeleteCard) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
                             contentDescription = "Save card",
                         )
                     }

@@ -52,4 +52,8 @@ class CharacterCardRepositoryImpl(
         val entity = CharacterCardEntity.fromCharacterCard(characterCard)
         database.characterCardDao().updateCharacterCard(entity)
     }
+
+    override suspend fun deleteCard(cardId: Long) {
+        database.characterCardDao().deleteCharacterCardById(cardId)
+    }
 }
