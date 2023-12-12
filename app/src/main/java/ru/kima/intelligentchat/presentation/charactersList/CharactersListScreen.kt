@@ -41,7 +41,7 @@ import ru.kima.intelligentchat.presentation.charactersList.events.CharactersList
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.navigation.navigateToCard
-import ru.kima.intelligentchat.presentation.navigation.navigateToImage
+import ru.kima.intelligentchat.presentation.navigation.navigateToCardImage
 
 @Composable
 fun CharactersListScreen(
@@ -72,8 +72,8 @@ fun CharactersListScreen(
                 CharactersListUiEvent.SelectPngImage ->
                     imagePicker.pickImage("image/png")
 
-                is CharactersListUiEvent.ShowImage ->
-                    navController.navigateToImage(event.imageName)
+                is CharactersListUiEvent.ShowCardImage ->
+                    navController.navigateToCardImage(event.cardId)
 
                 CharactersListUiEvent.NoCardPhoto -> scope.launch {
                     snackbarHostState.showSnackbar(content.getString(R.string.no_card_photo))

@@ -18,10 +18,10 @@ fun ChatNavHost(
 ) {
     NavHost(navController = navController, startDestination = "cardsScreen") {
         cardGraph(navController, snackbarHostState)
-        composable(route = "image/{imageName}", arguments = listOf(
-            navArgument(name = "imageName") {
-                type = NavType.StringType
-                defaultValue = String()
+        composable(route = "image/{cardId}", arguments = listOf(
+            navArgument(name = "cardId") {
+                type = NavType.LongType
+                defaultValue = -1L
             }
         )) {
             ShowImageScreen(navController, snackbarHostState, koinViewModel())
@@ -32,5 +32,8 @@ fun ChatNavHost(
 fun NavHostController.navigateSingleTopTo(route: String) =
     this.navigate(route) { launchSingleTop = true }
 
-fun NavController.navigateToImage(imageName: String) =
-    this.navigate("image/${imageName}")
+//fun NavController.navigateToImage(imageName: String) =
+//    this.navigate("image/${imageName}")
+
+fun NavController.navigateToCardImage(cardId: Long) =
+    this.navigate("image/${cardId}")

@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.showImage
 
+import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,37 +12,46 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
-import ru.kima.intelligentchat.domain.image.useCase.GetImageUseCase
+import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 
 class ShowImageViewModel(
     savedStateHandle: SavedStateHandle,
-    getImage: GetImageUseCase
+    private val getCard: GetCardUseCase
 ) : ViewModel() {
-    private val _imageByteArray = MutableStateFlow(byteArrayOf())
-    val imageByteArray = _imageByteArray.asStateFlow()
+    private val _imageBitmap = MutableStateFlow<Bitmap?>(null)
+    val imageBitmap = _imageBitmap.asStateFlow()
 
     private val _uiEvents = MutableSharedFlow<UiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
 
     init {
-        val imageName = savedStateHandle.get<String>("imageName")
-        if (imageName.isNullOrBlank()) {
-            onLoadError("There are no image")
-        } else {
-            getImage(imageName).onEach { resource ->
-                when (resource) {
-                    is Resource.Error -> onLoadError(resource.message!!)
-                    is Resource.Loading -> {}
-                    is Resource.Success -> _imageByteArray.value = resource.data!!
-                }
-            }.launchIn(viewModelScope)
+        val cardId = savedStateHandle.get<Long>("cardId")
+        if (cardId != null && cardId > 0) {
+            loadImageFromCard(cardId)
         }
     }
 
     fun onEvent(event: UserEvent) {
         when (event) {
-            UserEvent.onCloseClicked -> onCloseClicked()
+            UserEvent.OnCloseClicked -> onCloseClicked()
         }
+    }
+
+    private fun loadImageFromCard(cardId: Long) {
+        getCard(cardId).onEach {
+            when (it) {
+                is Resource.Error -> onLoadError(it.message!!)
+                is Resource.Loading -> {}
+                is Resource.Success -> {
+                    val card = it.data!!
+                    if (card.photoBytes == null) {
+                        onLoadError("No image")
+                    } else {
+                        _imageBitmap.value = card.photoBytes!!
+                    }
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun onLoadError(message: String) = viewModelScope.launch {
@@ -59,6 +69,6 @@ class ShowImageViewModel(
     }
 
     sealed interface UserEvent {
-        data object onCloseClicked : UserEvent
+        data object OnCloseClicked : UserEvent
     }
 }

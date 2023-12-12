@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import ru.kima.intelligentchat.data.CHARACTERS_TABLE_NAME
+import ru.kima.intelligentchat.data.card.util.getCardPhotoName
 import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 
@@ -66,7 +67,7 @@ data class CharacterCardEntity(
         fun fromCharacterCard(card: CharacterCard): CharacterCardEntity {
             return CharacterCardEntity(
                 id = card.id,
-                photoFilePath = card.photoBytes?.let { "avatar-${card.id}.png" },
+                photoFilePath = card.photoBytes?.let { getCardPhotoName(card) },
                 name = card.name,
                 description = card.description,
                 personality = card.personality,

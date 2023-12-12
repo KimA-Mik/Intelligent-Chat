@@ -17,7 +17,6 @@ import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
-import ru.kima.intelligentchat.domain.card.util.getCardPhotoName
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
 
@@ -109,7 +108,6 @@ class CharactersListViewModel(
             return@launch
         }
 
-        val photoName = getCardPhotoName(card)
-        _uiEvents.emit(CharactersListUiEvent.ShowImage(photoName))
+        _uiEvents.emit(CharactersListUiEvent.ShowCardImage(cardId))
     }
 }

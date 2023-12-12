@@ -1,6 +1,6 @@
 package ru.kima.intelligentchat.presentation.showImage
 
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateFloatAsState
@@ -40,7 +40,7 @@ fun ShowImageScreen(
     snackbarHostState: SnackbarHostState,
     viewModel: ShowImageViewModel
 ) {
-    val imageBytes by viewModel.imageByteArray.collectAsState()
+    val imageBitmap by viewModel.imageBitmap.collectAsState()
     LaunchedEffect(true) {
         viewModel.uiEvents.collect { event ->
             when (event) {
@@ -51,10 +51,10 @@ fun ShowImageScreen(
     }
 
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { contentPadding ->
-        if (imageBytes.isNotEmpty()) {
+        if (imageBitmap != null) {
             ShowImageContent(
                 Modifier.padding(contentPadding),
-                image = imageBytes,
+                bitmap = imageBitmap!!,
                 onEvent = viewModel::onEvent
             )
         }
@@ -64,7 +64,7 @@ fun ShowImageScreen(
 @Composable
 fun ShowImageContent(
     modifier: Modifier,
-    image: ByteArray,
+    bitmap: Bitmap,
     onEvent: (ShowImageViewModel.UserEvent) -> Unit
 ) {
     val config = LocalConfiguration.current
@@ -72,11 +72,8 @@ fun ShowImageContent(
     val screenHeight = config.screenHeightDp.toFloat()
     val screenWidth = config.screenWidthDp.toFloat()
 
-    val bitmapImage = remember(image) {
-        BitmapFactory.decodeByteArray(image, 0, image.size).asImageBitmap()
-    }
-
-    val imageHeight = remember(bitmapImage) { bitmapImage.height.toFloat() }
+    val imageHeight = remember(bitmap) { bitmap.height.toFloat() }
+    val imageBitmap = remember(bitmap) { bitmap.asImageBitmap() }
 
     Box(modifier = modifier) {
         var scale by remember { mutableFloatStateOf(1f) }
@@ -137,7 +134,7 @@ fun ShowImageContent(
         }
 
         Image(
-            bitmap = bitmapImage, contentDescription = "This is an image",
+            bitmap = imageBitmap, contentDescription = "This is an image",
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
                 .fillMaxSize()
@@ -156,7 +153,7 @@ fun ShowImageContent(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(16.dp),
-            onClick = { onEvent(ShowImageViewModel.UserEvent.onCloseClicked) }) {
+            onClick = { onEvent(ShowImageViewModel.UserEvent.OnCloseClicked) }) {
             Icon(imageVector = Icons.Filled.Close, contentDescription = "Close")
         }
     }

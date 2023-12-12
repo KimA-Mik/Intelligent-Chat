@@ -10,4 +10,5 @@ interface CharacterCardRepository {
     suspend fun putCharacterCardFromJson(serialized: String): Long
     suspend fun updateCharacterCard(characterCard: CharacterCard)
     suspend fun deleteCard(cardId: Long)
+    suspend fun updateCardAvatar(card: CharacterCard, bytes: ByteArray): CharacterCard
 }
