@@ -1,15 +1,12 @@
 package ru.kima.intelligentchat.presentation.cardDetails
 
-import android.Manifest
-import android.os.Build
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,14 +22,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
+import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,40 +53,12 @@ fun CardDetailsScreen(
         viewModel.onEvent(CardDetailUserEvent.UpdateCardImage(imageBytes))
     }
 
+    var deleteCardDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
-    val actualPhotoPermission = remember {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-    }
-
-
-    val askForPermission = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { permissionGranted ->
-        if (permissionGranted) {
-            imagePicker.pickImage()
-        }
-    }
-    val imagePickerCheck = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            imagePicker.pickImage()
-        } else {
-            askForPermission.launch(actualPhotoPermission)
-        }
-    }
-
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collect { uiEvent ->
             when (uiEvent) {
                 UiEvent.SelectImage -> {
-//                    imagePicker.launch("image/*")
-//                    imagePickerCheck.launch(actualPhotoPermission)
                     imagePicker.pickImage()
                 }
 
@@ -98,8 +72,24 @@ fun CardDetailsScreen(
                 }
 
                 UiEvent.PopBack -> navController.popBackStack()
+                UiEvent.ShowDeleteDialog -> deleteCardDialog = true
             }
         }
+    }
+
+    when {
+        deleteCardDialog -> SimpleAlertDialog(
+            onConfirm = {
+                deleteCardDialog = false
+                viewModel.onEvent(CardDetailUserEvent.DeleteCard)
+            },
+            onDismiss = { deleteCardDialog = false },
+            title = stringResource(R.string.delete_card_dialog_title),
+            text = stringResource(R.string.delete_card_dialog_text),
+            icon = Icons.Filled.DeleteForever,
+            confirmText = stringResource(R.string.delete_button_text),
+            dismissText = stringResource(R.string.cancel_button_text)
+        )
     }
 
     val scrollBehavior =
@@ -123,17 +113,17 @@ fun CardDetailsScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.DeleteCardClicked) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Save card",
+                        )
+                    }
+
                     //TODO: Implement proper menu
                     IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.SaveCard) }) {
                         Icon(
                             imageVector = Icons.Filled.Save,
-                            contentDescription = "Save card",
-                        )
-                    }
-                    //TODO: implement confirmation dialog
-                    IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.DeleteCard) }) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
                             contentDescription = "Save card",
                         )
                     }

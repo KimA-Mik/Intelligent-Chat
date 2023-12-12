@@ -109,6 +109,7 @@ class CardDetailsViewModel(
             CardDetailUserEvent.SelectImageClicked -> onSelectImageClicked()
             is CardDetailUserEvent.UpdateCardImage -> onUpdateCardImage(event.bytes)
             CardDetailUserEvent.SaveCard -> onSaveCard()
+            CardDetailUserEvent.DeleteCardClicked -> onDeleteCardClicked()
             CardDetailUserEvent.DeleteCard -> onDeleteCard()
         }
     }
@@ -178,6 +179,12 @@ class CardDetailsViewModel(
                     is Resource.Success -> _uiEvents.emit(UiEvent.SnackbarMessage("The card has been saved"))
                 }
             }.launchIn(viewModelScope)
+        }
+    }
+
+    private fun onDeleteCardClicked() {
+        viewModelScope.launch {
+            _uiEvents.emit(UiEvent.ShowDeleteDialog)
         }
     }
 
