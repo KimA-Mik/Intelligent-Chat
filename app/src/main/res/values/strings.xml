@@ -7,4 +7,8 @@
     <string name="delete_card_dialog_text">The card will be permanently removed from your device.</string>
     <string name="delete_button_text">Delete</string>
     <string name="cancel_button_text">Cancel</string>
+    <string name="confirm_button_text">Confirm</string>
+    <string name="decide_later_button_text">Decide later</string>
+    <string name="default_name_message">You will be known as "User".</string>
+    <string name="introduce_first_persona">Please introduce your first persona.</string>
 </resources>

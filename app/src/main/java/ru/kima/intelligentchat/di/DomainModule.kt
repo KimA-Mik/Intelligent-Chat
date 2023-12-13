@@ -1,9 +1,9 @@
 package ru.kima.intelligentchat.di
 
-import android.content.Context
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
+import ru.kima.intelligentchat.data.persona.PersonaRepositoryImpl
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
@@ -12,9 +12,13 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
+import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
+import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
 
-fun domain(context: Context) = module {
-    single<CharacterCardRepository> { CharacterCardRepositoryImpl(context, get(), get()) }
+fun domain() = module {
+    single<CharacterCardRepository> { CharacterCardRepositoryImpl(get(), get(), get()) }
+    single<PersonaRepository> { PersonaRepositoryImpl(get(), get()) }
 
     singleOf(::GetCardUseCase)
     singleOf(::GetCardsUseCase)
@@ -23,4 +27,7 @@ fun domain(context: Context) = module {
     singleOf(::AddCardFromPngUseCase)
     singleOf(::UpdateCardUseCase)
     singleOf(::DeleteCardUseCase)
+
+    singleOf(::CreatePersonaUseCase)
+    singleOf(::GetPersonaUseCase)
 }

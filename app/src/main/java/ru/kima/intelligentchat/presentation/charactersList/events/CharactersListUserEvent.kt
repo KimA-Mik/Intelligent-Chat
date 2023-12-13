@@ -20,4 +20,8 @@ sealed interface CharactersListUserEvent {
             return imageBytes.contentHashCode()
         }
     }
+
+    data class InitDialogValueChanged(val newValue: String) : CharactersListUserEvent
+    data object AcceptInitialPersonaName : CharactersListUserEvent
+    data object DismissInitialPersonaName : CharactersListUserEvent
 }

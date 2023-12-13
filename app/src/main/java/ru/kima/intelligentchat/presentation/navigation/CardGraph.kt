@@ -17,7 +17,7 @@ fun NavGraphBuilder.cardGraph(navController: NavController, snackbarHostState: S
     navigation(startDestination = "cards", route = "cardsScreen") {
         composable("cards") {
             CharactersListScreen(
-                navController, snackbarHostState, koinInject(), koinViewModel()
+                navController, snackbarHostState, koinInject(), koinInject(), koinViewModel()
             )
         }
         composable(

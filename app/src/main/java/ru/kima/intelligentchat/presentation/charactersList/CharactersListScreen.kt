@@ -2,26 +2,34 @@ package ru.kima.intelligentchat.presentation.charactersList
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,10 +41,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.core.preferences.PreferencesHandler
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
@@ -47,6 +59,7 @@ import ru.kima.intelligentchat.presentation.navigation.navigateToCardImage
 fun CharactersListScreen(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
+    preferencesHandler: PreferencesHandler,
     imagePicker: ImagePicker,
     viewModel: CharactersListViewModel
 ) {
@@ -75,15 +88,29 @@ fun CharactersListScreen(
                 is CharactersListUiEvent.ShowCardImage ->
                     navController.navigateToCardImage(event.cardId)
 
-                CharactersListUiEvent.NoCardPhoto -> scope.launch {
-                    snackbarHostState.showSnackbar(content.getString(R.string.no_card_photo))
-                }
+                is CharactersListUiEvent.Message ->
+                    snackbarHostState.showSnackbar(content.getString(event.messageId))
 
-                CharactersListUiEvent.NoSuchCard -> scope.launch {
-                    snackbarHostState.showSnackbar(content.getString(R.string.no_such_card))
+                is CharactersListUiEvent.SelectPersona -> preferencesHandler.updateData {
+                    it.copy(selectedPersonaId = event.id)
                 }
             }
         }
+    }
+
+    when {
+        state.initialDialog -> InitPersonaDialog(
+            text = state.initialDialogText,
+            onDismissRequest = { viewModel.onUserEvent(CharactersListUserEvent.DismissInitialPersonaName) },
+            onAcceptDialog = { viewModel.onUserEvent(CharactersListUserEvent.AcceptInitialPersonaName) },
+            onTextChanged = { text ->
+                viewModel.onUserEvent(
+                    CharactersListUserEvent.InitDialogValueChanged(
+                        text
+                    )
+                )
+            }
+        )
     }
 
 
@@ -93,7 +120,8 @@ fun CharactersListScreen(
 
     Scaffold(
         floatingActionButton = {
-            ActionButtons(isExpanded,
+            ActionButtons(
+                isExpanded,
                 onImageButtonClick = {
                     viewModel.onUserEvent(CharactersListUserEvent.AddCardFromImageClicked)
                 },
@@ -111,11 +139,9 @@ fun CharactersListScreen(
                 .padding(paddingValues),
             state = state, onEvent = viewModel::onUserEvent
         )
-
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ActionButtons(
     isExpanded: Boolean,
@@ -179,4 +205,52 @@ fun SmallFab(
         contentColor = MaterialTheme.colorScheme.onSurface,
         content = content
     )
+}
+
+@Composable
+fun InitPersonaDialog(
+    text: String,
+    onDismissRequest: () -> Unit,
+    onAcceptDialog: () -> Unit,
+    onTextChanged: (String) -> Unit,
+) {
+    Dialog(onDismissRequest = {}) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(210.dp)
+                .padding(8.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                verticalArrangement = Arrangement.SpaceAround,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.introduce_first_persona),
+                    textAlign = TextAlign.Center,
+                )
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = text,
+                    onValueChange = onTextChanged,
+                    label = { Text(text = "{{user}}") },
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismissRequest) {
+                        Text(text = stringResource(R.string.decide_later_button_text))
+                    }
+
+                    TextButton(onClick = onAcceptDialog) {
+                        Text(text = stringResource(R.string.confirm_button_text))
+                    }
+                }
+            }
+        }
+    }
 }
