@@ -7,6 +7,6 @@ class DeleteCardUseCase(
     private val characterRepository: CharacterCardRepository,
 ) {
     suspend operator fun invoke(card: CharacterCard) {
-        characterRepository.deleteCard(card.id)
+        characterRepository.deleteCard(card)
     }
 }

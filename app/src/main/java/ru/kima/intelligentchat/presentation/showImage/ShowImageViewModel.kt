@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 
 class ShowImageViewModel(
@@ -38,18 +37,11 @@ class ShowImageViewModel(
     }
 
     private fun loadImageFromCard(cardId: Long) {
-        getCard(cardId).onEach {
-            when (it) {
-                is Resource.Error -> onLoadError(it.message!!)
-                is Resource.Loading -> {}
-                is Resource.Success -> {
-                    val card = it.data!!
-                    if (card.photoBytes == null) {
-                        onLoadError("No image")
-                    } else {
-                        _imageBitmap.value = card.photoBytes!!
-                    }
-                }
+        getCard(cardId).onEach { card ->
+            if (card.photoBytes == null) {
+                onLoadError("No image")
+            } else {
+                _imageBitmap.value = card.photoBytes!!
             }
         }.launchIn(viewModelScope)
     }

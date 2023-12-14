@@ -67,7 +67,7 @@ data class CharacterCardEntity(
         fun fromCharacterCard(card: CharacterCard): CharacterCardEntity {
             return CharacterCardEntity(
                 id = card.id,
-                photoFilePath = card.photoBytes?.let { getCardPhotoName(card) },
+                photoFilePath = card.photoBytes?.let { getCardPhotoName(card.id) },
                 name = card.name,
                 description = card.description,
                 personality = card.personality,

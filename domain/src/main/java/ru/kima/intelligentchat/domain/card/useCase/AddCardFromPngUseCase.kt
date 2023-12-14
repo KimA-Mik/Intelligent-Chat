@@ -15,8 +15,8 @@ class AddCardFromPngUseCase(
             val parser = PngBlockParser()
             val data = parser.getTextBlock(imageBytes)
             val id = characterRepository.putCharacterCardFromJson(data)
-            val newCard = characterRepository.getCharacterCard(id)
-            updatePhoto(newCard, imageBytes)
+            updatePhoto(id, imageBytes)
+            emit(Resource.Success(id))
         }
         //TODO: Improve error handling
         catch (e: Exception) {

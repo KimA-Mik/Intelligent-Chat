@@ -29,8 +29,10 @@ class CharacterCardRepositoryImpl(
             }
         }
 
-    override suspend fun getCharacterCard(id: Long) =
-        cardDao.selectCharacterCard(id).toCharacterCard(imageStorage)
+    override fun getCharacterCard(id: Long) =
+        cardDao.selectCharacterCard(id).map {
+            it.toCharacterCard(imageStorage)
+        }
 
     override suspend fun putCharacterCard(characterCard: CharacterCard): Long {
         val entity = CharacterCardEntity.fromCharacterCard(characterCard)
@@ -47,25 +49,26 @@ class CharacterCardRepositoryImpl(
         cardDao.updateCharacterCard(entity)
     }
 
-    override suspend fun deleteCard(cardId: Long) {
-        cardDao.deleteCharacterCardById(cardId)
+    override suspend fun deleteCard(card: CharacterCard) {
+        val entity = CharacterCardEntity.fromCharacterCard(card)
+        entity.photoFilePath?.let {
+            imageStorage.deleteImage(it)
+        }
+        cardDao.deleteCharacterCardById(entity.id)
     }
 
-    override suspend fun updateCardAvatar(card: CharacterCard, bytes: ByteArray): CharacterCard {
-        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return card
+    override suspend fun updateCardAvatar(cardId: Long, bytes: ByteArray) {
+        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return
 
-        val fileName = getCardPhotoName(card)
+        val fileName = getCardPhotoName(cardId)
 
         val outputStream = ByteArrayOutputStream()
         if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
-            return card
+            return
         }
 
         val photoBytes = outputStream.toByteArray()
-        val photo = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)
         imageStorage.saveImage(fileName, photoBytes)
-        val newCard = card.copy(photoBytes = photo)
-        updateCharacterCard(newCard)
-        return newCard
+        cardDao.updatePhotoFilePath(cardId, fileName)
     }
 }

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -92,6 +93,8 @@ class CardDetailsViewModel(
     private val _uiEvents = MutableSharedFlow<UiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
 
+    private var cardJob: Job? = null
+
     init {
         val isLoaded = savedStateHandle.get<Boolean>("isLoaded")
 
@@ -115,30 +118,22 @@ class CardDetailsViewModel(
     }
 
     private fun loadCard(id: Long) {
-        getCard(id).onEach { resource ->
-            when (resource) {
-                is Resource.Error -> {}
-                is Resource.Loading -> {}
-                is Resource.Success -> {
-                    val card = resource.data!!
-
-                    savedStateHandle[CardField.Name.string] = card.name
-                    photoBytes.value = card.photoBytes
-                    savedStateHandle[CardField.Description.string] = card.description
-                    savedStateHandle[CardField.Personality.string] = card.personality
-                    savedStateHandle[CardField.Scenario.string] = card.scenario
-                    savedStateHandle[CardField.FirstMes.string] = card.firstMes
-                    savedStateHandle[CardField.MesExample.string] = card.mesExample
-                    savedStateHandle[CardField.CreatorNotes.string] = card.creatorNotes
-                    savedStateHandle[CardField.SystemPrompt.string] = card.systemPrompt
-                    savedStateHandle[CardField.PostHistoryInstructions.string] =
-                        card.postHistoryInstructions
-                    savedStateHandle[CardField.AlternateGreetings.string] = card.alternateGreetings
-                    savedStateHandle[CardField.Tags.string] = card.tags
-                    savedStateHandle[CardField.Creator.string] = card.creator
-                    savedStateHandle[CardField.CharacterVersion.string] = card.characterVersion
-                }
-            }
+        cardJob = getCard(id).onEach { card ->
+            savedStateHandle[CardField.Name.string] = card.name
+            photoBytes.value = card.photoBytes
+            savedStateHandle[CardField.Description.string] = card.description
+            savedStateHandle[CardField.Personality.string] = card.personality
+            savedStateHandle[CardField.Scenario.string] = card.scenario
+            savedStateHandle[CardField.FirstMes.string] = card.firstMes
+            savedStateHandle[CardField.MesExample.string] = card.mesExample
+            savedStateHandle[CardField.CreatorNotes.string] = card.creatorNotes
+            savedStateHandle[CardField.SystemPrompt.string] = card.systemPrompt
+            savedStateHandle[CardField.PostHistoryInstructions.string] =
+                card.postHistoryInstructions
+            savedStateHandle[CardField.AlternateGreetings.string] = card.alternateGreetings
+            savedStateHandle[CardField.Tags.string] = card.tags
+            savedStateHandle[CardField.Creator.string] = card.creator
+            savedStateHandle[CardField.CharacterVersion.string] = card.characterVersion
         }.launchIn(viewModelScope)
     }
 
@@ -148,21 +143,9 @@ class CardDetailsViewModel(
         }
     }
 
-    private fun onUpdateCardImage(bytes: ByteArray) {
+    private fun onUpdateCardImage(bytes: ByteArray) = viewModelScope.launch {
         if (bytes.isNotEmpty()) {
-            updateCardAvatar(state.value.card, bytes).onEach { resource ->
-                when (resource) {
-                    is Resource.Error -> {
-                        _uiEvents.emit(UiEvent.SnackbarMessage(resource.message!!))
-                    }
-
-                    is Resource.Loading -> {}
-                    is Resource.Success -> {
-                        photoBytes.value = resource.data?.photoBytes
-                    }
-                }
-
-            }.launchIn(viewModelScope)
+            updateCardAvatar(state.value.card.id, bytes)
         }
     }
 
@@ -190,8 +173,9 @@ class CardDetailsViewModel(
 
     private fun onDeleteCard() {
         viewModelScope.launch {
-            deleteCard(state.value.card)
+            cardJob?.cancel()
             _uiEvents.emit(UiEvent.PopBack)
+            deleteCard(state.value.card)
         }
     }
 

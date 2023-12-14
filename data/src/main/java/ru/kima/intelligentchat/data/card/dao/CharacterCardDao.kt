@@ -16,11 +16,14 @@ interface CharacterCardDao {
     @Update
     suspend fun updateCharacterCard(characterCard: CharacterCardEntity)
 
+    @Query("UPDATE $CHARACTERS_TABLE_NAME SET photoFilePath=:photoFilePath WHERE id = :id")
+    suspend fun updatePhotoFilePath(id: Long, photoFilePath: String)
+
     @Query("SELECT * FROM $CHARACTERS_TABLE_NAME")
     fun selectCharacterCards(): Flow<List<CharacterCardEntity>>
 
     @Query("SELECT * FROM $CHARACTERS_TABLE_NAME WHERE id = :id")
-    suspend fun selectCharacterCard(id: Long): CharacterCardEntity
+    fun selectCharacterCard(id: Long): Flow<CharacterCardEntity>
 
     @Query("DELETE FROM $CHARACTERS_TABLE_NAME WHERE id = :id")
     suspend fun deleteCharacterCardById(id: Long)
