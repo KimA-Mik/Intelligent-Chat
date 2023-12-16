@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.cardDetails
+package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
@@ -20,8 +20,8 @@ import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
-import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
-import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
 
 class CardDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,

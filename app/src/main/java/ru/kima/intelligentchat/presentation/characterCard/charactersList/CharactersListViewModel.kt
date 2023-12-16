@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.charactersList
+package ru.kima.intelligentchat.presentation.characterCard.charactersList
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -22,8 +22,8 @@ import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
-import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUiEvent
-import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
+import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 
 class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -86,6 +86,7 @@ class CharactersListViewModel(
             is CharactersListUserEvent.InitDialogValueChanged -> onInitDialogValueChanged(event.newValue)
             CharactersListUserEvent.AcceptInitialPersonaName -> onAcceptInitialPersonaName()
             CharactersListUserEvent.DismissInitialPersonaName -> onDismissInitialPersonaName()
+            CharactersListUserEvent.OnMenuButtonClicked -> onMenuButtonClicked()
         }
     }
 
@@ -174,5 +175,9 @@ class CharactersListViewModel(
         val persona = Persona(name = personaName)
         val id = createPersona(persona)
         _uiEvents.emit(CharactersListUiEvent.SelectPersona(id))
+    }
+
+    private fun onMenuButtonClicked() = viewModelScope.launch {
+        _uiEvents.emit(CharactersListUiEvent.OpenNavigationDrawer)
     }
 }

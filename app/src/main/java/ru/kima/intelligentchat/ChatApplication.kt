@@ -8,8 +8,8 @@ import org.koin.dsl.module
 import ru.kima.intelligentchat.core.preferences.PreferencesHandler
 import ru.kima.intelligentchat.di.data
 import ru.kima.intelligentchat.di.domain
-import ru.kima.intelligentchat.presentation.cardDetails.CardDetailsViewModel
-import ru.kima.intelligentchat.presentation.charactersList.CharactersListViewModel
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsViewModel
+import ru.kima.intelligentchat.presentation.characterCard.charactersList.CharactersListViewModel
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.showImage.ShowImageViewModel
 

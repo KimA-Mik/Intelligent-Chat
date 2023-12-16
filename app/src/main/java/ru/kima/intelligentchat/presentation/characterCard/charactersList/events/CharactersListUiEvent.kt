@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.charactersList.events
+package ru.kima.intelligentchat.presentation.characterCard.charactersList.events
 
 import ru.kima.intelligentchat.R
 
@@ -14,4 +14,6 @@ sealed interface CharactersListUiEvent {
         NoCardPhoto(R.string.no_card_photo),
         DefaultPersonaInit(R.string.default_name_message)
     }
+
+    data object OpenNavigationDrawer : CharactersListUiEvent
 }

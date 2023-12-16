@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.charactersList.events
+package ru.kima.intelligentchat.presentation.characterCard.charactersList.events
 
 sealed interface CharactersListUserEvent {
     data class CardSelected(val cardId: Long) : CharactersListUserEvent
@@ -24,4 +24,5 @@ sealed interface CharactersListUserEvent {
     data class InitDialogValueChanged(val newValue: String) : CharactersListUserEvent
     data object AcceptInitialPersonaName : CharactersListUserEvent
     data object DismissInitialPersonaName : CharactersListUserEvent
+    data object OnMenuButtonClicked : CharactersListUserEvent
 }

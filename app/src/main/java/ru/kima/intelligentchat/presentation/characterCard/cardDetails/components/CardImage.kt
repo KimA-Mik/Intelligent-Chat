@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.cardDetails.components
+package ru.kima.intelligentchat.presentation.characterCard.cardDetails.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.Bitmap

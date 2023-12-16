@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.cardDetails
+package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 

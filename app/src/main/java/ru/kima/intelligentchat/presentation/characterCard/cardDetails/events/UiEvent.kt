@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.cardDetails.events
+package ru.kima.intelligentchat.presentation.characterCard.cardDetails.events
 
 sealed interface UiEvent {
     data object SelectImage : UiEvent

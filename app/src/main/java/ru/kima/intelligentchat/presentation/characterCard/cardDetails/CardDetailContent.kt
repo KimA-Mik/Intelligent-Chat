@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.cardDetails
+package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -33,8 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
-import ru.kima.intelligentchat.presentation.cardDetails.components.CardImage
-import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable

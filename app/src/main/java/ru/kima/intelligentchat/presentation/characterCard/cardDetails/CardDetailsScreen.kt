@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.cardDetails
+package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,8 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.presentation.cardDetails.events.CardDetailUserEvent
-import ru.kima.intelligentchat.presentation.cardDetails.events.UiEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 

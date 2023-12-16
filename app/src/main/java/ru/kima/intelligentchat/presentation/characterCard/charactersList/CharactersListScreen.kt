@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.charactersList
+package ru.kima.intelligentchat.presentation.characterCard.charactersList
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Card
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -49,16 +50,17 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.core.preferences.PreferencesHandler
-import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUiEvent
-import ru.kima.intelligentchat.presentation.charactersList.events.CharactersListUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
+import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
-import ru.kima.intelligentchat.presentation.navigation.navigateToCard
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCard
 import ru.kima.intelligentchat.presentation.navigation.navigateToCardImage
 
 @Composable
 fun CharactersListScreen(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
+    drawerState: DrawerState,
     preferencesHandler: PreferencesHandler,
     imagePicker: ImagePicker,
     viewModel: CharactersListViewModel
@@ -93,6 +95,10 @@ fun CharactersListScreen(
 
                 is CharactersListUiEvent.SelectPersona -> preferencesHandler.updateData {
                     it.copy(selectedPersonaId = event.id)
+                }
+
+                CharactersListUiEvent.OpenNavigationDrawer -> scope.launch {
+                    drawerState.open()
                 }
             }
         }
