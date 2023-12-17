@@ -1,29 +1,29 @@
-package ru.kima.intelligentchat.domain.card.model
+package ru.kima.intelligentchat.data.card.entities
 
-import android.graphics.Bitmap
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 
-data class CharacterCard(
-    val id: Long = 0,
-
-    val photoBytes: Bitmap? = null,
-
+@Entity
+data class CharacterEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L,
+    val photoFilePath: String? = null,
     val name: String = String(),
     val description: String = String(),
     val personality: String = String(),
     val scenario: String = String(),
     val firstMes: String = String(),
     val mesExample: String = String(),
-
-    // New fields start here
     val creatorNotes: String = String(),
     val systemPrompt: String = String(),
     val postHistoryInstructions: String = String(),
-    val alternateGreetings: List<AltGreeting> = emptyList(),
-    //    val character_book?: CharacterBook
-
-    // May 8th additions
-    val tags: List<String> = emptyList(),
     val creator: String = String(),
     val characterVersion: String = String(),
 //    val extensions: Record<string, any> // see details for explanation
-)
+) {
+    //https://issuetracker.google.com/issues/70762008
+    @Ignore
+    var alternateGreetings: List<String> = emptyList()
+}
+

@@ -4,7 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
-import ru.kima.intelligentchat.data.card.entities.CharacterCardEntity
+import ru.kima.intelligentchat.data.card.entities.AltGreetingEntity
+import ru.kima.intelligentchat.data.card.entities.CardEntity
+import ru.kima.intelligentchat.data.card.mappers.toCharacterCard
+import ru.kima.intelligentchat.data.card.mappers.toEntity
 import ru.kima.intelligentchat.data.card.util.getCardPhotoName
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
@@ -35,26 +38,36 @@ class CharacterCardRepositoryImpl(
         }
 
     override suspend fun putCharacterCard(characterCard: CharacterCard): Long {
-        val entity = CharacterCardEntity.fromCharacterCard(characterCard)
-        return cardDao.insertCharacterCard(entity)
+        val entity = characterCard.toEntity()
+        return cardDao.insertTransaction(entity)
     }
 
     override suspend fun putCharacterCardFromJson(serialized: String): Long {
         val entity = jsonDeserializer.deserialize(serialized)
-        return cardDao.insertCharacterCard(entity)
+        val card = CardEntity(
+            character = entity,
+            altGreetings = entity.alternateGreetings.map {
+                AltGreetingEntity(
+                    id = 0,
+                    cardId = 0,
+                    body = it
+                )
+            }
+        )
+        return cardDao.insertTransaction(card)
     }
 
     override suspend fun updateCharacterCard(characterCard: CharacterCard) {
-        val entity = CharacterCardEntity.fromCharacterCard(characterCard)
-        cardDao.updateCharacterCard(entity)
+        val entity = characterCard.toEntity()
+        cardDao.updateTransaction(entity)
     }
 
     override suspend fun deleteCard(card: CharacterCard) {
-        val entity = CharacterCardEntity.fromCharacterCard(card)
-        entity.photoFilePath?.let {
+        val entity = card.toEntity()
+        entity.character.photoFilePath?.let {
             imageStorage.deleteImage(it)
         }
-        cardDao.deleteCharacterCardById(entity.id)
+        cardDao.deleteCharacterCardById(entity.character.id)
     }
 
     override suspend fun updateCardAvatar(cardId: Long, bytes: ByteArray) {

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
@@ -81,7 +82,7 @@ class CardDetailsViewModel(
                 creatorNotes = args[8] as String,
                 systemPrompt = args[9] as String,
                 postHistoryInstructions = args[10] as String,
-                alternateGreetings = args[11] as List<String>,
+                alternateGreetings = args[11] as List<AltGreeting>,
                 tags = args[12].let { if (it is List<*>) it.filterIsInstance<String>() else emptyList() },
                 creator = args[13] as String,
                 characterVersion = args[14] as String

@@ -2,7 +2,7 @@ package ru.kima.intelligentchat.data.serialization
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.kima.intelligentchat.data.card.entities.CharacterCardEntity
+import ru.kima.intelligentchat.data.card.entities.CharacterEntity
 
 @Serializable
 data class CardV1(
@@ -15,8 +15,8 @@ data class CardV1(
     @SerialName("mes_example")
     val mesExample: String = String(),
 ) {
-    fun toCharacterCardEntity(): CharacterCardEntity {
-        return CharacterCardEntity(
+    fun toCharacterCardEntity(): CharacterEntity {
+        return CharacterEntity(
             name = name,
             description = description,
             personality = personality,
