@@ -67,7 +67,7 @@ class CharacterCardRepositoryImpl(
         entity.character.photoFilePath?.let {
             imageStorage.deleteImage(it)
         }
-        cardDao.deleteCharacterCardById(entity.character.id)
+        cardDao.deleteTransaction(entity.character.id)
     }
 
     override suspend fun updateCardAvatar(cardId: Long, bytes: ByteArray) {
