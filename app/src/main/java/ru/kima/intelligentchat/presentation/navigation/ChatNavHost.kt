@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -43,8 +42,13 @@ fun ChatNavHost(
 
 fun NavHostController.navigateFromRoot(navBackStackEntry: NavBackStackEntry, route: String) {
     if (navBackStackEntry.lifecycleIsResumed()) {
-        popBackStack(graph.findStartDestination().id, inclusive = true)
+//        popBackStack(graph.startDestinationId, inclusive = true)
 
+        //TODO: change this shit to actual working solution
+        while (true) {
+            if (!popBackStack())
+                break
+        }
         //https://developer.android.com/jetpack/compose/navigation#bottom-nav
         //Todo: find out how to fix google example code
         navigate(route) {
