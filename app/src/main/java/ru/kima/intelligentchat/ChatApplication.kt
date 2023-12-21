@@ -11,6 +11,7 @@ import ru.kima.intelligentchat.di.domain
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsViewModel
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.CharactersListViewModel
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
+import ru.kima.intelligentchat.presentation.personas.list.PersonasListViewModel
 import ru.kima.intelligentchat.presentation.showImage.ShowImageViewModel
 
 
@@ -27,6 +28,7 @@ class ChatApplication : Application() {
             viewModelOf(::CharactersListViewModel)
             viewModelOf(::CardDetailsViewModel)
             viewModelOf(::ShowImageViewModel)
+            viewModelOf(::PersonasListViewModel)
         }
 
         startKoin {
