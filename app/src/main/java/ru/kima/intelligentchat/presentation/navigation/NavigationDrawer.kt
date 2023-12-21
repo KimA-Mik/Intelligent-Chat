@@ -11,37 +11,28 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.launch
-import ru.kima.intelligentchat.presentation.ui.MainActivityViewModel
 
 
 @Composable
 fun NavigationDrawer(
-    drawerSelected: Int,
     drawerState: DrawerState,
     navController: NavHostController,
-    navBackStackEntry: NavBackStackEntry,
-    onEvent: (MainActivityViewModel.UserEvent) -> Unit,
+//    navBackStackEntry: NavBackStackEntry,
     content: @Composable () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            NavigationDrawerContent(selectedIndex = drawerSelected,
-                onSelect = { index ->
-                    scope.launch {
-                        drawerState.close()
-                    }
-                    onEvent(MainActivityViewModel.UserEvent.SelectNavigationDrawerItem(index))
-                    val navItem = NavItem.entries[index]
-                    navController.navigateFromRoot(navBackStackEntry, navItem.root)
-                })
+            NavigationDrawerContent(drawerState = drawerState, navController = navController)
         },
         content = content
     )
@@ -49,19 +40,37 @@ fun NavigationDrawer(
 
 @Composable
 fun NavigationDrawerContent(
-    selectedIndex: Int = 0,
-    onSelect: (Int) -> Unit
-) {
+    drawerState: DrawerState,
+    navController: NavHostController,
+
+    ) {
+    val scope = rememberCoroutineScope()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
     ModalDrawerSheet {
         Spacer(modifier = Modifier.height(16.dp))
-        NavItem.entries.forEachIndexed { index, navItem ->
-            val selected = selectedIndex == index
+        NavItem.entries.forEach { navItem ->
+            val selected = currentDestination?.hierarchy?.any { it.route == navItem.root } == true
             NavigationDrawerItem(
                 label = {
                     Text(text = navItem.title)
                 },
                 selected = selected,
-                onClick = { onSelect(index) },
+                onClick = {
+                    scope.launch {
+                        drawerState.close()
+                    }
+
+                    //Example from: https://developer.android.com/jetpack/compose/navigation#bottom-nav
+                    navController.navigate(navItem.root) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 icon = {
                     Icon(
                         imageVector = if (selected) navItem.selectedIcon else navItem.unselectedIcon,

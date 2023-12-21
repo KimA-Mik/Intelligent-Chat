@@ -12,10 +12,7 @@ import ru.kima.intelligentchat.presentation.navigation.ChatNavHost
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun ApplicationScreen(
-    selected: Int,
-    onEvent: (MainActivityViewModel.UserEvent) -> Unit
-) {
+fun ApplicationScreen() {
     KoinAndroidContext {
         val navController = rememberNavController()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -23,9 +20,7 @@ fun ApplicationScreen(
         ChatNavHost(
             navController = navController,
             snackbarHostState = snackbarHostState,
-            drawerState = drawerState,
-            selected,
-            onEvent = onEvent
+            drawerState = drawerState
         )
     }
 }

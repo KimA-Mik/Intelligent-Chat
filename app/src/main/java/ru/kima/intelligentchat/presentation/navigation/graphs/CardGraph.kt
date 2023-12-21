@@ -15,24 +15,17 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetail
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.CharactersListScreen
 import ru.kima.intelligentchat.presentation.navigation.NavItem
 import ru.kima.intelligentchat.presentation.navigation.NavigationDrawer
-import ru.kima.intelligentchat.presentation.ui.MainActivityViewModel
 
 fun NavGraphBuilder.cardGraph(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
-    drawerSelected: Int,
-    onEvent: (MainActivityViewModel.UserEvent) -> Unit
 ) {
     navigation(startDestination = "cards", route = NavItem.Characters.root) {
         composable("cards") {
             NavigationDrawer(
-                drawerSelected = drawerSelected,
                 drawerState = drawerState,
                 navController = navController,
-                navBackStackEntry = it,
-                onEvent = onEvent
-
             ) {
                 CharactersListScreen(
                     navController,
