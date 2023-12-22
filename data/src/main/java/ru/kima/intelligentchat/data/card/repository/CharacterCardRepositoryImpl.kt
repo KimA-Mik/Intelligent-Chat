@@ -28,6 +28,7 @@ class CharacterCardRepositoryImpl(
     override fun getCharactersCards() =
         cardDao.selectCharacterCards().map { cards ->
             cards.map { entity ->
+                println("cardDao.selectCharacterCards().map")
                 entity.toCharacterCard(imageStorage)
             }
         }

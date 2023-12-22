@@ -15,6 +15,7 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 
 fun domain() = module {
     single<CharacterCardRepository> { CharacterCardRepositoryImpl(get(), get(), get()) }
@@ -30,4 +31,5 @@ fun domain() = module {
 
     singleOf(::CreatePersonaUseCase)
     singleOf(::GetPersonaUseCase)
+    singleOf(::GetPersonasUseCase)
 }

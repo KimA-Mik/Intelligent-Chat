@@ -1,3 +1,6 @@
 package ru.kima.intelligentchat.presentation.personas.list.events
 
-sealed interface UserEvent
+sealed interface UserEvent {
+    data class QueryChanged(val query: String) : UserEvent
+    data class NavigateToPersona(val id: Long) : UserEvent
+}
