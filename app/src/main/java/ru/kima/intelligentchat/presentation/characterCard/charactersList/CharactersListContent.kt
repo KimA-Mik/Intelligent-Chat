@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.kima.intelligentchat.domain.card.model.CharacterCard
+import ru.kima.intelligentchat.domain.card.model.CardEntry
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.components.CardItem
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -72,7 +72,7 @@ fun SearchField(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CharactersList(
-    cards: List<CharacterCard>,
+    cards: List<CardEntry>,
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
     LazyColumn(
@@ -113,10 +113,11 @@ fun CharactersListPreview() {
             modifier = Modifier.fillMaxSize()
         ) {
             val cards = List(100) { index ->
-                CharacterCard(
+                CardEntry(
                     id = index.toLong(),
                     name = "Name $index",
-                    description = "Description $index"
+                    characterVersion = "Version $index",
+                    creatorNotes = "Notes $index"
                 )
             }
             CharactersListContent(state = CharactersListState(cards)) {
@@ -124,5 +125,4 @@ fun CharactersListPreview() {
             }
         }
     }
-
 }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import ru.kima.intelligentchat.data.ALT_GREETING_TABLE_NAME
 import ru.kima.intelligentchat.data.card.entities.AltGreetingEntity
 import ru.kima.intelligentchat.data.card.entities.CardEntity
+import ru.kima.intelligentchat.data.card.entities.CardListItemEntity
 import ru.kima.intelligentchat.data.card.entities.CharacterEntity
 
 @Dao
@@ -51,6 +52,9 @@ interface CharacterCardDao {
     @Transaction
     @Query("SELECT * FROM CharacterEntity WHERE id = :id")
     fun selectCharacterCard(id: Long): Flow<CardEntity>
+
+    @Query("SELECT id, photoFilePath, name, creatorNotes, creator, characterVersion FROM CharacterEntity")
+    fun getCharacterListEntries(): Flow<List<CardListItemEntity>>
 
     @Transaction
     suspend fun deleteTransaction(id: Long) {

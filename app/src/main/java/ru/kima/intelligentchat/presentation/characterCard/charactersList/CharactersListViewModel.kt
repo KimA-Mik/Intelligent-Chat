@@ -15,9 +15,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.core.preferences.PreferencesHandler
+import ru.kima.intelligentchat.domain.card.model.CardEntry
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
-import ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase
+import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
@@ -28,18 +29,20 @@ import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.
 class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val preferencesHandler: PreferencesHandler,
-    private val getCards: GetCardsUseCase,
+    private val getCards: GetCardsListUseCase,
     private val putCard: PutCardUseCase,
     private val putCardFromImage: AddCardFromPngUseCase,
     private val createPersona: CreatePersonaUseCase,
     private val getPersona: GetPersonaUseCase
 ) : ViewModel() {
-    private val cards = MutableStateFlow(emptyList<CharacterCard>())
+    private val cards = MutableStateFlow(emptyList<CardEntry>())
     private val query = savedStateHandle.getStateFlow("query", String())
     private val persona = MutableStateFlow(Persona())
     private val initialDialog = savedStateHandle.getStateFlow("initialDialog", false)
     private val initialDialogText = savedStateHandle.getStateFlow("initialDialogText", String())
 
+    //TODO: Explore better implementation
+    private var cardsJob: Job? = null
     private var personaJob: Job? = null
 
     val state = combine(
@@ -69,9 +72,12 @@ class CharactersListViewModel(
         loadCards()
     }
 
-    private fun loadCards() = viewModelScope.launch {
-        getCards(query.value).collect { result ->
-            cards.value = result
+    private fun loadCards() {
+        cardsJob?.cancel()
+        cardsJob = viewModelScope.launch {
+            getCards(query.value).collect { result ->
+                cards.value = result
+            }
         }
     }
 

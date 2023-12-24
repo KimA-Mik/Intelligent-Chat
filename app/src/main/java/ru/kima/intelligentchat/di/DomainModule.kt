@@ -8,6 +8,7 @@ import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
+import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
@@ -28,6 +29,7 @@ fun domain() = module {
     singleOf(::AddCardFromPngUseCase)
     singleOf(::UpdateCardUseCase)
     singleOf(::DeleteCardUseCase)
+    singleOf(::GetCardsListUseCase)
 
     singleOf(::CreatePersonaUseCase)
     singleOf(::GetPersonaUseCase)

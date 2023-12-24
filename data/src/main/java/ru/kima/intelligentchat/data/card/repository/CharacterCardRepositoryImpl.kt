@@ -2,16 +2,19 @@ package ru.kima.intelligentchat.data.card.repository
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import ru.kima.intelligentchat.data.card.entities.AltGreetingEntity
 import ru.kima.intelligentchat.data.card.entities.CardEntity
 import ru.kima.intelligentchat.data.card.mappers.toCharacterCard
 import ru.kima.intelligentchat.data.card.mappers.toEntity
+import ru.kima.intelligentchat.data.card.mappers.toEntry
 import ru.kima.intelligentchat.data.card.util.getCardPhotoName
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
 import ru.kima.intelligentchat.data.serialization.CardDeserializer
+import ru.kima.intelligentchat.domain.card.model.CardEntry
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import java.io.ByteArrayOutputStream
@@ -30,6 +33,13 @@ class CharacterCardRepositoryImpl(
             cards.map { entity ->
                 println("cardDao.selectCharacterCards().map")
                 entity.toCharacterCard(imageStorage)
+            }
+        }
+
+    override fun getCardsListEntries(): Flow<List<CardEntry>> =
+        cardDao.getCharacterListEntries().map { entries ->
+            entries.map { entry ->
+                entry.toEntry(imageStorage)
             }
         }
 
