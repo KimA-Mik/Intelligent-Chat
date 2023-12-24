@@ -69,7 +69,7 @@ dependencies {
     val navVersion = "2.7.6"
     implementation("androidx.navigation:navigation-compose:$navVersion")
 
-    val koinVersion = "3.5.0"
+    val koinVersion = "3.5.3"
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
