@@ -30,7 +30,7 @@ fun CardItem(
     ) {
         Row {
             CardImage(
-                photoBytes = card.photoBytes,
+                photoBytes = card.thumbnail,
                 modifier = Modifier
                     .size(72.dp)
                     .padding(8.dp),
