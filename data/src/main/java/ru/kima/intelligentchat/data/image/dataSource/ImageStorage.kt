@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Size
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.FileDescriptor
 import kotlin.io.path.Path
 
 class ImageStorage(
@@ -31,6 +32,10 @@ class ImageStorage(
                 inputStream.readBytes()
             }
         }
+    }
+
+    fun getImageFileDescriptor(fileName: String): FileDescriptor {
+        return context.openFileInput(fileName).fd
     }
 
     suspend fun getThumbnail(fileName: String): Bitmap {

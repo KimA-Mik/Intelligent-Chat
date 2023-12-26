@@ -46,8 +46,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.persona.model.Persona
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToPersona
+import ru.kima.intelligentchat.presentation.personas.list.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.list.events.UserEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
@@ -58,13 +62,23 @@ fun PersonaListScreen(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
+    events: SharedFlow<UiEvent>,
     onEvent: (UserEvent) -> Unit
 ) {
+    LaunchedEffect(true) {
+        events.collect { event ->
+            when (event) {
+                is UiEvent.NavigateToPersona -> navController.navigateToPersona(event.id)
+            }
+        }
+    }
+
     val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Persona") },
+            TopAppBar(
+                title = { Text(text = "Persona") },
                 navigationIcon = {
                     IconButton(onClick = {
                         scope.launch {
@@ -78,7 +92,8 @@ fun PersonaListScreen(
     ) { paddingValues ->
         PersonaListContent(
             personas = state.personas,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
+            onEvent = onEvent
         )
     }
 }
@@ -86,14 +101,18 @@ fun PersonaListScreen(
 @Composable
 fun PersonaListContent(
     personas: List<Persona>,
-    modifier: Modifier
+    modifier: Modifier,
+    onEvent: (UserEvent) -> Unit
 ) {
     LazyColumn(modifier) {
         items(personas) { persona ->
             PersonaCard(
-                persona = persona, modifier = Modifier
+                persona = persona,
+                modifier = Modifier
                     .padding(8.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                onCardClicked = { onEvent(UserEvent.NavigateToPersona(persona.id)) },
+                onAvatarClicked = {}
             )
         }
     }
@@ -102,11 +121,20 @@ fun PersonaListContent(
 @Composable
 fun PersonaCard(
     persona: Persona,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCardClicked: () -> Unit,
+    onAvatarClicked: () -> Unit
 ) {
-    Row(modifier = modifier, horizontalArrangement = Arrangement.SpaceBetween) {
-        PersonaImage(bitmap = persona.bitmap, modifier = Modifier.size(72.dp),
-            onClick = {})
+    Row(
+        modifier = modifier
+            .clickable(onClick = onCardClicked),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        //TODO: Fx image
+        PersonaImage(
+            bitmap = null, modifier = Modifier.size(72.dp),
+            onClick = onAvatarClicked
+        )
         Text(text = persona.name, style = MaterialTheme.typography.headlineSmall)
     }
 }
@@ -178,6 +206,7 @@ fun PersonasListScreenPreview() {
                 navController = rememberNavController(),
                 snackbarHostState = SnackbarHostState(),
                 drawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+                events = MutableSharedFlow(),
                 onEvent = {}
             )
         }
