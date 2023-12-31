@@ -18,6 +18,7 @@ import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
 
 fun domain() = module {
@@ -34,6 +35,7 @@ fun domain() = module {
     singleOf(::GetCardsListUseCase)
 
     singleOf(::CreatePersonaUseCase)
+    singleOf(::SubscribeToPersonaUseCase)
     singleOf(::GetPersonaUseCase)
     singleOf(::GetPersonasUseCase)
     singleOf(::LoadPersonaImageUseCase)

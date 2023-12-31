@@ -22,7 +22,7 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
-import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 
@@ -33,7 +33,7 @@ class CharactersListViewModel(
     private val putCard: PutCardUseCase,
     private val putCardFromImage: AddCardFromPngUseCase,
     private val createPersona: CreatePersonaUseCase,
-    private val getPersona: GetPersonaUseCase
+    private val subscribeToPersona: SubscribeToPersonaUseCase
 ) : ViewModel() {
     private val cards = MutableStateFlow(emptyList<CardEntry>())
     private val query = savedStateHandle.getStateFlow("query", String())
@@ -162,7 +162,7 @@ class CharactersListViewModel(
         }
 
         personaJob?.cancel()
-        personaJob = getPersona(personaId).onEach {
+        personaJob = subscribeToPersona(personaId).onEach {
             persona.value = it
         }.launchIn(viewModelScope)
     }

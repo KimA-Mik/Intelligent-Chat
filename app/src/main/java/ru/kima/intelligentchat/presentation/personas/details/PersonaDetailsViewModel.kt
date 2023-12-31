@@ -3,7 +3,6 @@ package ru.kima.intelligentchat.presentation.personas.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -22,42 +21,75 @@ class PersonaDetailsViewModel(
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val updatePersona: UpdatePersonaUseCase
 ) : ViewModel() {
-    //TODO: Make it normal)))
-    private val persona: Flow<Persona>
+    private val personaName = savedStateHandle.getStateFlow(PersonaDetailsField.NAME.name, "")
+    private val personaDescription =
+        savedStateHandle.getStateFlow(PersonaDetailsField.DESCRIPTION.name, "")
+
+    private var persona = Persona()
     private val personaImage = MutableStateFlow(PersonaImage())
 
     init {
         val id = savedStateHandle.get<Long>("personaId")!!
-        persona = getPersona(id)
-        viewModelScope.launch {
-            personaImage.value = loadPersonaImage(id)
+
+        //Justifying usage of saved state handle
+        if (isPersonaEmpty()) {
+            viewModelScope.launch {
+                persona = getPersona(id)
+                savedStateHandle[PersonaDetailsField.NAME.name] = persona.name
+                savedStateHandle[PersonaDetailsField.DESCRIPTION.name] = persona.description
+                personaImage.value = loadPersonaImage(id)
+            }
         }
     }
 
     val state = combine(
-        persona,
+        personaName,
+        personaDescription,
         personaImage
-    ) { persona, personaImage ->
+    ) { personaName, personaDescription, personaImage ->
         PersonaDetailsState(
-            persona = persona,
+            personaName = personaName,
+            personaDescription = personaDescription,
             personaImage = personaImage
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), PersonaDetailsState())
 
     fun onEvent(event: UserEvent) {
         when (event) {
-            is UserEvent.UpdatePersonaName -> onUpdatePersonaName(event.name)
-            is UserEvent.UpdatePersonaDescription -> onUpdatePersonaDescription(event.description)
+            is UserEvent.UpdatePersonaDetailsField ->
+                onUpdatePersonaDetailsField(event.field, event.value)
+
+            UserEvent.SavePersona -> onSavePersona()
         }
     }
 
-    private fun onUpdatePersonaName(name: String) = viewModelScope.launch {
-        val newPersona = state.value.persona.copy(name = name)
-        updatePersona(newPersona)
+    private fun onUpdatePersonaDetailsField(
+        field: PersonaDetailsField,
+        value: String
+    ) {
+        savedStateHandle[field.name] = value
     }
 
-    private fun onUpdatePersonaDescription(description: String) = viewModelScope.launch {
-        val newPersona = state.value.persona.copy(description = description)
-        updatePersona(newPersona)
+    private fun onSavePersona() = viewModelScope.launch {
+        if (persona.id == 0L) {
+            return@launch
+        }
+
+        persona = persona.copy(
+            name = personaName.value,
+            description = personaDescription.value
+        )
+
+        updatePersona(persona)
+    }
+
+    private fun isPersonaEmpty() =
+        personaName.value.isEmpty() &&
+                personaDescription.value.isEmpty() &&
+                personaImage.value.bitmap == null
+
+    enum class PersonaDetailsField {
+        NAME,
+        DESCRIPTION
     }
 }

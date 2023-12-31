@@ -25,10 +25,14 @@ class PersonaRepositoryImpl(
         personaDao.updatePersona(entity)
     }
 
-    override fun selectPersona(id: Long): Flow<Persona> {
-        return personaDao.selectPersona(id).map { entity ->
+    override fun subscribeToPersona(id: Long): Flow<Persona> {
+        return personaDao.subscribeToPersona(id).map { entity ->
             entity.toPersona()
         }
+    }
+
+    override suspend fun selectPersona(id: Long): Persona {
+        return personaDao.selectPersona(id).toPersona()
     }
 
     override fun selectPersonas(): Flow<List<Persona>> {

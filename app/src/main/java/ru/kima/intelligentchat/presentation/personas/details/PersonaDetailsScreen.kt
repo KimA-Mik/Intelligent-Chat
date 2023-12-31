@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,7 +41,12 @@ fun PersonaDetailsScreen(
                     contentDescription = "Navigate back"
                 )
             }
-        })
+        },
+            actions = {
+                IconButton(onClick = { onEvent(UserEvent.SavePersona) }) {
+                    Icon(imageVector = Icons.Filled.Save, contentDescription = "Save")
+                }
+            })
     }) { paddingValues ->
         PersonaDetailsContent(
             modifier = Modifier
@@ -60,16 +66,26 @@ fun PersonaDetailsContent(
     Column(modifier = modifier) {
         OutlinedTextField(
             modifier = Modifier.padding(8.dp),
-            value = state.persona.name,
+            value = state.personaName,
             onValueChange = { value ->
-                onEvent(UserEvent.UpdatePersonaName(value))
+                onEvent(
+                    UserEvent.UpdatePersonaDetailsField(
+                        PersonaDetailsViewModel.PersonaDetailsField.NAME,
+                        value
+                    )
+                )
             })
 
         OutlinedTextField(
             modifier = Modifier.padding(8.dp),
-            value = state.persona.description,
+            value = state.personaDescription,
             onValueChange = { value ->
-                onEvent(UserEvent.UpdatePersonaDescription(value))
+                onEvent(
+                    UserEvent.UpdatePersonaDetailsField(
+                        PersonaDetailsViewModel.PersonaDetailsField.DESCRIPTION,
+                        value
+                    )
+                )
             })
     }
 
