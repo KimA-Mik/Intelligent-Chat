@@ -5,14 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
+import ru.kima.intelligentchat.presentation.personas.details.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.details.events.UserEvent
 
 class PersonaDetailsViewModel(
@@ -27,6 +30,9 @@ class PersonaDetailsViewModel(
 
     private var persona = Persona()
     private val personaImage = MutableStateFlow(PersonaImage())
+
+    private val _uiEvents = MutableStateFlow<Event<UiEvent>>(Event(null))
+    val uiEvents = _uiEvents.asStateFlow()
 
     init {
         val id = savedStateHandle.get<Long>("personaId")!!
@@ -81,6 +87,9 @@ class PersonaDetailsViewModel(
         )
 
         updatePersona(persona)
+        _uiEvents.emit(
+            Event(UiEvent.ShowSnackbar(UiEvent.ShowSnackbar.SnackbarMessage.PERSONA_SAVED))
+        )
     }
 
     private fun isPersonaEmpty() =

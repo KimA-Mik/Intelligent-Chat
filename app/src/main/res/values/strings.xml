@@ -11,4 +11,6 @@
     <string name="decide_later_button_text">Decide later</string>
     <string name="default_name_message">You will be known as "User".</string>
     <string name="introduce_first_persona">Please introduce your first persona.</string>
+
+    <string name="persona_saved_message">The persona has been saved.</string>
 </resources>

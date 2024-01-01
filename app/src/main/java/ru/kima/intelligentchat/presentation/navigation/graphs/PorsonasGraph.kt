@@ -59,6 +59,7 @@ fun NavGraphBuilder.personasGraph(
                 snackbarHostState = snackbarHostState,
                 imagePicker = koinInject(),
                 state = state,
+                uiEvents = viewModel.uiEvents,
                 onEvent = viewModel::onEvent
             )
         }

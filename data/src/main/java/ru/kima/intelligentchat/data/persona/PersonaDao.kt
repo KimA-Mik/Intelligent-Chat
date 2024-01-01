@@ -19,7 +19,7 @@ interface PersonaDao {
     fun subscribeToPersona(id: Long): Flow<PersonaEntity>
 
     @Query("SELECT * FROM $PERSONAS_TABLE_NAME WHERE id = :id")
-    fun selectPersona(id: Long): PersonaEntity
+    suspend fun selectPersona(id: Long): PersonaEntity
 
     @Query("SELECT * FROM $PERSONAS_TABLE_NAME")
     fun selectPersonas(): Flow<List<PersonaEntity>>
