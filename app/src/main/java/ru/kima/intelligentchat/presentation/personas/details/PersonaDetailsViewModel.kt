@@ -14,6 +14,7 @@ import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
 import ru.kima.intelligentchat.presentation.personas.details.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.details.events.UserEvent
@@ -22,7 +23,8 @@ class PersonaDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,
     getPersona: GetPersonaUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
-    private val updatePersona: UpdatePersonaUseCase
+    private val updatePersona: UpdatePersonaUseCase,
+    private val updatePersonaImage: UpdatePersonaImageUseCase
 ) : ViewModel() {
     private val personaName = savedStateHandle.getStateFlow(PersonaDetailsField.NAME.name, "")
     private val personaDescription =
@@ -66,6 +68,7 @@ class PersonaDetailsViewModel(
                 onUpdatePersonaDetailsField(event.field, event.value)
 
             UserEvent.SavePersona -> onSavePersona()
+            is UserEvent.UpdatePersonaImage -> onUpdatePersonaImage(event.bytes)
         }
     }
 
@@ -90,6 +93,11 @@ class PersonaDetailsViewModel(
         _uiEvents.emit(
             Event(UiEvent.ShowSnackbar(UiEvent.ShowSnackbar.SnackbarMessage.PERSONA_SAVED))
         )
+    }
+
+    private fun onUpdatePersonaImage(bytes: ByteArray) = viewModelScope.launch {
+        updatePersonaImage(persona.id, bytes)
+        personaImage.value = loadPersonaImage(persona.id)
     }
 
     private fun isPersonaEmpty() =

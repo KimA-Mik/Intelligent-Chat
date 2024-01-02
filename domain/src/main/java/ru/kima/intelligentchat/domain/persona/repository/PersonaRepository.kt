@@ -12,4 +12,5 @@ interface PersonaRepository {
     fun selectPersonas(): Flow<List<Persona>>
     suspend fun deletePersona(persona: Persona)
     suspend fun loadPersonaImage(id: Long): PersonaImage
+    suspend fun updatePersonaImage(id: Long, imageByteArray: ByteArray)
 }

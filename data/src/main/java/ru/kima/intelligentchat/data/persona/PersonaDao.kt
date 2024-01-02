@@ -26,4 +26,7 @@ interface PersonaDao {
 
     @Query("DELETE FROM $PERSONAS_TABLE_NAME WHERE id = :id")
     suspend fun deletePersona(id: Long)
+
+    @Query("UPDATE $PERSONAS_TABLE_NAME SET imageFilePath=:imageFilePath WHERE id = :id")
+    suspend fun updateImageFilePath(id: Long, imageFilePath: String)
 }

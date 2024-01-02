@@ -1,8 +1,5 @@
 package ru.kima.intelligentchat.presentation.personas.list
 
-import android.graphics.Bitmap
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -12,9 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person3
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -30,18 +25,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -51,6 +36,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToPersona
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
 import ru.kima.intelligentchat.presentation.personas.list.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.list.events.UserEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -139,57 +125,6 @@ fun PersonaCard(
     }
 }
 
-@Composable
-fun PersonaImage(
-    bitmap: Bitmap?,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    var imageBitmap by remember {
-        mutableStateOf<ImageBitmap?>(null)
-    }
-
-    LaunchedEffect(bitmap) {
-        imageBitmap = bitmap?.asImageBitmap()
-    }
-
-    if (imageBitmap == null) {
-        val iconBgColor = MaterialTheme.colorScheme.secondaryContainer
-        Icon(
-            Icons.Filled.Person3,
-            contentDescription = "",
-            tint = MaterialTheme.colorScheme.onSecondaryContainer,
-            modifier = modifier
-                .clip(CircleShape)
-                .border(
-                    1.5.dp,
-                    MaterialTheme.colorScheme.onSecondaryContainer,
-                    CircleShape
-                )
-                .drawBehind {
-                    drawCircle(color = iconBgColor)
-                }
-                .clickable {
-                    onClick()
-                }
-        )
-    } else {
-        Image(
-            painter = BitmapPainter(imageBitmap!!), contentDescription = "",
-            modifier = modifier
-                .clip(CircleShape)
-                .border(
-                    1.5.dp,
-                    MaterialTheme.colorScheme.onSecondaryContainer,
-                    CircleShape
-                )
-                .clickable {
-                    onClick()
-                },
-            contentScale = ContentScale.Crop
-        )
-    }
-}
 
 @Preview
 @Composable

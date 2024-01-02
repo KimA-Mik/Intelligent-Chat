@@ -1,7 +1,10 @@
 package ru.kima.intelligentchat.presentation.personas.details
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
@@ -18,8 +21,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -27,8 +32,10 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
 import ru.kima.intelligentchat.presentation.personas.details.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.details.events.UserEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -43,6 +50,9 @@ fun PersonaDetailsScreen(
     uiEvents: StateFlow<Event<UiEvent>>,
     onEvent: (UserEvent) -> Unit
 ) {
+    imagePicker.registerPicker { imageBytes ->
+        onEvent(UserEvent.UpdatePersonaImage(imageBytes))
+    }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     LaunchedEffect(key1 = true) {
@@ -64,26 +74,29 @@ fun PersonaDetailsScreen(
         }
     }
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text(text = "Persona") }, navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Navigate back"
-                )
-            }
-        }, actions = {
-            IconButton(onClick = { onEvent(UserEvent.SavePersona) }) {
-                Icon(
-                    imageVector = Icons.Filled.Save,
-                    contentDescription = "Save"
-                )
-            }
-        })
-    }, snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(title = { Text(text = "Persona") }, navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Navigate back"
+                    )
+                }
+            }, actions = {
+                IconButton(onClick = { onEvent(UserEvent.SavePersona) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Save,
+                        contentDescription = "Save"
+                    )
+                }
+            })
+        }, snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
         PersonaDetailsContent(
             modifier = Modifier.padding(paddingValues),
             state = state,
+            imagePicker = imagePicker,
             onEvent = onEvent
         )
     }
@@ -93,10 +106,26 @@ fun PersonaDetailsScreen(
 fun PersonaDetailsContent(
     modifier: Modifier = Modifier,
     state: PersonaDetailsState,
+    imagePicker: ImagePicker,
     onEvent: (UserEvent) -> Unit
 ) {
-    Column(modifier = modifier) {
-        OutlinedTextField(modifier = Modifier.padding(8.dp),
+    Column(
+        modifier = modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        PersonaImage(
+            bitmap = state.personaImage.bitmap,
+            modifier = Modifier.size(144.dp),
+            onClick = {
+                imagePicker.pickImage()
+            }
+        )
+
+        OutlinedTextField(modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+            label = { Text(stringResource(id = R.string.persona_name)) },
             value = state.personaName,
             onValueChange = { value ->
                 onEvent(
@@ -106,7 +135,10 @@ fun PersonaDetailsContent(
                 )
             })
 
-        OutlinedTextField(modifier = Modifier.padding(8.dp),
+        OutlinedTextField(modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+            label = { Text(stringResource(id = R.string.persona_description)) },
             value = state.personaDescription,
             onValueChange = { value ->
                 onEvent(

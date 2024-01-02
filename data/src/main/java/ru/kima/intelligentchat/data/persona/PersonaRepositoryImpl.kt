@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.data.persona
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -8,6 +9,7 @@ import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
+import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 
 class PersonaRepositoryImpl(
@@ -59,5 +61,19 @@ class PersonaRepositoryImpl(
         } catch (ex: FileNotFoundException) {
             PersonaImage(bitmap = null)
         }
+    }
+
+    override suspend fun updatePersonaImage(id: Long, imageByteArray: ByteArray) {
+        val fileName = getPersonaAvatarFileName(id)
+        val bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.size) ?: return
+
+        val outputStream = ByteArrayOutputStream()
+        if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
+            return
+        }
+
+        val photoBytes = outputStream.toByteArray()
+        imageStorage.saveImage(fileName, photoBytes)
+        personaDao.updateImageFilePath(id, fileName)
     }
 }
