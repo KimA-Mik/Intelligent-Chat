@@ -16,4 +16,5 @@
 
     <string name="persona_name">Persona name</string>
     <string name="persona_description">Persona description</string>
+    <string name="create_persona_fab_content_description">Create persona</string>
 </resources>

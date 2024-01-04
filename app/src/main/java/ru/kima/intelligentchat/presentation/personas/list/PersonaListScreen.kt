@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,13 +30,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToPersona
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
@@ -48,14 +54,12 @@ fun PersonaListScreen(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
-    events: SharedFlow<UiEvent>,
+    events: StateFlow<Event<UiEvent>>,
     onEvent: (UserEvent) -> Unit
 ) {
     LaunchedEffect(true) {
         events.collect { event ->
-            when (event) {
-                is UiEvent.NavigateToPersona -> navController.navigateToPersona(event.id)
-            }
+            consumeEvent(event, navController)
         }
     }
 
@@ -74,13 +78,32 @@ fun PersonaListScreen(
                         Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
                     }
                 })
-        }
+        },
+        floatingActionButton = {
+            CreatePersonaFab {
+                onEvent(UserEvent.CreatePersona)
+            }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         PersonaListContent(
             personas = state.personas,
             modifier = Modifier.padding(paddingValues),
             onEvent = onEvent
         )
+    }
+}
+
+fun consumeEvent(
+    event: Event<UiEvent>,
+    navController: NavController
+) {
+    event.consume { current ->
+        current?.let {
+            when (it) {
+                is UiEvent.NavigateToPersona -> navController.navigateToPersona(it.id)
+            }
+        }
     }
 }
 
@@ -125,6 +148,22 @@ fun PersonaCard(
     }
 }
 
+@Composable
+fun CreatePersonaFab(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    FloatingActionButton(
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Create,
+            contentDescription = stringResource(R.string.create_persona_fab_content_description)
+        )
+    }
+}
+
 
 @Preview
 @Composable
@@ -141,7 +180,7 @@ fun PersonasListScreenPreview() {
                 navController = rememberNavController(),
                 snackbarHostState = SnackbarHostState(),
                 drawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-                events = MutableSharedFlow(),
+                events = MutableStateFlow(Event(null)),
                 onEvent = {}
             )
         }
