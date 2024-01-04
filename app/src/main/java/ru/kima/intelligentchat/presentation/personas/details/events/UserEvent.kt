@@ -24,4 +24,6 @@ sealed interface UserEvent {
             return bytes.contentHashCode()
         }
     }
+
+    data object DeletePersona : UserEvent
 }

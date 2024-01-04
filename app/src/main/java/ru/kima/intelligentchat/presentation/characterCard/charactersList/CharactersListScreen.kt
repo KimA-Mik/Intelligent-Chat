@@ -49,7 +49,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.core.preferences.PreferencesHandler
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
@@ -61,7 +60,6 @@ fun CharactersListScreen(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
-    preferencesHandler: PreferencesHandler,
     imagePicker: ImagePicker,
     viewModel: CharactersListViewModel
 ) {
@@ -92,10 +90,6 @@ fun CharactersListScreen(
 
                 is CharactersListUiEvent.Message ->
                     snackbarHostState.showSnackbar(content.getString(event.messageId))
-
-                is CharactersListUiEvent.SelectPersona -> preferencesHandler.updateData {
-                    it.copy(selectedPersonaId = event.id)
-                }
 
                 CharactersListUiEvent.OpenNavigationDrawer -> scope.launch {
                     drawerState.open()

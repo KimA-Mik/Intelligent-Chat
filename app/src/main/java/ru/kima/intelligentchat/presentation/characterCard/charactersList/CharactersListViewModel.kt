@@ -162,8 +162,20 @@ class CharactersListViewModel(
         }
 
         personaJob?.cancel()
-        personaJob = subscribeToPersona(personaId).onEach {
-            persona.value = it
+        personaJob = subscribeToPersona(personaId).onEach { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    persona.emit(resource.data!!)
+                }
+
+                is Resource.Error -> {
+                    preferencesHandler.updateData {
+                        it.copy(selectedPersonaId = resource.data!!.id)
+                    }
+                }
+
+                is Resource.Loading -> {}
+            }
         }.launchIn(viewModelScope)
     }
 
@@ -180,7 +192,9 @@ class CharactersListViewModel(
         savedStateHandle["initialDialog"] = false
         val persona = Persona(name = personaName)
         val id = createPersona(persona)
-        _uiEvents.emit(CharactersListUiEvent.SelectPersona(id))
+        preferencesHandler.updateData {
+            it.copy(selectedPersonaId = id)
+        }
     }
 
     private fun onMenuButtonClicked() = viewModelScope.launch {

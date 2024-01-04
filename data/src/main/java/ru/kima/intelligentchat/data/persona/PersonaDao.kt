@@ -16,7 +16,7 @@ interface PersonaDao {
     suspend fun updatePersona(persona: PersonaEntity)
 
     @Query("SELECT * FROM $PERSONAS_TABLE_NAME WHERE id = :id")
-    fun subscribeToPersona(id: Long): Flow<PersonaEntity>
+    fun subscribeToPersona(id: Long): Flow<PersonaEntity?>
 
     @Query("SELECT * FROM $PERSONAS_TABLE_NAME WHERE id = :id")
     suspend fun selectPersona(id: Long): PersonaEntity
@@ -29,4 +29,7 @@ interface PersonaDao {
 
     @Query("UPDATE $PERSONAS_TABLE_NAME SET imageFilePath=:imageFilePath WHERE id = :id")
     suspend fun updateImageFilePath(id: Long, imageFilePath: String)
+
+    @Query("SELECT COUNT(id) FROM $PERSONAS_TABLE_NAME")
+    suspend fun getPersonasCount(): Int
 }

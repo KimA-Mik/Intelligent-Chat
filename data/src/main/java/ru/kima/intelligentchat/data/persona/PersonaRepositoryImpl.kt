@@ -27,10 +27,11 @@ class PersonaRepositoryImpl(
         personaDao.updatePersona(entity)
     }
 
-    override fun subscribeToPersona(id: Long): Flow<Persona> {
-        return personaDao.subscribeToPersona(id).map { entity ->
-            entity.toPersona()
-        }
+    override fun subscribeToPersona(id: Long): Flow<Persona?> {
+        return personaDao.subscribeToPersona(id)
+            .map { entity ->
+                entity?.toPersona()
+            }
     }
 
     override suspend fun selectPersona(id: Long): Persona {
@@ -75,5 +76,9 @@ class PersonaRepositoryImpl(
         val photoBytes = outputStream.toByteArray()
         imageStorage.saveImage(fileName, photoBytes)
         personaDao.updateImageFilePath(id, fileName)
+    }
+
+    override suspend fun getPersonasCount(): Int {
+        return personaDao.getPersonasCount()
     }
 }

@@ -7,7 +7,6 @@ sealed interface CharactersListUiEvent {
     data class ShowCardImage(val cardId: Long) : CharactersListUiEvent
     data class SnackbarMessage(val message: String) : CharactersListUiEvent
     data object SelectPngImage : CharactersListUiEvent
-    data class SelectPersona(val id: Long) : CharactersListUiEvent
 
     enum class Message(val messageId: Int) : CharactersListUiEvent {
         NoSuchCard(R.string.no_such_card),

@@ -15,6 +15,7 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.DeletePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
@@ -42,4 +43,5 @@ fun domain() = module {
     singleOf(::LoadPersonaImageUseCase)
     singleOf(::UpdatePersonaUseCase)
     singleOf(::UpdatePersonaImageUseCase)
+    singleOf(::DeletePersonaUseCase)
 }

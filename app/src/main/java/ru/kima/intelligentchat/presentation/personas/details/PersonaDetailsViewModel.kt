@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.model.PersonaImage
+import ru.kima.intelligentchat.domain.persona.useCase.DeletePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
@@ -21,10 +22,11 @@ import ru.kima.intelligentchat.presentation.personas.details.events.UserEvent
 
 class PersonaDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,
-    getPersona: GetPersonaUseCase,
+    private val getPersona: GetPersonaUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val updatePersona: UpdatePersonaUseCase,
-    private val updatePersonaImage: UpdatePersonaImageUseCase
+    private val updatePersonaImage: UpdatePersonaImageUseCase,
+    private val deletePersona: DeletePersonaUseCase
 ) : ViewModel() {
     private val personaName = savedStateHandle.getStateFlow(PersonaDetailsField.NAME.name, "")
     private val personaDescription =
@@ -69,6 +71,7 @@ class PersonaDetailsViewModel(
 
             UserEvent.SavePersona -> onSavePersona()
             is UserEvent.UpdatePersonaImage -> onUpdatePersonaImage(event.bytes)
+            UserEvent.DeletePersona -> onDeletePersona()
         }
     }
 
@@ -98,6 +101,16 @@ class PersonaDetailsViewModel(
     private fun onUpdatePersonaImage(bytes: ByteArray) = viewModelScope.launch {
         updatePersonaImage(persona.id, bytes)
         personaImage.value = loadPersonaImage(persona.id)
+        persona = getPersona(persona.id)
+    }
+
+    private fun onDeletePersona() = viewModelScope.launch {
+        if (deletePersona(persona)) {
+            _uiEvents.emit(Event(UiEvent.ShowSnackbar(UiEvent.ShowSnackbar.SnackbarMessage.PERSONA_DELETED)))
+            _uiEvents.emit(Event(UiEvent.PopBack))
+        } else {
+            _uiEvents.emit(Event(UiEvent.ShowSnackbar(UiEvent.ShowSnackbar.SnackbarMessage.PERSONA_NOT_DELETED)))
+        }
     }
 
     private fun isPersonaEmpty() =

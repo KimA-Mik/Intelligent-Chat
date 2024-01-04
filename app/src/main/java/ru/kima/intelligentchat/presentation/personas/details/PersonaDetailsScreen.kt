@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.personas.details
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,7 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,11 +36,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
+import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
 import ru.kima.intelligentchat.presentation.personas.details.events.UiEvent
@@ -57,21 +66,23 @@ fun PersonaDetailsScreen(
     val scope = rememberCoroutineScope()
     LaunchedEffect(key1 = true) {
         uiEvents.collect { event ->
-            event.consume { current ->
-                current?.let {
-                    when (it) {
-                        is UiEvent.ShowSnackbar -> {
-                            val message = context.getString(it.message.mesId)
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message, duration = SnackbarDuration.Short
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+            consumeEvent(event, context, scope, snackbarHostState, navController)
         }
+    }
+
+    var deletePersonaDialog by remember { mutableStateOf(false) }
+
+    when {
+        deletePersonaDialog -> SimpleAlertDialog(
+            onConfirm = {
+                deletePersonaDialog = false
+                onEvent(UserEvent.DeletePersona)
+            },
+            onDismiss = { deletePersonaDialog = false },
+            title = stringResource(R.string.delete_persona_dialog_title),
+            text = stringResource(R.string.delete_persona_dialog_text),
+            icon = Icons.Filled.DeleteForever
+        )
     }
 
     Scaffold(
@@ -85,20 +96,52 @@ fun PersonaDetailsScreen(
                     )
                 }
             }, actions = {
+                IconButton(onClick = { deletePersonaDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = stringResource(R.string.delete_persona_content_description)
+                    )
+                }
                 IconButton(onClick = { onEvent(UserEvent.SavePersona) }) {
                     Icon(
                         imageVector = Icons.Filled.Save,
-                        contentDescription = "Save"
+                        contentDescription = stringResource(R.string.save_persona_content_description)
                     )
                 }
             })
         }, snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
         PersonaDetailsContent(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier
+                .padding(paddingValues),
             state = state,
             imagePicker = imagePicker,
             onEvent = onEvent
         )
+    }
+}
+
+fun consumeEvent(
+    event: Event<UiEvent>,
+    context: Context,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    navController: NavController
+) {
+    event.consume { current ->
+        current?.let {
+            when (it) {
+                is UiEvent.ShowSnackbar -> {
+                    val message = context.getString(it.message.mesId)
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message, duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+
+                UiEvent.PopBack -> navController.popBackStack()
+            }
+        }
     }
 }
 
