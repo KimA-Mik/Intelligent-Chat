@@ -32,7 +32,6 @@ fun NavGraphBuilder.cardGraph(
                     snackbarHostState,
                     drawerState,
                     koinInject(),
-                    koinInject(),
                     koinViewModel()
                 )
             }
