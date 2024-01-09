@@ -169,9 +169,7 @@ class CharactersListViewModel(
                 }
 
                 is Resource.Error -> {
-                    preferencesHandler.updateData {
-                        it.copy(selectedPersonaId = resource.data!!.id)
-                    }
+                    preferencesHandler.updateSelectedPersona(resource.data!!.id)
                 }
 
                 is Resource.Loading -> {}
@@ -192,9 +190,7 @@ class CharactersListViewModel(
         savedStateHandle["initialDialog"] = false
         val persona = Persona(name = personaName)
         val id = createPersona(persona)
-        preferencesHandler.updateData {
-            it.copy(selectedPersonaId = id)
-        }
+        preferencesHandler.updateSelectedPersona(id)
     }
 
     private fun onMenuButtonClicked() = viewModelScope.launch {

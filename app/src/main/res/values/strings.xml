@@ -23,4 +23,5 @@
     <string name="persona_not_deleted_snackbar">The persona can not be deleted.</string>
     <string name="delete_persona_content_description">Delete persona</string>
     <string name="save_persona_content_description">Save persona</string>
+    <string name="select_persona_button_content_description">Select persona button</string>
 </resources>

@@ -1,8 +1,10 @@
 package ru.kima.intelligentchat.presentation.personas.list
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.RadioButtonChecked
+import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,23 +32,25 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
-import ru.kima.intelligentchat.domain.persona.model.Persona
-import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToPersona
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
 import ru.kima.intelligentchat.presentation.personas.list.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.list.events.UserEvent
+import ru.kima.intelligentchat.presentation.personas.list.model.PersonaItem
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,7 +95,9 @@ fun PersonaListScreen(
         PersonaListContent(
             personas = state.personas,
             thumbnails = state.thumbnails,
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
             onEvent = onEvent
         )
     }
@@ -108,24 +116,24 @@ fun consumeEvent(
     }
 }
 
+//TODO: Fix recomposing whole list on select
 @Composable
 fun PersonaListContent(
-    personas: List<Persona>,
-    thumbnails: List<PersonaImage?>,
+    personas: ImmutableList<PersonaItem>,
+    thumbnails: ImmutableList<Bitmap?>,
     modifier: Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
-    LazyColumn(modifier) {
-        items(personas.size) { i ->
+    LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(personas.size, key = { personas[it].id }) { i ->
             val persona = personas[i]
             PersonaCard(
                 persona = persona,
                 thumbnail = thumbnails.getOrNull(i),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 onCardClicked = { onEvent(UserEvent.NavigateToPersona(persona.id)) },
-                onAvatarClicked = {}
+                onAvatarClicked = {},
+                onSelectClicked = { onEvent(UserEvent.SelectPersona(persona.id)) }
             )
         }
     }
@@ -133,23 +141,42 @@ fun PersonaListContent(
 
 @Composable
 fun PersonaCard(
-    persona: Persona,
-    thumbnail: PersonaImage?,
+    persona: PersonaItem,
+    thumbnail: Bitmap?,
     modifier: Modifier = Modifier,
     onCardClicked: () -> Unit,
-    onAvatarClicked: () -> Unit
+    onAvatarClicked: () -> Unit,
+    onSelectClicked: () -> Unit
 ) {
     Row(
         modifier = modifier
             .clickable(onClick = onCardClicked),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        //TODO: Fx image
         PersonaImage(
-            bitmap = thumbnail?.bitmap, modifier = Modifier.size(72.dp),
+            bitmap = thumbnail, modifier = Modifier
+                .size(88.dp)
+                .padding(8.dp),
             onClick = onAvatarClicked
         )
-        Text(text = persona.name, style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = persona.name, style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp)
+                .fillMaxHeight()
+        )
+        IconButton(
+            onClick = onSelectClicked,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = if (persona.selected) Icons.Outlined.RadioButtonChecked else Icons.Outlined.RadioButtonUnchecked,
+                contentDescription = stringResource(R.string.select_persona_button_content_description)
+            )
+        }
     }
 }
 
@@ -176,12 +203,15 @@ fun PersonasListScreenPreview() {
     IntelligentChatTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             PersonaListScreen(
-                state = PersonasListState(personas = List(5) {
-                    Persona(
-                        id = it.toLong(),
-                        name = "Persona $it"
-                    )
-                }),
+                state = PersonasListState(
+                    personas = List(5) {
+                        PersonaItem(
+                            id = it.toLong(),
+                            name = "Persona $it",
+                            selected = it == 2
+                        )
+                    }.toImmutableList(),
+                ),
                 navController = rememberNavController(),
                 snackbarHostState = SnackbarHostState(),
                 drawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
