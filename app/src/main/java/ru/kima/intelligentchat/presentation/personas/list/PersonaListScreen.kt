@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.outlined.Menu
@@ -41,6 +40,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.persona.model.Persona
+import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToPersona
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
 import ru.kima.intelligentchat.presentation.personas.list.events.UiEvent
@@ -88,6 +88,7 @@ fun PersonaListScreen(
     ) { paddingValues ->
         PersonaListContent(
             personas = state.personas,
+            thumbnails = state.thumbnails,
             modifier = Modifier.padding(paddingValues),
             onEvent = onEvent
         )
@@ -110,13 +111,16 @@ fun consumeEvent(
 @Composable
 fun PersonaListContent(
     personas: List<Persona>,
+    thumbnails: List<PersonaImage?>,
     modifier: Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
     LazyColumn(modifier) {
-        items(personas) { persona ->
+        items(personas.size) { i ->
+            val persona = personas[i]
             PersonaCard(
                 persona = persona,
+                thumbnail = thumbnails.getOrNull(i),
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
@@ -130,6 +134,7 @@ fun PersonaListContent(
 @Composable
 fun PersonaCard(
     persona: Persona,
+    thumbnail: PersonaImage?,
     modifier: Modifier = Modifier,
     onCardClicked: () -> Unit,
     onAvatarClicked: () -> Unit
@@ -141,7 +146,7 @@ fun PersonaCard(
     ) {
         //TODO: Fx image
         PersonaImage(
-            bitmap = null, modifier = Modifier.size(72.dp),
+            bitmap = thumbnail?.bitmap, modifier = Modifier.size(72.dp),
             onClick = onAvatarClicked
         )
         Text(text = persona.name, style = MaterialTheme.typography.headlineSmall)

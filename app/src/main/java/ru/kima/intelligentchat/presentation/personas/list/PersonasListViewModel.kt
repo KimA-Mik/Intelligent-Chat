@@ -13,25 +13,33 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.persona.model.Persona
+import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.presentation.personas.list.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.list.events.UserEvent
 
 class PersonasListViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val getPersonas: GetPersonasUseCase,
-    private val createPersona: CreatePersonaUseCase
+    private val createPersona: CreatePersonaUseCase,
+    private val getPersonaImage: LoadPersonaImageUseCase,
 ) : ViewModel() {
     private val personas = MutableStateFlow(emptyList<Persona>())
+
+    //is' images for now
+    private val personaImages = MutableStateFlow<List<PersonaImage?>>(emptyList())
     private val query = savedStateHandle.getStateFlow("query", String())
     val state = combine(
         personas,
-        query
-    ) { personas, query ->
+        personaImages,
+        query,
+    ) { personas, personaImages, query ->
         PersonasListState(
             personas = personas,
-            query = query
+            thumbnails = personaImages,
+            query = query,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), PersonasListState())
 
@@ -42,6 +50,10 @@ class PersonasListViewModel(
     init {
         getPersonas(query.value).onEach {
             personas.value = it
+
+            personaImages.value = it.map { persona ->
+                getPersonaImage(persona.id)
+            }
         }.launchIn(viewModelScope)
     }
 
