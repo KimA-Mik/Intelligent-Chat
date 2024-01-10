@@ -4,6 +4,7 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -33,13 +34,20 @@ fun NavGraphBuilder.personasGraph(
             ) {
                 val viewModel: PersonasListViewModel = koinViewModel()
                 val state by viewModel.state.collectAsState()
+                val onEvent =
+                    remember<(ru.kima.intelligentchat.presentation.personas.list.events.UserEvent) -> Unit> {
+                        {
+                            viewModel.onEvent(it)
+                        }
+                    }
+
                 PersonaListScreen(
                     state = state,
                     navController = navController,
                     snackbarHostState = snackbarHostState,
                     drawerState = drawerState,
                     events = viewModel.events,
-                    onEvent = viewModel::onEvent
+                    onEvent = onEvent
                 )
             }
         }
@@ -54,13 +62,20 @@ fun NavGraphBuilder.personasGraph(
         ) {
             val viewModel: PersonaDetailsViewModel = koinViewModel()
             val state by viewModel.state.collectAsState()
+            val onEvent =
+                remember<(ru.kima.intelligentchat.presentation.personas.details.events.UserEvent) -> Unit> {
+                    {
+                        viewModel.onEvent(it)
+                    }
+                }
+
             PersonaDetailsScreen(
                 navController = navController,
                 snackbarHostState = snackbarHostState,
                 imagePicker = koinInject(),
                 state = state,
                 uiEvents = viewModel.uiEvents,
-                onEvent = viewModel::onEvent
+                onEvent = onEvent
             )
         }
     }

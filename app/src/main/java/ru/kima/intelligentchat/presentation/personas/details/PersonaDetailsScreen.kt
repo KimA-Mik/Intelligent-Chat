@@ -158,7 +158,7 @@ fun PersonaDetailsContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         PersonaImage(
-            bitmap = state.personaImage.bitmap,
+            container = state.personaImage,
             modifier = Modifier.size(144.dp),
             onClick = {
                 imagePicker.pickImage()

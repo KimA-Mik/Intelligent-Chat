@@ -1,6 +1,5 @@
 package ru.kima.intelligentchat.presentation.personas.common
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,7 +25,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PersonaImage(
-    bitmap: Bitmap?,
+    container: PersonaImageContainer?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -34,8 +33,8 @@ fun PersonaImage(
         mutableStateOf<ImageBitmap?>(null)
     }
 
-    LaunchedEffect(bitmap) {
-        imageBitmap = bitmap?.asImageBitmap()
+    LaunchedEffect(container) {
+        imageBitmap = container?.bitmap?.asImageBitmap()
     }
 
     if (imageBitmap == null) {

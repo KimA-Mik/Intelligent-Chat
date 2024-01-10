@@ -1,14 +1,12 @@
 package ru.kima.intelligentchat.presentation.personas.list
 
-import android.graphics.Bitmap
-import androidx.compose.runtime.Stable
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import androidx.compose.runtime.Immutable
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 import ru.kima.intelligentchat.presentation.personas.list.model.PersonaItem
 
-@Stable
+@Immutable
 data class PersonasListState(
-    val personas: ImmutableList<PersonaItem> = persistentListOf(),
-    val thumbnails: ImmutableList<Bitmap?> = persistentListOf(),
+    val personas: List<PersonaItem> = emptyList(),
+    val thumbnails: List<PersonaImageContainer> = emptyList(),
     val query: String = String()
 )

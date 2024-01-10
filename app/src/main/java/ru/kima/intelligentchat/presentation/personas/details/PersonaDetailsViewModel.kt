@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.persona.model.Persona
-import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.domain.persona.useCase.DeletePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 import ru.kima.intelligentchat.presentation.personas.details.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.details.events.UserEvent
 
@@ -33,7 +33,7 @@ class PersonaDetailsViewModel(
         savedStateHandle.getStateFlow(PersonaDetailsField.DESCRIPTION.name, "")
 
     private var persona = Persona()
-    private val personaImage = MutableStateFlow(PersonaImage())
+    private val personaImage = MutableStateFlow(PersonaImageContainer())
 
     private val _uiEvents = MutableStateFlow<Event<UiEvent>>(Event(null))
     val uiEvents = _uiEvents.asStateFlow()
@@ -47,7 +47,8 @@ class PersonaDetailsViewModel(
                 persona = getPersona(id)
                 savedStateHandle[PersonaDetailsField.NAME.name] = persona.name
                 savedStateHandle[PersonaDetailsField.DESCRIPTION.name] = persona.description
-                personaImage.value = loadPersonaImage(id)
+                val image = PersonaImageContainer(loadPersonaImage(id).bitmap)
+                personaImage.value = image
             }
         }
     }
@@ -100,7 +101,10 @@ class PersonaDetailsViewModel(
 
     private fun onUpdatePersonaImage(bytes: ByteArray) = viewModelScope.launch {
         updatePersonaImage(persona.id, bytes)
-        personaImage.value = loadPersonaImage(persona.id)
+
+        val image = PersonaImageContainer(loadPersonaImage(persona.id).bitmap)
+        personaImage.value = image
+
         persona = getPersona(persona.id)
     }
 

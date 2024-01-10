@@ -1,6 +1,5 @@
 package ru.kima.intelligentchat.presentation.personas.list
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -39,8 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -48,6 +45,7 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToPersona
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 import ru.kima.intelligentchat.presentation.personas.list.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.list.events.UserEvent
 import ru.kima.intelligentchat.presentation.personas.list.model.PersonaItem
@@ -116,11 +114,10 @@ fun consumeEvent(
     }
 }
 
-//TODO: Fix recomposing whole list on select
 @Composable
 fun PersonaListContent(
-    personas: ImmutableList<PersonaItem>,
-    thumbnails: ImmutableList<Bitmap?>,
+    personas: List<PersonaItem>,
+    thumbnails: List<PersonaImageContainer>,
     modifier: Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
@@ -142,7 +139,7 @@ fun PersonaListContent(
 @Composable
 fun PersonaCard(
     persona: PersonaItem,
-    thumbnail: Bitmap?,
+    thumbnail: PersonaImageContainer?,
     modifier: Modifier = Modifier,
     onCardClicked: () -> Unit,
     onAvatarClicked: () -> Unit,
@@ -154,7 +151,7 @@ fun PersonaCard(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         PersonaImage(
-            bitmap = thumbnail, modifier = Modifier
+            container = thumbnail, modifier = Modifier
                 .size(88.dp)
                 .padding(8.dp),
             onClick = onAvatarClicked
@@ -210,7 +207,7 @@ fun PersonasListScreenPreview() {
                             name = "Persona $it",
                             selected = it == 2
                         )
-                    }.toImmutableList(),
+                    },
                 ),
                 navController = rememberNavController(),
                 snackbarHostState = SnackbarHostState(),

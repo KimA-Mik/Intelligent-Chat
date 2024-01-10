@@ -1,13 +1,9 @@
 package ru.kima.intelligentchat.presentation.personas.list
 
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +18,7 @@ import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 import ru.kima.intelligentchat.presentation.personas.list.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.list.events.UserEvent
 import ru.kima.intelligentchat.presentation.personas.list.model.toListItem
@@ -40,10 +37,11 @@ class PersonasListViewModel(
         selectedPersona
     ) { personas, selectedPersona ->
         Log.d("PersonasListViewModel", "personaItems = combine")
-        personas.map { it.toListItem(selected = selectedPersona == it.id) }.toImmutableList()
+        personas.map { it.toListItem(selected = selectedPersona == it.id) }
     }
 
-    private val thumbnails = MutableStateFlow<ImmutableList<Bitmap?>>(persistentListOf())
+    private val thumbnails =
+        MutableStateFlow<List<PersonaImageContainer>>(emptyList())
 
     //    private val personaItems = MutableStateFlow(emptyList<PersonaItem>())
     private val query = savedStateHandle.getStateFlow("query", String())
@@ -68,8 +66,8 @@ class PersonasListViewModel(
             personas.value = it
 
             thumbnails.value = it.map { persona ->
-                getPersonaImage(persona.id).bitmap
-            }.toImmutableList()
+                PersonaImageContainer(getPersonaImage(persona.id).bitmap)
+            }
         }.launchIn(viewModelScope)
 
         preferencesHandler.data.onEach {
