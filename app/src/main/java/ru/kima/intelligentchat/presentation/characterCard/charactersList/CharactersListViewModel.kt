@@ -22,7 +22,7 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
-import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 
@@ -33,7 +33,7 @@ class CharactersListViewModel(
     private val putCard: PutCardUseCase,
     private val putCardFromImage: AddCardFromPngUseCase,
     private val createPersona: CreatePersonaUseCase,
-    private val subscribeToPersona: SubscribeToPersonaUseCase
+    private val selectedPersona: SelectedPersonaUseCase
 ) : ViewModel() {
     private val cards = MutableStateFlow(emptyList<CardEntry>())
     private val query = savedStateHandle.getStateFlow("query", String())
@@ -43,7 +43,6 @@ class CharactersListViewModel(
 
     //TODO: Explore better implementation
     private var cardsJob: Job? = null
-    private var personaJob: Job? = null
 
     val state = combine(
         cards,
@@ -65,9 +64,14 @@ class CharactersListViewModel(
     val uiEvents = _uiEvents.asSharedFlow()
 
     init {
+        // TODO: redo first launch check 
         preferencesHandler.data.onEach { preferences ->
             onLoadPersona(preferences.selectedPersonaId)
         }.launchIn(viewModelScope)
+
+        selectedPersona(viewModelScope)
+            .onEach { persona.value = it }
+            .launchIn(viewModelScope)
 
         loadCards()
     }
@@ -160,21 +164,6 @@ class CharactersListViewModel(
         if (personaId == persona.value.id) {
             return
         }
-
-        personaJob?.cancel()
-        personaJob = subscribeToPersona(personaId).onEach { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    persona.emit(resource.data!!)
-                }
-
-                is Resource.Error -> {
-                    preferencesHandler.updateSelectedPersona(resource.data!!.id)
-                }
-
-                is Resource.Loading -> {}
-            }
-        }.launchIn(viewModelScope)
     }
 
     private fun onDismissInitialPersonaName() = viewModelScope.launch {
