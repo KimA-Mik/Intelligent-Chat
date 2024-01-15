@@ -22,9 +22,11 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
+import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 
 class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -33,11 +35,13 @@ class CharactersListViewModel(
     private val putCard: PutCardUseCase,
     private val putCardFromImage: AddCardFromPngUseCase,
     private val createPersona: CreatePersonaUseCase,
-    private val selectedPersona: SelectedPersonaUseCase
+    private val loadPersonaImage: LoadPersonaImageUseCase,
+    selectedPersona: SelectedPersonaUseCase
 ) : ViewModel() {
     private val cards = MutableStateFlow(emptyList<CardEntry>())
     private val query = savedStateHandle.getStateFlow("query", String())
     private val persona = MutableStateFlow(Persona())
+    private val personaImage = MutableStateFlow(PersonaImageContainer())
     private val initialDialog = savedStateHandle.getStateFlow("initialDialog", false)
     private val initialDialogText = savedStateHandle.getStateFlow("initialDialogText", String())
 
@@ -48,15 +52,18 @@ class CharactersListViewModel(
         cards,
         query,
         persona,
+        personaImage,
         initialDialog,
         initialDialogText
-    ) { cards, query, persona, initialDialog, initialDialogText ->
+    ) { args ->
+        @Suppress("UNCHECKED_CAST")
         CharactersListState(
-            cards = cards,
-            searchText = query,
-            persona = persona,
-            initialDialog = initialDialog,
-            initialDialogText = initialDialogText
+            cards = args[0] as List<CardEntry>,
+            searchText = args[1] as String,
+            persona = args[2] as Persona,
+            personaImage = args[3] as PersonaImageContainer,
+            initialDialog = args[4] as Boolean,
+            initialDialogText = args[5] as String
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CharactersListState())
 
@@ -71,6 +78,7 @@ class CharactersListViewModel(
 
         selectedPersona(viewModelScope)
             .onEach { persona.value = it }
+            .onEach { personaImage.value = PersonaImageContainer(loadPersonaImage(it.id).bitmap) }
             .launchIn(viewModelScope)
 
         loadCards()

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -26,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.domain.card.model.CardEntry
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.components.CardItem
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
+import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -35,7 +38,7 @@ fun CharactersListContent(
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
     BoxWithConstraints(modifier) {
-        SearchField(state.searchText, onEvent)
+        SearchField(state.searchText, state.personaImage, onEvent)
         CharactersList(state.cards, onEvent)
     }
 }
@@ -44,6 +47,7 @@ fun CharactersListContent(
 @Composable
 fun SearchField(
     query: String,
+    personaImage: PersonaImageContainer,
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
     SearchBar(
@@ -64,9 +68,16 @@ fun SearchField(
             IconButton(onClick = { onEvent(CharactersListUserEvent.OnMenuButtonClicked) }) {
                 Icon(imageVector = Icons.Filled.Menu, contentDescription = "Open menu")
             }
-        }) {
-
-    }
+        },
+        trailingIcon = {
+            PersonaImage(
+                container = personaImage,
+                onClick = {},
+                border = false,
+                modifier = Modifier.size(30.dp)
+            )
+        },
+        content = {})
 }
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 fun PersonaImage(
     container: PersonaImageContainer?,
     modifier: Modifier = Modifier,
+    border: Boolean = true,
     onClick: () -> Unit
 ) {
     var imageBitmap by remember {
@@ -58,15 +59,21 @@ fun PersonaImage(
                 }
         )
     } else {
-        Image(
-            painter = BitmapPainter(imageBitmap!!), contentDescription = "",
-            modifier = modifier
-                .clip(CircleShape)
+        val m = if (border) {
+            modifier
                 .border(
                     1.5.dp,
                     MaterialTheme.colorScheme.onSecondaryContainer,
                     CircleShape
                 )
+        } else {
+            modifier
+        }
+
+        Image(
+            painter = BitmapPainter(imageBitmap!!), contentDescription = "",
+            modifier = m
+                .clip(CircleShape)
                 .clickable {
                     onClick()
                 },
