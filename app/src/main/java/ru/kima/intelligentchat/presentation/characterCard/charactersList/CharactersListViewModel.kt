@@ -82,6 +82,7 @@ class CharactersListViewModel(
     }
 
     private fun loadCards() = viewModelScope.launch {
+        cardsUseCase.filter(query.value)
         cardsUseCase().collect { result ->
             cards.value = result.map {
                 it.toImmutable()
