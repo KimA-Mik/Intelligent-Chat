@@ -30,13 +30,13 @@ fun domain() = module {
     single<PersonaRepository> { PersonaRepositoryImpl(get(), get()) }
 
     factoryOf(::GetCardsUseCase)
+    factoryOf(::GetCardsListUseCase)
     singleOf(::GetCardUseCase)
     singleOf(::PutCardUseCase)
     singleOf(::UpdateCardAvatarUseCase)
     singleOf(::AddCardFromPngUseCase)
     singleOf(::UpdateCardUseCase)
     singleOf(::DeleteCardUseCase)
-    singleOf(::GetCardsListUseCase)
 
 
     singleOf(::CreatePersonaUseCase)
