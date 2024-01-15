@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
+import ru.kima.intelligentchat.presentation.common.image.ImmutableBitmap
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -116,7 +117,8 @@ fun HeadArea(
             .then(modifier)
     ) {
         CardImage(
-            photo,
+            // FIXME: Fix later
+            ImmutableBitmap(photo),
             modifier = Modifier.size(100.dp)
         ) {
             onEvent(CardDetailUserEvent.SelectImageClicked)

@@ -1,7 +1,6 @@
 package ru.kima.intelligentchat.presentation.characterCard.cardDetails.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,11 +25,12 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.kima.intelligentchat.presentation.common.image.ImmutableBitmap
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun CardImage(
-    photoBytes: Bitmap?,
+    image: ImmutableBitmap,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -45,8 +45,8 @@ fun CardImage(
         mutableStateOf<ImageBitmap?>(null)
     }
 
-    LaunchedEffect(photoBytes) {
-        bitmap = photoBytes?.asImageBitmap()
+    LaunchedEffect(image) {
+        bitmap = image.bitmap?.asImageBitmap()
     }
 
 
@@ -98,7 +98,7 @@ fun CardImage(
 fun CardImagePreview() {
     IntelligentChatTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            CardImage(photoBytes = null) {
+            CardImage(image = ImmutableBitmap()) {
 
             }
         }

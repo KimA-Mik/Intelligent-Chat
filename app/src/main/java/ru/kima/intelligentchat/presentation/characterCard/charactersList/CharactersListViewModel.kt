@@ -3,7 +3,6 @@ package ru.kima.intelligentchat.presentation.characterCard.charactersList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.core.preferences.PreferencesHandler
-import ru.kima.intelligentchat.domain.card.model.CardEntry
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
@@ -26,27 +24,26 @@ import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
+import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.toImmutable
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 
 class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val preferencesHandler: PreferencesHandler,
-    private val getCards: GetCardsListUseCase,
+    private val cardsUseCase: GetCardsListUseCase,
     private val putCard: PutCardUseCase,
     private val putCardFromImage: AddCardFromPngUseCase,
     private val createPersona: CreatePersonaUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
     selectedPersona: SelectedPersonaUseCase
 ) : ViewModel() {
-    private val cards = MutableStateFlow(emptyList<CardEntry>())
+    private val cards = MutableStateFlow(emptyList<ImmutableCardEntry>())
     private val query = savedStateHandle.getStateFlow("query", String())
     private val persona = MutableStateFlow(Persona())
     private val personaImage = MutableStateFlow(PersonaImageContainer())
     private val initialDialog = savedStateHandle.getStateFlow("initialDialog", false)
     private val initialDialogText = savedStateHandle.getStateFlow("initialDialogText", String())
-
-    //TODO: Explore better implementation
-    private var cardsJob: Job? = null
 
     val state = combine(
         cards,
@@ -58,7 +55,7 @@ class CharactersListViewModel(
     ) { args ->
         @Suppress("UNCHECKED_CAST")
         CharactersListState(
-            cards = args[0] as List<CardEntry>,
+            cards = args[0] as List<ImmutableCardEntry>,
             searchText = args[1] as String,
             persona = args[2] as Persona,
             personaImage = args[3] as PersonaImageContainer,
@@ -84,11 +81,10 @@ class CharactersListViewModel(
         loadCards()
     }
 
-    private fun loadCards() {
-        cardsJob?.cancel()
-        cardsJob = viewModelScope.launch {
-            getCards(query.value).collect { result ->
-                cards.value = result
+    private fun loadCards() = viewModelScope.launch {
+        cardsUseCase().collect { result ->
+            cards.value = result.map {
+                it.toImmutable()
             }
         }
     }
@@ -142,7 +138,7 @@ class CharactersListViewModel(
 
     private fun onSearchQueryChanger(query: String) {
         savedStateHandle["query"] = query
-        loadCards()
+        cardsUseCase.filter(query)
     }
 
     private fun onShowCardAvatar(cardId: Long) = viewModelScope.launch {
@@ -151,7 +147,7 @@ class CharactersListViewModel(
             _uiEvents.emit(CharactersListUiEvent.Message.NoSuchCard)
             return@launch
         }
-        if (card.thumbnail == null) {
+        if (card.thumbnail.bitmap == null) {
             _uiEvents.emit(CharactersListUiEvent.Message.NoCardPhoto)
             return@launch
         }

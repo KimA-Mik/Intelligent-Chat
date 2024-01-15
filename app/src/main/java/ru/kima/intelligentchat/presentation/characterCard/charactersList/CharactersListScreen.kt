@@ -63,10 +63,16 @@ fun CharactersListScreen(
     imagePicker: ImagePicker,
     viewModel: CharactersListViewModel
 ) {
+    val onEvent = remember<(CharactersListUserEvent) -> Unit> {
+        {
+            viewModel.onUserEvent(it)
+        }
+    }
+
     val content = LocalContext.current
     val state by viewModel.state.collectAsState()
     imagePicker.registerPicker { imageBytes ->
-        viewModel.onUserEvent(CharactersListUserEvent.AddCardFromImage(imageBytes))
+        onEvent(CharactersListUserEvent.AddCardFromImage(imageBytes))
     }
 
     val scope = rememberCoroutineScope()
@@ -101,10 +107,10 @@ fun CharactersListScreen(
     when {
         state.initialDialog -> InitPersonaDialog(
             text = state.initialDialogText,
-            onDismissRequest = { viewModel.onUserEvent(CharactersListUserEvent.DismissInitialPersonaName) },
-            onAcceptDialog = { viewModel.onUserEvent(CharactersListUserEvent.AcceptInitialPersonaName) },
+            onDismissRequest = { onEvent(CharactersListUserEvent.DismissInitialPersonaName) },
+            onAcceptDialog = { onEvent(CharactersListUserEvent.AcceptInitialPersonaName) },
             onTextChanged = { text ->
-                viewModel.onUserEvent(
+                onEvent(
                     CharactersListUserEvent.InitDialogValueChanged(
                         text
                     )
@@ -123,10 +129,10 @@ fun CharactersListScreen(
             ActionButtons(
                 isExpanded,
                 onImageButtonClick = {
-                    viewModel.onUserEvent(CharactersListUserEvent.AddCardFromImageClicked)
+                    onEvent(CharactersListUserEvent.AddCardFromImageClicked)
                 },
                 onCreateButtonClick = {
-                    viewModel.onUserEvent(CharactersListUserEvent.CreateCardClicked)
+                    onEvent(CharactersListUserEvent.CreateCardClicked)
                 },
                 onControlButtonClick = {
                     isExpanded = !isExpanded
@@ -137,7 +143,7 @@ fun CharactersListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            state = state, onEvent = viewModel::onUserEvent
+            state = state, onEvent = onEvent
         )
     }
 }

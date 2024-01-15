@@ -1,21 +1,40 @@
 package ru.kima.intelligentchat.domain.card.useCase
 
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.card.util.CardOrder
 
-class GetCardsListUseCase(private val cardRepository: CharacterCardRepository) {
-    operator fun invoke(filter: String = String(), order: CardOrder = CardOrder.Date) =
-        cardRepository.getCardsListEntries().map { cards ->
-            var result = cards
-            if (filter.isNotBlank()) {
-                result = result.filter { it.name.contains(filter, ignoreCase = true) }
-            }
+class GetCardsListUseCase(
+    cardRepository: CharacterCardRepository
+) {
+    private val query = MutableStateFlow("")
+    private val order = MutableStateFlow(CardOrder.Date)
+    private val personas = cardRepository.getCardsListEntries()
 
-            result = when (order) {
-                CardOrder.Name -> result.sortedBy { it.name }
-                CardOrder.Date -> result
-            }
-            result
+    fun filter(query: String) {
+        this.query.value = query
+    }
+
+    fun order(order: CardOrder) {
+        this.order.value = order
+    }
+
+    operator fun invoke() = combine(
+        query,
+        order,
+        personas
+    ) { query, order, personas ->
+        var result = personas
+        if (query.isNotBlank()) {
+            result = result.filter { it.name.contains(query, ignoreCase = true) }
         }
+
+        result = when (order) {
+            CardOrder.Name -> result.sortedBy { it.name }
+            CardOrder.Date -> result
+        }
+
+        return@combine result
+    }
 }

@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.di
 
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
@@ -28,14 +29,15 @@ fun domain() = module {
     single<CharacterCardRepository> { CharacterCardRepositoryImpl(get(), get(), get()) }
     single<PersonaRepository> { PersonaRepositoryImpl(get(), get()) }
 
+    factoryOf(::GetCardsUseCase)
     singleOf(::GetCardUseCase)
-    singleOf(::GetCardsUseCase)
     singleOf(::PutCardUseCase)
     singleOf(::UpdateCardAvatarUseCase)
     singleOf(::AddCardFromPngUseCase)
     singleOf(::UpdateCardUseCase)
     singleOf(::DeleteCardUseCase)
     singleOf(::GetCardsListUseCase)
+
 
     singleOf(::CreatePersonaUseCase)
     singleOf(::SubscribeToPersonaUseCase)
@@ -45,5 +47,5 @@ fun domain() = module {
     singleOf(::UpdatePersonaUseCase)
     singleOf(::UpdatePersonaImageUseCase)
     singleOf(::DeletePersonaUseCase)
-    singleOf(::SelectedPersonaUseCase)
+    factoryOf(::SelectedPersonaUseCase)
 }
