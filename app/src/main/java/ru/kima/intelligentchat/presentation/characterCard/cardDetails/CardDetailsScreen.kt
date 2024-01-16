@@ -45,12 +45,17 @@ fun CardDetailsScreen(
     imagePicker: ImagePicker,
     viewModel: CardDetailsViewModel
 ) {
+    val onEvent = remember<(CardDetailUserEvent) -> Unit> {
+        {
+            viewModel.onEvent(it)
+        }
+    }
     BackHandler(onBack = {
         navController.popBackStack()
     })
     val state by viewModel.state.collectAsState()
     imagePicker.registerPicker { imageBytes ->
-        viewModel.onEvent(CardDetailUserEvent.UpdateCardImage(imageBytes))
+        onEvent(CardDetailUserEvent.UpdateCardImage(imageBytes))
     }
 
     var deleteCardDialog by remember { mutableStateOf(false) }
@@ -81,7 +86,7 @@ fun CardDetailsScreen(
         deleteCardDialog -> SimpleAlertDialog(
             onConfirm = {
                 deleteCardDialog = false
-                viewModel.onEvent(CardDetailUserEvent.DeleteCard)
+                onEvent(CardDetailUserEvent.DeleteCard)
             },
             onDismiss = { deleteCardDialog = false },
             title = stringResource(R.string.delete_card_dialog_title),
@@ -113,7 +118,7 @@ fun CardDetailsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.DeleteCardClicked) }) {
+                    IconButton(onClick = { onEvent(CardDetailUserEvent.DeleteCardClicked) }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = "Save card",
@@ -121,7 +126,7 @@ fun CardDetailsScreen(
                     }
 
                     //TODO: Implement proper menu
-                    IconButton(onClick = { viewModel.onEvent(CardDetailUserEvent.SaveCard) }) {
+                    IconButton(onClick = { onEvent(CardDetailUserEvent.SaveCard) }) {
                         Icon(
                             imageVector = Icons.Filled.Save,
                             contentDescription = "Save card",
@@ -133,7 +138,7 @@ fun CardDetailsScreen(
     ) { contentPadding ->
         CardDetailContent(
             state,
-            onEvent = viewModel::onEvent,
+            onEvent = onEvent,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
