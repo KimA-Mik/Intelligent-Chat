@@ -1,6 +1,6 @@
 package ru.kima.intelligentchat.domain.persona.useCase
 
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 import ru.kima.intelligentchat.core.preferences.PreferencesHandler
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
@@ -15,11 +15,11 @@ class DeletePersonaUseCase(
             return false
         }
 
-        val selectedPersonaId = preferences.data.last().selectedPersonaId
+        val selectedPersonaId = preferences.data.first().selectedPersonaId
         if (selectedPersonaId == persona.id) {
             val newId = repository
                 .selectPersonas()
-                .last()
+                .first()
                 .first { it.id != selectedPersonaId }
                 .id
             preferences.updateSelectedPersona(newId)
