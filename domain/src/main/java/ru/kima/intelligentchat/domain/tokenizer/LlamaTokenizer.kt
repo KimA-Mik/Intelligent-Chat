@@ -28,13 +28,14 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
         fun PriorityQueue<TokenNode>.addNode(node: TokenNode) {
             val mergeIdentifier = node.next?.tokenId?.let { getMergeIdentifier(node.tokenId, it) }
 
-            val mergePriority = merges.getOrDefault(mergeIdentifier, 0)
-                .toFloat() + node.pos / prompt.length.toFloat()
-            node.priority = mergePriority
-            mergeIdentifier?.let {
-                node.mergeToString = it.replace(" ", "")
+            val priority = merges.getOrDefault(mergeIdentifier, 0)
+            if (priority > 0) {
+                node.priority = priority.toFloat() + node.pos / prompt.length.toFloat()
+                mergeIdentifier?.let {
+                    node.mergeToString = it.replace(" ", "")
+                }
+                add(node)
             }
-            add(node)
         }
 
         var firstTokenNode = TokenNode(
@@ -139,8 +140,25 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
             if (tokens.containsKey(cStr)) {
                 tokensIds.add(tokens[cStr]!!)
             } else {
+                println(cStr)
+
+//                val bytes = cStr.toByteArray(charset = Charsets.UTF_8)
+//                bytes.forEach {
+//                    val hexToken = byteToHex(it)
+//                    val tokenId = tokens[hexToken]
+//                    if (tokenId == null) {
+//                        //unknown token
+//                        tokensIds.add(0)
+//                    } else {
+//                        tokensIds.add(tokenId)
+//                    }
+//                }
+
                 for (i in 0..3) {
                     val byte: Byte = (c.code shr i * 8).toByte()
+                    if (byte == 0.toByte()) {
+                        break
+                    }
                     val hexToken = byteToHex(byte)
                     val tokenId = tokens[hexToken]
                     if (tokenId == null) {
@@ -168,7 +186,7 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
     }
 
 
-    private val comparator: Comparator<TokenNode> = compareByDescending { it.priority }
+    private val comparator: Comparator<TokenNode> = compareBy { it.priority }
 
     private data class TokenNode(
         val pos: Float,
