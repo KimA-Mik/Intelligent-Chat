@@ -9,7 +9,8 @@ class LlamaTokenizerTest {
     val tokenizer: LlamaTokenizer
 
     init {
-        val vocabulary = File("src/main/res/raw/llama_vocabulary").bufferedReader().readLines()
+        val vocabulary =
+            File("src/main/res/raw/llama_vocabulary").bufferedReader().readText().split('\n')
         val merges = mutableMapOf<String, Int>()
         File("src/main/res/raw/llama_merges").bufferedReader()
             .readText()
@@ -171,7 +172,7 @@ class LlamaTokenizerTest {
             787, 988, 896, 2041, 515, 472, 278, 1095, 310, 931,
             7226, 29953, 29962
         )
-
-        assertArrayEquals(expected, tokenizer.encode(prompt))
+        val res = tokenizer.encode(prompt)
+        assertArrayEquals(expected, res)
     }
 }

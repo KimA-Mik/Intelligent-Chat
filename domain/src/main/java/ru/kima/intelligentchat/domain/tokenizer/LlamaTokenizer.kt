@@ -10,6 +10,7 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
 
     init {
         val t = mutableMapOf<String, Int>()
+
         vocabulary.forEachIndexed { index, token ->
             t[token] = index
         }
@@ -23,7 +24,7 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
         addPrecedingSpace: Boolean
     ): IntArray {
         val tokenIds = mapCharactersToTokenIds(prompt, addBosToken, addPrecedingSpace)
-        val mergeQueue = PriorityQueue(comparator)
+        val mergeQueue = PriorityQueue(prompt.length, comparator)
 
         fun PriorityQueue<TokenNode>.addNode(node: TokenNode) {
             val mergeIdentifier = node.next?.tokenId?.let { getMergeIdentifier(node.tokenId, it) }
@@ -117,60 +118,47 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
     }
 
     private fun mapCharactersToTokenIds(
-        p: String,
+        prompt: String,
         addBosToken: Boolean,
         addPrecedingSpace: Boolean
     ): IntArray {
-        val tokensIds: MutableList<Int> = ArrayList(p.length)
+        val tokensIds: MutableList<Int> = ArrayList(prompt.length + 1)
         if (addBosToken) {
             tokensIds.add(1)
         }
 
-        val prompt = if (!addPrecedingSpace) {
-            p
-        } else {
-            " $p"
-        }
-
         // Special: spaces are represented as thick underscore ▁ (id 29871)
-        val alteredPrompt = prompt.replace(" ", thickUnderscore)
+        val alteredPrompt = if (addPrecedingSpace) {
+            " $prompt"
+        } else {
+            prompt
+        }.replace(" ", thickUnderscore)
 
-        for (c in alteredPrompt) {
+
+        var i = 0
+        while (i < alteredPrompt.length) {
+            val c = alteredPrompt[i]
             val cStr = c.toString()
-            if (tokens.containsKey(cStr)) {
-                tokensIds.add(tokens[cStr]!!)
+            if (tokens.contains(cStr)) {
+                val tokenId = tokens[cStr]!!
+                tokensIds.add(tokenId)
+                i += 1
             } else {
-                println(cStr)
+                val utf8String = if (c.isSurrogate() && alteredPrompt.length - i > 1) {
+                    alteredPrompt.substring(i, i + 2)
+                } else {
+                    cStr
+                }
+                i += utf8String.length
 
-//                val bytes = cStr.toByteArray(charset = Charsets.UTF_8)
-//                bytes.forEach {
-//                    val hexToken = byteToHex(it)
-//                    val tokenId = tokens[hexToken]
-//                    if (tokenId == null) {
-//                        //unknown token
-//                        tokensIds.add(0)
-//                    } else {
-//                        tokensIds.add(tokenId)
-//                    }
-//                }
-
-                for (i in 0..3) {
-                    val byte: Byte = (c.code shr i * 8).toByte()
-                    if (byte == 0.toByte()) {
-                        break
-                    }
-                    val hexToken = byteToHex(byte)
-                    val tokenId = tokens[hexToken]
-                    if (tokenId == null) {
-                        //unknown token
-                        tokensIds.add(0)
-                    } else {
-                        tokensIds.add(tokenId)
-                    }
+                val bytes = utf8String.toByteArray(Charsets.UTF_8)
+                bytes.forEach {
+                    val hexToken = byteToHex(it)
+                    val tokenId = tokens.getOrDefault(hexToken, 0)
+                    tokensIds.add(tokenId)
                 }
             }
         }
-
         return tokensIds.toIntArray()
     }
 
@@ -184,7 +172,6 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
     private fun getMergeIdentifier(id1: Int, id2: Int): String {
         return "${vocabulary[id1]} ${vocabulary[id2]}"
     }
-
 
     private val comparator: Comparator<TokenNode> = compareBy { it.priority }
 
