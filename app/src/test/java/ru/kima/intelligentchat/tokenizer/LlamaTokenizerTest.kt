@@ -1,7 +1,9 @@
-package ru.kima.intelligentchat.domain.tokenizer
+package ru.kima.intelligentchat.tokenizer
 
+import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
+import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import java.io.File
 
 class LlamaTokenizerTest {
@@ -9,24 +11,22 @@ class LlamaTokenizerTest {
     val tokenizer: LlamaTokenizer
 
     init {
-        val vocabulary =
-            File("src/main/res/raw/llama_vocabulary").bufferedReader().readText().split('\n')
-        val merges = mutableMapOf<String, Int>()
-        File("src/main/res/raw/llama_merges").bufferedReader()
-            .readText()
-            .split('\n')
-            .dropLast(1)
-            .forEach { line ->
-                val parts = line.split(',')
-                merges[parts.first()] = parts.last().toInt()
+        val vocabulary: List<String> = File("src/main/res/raw/llama_vocabulary.json")
+            .bufferedReader()
+            .use {
+                Json.decodeFromString(it.readText())
             }
+
+        val merges = mutableMapOf<String, Int>()
+        File("src/main/res/raw/llama_merges_list.json").bufferedReader().use {
+            val mergesList: List<String> = Json.decodeFromString(it.readText())
+            mergesList.forEachIndexed { index, merge ->
+                merges[merge] = index * 2 + 1
+            }
+        }
 
         tokenizer = LlamaTokenizer(vocabulary, merges)
     }
-
-//    @BeforeEach
-//    fun setUp() {
-//    }
 
     @Test
     fun simpleTest() {
