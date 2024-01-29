@@ -40,5 +40,4 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.2")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
 }
