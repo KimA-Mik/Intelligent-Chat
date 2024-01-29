@@ -23,6 +23,10 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
         addBosToken: Boolean,
         addPrecedingSpace: Boolean
     ): IntArray {
+        if (prompt.isBlank()) {
+            return intArrayOf()
+        }
+
         val tokenIds = mapCharactersToTokenIds(prompt, addBosToken, addPrecedingSpace)
         val mergeQueue = PriorityQueue(prompt.length, comparator)
 
