@@ -1,8 +1,14 @@
 package ru.kima.intelligentchat.di
 
+import android.content.Context
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
 import ru.kima.intelligentchat.data.persona.PersonaRepositoryImpl
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
@@ -24,8 +30,11 @@ import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
+import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
+import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 
-fun domain() = module {
+@OptIn(ExperimentalSerializationApi::class, DelicateCoroutinesApi::class)
+fun domain(context: Context) = module {
     single<CharacterCardRepository> { CharacterCardRepositoryImpl(get(), get(), get()) }
     single<PersonaRepository> { PersonaRepositoryImpl(get(), get()) }
 
@@ -48,4 +57,20 @@ fun domain() = module {
     singleOf(::UpdatePersonaImageUseCase)
     singleOf(::DeletePersonaUseCase)
     factoryOf(::SelectedPersonaUseCase)
+
+    factoryOf(::TokenizeTextUseCase)
+
+    single {
+        val vocabStream = context.resources.openRawResource(R.raw.llama_vocabulary)
+        val vocabulary: List<String> = Json.decodeFromStream(vocabStream)
+        vocabStream.close()
+
+        val mergesStream = context.resources.openRawResource(R.raw.llama_merges_list)
+        val merges = mutableMapOf<String, Int>()
+        Json.decodeFromStream<List<String>>(mergesStream)
+            .forEachIndexed { index, merge ->
+                merges[merge] = index * 2 + 1
+            }
+        LlamaTokenizer(vocabulary, merges)
+    }
 }

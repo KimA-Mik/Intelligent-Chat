@@ -38,7 +38,7 @@ class ChatApplication : Application() {
             modules(
                 core,
                 data(this@ChatApplication),
-                domain(),
+                domain(this@ChatApplication),
                 presentation
             )
         }
