@@ -3,14 +3,17 @@ package ru.kima.intelligentchat.data.kobold.config
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import kotlinx.serialization.Serializable
 import ru.kima.intelligentchat.data.KOBOLD_CONFIG_TABLE_NAME
 import ru.kima.intelligentchat.data.common.IntListConverter
 
+@Serializable
 @Entity(KOBOLD_CONFIG_TABLE_NAME)
 @TypeConverters(IntListConverter::class)
 data class KoboldConfigEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val name: String = String(),
     val temperature: Float = 1f,
     val repetitionPenalty: Float = 1f,
     val repetitionPenaltyRange: Int = 2048,
