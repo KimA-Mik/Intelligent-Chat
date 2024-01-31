@@ -1,9 +1,9 @@
 package ru.kima.intelligentchat.presentation.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -15,8 +15,8 @@ enum class NavItem(
 ) {
     Characters(
         title = "Characters",
-        selectedIcon = Icons.Filled.Article,
-        unselectedIcon = Icons.Outlined.Article,
+        selectedIcon = Icons.AutoMirrored.Filled.Article,
+        unselectedIcon = Icons.AutoMirrored.Outlined.Article,
         root = "cardsScreen"
     ),
     Personas(
