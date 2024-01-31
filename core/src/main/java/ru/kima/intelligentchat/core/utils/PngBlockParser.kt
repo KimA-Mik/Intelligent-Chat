@@ -4,13 +4,16 @@ import android.util.Base64
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-@Suppress("UNUSED")
 class PngBlockParser {
     private val pngSignature = byteArrayOf(137.toByte(), 80, 78, 71, 13, 10, 26, 10)
 
     private enum class BLOCK(val type: Int) {
+        //additional png blocks
+        @Suppress("unused")
         IHDR(1229472850),
         tEXt(1950701684),
+
+        @Suppress("unused")
         IDAT(1229209940),
         IEND(1229278788)
     }
@@ -45,24 +48,13 @@ class PngBlockParser {
             }
 
             buffer.position(buffer.position() + length)
-            val crc = buffer.int
+            @Suppress("UNUSED_VARIABLE") val crc = buffer.int
         }
 
         if (resultBuffer == null)
             return String()
 
         return parseTextChunk(resultBuffer)
-    }
-
-    private fun intToStr(value: Int): String {
-        val sb = StringBuilder(4)
-
-        sb.append(((0x000000FF) and (value shr 24)).toChar())
-        sb.append(((0x000000FF) and (value shr 16)).toChar())
-        sb.append(((0x000000FF) and (value shr 8)).toChar())
-        sb.append(((0x000000FF) and (value shr 0)).toChar())
-
-        return sb.toString()
     }
 
     private fun parseTextChunk(buffer: ByteBuffer): String {
@@ -78,7 +70,8 @@ class PngBlockParser {
 
         val keywordBuffer = buffer.slice()
         keywordBuffer.limit(separatorPosition)
-        val keyword = StandardCharsets.US_ASCII.decode(keywordBuffer).toString()
+        @Suppress("UNUSED_VARIABLE") val keyword =
+            StandardCharsets.US_ASCII.decode(keywordBuffer).toString()
 
         buffer.position(separatorPosition + 1)
         val toDecode = buffer.slice()
