@@ -14,6 +14,10 @@
 
     <string name="persona_saved_message">The persona has been saved.</string>
 
+    <string name="nav_item_characters">Characters</string>
+    <string name="nav_item_personas">Personas</string>
+    <string name="nav_item_connection">Connection</string>
+
     <string name="persona_name">Persona name</string>
     <string name="persona_description">Persona description</string>
     <string name="create_persona_fab_content_description">Create persona</string>

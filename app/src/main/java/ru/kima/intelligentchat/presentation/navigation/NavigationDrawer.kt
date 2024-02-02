@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -52,9 +53,10 @@ fun NavigationDrawerContent(
         Spacer(modifier = Modifier.height(16.dp))
         NavItem.entries.forEach { navItem ->
             val selected = currentDestination?.hierarchy?.any { it.route == navItem.root } == true
+            val title = stringResource(id = navItem.titleId)
             NavigationDrawerItem(
                 label = {
-                    Text(text = navItem.title)
+                    Text(text = title)
                 },
                 selected = selected,
                 onClick = {
@@ -74,7 +76,7 @@ fun NavigationDrawerContent(
                 icon = {
                     Icon(
                         imageVector = if (selected) navItem.selectedIcon else navItem.unselectedIcon,
-                        contentDescription = navItem.title
+                        contentDescription = title
                     )
                 },
                 modifier = Modifier
