@@ -14,6 +14,7 @@ import ru.kima.intelligentchat.data.card.util.getCardPhotoName
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
 import ru.kima.intelligentchat.data.serialization.CardDeserializer
+import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.model.CardEntry
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
@@ -93,5 +94,19 @@ class CharacterCardRepositoryImpl(
         val photoBytes = outputStream.toByteArray()
         imageStorage.saveImage(fileName, photoBytes)
         cardDao.updatePhotoFilePath(cardId, fileName)
+    }
+
+    override suspend fun createAlternateGreeting(cardId: Long): Long {
+        val greeting = AltGreetingEntity(cardId = cardId, body = String())
+        return cardDao.insertGreeting(greeting)
+    }
+
+    override suspend fun updateAlternateGreeting(altGreeting: AltGreeting, cardId: Long) {
+        val entity = altGreeting.toEntity(cardId)
+        cardDao.updateGreeting(entity)
+    }
+
+    override suspend fun deleteAlternateGreeting(id: Long) {
+        cardDao.deleteGreeting(id)
     }
 }

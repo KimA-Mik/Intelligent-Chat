@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
+import ru.kima.intelligentchat.domain.card.useCase.CreateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
@@ -29,7 +30,8 @@ class CardDetailsViewModel(
     private val getCard: GetCardUseCase,
     private val updateCardAvatar: UpdateCardAvatarUseCase,
     private val updateCard: UpdateCardUseCase,
-    private val deleteCard: DeleteCardUseCase
+    private val deleteCard: DeleteCardUseCase,
+    private val createAlternateGreeting: CreateAlternateGreetingUseCase
 ) : ViewModel() {
     private val cardId = savedStateHandle.getStateFlow(CardField.Id.string, 0L)
     private val photoBytes = MutableStateFlow<Bitmap?>(null)
@@ -43,12 +45,12 @@ class CardDetailsViewModel(
     private val cardSystemPrompt = savedStateHandle.getStateFlow(CardField.SystemPrompt.string, "")
     private val cardPostHistoryInstructions =
         savedStateHandle.getStateFlow(CardField.PostHistoryInstructions.string, "")
-    private val cardAlternateGreetings =
-        savedStateHandle.getStateFlow(CardField.AlternateGreetings.string, emptyList<String>())
+    private val cardAlternateGreetings = MutableStateFlow(emptyList<AltGreeting>())
     private val cardTags = savedStateHandle.getStateFlow(CardField.Tags.string, emptyList<String>())
     private val cardCreator = savedStateHandle.getStateFlow(CardField.Creator.string, "")
     private val cardCharacterVersion =
         savedStateHandle.getStateFlow(CardField.CharacterVersion.string, "")
+    private val showAltGreetingSheet = savedStateHandle.getStateFlow("showGreetings", false)
 
     val state = combine(
         cardId,
@@ -65,7 +67,8 @@ class CardDetailsViewModel(
         cardAlternateGreetings,
         cardTags,
         cardCreator,
-        cardCharacterVersion
+        cardCharacterVersion,
+        showAltGreetingSheet
     ) { args ->
 
         @Suppress("UNCHECKED_CAST")
@@ -86,7 +89,8 @@ class CardDetailsViewModel(
                 tags = args[12].let { if (it is List<*>) it.filterIsInstance<String>() else emptyList() },
                 creator = args[13] as String,
                 characterVersion = args[14] as String
-            )
+            ),
+            showAltGreeting = args[15] as Boolean
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
@@ -95,15 +99,11 @@ class CardDetailsViewModel(
     val uiEvents = _uiEvents.asSharedFlow()
 
     private var cardJob: Job? = null
+    private val isLoaded = savedStateHandle.getStateFlow("isLoaded", false)
 
     init {
-        val isLoaded = savedStateHandle.get<Boolean>("isLoaded")
-
-        if (isLoaded == null || !isLoaded) {
-            savedStateHandle.get<Long>(CardField.Id.string)?.let {
-                loadCard(it)
-                savedStateHandle["isLoaded"] = true
-            }
+        savedStateHandle.get<Long>(CardField.Id.string)?.let {
+            loadCard(it)
         }
     }
 
@@ -115,26 +115,33 @@ class CardDetailsViewModel(
             CardDetailUserEvent.SaveCard -> onSaveCard()
             CardDetailUserEvent.DeleteCardClicked -> onDeleteCardClicked()
             CardDetailUserEvent.DeleteCard -> onDeleteCard()
+            CardDetailUserEvent.OpenAltGreetingsSheet -> onOpenAlternateMessages()
+            CardDetailUserEvent.CloseAltGreetingsSheet -> onCloseAlternateMessages()
+            CardDetailUserEvent.CreateAltGreeting -> onCreateAltGreeting()
         }
     }
 
     private fun loadCard(id: Long) {
         cardJob = getCard(id).onEach { card ->
-            savedStateHandle[CardField.Name.string] = card.name
-            photoBytes.value = card.photoBytes
-            savedStateHandle[CardField.Description.string] = card.description
-            savedStateHandle[CardField.Personality.string] = card.personality
-            savedStateHandle[CardField.Scenario.string] = card.scenario
-            savedStateHandle[CardField.FirstMes.string] = card.firstMes
-            savedStateHandle[CardField.MesExample.string] = card.mesExample
-            savedStateHandle[CardField.CreatorNotes.string] = card.creatorNotes
-            savedStateHandle[CardField.SystemPrompt.string] = card.systemPrompt
-            savedStateHandle[CardField.PostHistoryInstructions.string] =
-                card.postHistoryInstructions
-            savedStateHandle[CardField.AlternateGreetings.string] = card.alternateGreetings
-            savedStateHandle[CardField.Tags.string] = card.tags
-            savedStateHandle[CardField.Creator.string] = card.creator
-            savedStateHandle[CardField.CharacterVersion.string] = card.characterVersion
+            if (!isLoaded.value) {
+                savedStateHandle[CardField.Name.string] = card.name
+                photoBytes.value = card.photoBytes
+                savedStateHandle[CardField.Description.string] = card.description
+                savedStateHandle[CardField.Personality.string] = card.personality
+                savedStateHandle[CardField.Scenario.string] = card.scenario
+                savedStateHandle[CardField.FirstMes.string] = card.firstMes
+                savedStateHandle[CardField.MesExample.string] = card.mesExample
+                savedStateHandle[CardField.CreatorNotes.string] = card.creatorNotes
+                savedStateHandle[CardField.SystemPrompt.string] = card.systemPrompt
+                savedStateHandle[CardField.PostHistoryInstructions.string] =
+                    card.postHistoryInstructions
+                savedStateHandle[CardField.Tags.string] = card.tags
+                savedStateHandle[CardField.Creator.string] = card.creator
+                savedStateHandle[CardField.CharacterVersion.string] = card.characterVersion
+                savedStateHandle["isLoaded"] = true
+            }
+
+            cardAlternateGreetings.value = card.alternateGreetings
         }.launchIn(viewModelScope)
     }
 
@@ -178,6 +185,18 @@ class CardDetailsViewModel(
             _uiEvents.emit(UiEvent.PopBack)
             deleteCard(state.value.card)
         }
+    }
+
+    private fun onOpenAlternateMessages() {
+        savedStateHandle["showGreetings"] = true
+    }
+
+    private fun onCloseAlternateMessages() {
+        savedStateHandle["showGreetings"] = false
+    }
+
+    private fun onCreateAltGreeting() = viewModelScope.launch {
+        createAlternateGreeting(cardId.value)
     }
 
     enum class CardField(val string: String) {

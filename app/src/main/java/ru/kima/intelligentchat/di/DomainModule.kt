@@ -13,11 +13,14 @@ import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
 import ru.kima.intelligentchat.data.persona.PersonaRepositoryImpl
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
+import ru.kima.intelligentchat.domain.card.useCase.CreateAlternateGreetingUseCase
+import ru.kima.intelligentchat.domain.card.useCase.DeleteAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
+import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
@@ -47,6 +50,10 @@ fun domain(context: Context) = module {
     singleOf(::UpdateCardUseCase)
     singleOf(::DeleteCardUseCase)
 
+    singleOf(::CreateAlternateGreetingUseCase)
+    singleOf(::DeleteAlternateGreetingUseCase)
+    singleOf(::UpdateAlternateGreetingUseCase)
+
 
     singleOf(::CreatePersonaUseCase)
     singleOf(::SubscribeToPersonaUseCase)
@@ -58,7 +65,9 @@ fun domain(context: Context) = module {
     singleOf(::DeletePersonaUseCase)
     factoryOf(::SelectedPersonaUseCase)
 
+
     factoryOf(::TokenizeTextUseCase)
+
 
     single {
         val vocabStream = context.resources.openRawResource(R.raw.llama_vocabulary)

@@ -21,6 +21,12 @@ interface CharacterCardDao {
     @Insert
     suspend fun insertCharacterCard(character: CharacterEntity): Long
 
+    @Insert
+    suspend fun insertGreeting(greeting: AltGreetingEntity): Long
+
+    @Update
+    suspend fun updateGreeting(greeting: AltGreetingEntity)
+
     @Update
     suspend fun updateCharacterCard(character: CharacterEntity)
 
@@ -67,4 +73,7 @@ interface CharacterCardDao {
 
     @Query("DELETE FROM $ALT_GREETING_TABLE_NAME where cardId=:cardId")
     suspend fun deleteGreetings(cardId: Long)
+
+    @Query("DELETE FROM $ALT_GREETING_TABLE_NAME where id=:id")
+    suspend fun deleteGreeting(id: Long)
 }

@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -21,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -79,6 +81,13 @@ fun CardDetailContent(
             field = CardDetailsViewModel.CardField.FirstMes,
             isExpanded = isFirstMesExpanded,
             onEvent = onEvent,
+            supportRow = {
+                TextButton(onClick = {
+                    onEvent(CardDetailUserEvent.OpenAltGreetingsSheet)
+                }) {
+                    Text(text = "Alternative greetings")
+                }
+            },
             onExpand = { isFirstMesExpanded = !isFirstMesExpanded }
         )
 
@@ -155,6 +164,7 @@ fun GeneralInfo(
     modifier: Modifier = Modifier,
     isExpanded: Boolean,
     onExpand: () -> Unit,
+    supportRow: @Composable () -> Unit = {},
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
     val rotation by animateFloatAsState(
@@ -196,14 +206,21 @@ fun GeneralInfo(
                     onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
                 },
                 supportingText = {
-                    Text(
-                        text = text.length.toString(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        textAlign = TextAlign.End,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        supportRow()
+
+                        Text(
+                            text = "Length: ${text.length}",
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.End,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 })
         }
     }
