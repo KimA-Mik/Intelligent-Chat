@@ -23,7 +23,7 @@ class LlamaTokenizer(private val vocabulary: List<String>, private val merges: M
         addBosToken: Boolean,
         addPrecedingSpace: Boolean
     ): IntArray {
-        if (prompt.isBlank()) {
+        if (prompt.isEmpty()) {
             return intArrayOf()
         }
 
