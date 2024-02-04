@@ -67,7 +67,7 @@ fun AltGreetingsSheetContent(
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { onEvent(CardDetailUserEvent.DeleteAltGreeting(greetings[it].id)) }) {
                     Icon(imageVector = Icons.Filled.DeleteForever, contentDescription = null)
                 }
             }

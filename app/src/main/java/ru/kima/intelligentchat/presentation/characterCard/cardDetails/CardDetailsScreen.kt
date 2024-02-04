@@ -58,8 +58,8 @@ fun CardDetailsScreen(
     imagePicker.registerPicker { imageBytes ->
         onEvent(CardDetailUserEvent.UpdateCardImage(imageBytes))
     }
-
     var deleteCardDialog by remember { mutableStateOf(false) }
+    var deleteAltGreetingDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collect { uiEvent ->
@@ -79,6 +79,7 @@ fun CardDetailsScreen(
 
                 UiEvent.PopBack -> navController.popBackStack()
                 UiEvent.ShowDeleteDialog -> deleteCardDialog = true
+                UiEvent.ShowDeleteGreetingDialog -> deleteAltGreetingDialog = true
             }
         }
     }
@@ -87,11 +88,24 @@ fun CardDetailsScreen(
         deleteCardDialog -> SimpleAlertDialog(
             onConfirm = {
                 deleteCardDialog = false
-                onEvent(CardDetailUserEvent.DeleteCard)
+                onEvent(CardDetailUserEvent.ConfirmDeleteCard)
             },
             onDismiss = { deleteCardDialog = false },
             title = stringResource(R.string.delete_card_dialog_title),
             text = stringResource(R.string.delete_card_dialog_text),
+            icon = Icons.Filled.DeleteForever,
+            confirmText = stringResource(R.string.delete_button_text),
+            dismissText = stringResource(R.string.cancel_button_text)
+        )
+
+        deleteAltGreetingDialog -> SimpleAlertDialog(
+            onConfirm = {
+                deleteAltGreetingDialog = false
+                onEvent(CardDetailUserEvent.ConfirmDeleteAltGreeting)
+            },
+            onDismiss = { deleteAltGreetingDialog = false },
+            title = stringResource(R.string.delete_alternate_greeting_dialog_title),
+            text = stringResource(R.string.delete_alternate_greeting_dialog_text),
             icon = Icons.Filled.DeleteForever,
             confirmText = stringResource(R.string.delete_button_text),
             dismissText = stringResource(R.string.cancel_button_text)

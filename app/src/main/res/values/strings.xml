@@ -11,6 +11,8 @@
     <string name="decide_later_button_text">Decide later</string>
     <string name="default_name_message">You will be known as "User".</string>
     <string name="introduce_first_persona">Please introduce your first persona.</string>
+    <string name="delete_alternate_greeting_dialog_title">Delete alternate greeting?</string>
+    <string name="delete_alternate_greeting_dialog_text">The greeting will be deleted forever. This action cannot be undone.</string>
 
     <string name="persona_saved_message">The persona has been saved.</string>
 
