@@ -34,9 +34,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
 import ru.kima.intelligentchat.presentation.common.image.ImmutableBitmap
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
@@ -239,7 +239,7 @@ fun PreviewCardDetails() {
             color = MaterialTheme.colorScheme.background,
             modifier = Modifier.fillMaxSize()
         ) {
-            val card = CharacterCard(
+            val card = ImmutableCard(
                 name = "Name",
                 description = "Description"
             )

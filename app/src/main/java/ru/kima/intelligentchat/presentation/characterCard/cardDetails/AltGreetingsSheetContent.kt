@@ -20,13 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableAltGreeting
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun AltGreetingsSheetContent(
-    greetings: List<AltGreeting>,
+    greetings: List<ImmutableAltGreeting>,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
     LazyColumn(
@@ -52,6 +52,7 @@ fun AltGreetingsSheetContent(
             count = greetings.size,
             key = { greetings[it].id }
         ) {
+            val greeting = greetings[it]
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -67,13 +68,13 @@ fun AltGreetingsSheetContent(
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
                 }
-                IconButton(onClick = { onEvent(CardDetailUserEvent.DeleteAltGreeting(greetings[it].id)) }) {
+                IconButton(onClick = { onEvent(CardDetailUserEvent.DeleteAltGreeting(greeting.id)) }) {
                     Icon(imageVector = Icons.Filled.DeleteForever, contentDescription = null)
                 }
             }
 
             Text(
-                text = greetings[it].body,
+                text = greeting.body,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -90,7 +91,12 @@ fun AltGreetingsSheetPreview() {
     IntelligentChatTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             AltGreetingsSheetContent(
-                greetings = List(10) { AltGreeting(id = it.toLong(), body = "Greeting $it") },
+                greetings = List(10) {
+                    ImmutableAltGreeting(
+                        id = it.toLong(),
+                        body = "Greeting $it"
+                    )
+                },
                 onEvent = {}
             )
         }

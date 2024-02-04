@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
-import ru.kima.intelligentchat.domain.card.model.AltGreeting
-import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.CreateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
@@ -25,6 +23,9 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableAltGreeting
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.toImmutable
 
 class CardDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -47,7 +48,7 @@ class CardDetailsViewModel(
     private val cardSystemPrompt = savedStateHandle.getStateFlow(CardField.SystemPrompt.string, "")
     private val cardPostHistoryInstructions =
         savedStateHandle.getStateFlow(CardField.PostHistoryInstructions.string, "")
-    private val cardAlternateGreetings = MutableStateFlow(emptyList<AltGreeting>())
+    private val cardAlternateGreetings = MutableStateFlow(emptyList<ImmutableAltGreeting>())
     private val cardTags = savedStateHandle.getStateFlow(CardField.Tags.string, emptyList<String>())
     private val cardCreator = savedStateHandle.getStateFlow(CardField.Creator.string, "")
     private val cardCharacterVersion =
@@ -80,7 +81,7 @@ class CardDetailsViewModel(
 
         @Suppress("UNCHECKED_CAST")
         CardDetailsState(
-            card = CharacterCard(
+            card = ImmutableCard(
                 id = args[0] as Long,
                 photoBytes = args[1]?.let { it as Bitmap },
                 name = args[2] as String,
@@ -92,7 +93,7 @@ class CardDetailsViewModel(
                 creatorNotes = args[8] as String,
                 systemPrompt = args[9] as String,
                 postHistoryInstructions = args[10] as String,
-                alternateGreetings = args[11] as List<AltGreeting>,
+                alternateGreetings = args[11] as List<ImmutableAltGreeting>,
                 tags = args[12].let { if (it is List<*>) it.filterIsInstance<String>() else emptyList() },
                 creator = args[13] as String,
                 characterVersion = args[14] as String
@@ -159,7 +160,7 @@ class CardDetailsViewModel(
                 savedStateHandle["isLoaded"] = true
             }
 
-            cardAlternateGreetings.value = card.alternateGreetings
+            cardAlternateGreetings.value = card.alternateGreetings.map { it.toImmutable() }
         }.launchIn(viewModelScope)
     }
 
@@ -181,7 +182,7 @@ class CardDetailsViewModel(
 
     private fun onSaveCard() {
         viewModelScope.launch {
-            updateCard(state.value.card).onEach { resource ->
+            updateCard(state.value.card.toCard()).onEach { resource ->
                 when (resource) {
                     is Resource.Error -> _uiEvents.emit(UiEvent.SnackbarMessage(resource.message!!))
                     is Resource.Loading -> {}
@@ -200,7 +201,7 @@ class CardDetailsViewModel(
         viewModelScope.launch {
             cardJob?.cancel()
             _uiEvents.emit(UiEvent.PopBack)
-            deleteCard(state.value.card)
+            deleteCard(state.value.card.toCard())
         }
     }
 
