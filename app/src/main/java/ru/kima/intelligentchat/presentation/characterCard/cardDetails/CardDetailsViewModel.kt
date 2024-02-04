@@ -52,7 +52,10 @@ class CardDetailsViewModel(
     private val cardCreator = savedStateHandle.getStateFlow(CardField.Creator.string, "")
     private val cardCharacterVersion =
         savedStateHandle.getStateFlow(CardField.CharacterVersion.string, "")
+
+    private val deleteCardDialog = MutableStateFlow(false)
     private val showAltGreetingSheet = savedStateHandle.getStateFlow("showGreetings", false)
+    private val deleteAltGreetingDialog = MutableStateFlow(false)
 
     val state = combine(
         cardId,
@@ -70,7 +73,9 @@ class CardDetailsViewModel(
         cardTags,
         cardCreator,
         cardCharacterVersion,
-        showAltGreetingSheet
+        deleteCardDialog,
+        showAltGreetingSheet,
+        deleteAltGreetingDialog
     ) { args ->
 
         @Suppress("UNCHECKED_CAST")
@@ -92,7 +97,9 @@ class CardDetailsViewModel(
                 creator = args[13] as String,
                 characterVersion = args[14] as String
             ),
-            showAltGreeting = args[15] as Boolean
+            deleteCardDialog = args[15] as Boolean,
+            showAltGreeting = args[16] as Boolean,
+            deleteAltGreetingDialog = args[17] as Boolean
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
@@ -119,11 +126,13 @@ class CardDetailsViewModel(
             CardDetailUserEvent.SaveCard -> onSaveCard()
             CardDetailUserEvent.DeleteCardClicked -> onDeleteCardClicked()
             CardDetailUserEvent.ConfirmDeleteCard -> onDeleteCard()
+            CardDetailUserEvent.DismissDeleteCard -> onDismissDeleteCard()
             CardDetailUserEvent.OpenAltGreetingsSheet -> onOpenAlternateMessages()
             CardDetailUserEvent.CloseAltGreetingsSheet -> onCloseAlternateMessages()
             CardDetailUserEvent.CreateAltGreeting -> onCreateAltGreeting()
             is CardDetailUserEvent.DeleteAltGreeting -> onDeleteAltGreeting(event.id)
             CardDetailUserEvent.ConfirmDeleteAltGreeting -> onConfirmDeleteAltGreeting()
+            CardDetailUserEvent.DismissDeleteAltGreeting -> onDismissDeleteAltGreeting()
             is CardDetailUserEvent.EditAltGreeting -> onEditAltGreeting(event.id)
             CardDetailUserEvent.AcceptAltGreetingEdit -> onAcceptAltGreetingEdit()
             CardDetailUserEvent.RejectAltGreetingEdit -> onRejectAltGreetingEdit()
@@ -183,17 +192,20 @@ class CardDetailsViewModel(
     }
 
     private fun onDeleteCardClicked() {
-        viewModelScope.launch {
-            _uiEvents.emit(UiEvent.ShowDeleteDialog)
-        }
+        deleteCardDialog.value = true
     }
 
     private fun onDeleteCard() {
+        deleteCardDialog.value = false
         viewModelScope.launch {
             cardJob?.cancel()
             _uiEvents.emit(UiEvent.PopBack)
             deleteCard(state.value.card)
         }
+    }
+
+    private fun onDismissDeleteCard() {
+        deleteCardDialog.value = false
     }
 
     private fun onOpenAlternateMessages() {
@@ -210,14 +222,19 @@ class CardDetailsViewModel(
 
     private fun onDeleteAltGreeting(id: Long) = viewModelScope.launch {
         greetingToDelete = id
-        _uiEvents.emit(UiEvent.ShowDeleteGreetingDialog)
+        deleteAltGreetingDialog.value = true
     }
 
     private fun onConfirmDeleteAltGreeting() = viewModelScope.launch {
         if (greetingToDelete > 0) {
+            deleteAltGreetingDialog.value = false
             deleteAltGreeting(greetingToDelete)
-            greetingToDelete = 0
+            greetingToDelete = 0L
         }
+    }
+
+    private fun onDismissDeleteAltGreeting() {
+        deleteAltGreetingDialog.value = false
     }
 
     private fun onEditAltGreeting(id: Long) {

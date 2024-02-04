@@ -25,11 +25,13 @@ sealed interface CardDetailUserEvent {
 
     data object DeleteCardClicked : CardDetailUserEvent
     data object ConfirmDeleteCard : CardDetailUserEvent
+    data object DismissDeleteCard : CardDetailUserEvent
     data object OpenAltGreetingsSheet : CardDetailUserEvent
     data object CloseAltGreetingsSheet : CardDetailUserEvent
     data object CreateAltGreeting : CardDetailUserEvent
     data class DeleteAltGreeting(val id: Long) : CardDetailUserEvent
     data object ConfirmDeleteAltGreeting : CardDetailUserEvent
+    data object DismissDeleteAltGreeting : CardDetailUserEvent
     data class EditAltGreeting(val id: Long) : CardDetailUserEvent
     data object AcceptAltGreetingEdit : CardDetailUserEvent
     data object RejectAltGreetingEdit : CardDetailUserEvent

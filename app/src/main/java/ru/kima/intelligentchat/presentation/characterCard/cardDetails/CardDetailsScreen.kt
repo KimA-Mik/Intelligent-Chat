@@ -23,10 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -58,8 +56,6 @@ fun CardDetailsScreen(
     imagePicker.registerPicker { imageBytes ->
         onEvent(CardDetailUserEvent.UpdateCardImage(imageBytes))
     }
-    var deleteCardDialog by remember { mutableStateOf(false) }
-    var deleteAltGreetingDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collect { uiEvent ->
@@ -78,19 +74,14 @@ fun CardDetailsScreen(
                 }
 
                 UiEvent.PopBack -> navController.popBackStack()
-                UiEvent.ShowDeleteDialog -> deleteCardDialog = true
-                UiEvent.ShowDeleteGreetingDialog -> deleteAltGreetingDialog = true
             }
         }
     }
 
     when {
-        deleteCardDialog -> SimpleAlertDialog(
-            onConfirm = {
-                deleteCardDialog = false
-                onEvent(CardDetailUserEvent.ConfirmDeleteCard)
-            },
-            onDismiss = { deleteCardDialog = false },
+        state.deleteCardDialog -> SimpleAlertDialog(
+            onConfirm = { onEvent(CardDetailUserEvent.ConfirmDeleteCard) },
+            onDismiss = { onEvent(CardDetailUserEvent.DismissDeleteCard) },
             title = stringResource(R.string.delete_card_dialog_title),
             text = stringResource(R.string.delete_card_dialog_text),
             icon = Icons.Filled.DeleteForever,
@@ -98,12 +89,9 @@ fun CardDetailsScreen(
             dismissText = stringResource(R.string.cancel_button_text)
         )
 
-        deleteAltGreetingDialog -> SimpleAlertDialog(
-            onConfirm = {
-                deleteAltGreetingDialog = false
-                onEvent(CardDetailUserEvent.ConfirmDeleteAltGreeting)
-            },
-            onDismiss = { deleteAltGreetingDialog = false },
+        state.deleteAltGreetingDialog -> SimpleAlertDialog(
+            onConfirm = { onEvent(CardDetailUserEvent.ConfirmDeleteAltGreeting) },
+            onDismiss = { onEvent(CardDetailUserEvent.DismissDeleteAltGreeting) },
             title = stringResource(R.string.delete_alternate_greeting_dialog_title),
             text = stringResource(R.string.delete_alternate_greeting_dialog_text),
             icon = Icons.Filled.DeleteForever,
