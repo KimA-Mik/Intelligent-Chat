@@ -9,4 +9,6 @@ data class CardDetailsState(
     val deleteCardDialog: Boolean = false,
     val showAltGreeting: Boolean = false,
     val deleteAltGreetingDialog: Boolean = false,
+    val editableGreeting: Long = 0,
+    val editableGreetingBuffer: String = String()
 )

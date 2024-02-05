@@ -15,10 +15,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.useCase.CreateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
+import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
@@ -34,7 +36,8 @@ class CardDetailsViewModel(
     private val updateCard: UpdateCardUseCase,
     private val deleteCard: DeleteCardUseCase,
     private val createAlternateGreeting: CreateAlternateGreetingUseCase,
-    private val deleteAltGreeting: DeleteAlternateGreetingUseCase
+    private val deleteAltGreeting: DeleteAlternateGreetingUseCase,
+    private val updateAlternateGreeting: UpdateAlternateGreetingUseCase
 ) : ViewModel() {
     private val cardId = savedStateHandle.getStateFlow(CardField.Id.string, 0L)
     private val photoBytes = MutableStateFlow<Bitmap?>(null)
@@ -58,6 +61,10 @@ class CardDetailsViewModel(
     private val showAltGreetingSheet = savedStateHandle.getStateFlow("showGreetings", false)
     private val deleteAltGreetingDialog = MutableStateFlow(false)
 
+    private val editableGreeting = savedStateHandle.getStateFlow("editableGreeting", 0L)
+    private val editableGreetingBuffer =
+        savedStateHandle.getStateFlow("editableGreetingBuffer", String())
+
     val state = combine(
         cardId,
         photoBytes,
@@ -76,7 +83,9 @@ class CardDetailsViewModel(
         cardCharacterVersion,
         deleteCardDialog,
         showAltGreetingSheet,
-        deleteAltGreetingDialog
+        deleteAltGreetingDialog,
+        editableGreeting,
+        editableGreetingBuffer
     ) { args ->
 
         @Suppress("UNCHECKED_CAST")
@@ -100,7 +109,9 @@ class CardDetailsViewModel(
             ),
             deleteCardDialog = args[15] as Boolean,
             showAltGreeting = args[16] as Boolean,
-            deleteAltGreetingDialog = args[17] as Boolean
+            deleteAltGreetingDialog = args[17] as Boolean,
+            editableGreeting = args[18] as Long,
+            editableGreetingBuffer = args[19] as String
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
@@ -137,6 +148,9 @@ class CardDetailsViewModel(
             is CardDetailUserEvent.EditAltGreeting -> onEditAltGreeting(event.id)
             CardDetailUserEvent.AcceptAltGreetingEdit -> onAcceptAltGreetingEdit()
             CardDetailUserEvent.RejectAltGreetingEdit -> onRejectAltGreetingEdit()
+            is CardDetailUserEvent.UpdateAlternateGreetingBuffer -> onUpdateAlternateGreetingBuffer(
+                event.buffer
+            )
         }
     }
 
@@ -239,15 +253,31 @@ class CardDetailsViewModel(
     }
 
     private fun onEditAltGreeting(id: Long) {
-        TODO("Not yet implemented")
+        val selectedGreeting = state.value.card.alternateGreetings.find { it.id == id } ?: return
+        savedStateHandle["editableGreeting"] = id
+        savedStateHandle["editableGreetingBuffer"] = selectedGreeting.body
     }
 
-    private fun onAcceptAltGreetingEdit() {
-        TODO("Not yet implemented")
+    private fun onAcceptAltGreetingEdit() = viewModelScope.launch {
+        val newBody = editableGreetingBuffer.value
+        val selectedGreeting =
+            state.value.card
+                .alternateGreetings
+                .find { it.id == editableGreeting.value }
+                ?: return@launch
+        val newGreeting = AltGreeting(id = selectedGreeting.id, body = newBody)
+        updateAlternateGreeting(newGreeting, state.value.card.id)
+        savedStateHandle["editableGreeting"] = 0L
+        savedStateHandle["editableGreetingBuffer"] = String()
     }
 
     private fun onRejectAltGreetingEdit() {
-        TODO("Not yet implemented")
+        savedStateHandle["editableGreeting"] = 0L
+        savedStateHandle["editableGreetingBuffer"] = String()
+    }
+
+    private fun onUpdateAlternateGreetingBuffer(buffer: String) {
+        savedStateHandle["editableGreetingBuffer"] = buffer
     }
 
     enum class CardField(val string: String) {

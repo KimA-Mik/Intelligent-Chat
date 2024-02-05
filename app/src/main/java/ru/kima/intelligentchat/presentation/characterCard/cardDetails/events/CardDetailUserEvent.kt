@@ -35,4 +35,5 @@ sealed interface CardDetailUserEvent {
     data class EditAltGreeting(val id: Long) : CardDetailUserEvent
     data object AcceptAltGreetingEdit : CardDetailUserEvent
     data object RejectAltGreetingEdit : CardDetailUserEvent
+    data class UpdateAlternateGreetingBuffer(val buffer: String) : CardDetailUserEvent
 }

@@ -145,6 +145,8 @@ fun CardDetailsScreen(
             }) {
                 AltGreetingsSheetContent(
                     greetings = state.card.alternateGreetings,
+                    editableGreeting = state.editableGreeting,
+                    editableGreetingBuffer = state.editableGreetingBuffer,
                     onEvent = onEvent
                 )
             }
