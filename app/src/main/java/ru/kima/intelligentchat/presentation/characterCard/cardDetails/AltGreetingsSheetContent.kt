@@ -1,6 +1,9 @@
 package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +30,7 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.Car
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableAltGreeting
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AltGreetingsSheetContent(
     greetings: List<ImmutableAltGreeting>,
@@ -58,18 +62,25 @@ fun AltGreetingsSheetContent(
             key = { greetings[it].id }
         ) {
             val greeting = greetings[it]
-            if (editableGreeting == greeting.id) {
-                EditableAlternateGreeting(
-                    buffer = editableGreetingBuffer,
-                    position = it,
-                    onEvent = onEvent
-                )
-            } else {
-                AlternateGreeting(
-                    greeting = greeting,
-                    position = it,
-                    onEvent = onEvent
-                )
+            val edited = editableGreeting == greeting.id
+
+            AnimatedContent(
+                targetState = edited, label = "",
+                modifier = Modifier.animateItemPlacement(),
+            ) { e ->
+                if (e) {
+                    EditableAlternateGreeting(
+                        buffer = editableGreetingBuffer,
+                        position = it,
+                        onEvent = onEvent
+                    )
+                } else {
+                    AlternateGreeting(
+                        greeting = greeting,
+                        position = it,
+                        onEvent = onEvent
+                    )
+                }
             }
         }
     }
@@ -81,33 +92,35 @@ fun AlternateGreeting(
     position: Int,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp)
-    ) {
-        Text(
-            text = "Greeting #${position + 1}",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(onClick = { onEvent(CardDetailUserEvent.EditAltGreeting(greeting.id)) }) {
-            Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp)
+        ) {
+            Text(
+                text = "Greeting #${position + 1}",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = { onEvent(CardDetailUserEvent.EditAltGreeting(greeting.id)) }) {
+                Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
+            }
+            IconButton(onClick = { onEvent(CardDetailUserEvent.DeleteAltGreeting(greeting.id)) }) {
+                Icon(imageVector = Icons.Filled.DeleteForever, contentDescription = null)
+            }
         }
-        IconButton(onClick = { onEvent(CardDetailUserEvent.DeleteAltGreeting(greeting.id)) }) {
-            Icon(imageVector = Icons.Filled.DeleteForever, contentDescription = null)
-        }
-    }
 
-    Text(
-        text = greeting.body,
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-    )
+        Text(
+            text = greeting.body,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+        )
+    }
 }
 
 @Composable
@@ -116,34 +129,36 @@ fun EditableAlternateGreeting(
     position: Int,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp)
-    ) {
-        Text(
-            text = "Greeting #${position + 1}",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(onClick = { onEvent(CardDetailUserEvent.AcceptAltGreetingEdit) }) {
-            Icon(imageVector = Icons.Filled.Done, contentDescription = null)
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp)
+        ) {
+            Text(
+                text = "Greeting #${position + 1}",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = { onEvent(CardDetailUserEvent.AcceptAltGreetingEdit) }) {
+                Icon(imageVector = Icons.Filled.Done, contentDescription = null)
+            }
+            IconButton(onClick = { onEvent(CardDetailUserEvent.RejectAltGreetingEdit) }) {
+                Icon(imageVector = Icons.Filled.Close, contentDescription = null)
+            }
         }
-        IconButton(onClick = { onEvent(CardDetailUserEvent.RejectAltGreetingEdit) }) {
-            Icon(imageVector = Icons.Filled.Close, contentDescription = null)
-        }
-    }
 
-    OutlinedTextField(
-        value = buffer,
-        onValueChange = { onEvent(CardDetailUserEvent.UpdateAlternateGreetingBuffer(it)) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        textStyle = MaterialTheme.typography.bodyMedium
-    )
+        OutlinedTextField(
+            value = buffer,
+            onValueChange = { onEvent(CardDetailUserEvent.UpdateAlternateGreetingBuffer(it)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            textStyle = MaterialTheme.typography.bodyMedium
+        )
+    }
 }
 
 
