@@ -35,7 +35,11 @@ fun NavGraphBuilder.connectionGraph(
                 drawerState = drawerState,
                 navController = navController
             ) {
-                ConnectionOverviewScreen(state = state, onEvent = onEvent)
+                ConnectionOverviewScreen(
+                    state = state,
+                    drawerState = drawerState,
+                    onEvent = onEvent
+                )
             }
         }
     }

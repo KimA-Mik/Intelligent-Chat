@@ -72,7 +72,12 @@ fun PersonaListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Persona") },
+                title = {
+                    Text(
+                        text = "Persona",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = {
                         scope.launch {
