@@ -30,4 +30,7 @@
     <string name="delete_persona_content_description">Delete persona</string>
     <string name="save_persona_content_description">Save persona</string>
     <string name="select_persona_button_content_description">Select persona button</string>
+
+    <string name="api_type_kobold">Kobold AI</string>
+    <string name="api_type_kobold_horde">Kobold AI Horde</string>
 </resources>

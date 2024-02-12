@@ -1,7 +1,6 @@
 package ru.kima.intelligentchat.di
 
 import android.content.Context
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -33,13 +32,20 @@ import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
+import ru.kima.intelligentchat.domain.preferences.useCase.GetPreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.useCase.SetSelectedPersonaIdUseCase
+import ru.kima.intelligentchat.domain.preferences.useCase.UpdateSelectedApiUseCase
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 
-@OptIn(ExperimentalSerializationApi::class, DelicateCoroutinesApi::class)
+@OptIn(ExperimentalSerializationApi::class)
 fun domain(context: Context) = module {
     single<CharacterCardRepository> { CharacterCardRepositoryImpl(get(), get(), get()) }
     single<PersonaRepository> { PersonaRepositoryImpl(get(), get()) }
+
+    singleOf(::GetPreferencesUseCase)
+    singleOf(::SetSelectedPersonaIdUseCase)
+    singleOf(::UpdateSelectedApiUseCase)
 
     factoryOf(::GetCardsUseCase)
     factoryOf(::GetCardsListUseCase)

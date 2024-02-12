@@ -38,6 +38,7 @@ fun NavGraphBuilder.connectionGraph(
                 ConnectionOverviewScreen(
                     state = state,
                     drawerState = drawerState,
+                    snackbarHostState = snackbarHostState,
                     onEvent = onEvent
                 )
             }

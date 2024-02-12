@@ -13,11 +13,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
-import ru.kima.intelligentchat.core.preferences.PreferencesHandler
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
+import ru.kima.intelligentchat.domain.preferences.useCase.GetPreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.useCase.SetSelectedPersonaIdUseCase
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 import ru.kima.intelligentchat.presentation.personas.list.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.list.events.UserEvent
@@ -25,10 +26,11 @@ import ru.kima.intelligentchat.presentation.personas.list.model.toListItem
 
 class PersonasListViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val getPersonas: GetPersonasUseCase,
+    getPersonas: GetPersonasUseCase,
     private val createPersona: CreatePersonaUseCase,
     private val getPersonaImage: LoadPersonaImageUseCase,
-    private val preferencesHandler: PreferencesHandler
+    getPreferences: GetPreferencesUseCase,
+    private val setSelectedPersonaId: SetSelectedPersonaIdUseCase
 ) : ViewModel() {
     private val personas = MutableStateFlow(emptyList<Persona>())
     private val selectedPersona = MutableStateFlow(0L)
@@ -70,7 +72,7 @@ class PersonasListViewModel(
             }
         }.launchIn(viewModelScope)
 
-        preferencesHandler.data.onEach {
+        getPreferences().onEach {
             selectedPersona.value = it.selectedPersonaId
         }.launchIn(viewModelScope)
     }
@@ -99,7 +101,7 @@ class PersonasListViewModel(
 
     private fun onSelectPersona(id: Long) = viewModelScope.launch {
         if (selectedPersona.value != id) {
-            preferencesHandler.updateSelectedPersona(id)
+            setSelectedPersonaId(id)
         }
     }
 }

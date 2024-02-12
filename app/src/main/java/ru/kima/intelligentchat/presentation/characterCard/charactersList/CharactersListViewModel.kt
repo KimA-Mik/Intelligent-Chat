@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.Resource
-import ru.kima.intelligentchat.core.preferences.PreferencesHandler
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
@@ -22,6 +21,8 @@ import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
+import ru.kima.intelligentchat.domain.preferences.useCase.GetPreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.useCase.SetSelectedPersonaIdUseCase
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
@@ -30,7 +31,8 @@ import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContaine
 
 class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val preferencesHandler: PreferencesHandler,
+    preferences: GetPreferencesUseCase,
+    private val setSelectedPersonaId: SetSelectedPersonaIdUseCase,
     private val cardsUseCase: GetCardsListUseCase,
     private val putCard: PutCardUseCase,
     private val putCardFromImage: AddCardFromPngUseCase,
@@ -69,8 +71,8 @@ class CharactersListViewModel(
 
     init {
         // TODO: redo first launch check 
-        preferencesHandler.data.onEach { preferences ->
-            onLoadPersona(preferences.selectedPersonaId)
+        preferences().onEach {
+            onLoadPersona(it.selectedPersonaId)
         }.launchIn(viewModelScope)
 
         selectedPersona(viewModelScope)
@@ -184,7 +186,7 @@ class CharactersListViewModel(
         savedStateHandle["initialDialog"] = false
         val persona = Persona(name = personaName)
         val id = createPersona(persona)
-        preferencesHandler.updateSelectedPersona(id)
+        setSelectedPersonaId(id)
     }
 
     private fun onMenuButtonClicked() = viewModelScope.launch {
