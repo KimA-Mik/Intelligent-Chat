@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -90,44 +90,52 @@ fun ConnectionOverviewScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionOverviewContent(
     state: ConnectionOverviewState,
     modifier: Modifier,
     onEvent: (COUserEvent) -> Unit
 ) {
-    //TODO: Fix menu
     var isApiMenuExpanded by remember { mutableStateOf(false) }
-    DropdownMenu(expanded = isApiMenuExpanded, onDismissRequest = { isApiMenuExpanded = false }) {
-        DropdownMenuItem(
-            text = { Text(text = stringResource(id = R.string.api_type_kobold_horde)) },
-            onClick = {
-                onEvent(COUserEvent.UpdateSelectedApi(API_TYPE.HORDE))
-                isApiMenuExpanded = false
-            })
-        DropdownMenuItem(
-            text = { Text(text = stringResource(id = R.string.api_type_kobold)) },
-            onClick = {
-                onEvent(COUserEvent.UpdateSelectedApi(API_TYPE.KOBOLD_AI))
-                isApiMenuExpanded = false
-            })
-    }
 
     Column(modifier = modifier, horizontalAlignment = Alignment.Start) {
-        TextField(
-            value = stringResource(id = apiTypeStringResource(state.selectedApiType)),
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { isApiMenuExpanded = true }) {
-                    Icon(imageVector = Icons.Outlined.ArrowDropDown, contentDescription = "")
-                }
-            },
-            label = { Text(text = "Type") },
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-        )
+        ExposedDropdownMenuBox(
+            expanded = isApiMenuExpanded,
+            onExpandedChange = {
+                isApiMenuExpanded = it
+            }
+        ) {
+            TextField(
+                value = stringResource(id = apiTypeStringResource(state.selectedApiType)),
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isApiMenuExpanded)
+                },
+                label = { Text(text = "Type") },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .menuAnchor()
+            )
+            ExposedDropdownMenu(
+                expanded = isApiMenuExpanded,
+                onDismissRequest = { isApiMenuExpanded = false }) {
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.api_type_kobold_horde)) },
+                    onClick = {
+                        onEvent(COUserEvent.UpdateSelectedApi(API_TYPE.HORDE))
+                        isApiMenuExpanded = false
+                    })
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.api_type_kobold)) },
+                    onClick = {
+                        onEvent(COUserEvent.UpdateSelectedApi(API_TYPE.KOBOLD_AI))
+                        isApiMenuExpanded = false
+                    })
+            }
+        }
     }
 }
 
