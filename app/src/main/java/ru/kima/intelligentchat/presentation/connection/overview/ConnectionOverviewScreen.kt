@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.connection.overview
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +41,8 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
+import ru.kima.intelligentchat.presentation.connection.overview.fragments.HordeFragment
+import ru.kima.intelligentchat.presentation.connection.overview.fragments.KoboldAiFragment
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 
@@ -134,6 +137,19 @@ fun ConnectionOverviewContent(
                         onEvent(COUserEvent.UpdateSelectedApi(API_TYPE.KOBOLD_AI))
                         isApiMenuExpanded = false
                     })
+            }
+        }
+
+        AnimatedContent(
+            targetState = state.selectedApiType, label = "",
+            modifier = Modifier.fillMaxSize()
+        ) { apiType ->
+            when (apiType) {
+                API_TYPE.KOBOLD_AI -> KoboldAiFragment(modifier = Modifier, onEvent = onEvent)
+                API_TYPE.HORDE -> HordeFragment(
+                    state = state.hordeFragmentState,
+                    modifier = Modifier, onEvent = onEvent
+                )
             }
         }
     }

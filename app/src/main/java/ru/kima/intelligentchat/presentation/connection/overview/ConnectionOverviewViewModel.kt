@@ -17,17 +17,45 @@ class ConnectionOverviewViewModel(
     getPreferences: GetPreferencesUseCase,
     private val updateSelectedApi: UpdateSelectedApiUseCase
 ) : ViewModel() {
-    val state = combine(getPreferences()) {
-        ConnectionOverviewState(selectedApiType = it.first().selectedApiType)
+    private val showApiToken = savedStateHandle.getStateFlow(SHOW_API_TOKEN_KEY, false)
+    private val currentHordeApiToken =
+        savedStateHandle.getStateFlow(HORDE_API_TOKEN_KEY, String())
+    val state = combine(
+        getPreferences(),
+        currentHordeApiToken,
+        showApiToken
+    ) { preferences, currentHordeApiToken, showApiToken ->
+        ConnectionOverviewState(
+            selectedApiType = preferences.selectedApiType,
+            hordeFragmentState = ConnectionOverviewState.HordeFragmentState(
+                currentApiToken = currentHordeApiToken,
+                showApiToken = showApiToken
+            )
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())
 
     fun onEvent(event: COUserEvent) {
         when (event) {
             is COUserEvent.UpdateSelectedApi -> onUpdateSelectedApi(event.apiType)
+            COUserEvent.ToggleHordeTokenVisibility -> onToggleHordeTokenVisibility()
+            is COUserEvent.UpdateApiToken -> onUpdateApiToken(event.token)
         }
     }
 
     private fun onUpdateSelectedApi(apiType: API_TYPE) = viewModelScope.launch {
         updateSelectedApi(apiType)
+    }
+
+    private fun onToggleHordeTokenVisibility() {
+        savedStateHandle[SHOW_API_TOKEN_KEY] = !showApiToken.value
+    }
+
+    private fun onUpdateApiToken(token: String) {
+        savedStateHandle[HORDE_API_TOKEN_KEY] = token
+    }
+
+    companion object {
+        private const val SHOW_API_TOKEN_KEY = "showApiToken"
+        private const val HORDE_API_TOKEN_KEY = "currentHordeApiToken"
     }
 }
