@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.API_TYPE
-import ru.kima.intelligentchat.domain.preferences.useCase.GetPreferencesUseCase
-import ru.kima.intelligentchat.domain.preferences.useCase.UpdateSelectedApiUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 
 class ConnectionOverviewViewModel(

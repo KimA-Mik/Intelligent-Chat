@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.core.preferences
+package ru.kima.intelligentchat.core.preferences.appPreferences
 
 import android.content.Context
 import ru.kima.intelligentchat.core.common.API_TYPE

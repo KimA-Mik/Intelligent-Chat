@@ -32,9 +32,14 @@ import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
-import ru.kima.intelligentchat.domain.preferences.useCase.GetPreferencesUseCase
-import ru.kima.intelligentchat.domain.preferences.useCase.SetSelectedPersonaIdUseCase
-import ru.kima.intelligentchat.domain.preferences.useCase.UpdateSelectedApiUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToWorkerUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateHordeApiTokenUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 
@@ -46,6 +51,12 @@ fun domain(context: Context) = module {
     singleOf(::GetPreferencesUseCase)
     singleOf(::SetSelectedPersonaIdUseCase)
     singleOf(::UpdateSelectedApiUseCase)
+
+    singleOf(::GetHordePreferencesUseCase)
+    singleOf(::UpdateContextToWorkerUseCase)
+    singleOf(::UpdateHordeApiTokenUseCase)
+    singleOf(::UpdateResponseToWorkerUseCase)
+    singleOf(::UpdateTrustedWorkersUseCase)
 
     factoryOf(::GetCardsUseCase)
     factoryOf(::GetCardsListUseCase)

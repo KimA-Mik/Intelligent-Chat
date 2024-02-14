@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import ru.kima.intelligentchat.core.preferences.AppPreferences
-import ru.kima.intelligentchat.core.preferences.PreferencesHandler
+import ru.kima.intelligentchat.core.preferences.appPreferences.AppPreferences
+import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 

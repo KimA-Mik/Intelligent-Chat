@@ -1,7 +1,7 @@
 package ru.kima.intelligentchat.domain.persona.useCase
 
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.core.preferences.PreferencesHandler
+import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 

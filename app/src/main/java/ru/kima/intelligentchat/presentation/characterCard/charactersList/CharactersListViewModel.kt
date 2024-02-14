@@ -21,8 +21,8 @@ import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
-import ru.kima.intelligentchat.domain.preferences.useCase.GetPreferencesUseCase
-import ru.kima.intelligentchat.domain.preferences.useCase.SetSelectedPersonaIdUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry

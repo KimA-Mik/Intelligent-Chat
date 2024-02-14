@@ -1,10 +1,7 @@
-package ru.kima.intelligentchat.core.preferences
+package ru.kima.intelligentchat.core.preferences.appPreferences
 
-import android.content.Context
 import androidx.datastore.core.CorruptionException
-import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
-import androidx.datastore.dataStore
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromByteArray
@@ -32,7 +29,3 @@ object AppPreferencesSerialize : Serializer<AppPreferences> {
     }
 }
 
-val Context.preferencesDataStore: DataStore<AppPreferences> by dataStore(
-    fileName = "preferences.pb",
-    serializer = AppPreferencesSerialize
-)
