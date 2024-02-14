@@ -1,18 +1,21 @@
 package ru.kima.intelligentchat.presentation.connection.overview
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +28,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -78,6 +83,9 @@ fun ConnectionOverviewScreen(
                     }
                 },
                 scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
+                )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -107,16 +115,36 @@ fun ConnectionOverviewContent(
             expanded = isApiMenuExpanded,
             onExpandedChange = {
                 isApiMenuExpanded = it
-            }
+            },
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                    shape = MaterialTheme.shapes.medium.copy(
+                        topStart = CornerSize(0.dp),
+                        topEnd = CornerSize(0.dp)
+                    )
+                )
         ) {
+            val rotation by animateFloatAsState(
+                targetValue = if (isApiMenuExpanded) 0f else 180f,
+                label = "rotation"
+            )
+
             TextField(
                 value = stringResource(id = apiTypeStringResource(state.selectedApiType)),
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isApiMenuExpanded)
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropUp, contentDescription = "",
+                            modifier = Modifier.graphicsLayer(
+                                rotationZ = rotation
+                            )
+                        )
+                    }
                 },
-                label = { Text(text = "Type") },
+                label = { Text(text = stringResource(R.string.apiTypeLabel)) },
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
