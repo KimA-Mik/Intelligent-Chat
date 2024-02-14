@@ -45,7 +45,12 @@ fun HordeFragment(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        SimpleConfig()
+        SimpleConfig(
+            contextToWorker = state.contextToWorker,
+            responseToWorker = state.responseToWorker,
+            trustedWorkers = state.trustedWorkers,
+            onEvent = onEvent
+        )
 
         ApiKeyField(
             currentApiToken = state.currentApiToken,
@@ -58,10 +63,17 @@ fun HordeFragment(
 }
 
 @Composable
-fun SimpleConfig() {
+fun SimpleConfig(
+    contextToWorker: Boolean,
+    responseToWorker: Boolean,
+    trustedWorkers: Boolean,
+    onEvent: (COUserEvent) -> Unit
+) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = false, onCheckedChange = {})
+            Checkbox(checked = contextToWorker, onCheckedChange = {
+                onEvent(COUserEvent.ToggleContextToWorker)
+            })
             Text(
                 text = "Adjust context size to worker capabilities",
                 style = MaterialTheme.typography.bodyMedium,
@@ -69,7 +81,9 @@ fun SimpleConfig() {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = false, onCheckedChange = {})
+            Checkbox(checked = responseToWorker, onCheckedChange = {
+                onEvent(COUserEvent.ToggleResponseToWorker)
+            })
             Text(
                 text = "Adjust response length to worker capabilities",
                 style = MaterialTheme.typography.bodyMedium,
@@ -77,7 +91,9 @@ fun SimpleConfig() {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = false, onCheckedChange = {})
+            Checkbox(checked = trustedWorkers, onCheckedChange = {
+                onEvent(COUserEvent.ToggleTrustedWorkers)
+            })
             Text(
                 text = "Trusted workers only",
                 style = MaterialTheme.typography.bodyMedium,

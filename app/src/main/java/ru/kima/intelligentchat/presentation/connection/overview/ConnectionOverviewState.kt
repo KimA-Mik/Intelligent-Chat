@@ -11,7 +11,10 @@ data class ConnectionOverviewState(
     @Immutable
     data class HordeFragmentState(
         val currentApiToken: String = String(),
-        val showApiToken: Boolean = false
+        val showApiToken: Boolean = false,
+        val contextToWorker: Boolean = true,
+        val responseToWorker: Boolean = true,
+        val trustedWorkers: Boolean = false
     )
 }
 

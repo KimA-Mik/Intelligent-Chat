@@ -64,6 +64,15 @@ fun ConnectionOverviewScreen(
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
+    //Open drawer button kept recomposing, looked ugly
+    val openDrawer = remember<() -> Unit> {
+        {
+            scope.launch {
+                drawerState.open()
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -74,11 +83,7 @@ fun ConnectionOverviewScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            drawerState.open()
-                        }
-                    }) {
+                    IconButton(onClick = openDrawer) {
                         Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
                     }
                 },
