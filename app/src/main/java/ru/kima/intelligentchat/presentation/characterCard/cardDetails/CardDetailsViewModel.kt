@@ -4,12 +4,15 @@ import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -23,6 +26,7 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
+import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableAltGreeting
@@ -37,7 +41,8 @@ class CardDetailsViewModel(
     private val deleteCard: DeleteCardUseCase,
     private val createAlternateGreeting: CreateAlternateGreetingUseCase,
     private val deleteAltGreeting: DeleteAlternateGreetingUseCase,
-    private val updateAlternateGreeting: UpdateAlternateGreetingUseCase
+    private val updateAlternateGreeting: UpdateAlternateGreetingUseCase,
+    private val tokenizeText: TokenizeTextUseCase
 ) : ViewModel() {
     private val cardId = savedStateHandle.getStateFlow(CardField.Id.string, 0L)
     private val photoBytes = MutableStateFlow<Bitmap?>(null)
@@ -58,34 +63,32 @@ class CardDetailsViewModel(
         savedStateHandle.getStateFlow(CardField.CharacterVersion.string, "")
 
     private val deleteCardDialog = MutableStateFlow(false)
-    private val showAltGreetingSheet = savedStateHandle.getStateFlow("showGreetings", false)
+    private val showAltGreetingSheet = savedStateHandle.getStateFlow(SHOW_GREETINGS, false)
     private val deleteAltGreetingDialog = MutableStateFlow(false)
 
-    private val editableGreeting = savedStateHandle.getStateFlow("editableGreeting", 0L)
+    private val editableGreeting = savedStateHandle.getStateFlow(EDITABLE_GREETING, 0L)
     private val editableGreetingBuffer =
-        savedStateHandle.getStateFlow("editableGreetingBuffer", String())
+        savedStateHandle.getStateFlow(EDITABLE_GREETING_BUFFER, String())
+
+    private val nameTokensCount = MutableStateFlow(0)
+    private val descriptionTokensCount = MutableStateFlow(0)
+    private val personalityTokensCount = MutableStateFlow(0)
+    private val scenarioTokensCount = MutableStateFlow(0)
+    private val firstMesTokensCount = MutableStateFlow(0)
+    private val mesExampleTokensCount = MutableStateFlow(0)
+    private val systemPromptTokensCount = MutableStateFlow(0)
+    private val postHistoryInstructionsTokensCount = MutableStateFlow(0)
 
     val state = combine(
-        cardId,
-        photoBytes,
-        cardName,
-        cardDescription,
-        cardPersonality,
-        cardScenario,
-        cardFirstMes,
-        cardMesExample,
-        cardCreatorNotes,
-        cardSystemPrompt,
-        cardPostHistoryInstructions,
-        cardAlternateGreetings,
-        cardTags,
-        cardCreator,
-        cardCharacterVersion,
-        deleteCardDialog,
-        showAltGreetingSheet,
-        deleteAltGreetingDialog,
-        editableGreeting,
-        editableGreetingBuffer
+        cardId, photoBytes, cardName,
+        cardDescription, cardPersonality, cardScenario,
+        cardFirstMes, cardMesExample, cardCreatorNotes,
+        cardSystemPrompt, cardPostHistoryInstructions, cardAlternateGreetings,
+        cardTags, cardCreator, cardCharacterVersion, deleteCardDialog, showAltGreetingSheet,
+        deleteAltGreetingDialog, editableGreeting, editableGreetingBuffer,
+        nameTokensCount, descriptionTokensCount, personalityTokensCount,
+        scenarioTokensCount, firstMesTokensCount, mesExampleTokensCount,
+        systemPromptTokensCount, postHistoryInstructionsTokensCount
     ) { args ->
 
         @Suppress("UNCHECKED_CAST")
@@ -111,7 +114,15 @@ class CardDetailsViewModel(
             showAltGreeting = args[16] as Boolean,
             deleteAltGreetingDialog = args[17] as Boolean,
             editableGreeting = args[18] as Long,
-            editableGreetingBuffer = args[19] as String
+            editableGreetingBuffer = args[19] as String,
+            nameTokensCount = args[20] as Int,
+            descriptionTokensCount = args[21] as Int,
+            personalityTokensCount = args[22] as Int,
+            scenarioTokensCount = args[23] as Int,
+            firstMesTokensCount = args[24] as Int,
+            mesExampleTokensCount = args[25] as Int,
+            systemPromptTokensCount = args[26] as Int,
+            postHistoryInstructionsTokensCount = args[27] as Int,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
@@ -120,7 +131,7 @@ class CardDetailsViewModel(
     val uiEvents = _uiEvents.asSharedFlow()
 
     private var cardJob: Job? = null
-    private val isLoaded = savedStateHandle.getStateFlow("isLoaded", false)
+    private val isLoaded = savedStateHandle.getStateFlow(IS_LOADED, false)
 
     private var greetingToDelete = 0L
 
@@ -128,6 +139,7 @@ class CardDetailsViewModel(
         savedStateHandle.get<Long>(CardField.Id.string)?.let {
             loadCard(it)
         }
+        tokenizeCardOnLoad()
     }
 
     fun onEvent(event: CardDetailUserEvent) {
@@ -171,11 +183,28 @@ class CardDetailsViewModel(
                 savedStateHandle[CardField.Tags.string] = card.tags
                 savedStateHandle[CardField.Creator.string] = card.creator
                 savedStateHandle[CardField.CharacterVersion.string] = card.characterVersion
-                savedStateHandle["isLoaded"] = true
+                savedStateHandle[IS_LOADED] = true
             }
 
             cardAlternateGreetings.value = card.alternateGreetings.map { it.toImmutable() }
         }.launchIn(viewModelScope)
+    }
+
+    private fun tokenizeCardOnLoad() = viewModelScope.launch(Dispatchers.Default) {
+        //resume coroutine when it card loaded
+        isLoaded
+            .filter { it }
+            .first()
+
+        nameTokensCount.value = tokenizeText(cardName.value).size
+        descriptionTokensCount.value = tokenizeText(cardDescription.value).size
+        personalityTokensCount.value = tokenizeText(cardPersonality.value).size
+        scenarioTokensCount.value = tokenizeText(cardScenario.value).size
+        firstMesTokensCount.value = tokenizeText(cardFirstMes.value).size
+        mesExampleTokensCount.value = tokenizeText(cardMesExample.value).size
+        systemPromptTokensCount.value = tokenizeText(cardSystemPrompt.value).size
+        postHistoryInstructionsTokensCount.value =
+            tokenizeText(cardPostHistoryInstructions.value).size
     }
 
     private fun onSelectImageClicked() {
@@ -192,6 +221,12 @@ class CardDetailsViewModel(
 
     private fun onFieldUpdate(field: CardField, update: String) {
         savedStateHandle[field.string] = update
+        if (tokenizableFields.contains(field)) {
+            viewModelScope.launch(Dispatchers.Default) {
+                val tokensCount = tokenizeText(update).size
+                tokenizableFields[field]!!.value = tokensCount
+            }
+        }
     }
 
     private fun onSaveCard() {
@@ -224,11 +259,11 @@ class CardDetailsViewModel(
     }
 
     private fun onOpenAlternateMessages() {
-        savedStateHandle["showGreetings"] = true
+        savedStateHandle[SHOW_GREETINGS] = true
     }
 
     private fun onCloseAlternateMessages() {
-        savedStateHandle["showGreetings"] = false
+        savedStateHandle[SHOW_GREETINGS] = false
     }
 
     private fun onCreateAltGreeting() = viewModelScope.launch {
@@ -254,8 +289,8 @@ class CardDetailsViewModel(
 
     private fun onEditAltGreeting(id: Long) {
         val selectedGreeting = state.value.card.alternateGreetings.find { it.id == id } ?: return
-        savedStateHandle["editableGreeting"] = id
-        savedStateHandle["editableGreetingBuffer"] = selectedGreeting.body
+        savedStateHandle[EDITABLE_GREETING] = id
+        savedStateHandle[EDITABLE_GREETING_BUFFER] = selectedGreeting.body
     }
 
     private fun onAcceptAltGreetingEdit() = viewModelScope.launch {
@@ -267,17 +302,17 @@ class CardDetailsViewModel(
                 ?: return@launch
         val newGreeting = AltGreeting(id = selectedGreeting.id, body = newBody)
         updateAlternateGreeting(newGreeting, state.value.card.id)
-        savedStateHandle["editableGreeting"] = 0L
-        savedStateHandle["editableGreetingBuffer"] = String()
+        savedStateHandle[EDITABLE_GREETING] = 0L
+        savedStateHandle[EDITABLE_GREETING_BUFFER] = String()
     }
 
     private fun onRejectAltGreetingEdit() {
-        savedStateHandle["editableGreeting"] = 0L
-        savedStateHandle["editableGreetingBuffer"] = String()
+        savedStateHandle[EDITABLE_GREETING] = 0L
+        savedStateHandle[EDITABLE_GREETING_BUFFER] = String()
     }
 
     private fun onUpdateAlternateGreetingBuffer(buffer: String) {
-        savedStateHandle["editableGreetingBuffer"] = buffer
+        savedStateHandle[EDITABLE_GREETING_BUFFER] = buffer
     }
 
     enum class CardField(val string: String) {
@@ -295,5 +330,23 @@ class CardDetailsViewModel(
         Tags("cardTags"),
         Creator("cardCreator"),
         CharacterVersion("cardCharacterVersion")
+    }
+
+    private val tokenizableFields = mapOf(
+        CardField.Name to nameTokensCount,
+        CardField.Description to descriptionTokensCount,
+        CardField.Personality to personalityTokensCount,
+        CardField.Scenario to scenarioTokensCount,
+        CardField.FirstMes to firstMesTokensCount,
+        CardField.MesExample to mesExampleTokensCount,
+        CardField.SystemPrompt to systemPromptTokensCount,
+        CardField.PostHistoryInstructions to postHistoryInstructionsTokensCount
+    )
+
+    companion object {
+        private const val IS_LOADED = "isLoaded"
+        private const val SHOW_GREETINGS = "showGreetings"
+        private const val EDITABLE_GREETING = "editableGreeting"
+        private const val EDITABLE_GREETING_BUFFER = "editableGreetingBuffer"
     }
 }

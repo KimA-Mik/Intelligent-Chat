@@ -207,7 +207,7 @@ fun PersonaDetailsContent(
 @Composable
 fun TokensCountText(tokens: Int) {
     Text(
-        text = "Tokens: $tokens",
+        text = stringResource(id = R.string.tokens_count, tokens),
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.End,
     )

@@ -16,6 +16,8 @@
 
     <string name="persona_saved_message">The persona has been saved.</string>
 
+    <string name="tokens_count">Tokens: %1$d</string>
+
     <string name="nav_item_characters">Characters</string>
     <string name="nav_item_personas">Personas</string>
     <string name="nav_item_connection">Connection</string>

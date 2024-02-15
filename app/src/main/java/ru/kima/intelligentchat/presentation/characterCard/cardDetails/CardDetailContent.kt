@@ -31,9 +31,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
@@ -60,12 +62,14 @@ fun CardDetailContent(
     ) {
         HeadArea(
             name = state.card.name,
+            nameTokensCount = state.nameTokensCount,
             photo = state.card.photoBytes,
             onEvent = onEvent
         )
 
         GeneralInfo(
             text = state.card.description,
+            textTokensCount = state.descriptionTokensCount,
             modifier = Modifier.padding(8.dp),
             title = "Description",
             field = CardDetailsViewModel.CardField.Description,
@@ -76,6 +80,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.firstMes,
+            textTokensCount = state.firstMesTokensCount,
             modifier = Modifier.padding(8.dp),
             title = "First message",
             field = CardDetailsViewModel.CardField.FirstMes,
@@ -93,6 +98,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.personality,
+            textTokensCount = state.personalityTokensCount,
             modifier = Modifier.padding(8.dp),
             title = "Personality",
             field = CardDetailsViewModel.CardField.Personality,
@@ -103,6 +109,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.scenario,
+            textTokensCount = state.scenarioTokensCount,
             modifier = Modifier.padding(8.dp),
             title = "Scenario",
             field = CardDetailsViewModel.CardField.Scenario,
@@ -116,6 +123,7 @@ fun CardDetailContent(
 @Composable
 fun HeadArea(
     name: String,
+    nameTokensCount: Int,
     photo: Bitmap?,
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
@@ -150,7 +158,10 @@ fun HeadArea(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
                 .weight(1f),
-            maxLines = 3
+            maxLines = 3,
+            supportingText = {
+                TokensCountText(tokens = nameTokensCount)
+            }
         )
 
     }
@@ -161,9 +172,11 @@ fun GeneralInfo(
     text: String,
     title: String,
     field: CardDetailsViewModel.CardField,
-    modifier: Modifier = Modifier,
     isExpanded: Boolean,
     onExpand: () -> Unit,
+    modifier: Modifier = Modifier,
+    textTokensCount: Int = 0,
+    showTokensCount: Boolean = true,
     supportRow: @Composable () -> Unit = {},
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
@@ -212,19 +225,22 @@ fun GeneralInfo(
                     ) {
                         supportRow()
 
-                        Text(
-                            text = "Length: ${text.length}",
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.End,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        if (showTokensCount) {
+                            TokensCountText(textTokensCount)
+                        }
                     }
                 })
         }
     }
+}
 
+@Composable
+fun TokensCountText(tokens: Int) {
+    Text(
+        text = stringResource(id = R.string.tokens_count, tokens),
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.End,
+    )
 }
 
 @Preview(name = "Card details light mode")

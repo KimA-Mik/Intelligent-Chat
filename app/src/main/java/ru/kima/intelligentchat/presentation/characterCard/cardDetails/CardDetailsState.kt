@@ -10,5 +10,13 @@ data class CardDetailsState(
     val showAltGreeting: Boolean = false,
     val deleteAltGreetingDialog: Boolean = false,
     val editableGreeting: Long = 0,
-    val editableGreetingBuffer: String = String()
+    val editableGreetingBuffer: String = String(),
+    val nameTokensCount: Int = 0,
+    val descriptionTokensCount: Int = 0,
+    val personalityTokensCount: Int = 0,
+    val scenarioTokensCount: Int = 0,
+    val firstMesTokensCount: Int = 0,
+    val mesExampleTokensCount: Int = 0,
+    val systemPromptTokensCount: Int = 0,
+    val postHistoryInstructionsTokensCount: Int = 0,
 )
