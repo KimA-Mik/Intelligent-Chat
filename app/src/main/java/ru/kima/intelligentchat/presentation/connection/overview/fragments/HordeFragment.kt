@@ -140,7 +140,7 @@ fun ApiKeyField(
         )
 
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = { onEvent(COUserEvent.SaveApiKey) },
         ) {
             Icon(imageVector = Icons.Filled.Save, contentDescription = "")
         }

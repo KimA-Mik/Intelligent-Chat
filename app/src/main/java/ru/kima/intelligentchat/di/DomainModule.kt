@@ -9,6 +9,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
+import ru.kima.intelligentchat.data.kobold.horde.HordeRepositoryImpl
 import ru.kima.intelligentchat.data.persona.PersonaRepositoryImpl
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
@@ -22,6 +23,8 @@ import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
+import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
+import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.DeletePersonaUseCase
@@ -47,6 +50,7 @@ import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 fun domain(context: Context) = module {
     single<CharacterCardRepository> { CharacterCardRepositoryImpl(get(), get(), get()) }
     single<PersonaRepository> { PersonaRepositoryImpl(get(), get()) }
+    single<HordeRepository> { HordeRepositoryImpl(get()) }
 
     singleOf(::GetPreferencesUseCase)
     singleOf(::SetSelectedPersonaIdUseCase)
@@ -85,6 +89,7 @@ fun domain(context: Context) = module {
 
     factoryOf(::TokenizeTextUseCase)
 
+    singleOf(::SaveApiKeyUseCase)
 
     single {
         val vocabStream = context.resources.openRawResource(R.raw.llama_vocabulary)

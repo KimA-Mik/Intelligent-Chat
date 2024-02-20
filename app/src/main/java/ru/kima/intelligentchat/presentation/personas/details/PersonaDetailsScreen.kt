@@ -135,19 +135,17 @@ fun consumeEvent(
     navController: NavController
 ) {
     event.consume { current ->
-        current?.let {
-            when (it) {
-                is UiEvent.ShowSnackbar -> {
-                    val message = context.getString(it.message.mesId)
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message, duration = SnackbarDuration.Short
-                        )
-                    }
+        when (current) {
+            is UiEvent.ShowSnackbar -> {
+                val message = context.getString(current.message.mesId)
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message, duration = SnackbarDuration.Short
+                    )
                 }
-
-                UiEvent.PopBack -> navController.popBackStack()
             }
+
+            UiEvent.PopBack -> navController.popBackStack()
         }
     }
 }

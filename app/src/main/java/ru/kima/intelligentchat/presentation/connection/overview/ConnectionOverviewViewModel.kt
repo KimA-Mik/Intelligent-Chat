@@ -3,17 +3,23 @@ package ru.kima.intelligentchat.presentation.connection.overview
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.core.common.API_TYPE
+import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
+import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 
 class ConnectionOverviewViewModel(
@@ -23,7 +29,8 @@ class ConnectionOverviewViewModel(
     getHordePreferences: GetHordePreferencesUseCase,
     private val updateContextToWorker: UpdateContextToWorkerUseCase,
     private val updateResponseToWorker: UpdateResponseToWorkerUseCase,
-    private val updateTrustedWorkers: UpdateTrustedWorkersUseCase
+    private val updateTrustedWorkers: UpdateTrustedWorkersUseCase,
+    private val saveApiKey: SaveApiKeyUseCase
 ) : ViewModel() {
     private val showApiToken = savedStateHandle.getStateFlow(SHOW_API_TOKEN_KEY, false)
     private val currentHordeApiToken =
@@ -46,6 +53,9 @@ class ConnectionOverviewViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())
 
+    private val _uiEvents = MutableStateFlow(Event<COUiEvent>(null))
+    val uiEvents = _uiEvents.asStateFlow()
+
     fun onEvent(event: COUserEvent) {
         when (event) {
             is COUserEvent.UpdateSelectedApi -> onUpdateSelectedApi(event.apiType)
@@ -54,6 +64,7 @@ class ConnectionOverviewViewModel(
             COUserEvent.ToggleContextToWorker -> onToggleContextToWorker()
             COUserEvent.ToggleResponseToWorker -> onToggleResponseToWorker()
             COUserEvent.ToggleTrustedWorkers -> onToggleTrustedWorkers()
+            COUserEvent.SaveApiKey -> onSaveApiKey()
         }
     }
 
@@ -69,11 +80,6 @@ class ConnectionOverviewViewModel(
         savedStateHandle[HORDE_API_TOKEN_KEY] = token
     }
 
-    companion object {
-        private const val SHOW_API_TOKEN_KEY = "showApiToken"
-        private const val HORDE_API_TOKEN_KEY = "currentHordeApiToken"
-    }
-
     private fun onToggleContextToWorker() = viewModelScope.launch {
         updateContextToWorker(!state.value.hordeFragmentState.contextToWorker)
     }
@@ -84,5 +90,23 @@ class ConnectionOverviewViewModel(
 
     private fun onToggleTrustedWorkers() = viewModelScope.launch {
         updateTrustedWorkers(!state.value.hordeFragmentState.trustedWorkers)
+    }
+
+    private fun onSaveApiKey() = viewModelScope.launch {
+        val userInfoResource = saveApiKey(apiKey = state.value.hordeFragmentState.currentApiToken)
+        when (userInfoResource) {
+            is Resource.Success -> _uiEvents.value =
+                Event(COUiEvent.ShowMessage(userInfoResource.data!!.userName))
+
+            is Resource.Error -> _uiEvents.value =
+                Event(COUiEvent.ShowMessage(userInfoResource.message!!))
+
+            else -> {}
+        }
+    }
+
+    companion object {
+        private const val SHOW_API_TOKEN_KEY = "showApiToken"
+        private const val HORDE_API_TOKEN_KEY = "currentHordeApiToken"
     }
 }

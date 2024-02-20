@@ -9,4 +9,5 @@ sealed interface COUserEvent {
     data object ToggleContextToWorker : COUserEvent
     data object ToggleResponseToWorker : COUserEvent
     data object ToggleTrustedWorkers : COUserEvent
+    data object SaveApiKey : COUserEvent
 }

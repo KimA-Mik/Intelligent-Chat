@@ -42,9 +42,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.core.common.API_TYPE
+import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.fragments.HordeFragment
 import ru.kima.intelligentchat.presentation.connection.overview.fragments.KoboldAiFragment
@@ -55,11 +58,14 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 @Composable
 fun ConnectionOverviewScreen(
     state: ConnectionOverviewState,
+    uiEvents: Event<COUiEvent>,
     drawerState: DrawerState,
     snackbarHostState: SnackbarHostState,
     onEvent: (COUserEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+
+    consumeEvent(uiEvents, snackbarHostState, scope)
 
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -103,6 +109,18 @@ fun ConnectionOverviewScreen(
                 .padding(padding)
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
         )
+    }
+}
+
+fun consumeEvent(
+    event: Event<COUiEvent>,
+    snackbarHostState: SnackbarHostState,
+    scope: CoroutineScope
+) {
+    event.consume { current ->
+        when (current) {
+            is COUiEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(current.message) }
+        }
     }
 }
 
@@ -202,6 +220,7 @@ fun ConnectionOverviewPreview() {
         Surface(Modifier.fillMaxSize()) {
             ConnectionOverviewScreen(
                 state = ConnectionOverviewState(),
+                uiEvents = Event(COUiEvent.ShowMessage("123")),
                 drawerState = DrawerState(initialValue = DrawerValue.Closed),
                 snackbarHostState = SnackbarHostState(),
                 onEvent = {}

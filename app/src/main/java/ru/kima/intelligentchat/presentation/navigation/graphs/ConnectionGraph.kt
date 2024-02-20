@@ -25,6 +25,7 @@ fun NavGraphBuilder.connectionGraph(
         composable("overview") {
             val viewModel: ConnectionOverviewViewModel = koinViewModel()
             val state by viewModel.state.collectAsState()
+            val uiEvents by viewModel.uiEvents.collectAsState()
             val onEvent = remember<(COUserEvent) -> Unit> {
                 {
                     viewModel.onEvent(it)
@@ -37,6 +38,7 @@ fun NavGraphBuilder.connectionGraph(
             ) {
                 ConnectionOverviewScreen(
                     state = state,
+                    uiEvents = uiEvents,
                     drawerState = drawerState,
                     snackbarHostState = snackbarHostState,
                     onEvent = onEvent

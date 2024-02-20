@@ -41,6 +41,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(project(mapOf("path" to ":domain")))
+    implementation(project(mapOf("path" to ":core")))
 
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
