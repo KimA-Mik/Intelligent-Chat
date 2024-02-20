@@ -24,11 +24,13 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewState
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -49,12 +51,15 @@ fun HordeFragment(
             contextToWorker = state.contextToWorker,
             responseToWorker = state.responseToWorker,
             trustedWorkers = state.trustedWorkers,
+            contextSize = state.contextSize,
+            responseLength = state.responseLength,
             onEvent = onEvent
         )
 
         ApiKeyField(
             currentApiToken = state.currentApiToken,
             showApiToken = state.showApiToken,
+            userName = state.userName.ifBlank { stringResource(id = R.string.anonymous_username) },
             onEvent = onEvent
         )
 
@@ -67,6 +72,8 @@ fun SimpleConfig(
     contextToWorker: Boolean,
     responseToWorker: Boolean,
     trustedWorkers: Boolean,
+    contextSize: Int,
+    responseLength: Int,
     onEvent: (COUserEvent) -> Unit
 ) {
     Column {
@@ -75,7 +82,7 @@ fun SimpleConfig(
                 onEvent(COUserEvent.ToggleContextToWorker)
             })
             Text(
-                text = "Adjust context size to worker capabilities",
+                text = stringResource(R.string.adjust_context_size),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -85,7 +92,7 @@ fun SimpleConfig(
                 onEvent(COUserEvent.ToggleResponseToWorker)
             })
             Text(
-                text = "Adjust response length to worker capabilities",
+                text = stringResource(R.string.adjust_response_length),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -95,12 +102,17 @@ fun SimpleConfig(
                 onEvent(COUserEvent.ToggleTrustedWorkers)
             })
             Text(
-                text = "Trusted workers only",
+                text = stringResource(R.string.trusted_workers_only),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
             )
         }
-        Text(text = "Context: --, Response: --", style = MaterialTheme.typography.bodyMedium)
+        val contextField = if (contextSize > 0) contextSize.toString() else "--"
+        val responseField = if (responseLength > 0) responseLength.toString() else "--"
+        Text(
+            text = stringResource(id = R.string.context_and_response, contextField, responseField),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -108,12 +120,17 @@ fun SimpleConfig(
 fun ApiKeyField(
     currentApiToken: String,
     showApiToken: Boolean,
+    userName: String,
     onEvent: (COUserEvent) -> Unit
 ) {
     Text(
-        text = "API key",
+        text = stringResource(R.string.api_key),
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold
+    )
+    Text(
+        text = stringResource(id = R.string.username_template, userName),
+        style = MaterialTheme.typography.bodyLarge
     )
     Row(
         modifier = Modifier
@@ -126,7 +143,8 @@ fun ApiKeyField(
             onValueChange = { onEvent(COUserEvent.UpdateApiToken(it)) },
             modifier = Modifier
                 .weight(1f),
-            label = { Text(text = "Horde API token") },
+            label = { Text(text = stringResource(R.string.horde_api_token)) },
+            placeholder = { Text(text = "0000000000") },
             singleLine = true,
             trailingIcon = {
                 IconButton(onClick = { onEvent(COUserEvent.ToggleHordeTokenVisibility) }) {

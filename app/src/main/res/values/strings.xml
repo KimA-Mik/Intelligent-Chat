@@ -33,7 +33,15 @@
     <string name="save_persona_content_description">Save persona</string>
     <string name="select_persona_button_content_description">Select persona button</string>
 
+    <string name="api_key">API key</string>
     <string name="apiTypeLabel">API Type</string>
     <string name="api_type_kobold">Kobold AI</string>
     <string name="api_type_kobold_horde">Kobold AI Horde</string>
+    <string name="horde_api_token">Horde API token</string>
+    <string name="adjust_context_size">Adjust context size to worker capabilities</string>
+    <string name="adjust_response_length">Adjust response length to worker capabilities</string>
+    <string name="trusted_workers_only">Trusted workers only</string>
+    <string name="context_and_response">Context: %1$s, Response: %2$s</string>
+    <string name="username_template">Username: %1$s</string>
+    <string name="anonymous_username">Anonymous</string>
 </resources>

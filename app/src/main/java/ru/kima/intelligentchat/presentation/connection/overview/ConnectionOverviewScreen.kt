@@ -78,6 +78,9 @@ fun ConnectionOverviewScreen(
             }
         }
     }
+    //and scroll behavior is unstable too
+    //whats the point of composable behavior if it make top bar recompose every time...
+    val sb = remember { scrollBehavior }
 
     Scaffold(
         topBar = {
@@ -93,7 +96,7 @@ fun ConnectionOverviewScreen(
                         Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
                     }
                 },
-                scrollBehavior = scrollBehavior,
+                scrollBehavior = sb,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
                 )
@@ -154,7 +157,7 @@ fun ConnectionOverviewContent(
             )
 
             TextField(
-                value = stringResource(id = apiTypeStringResource(state.selectedApiType)),
+                value = apiTypeStringResource(state.selectedApiType),
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = {
@@ -206,10 +209,11 @@ fun ConnectionOverviewContent(
     }
 }
 
-fun apiTypeStringResource(apiType: API_TYPE): Int {
+@Composable
+fun apiTypeStringResource(apiType: API_TYPE): String {
     return when (apiType) {
-        API_TYPE.KOBOLD_AI -> R.string.api_type_kobold
-        API_TYPE.HORDE -> R.string.api_type_kobold_horde
+        API_TYPE.KOBOLD_AI -> stringResource(id = R.string.api_type_kobold)
+        API_TYPE.HORDE -> stringResource(id = R.string.api_type_kobold_horde)
     }
 }
 

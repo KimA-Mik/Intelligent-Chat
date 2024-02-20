@@ -10,7 +10,11 @@ data class HordePreferences(
     val apiToken: String = String(),
     val contextToWorker: Boolean = true,
     val responseToWorker: Boolean = true,
-    val trustedWorkers: Boolean = false
+    val trustedWorkers: Boolean = false,
+    val userName: String = String(),
+    val userId: Int = 0,
+    val contextSize: Int = 1024,
+    val responseLength: Int = 256
 )
 
 val Context.hordePreferencesDataStore: DataStore<HordePreferences> by dataStore(

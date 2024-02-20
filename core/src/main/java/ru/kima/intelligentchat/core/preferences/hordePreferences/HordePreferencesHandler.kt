@@ -6,14 +6,6 @@ class HordePreferencesHandler(context: Context) {
     private val store = context.hordePreferencesDataStore
     val data = store.data
 
-    suspend fun updateApiKey(token: String) {
-        updateData {
-            it.copy(
-                apiToken = token
-            )
-        }
-    }
-
     suspend fun updateContextToWorker(contextToWorker: Boolean) {
         updateData {
             it.copy(
@@ -34,6 +26,16 @@ class HordePreferencesHandler(context: Context) {
         updateData {
             it.copy(
                 trustedWorkers = trustedWorkers
+            )
+        }
+    }
+
+    suspend fun updateUserData(apiToken: String, userName: String, userId: Int) {
+        updateData {
+            it.copy(
+                apiToken = apiToken,
+                userName = userName,
+                userId = userId
             )
         }
     }

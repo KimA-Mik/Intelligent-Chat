@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
@@ -26,7 +27,7 @@ class ConnectionOverviewViewModel(
     private val savedStateHandle: SavedStateHandle,
     getPreferences: GetPreferencesUseCase,
     private val updateSelectedApi: UpdateSelectedApiUseCase,
-    getHordePreferences: GetHordePreferencesUseCase,
+    private val getHordePreferences: GetHordePreferencesUseCase,
     private val updateContextToWorker: UpdateContextToWorkerUseCase,
     private val updateResponseToWorker: UpdateResponseToWorkerUseCase,
     private val updateTrustedWorkers: UpdateTrustedWorkersUseCase,
@@ -35,6 +36,14 @@ class ConnectionOverviewViewModel(
     private val showApiToken = savedStateHandle.getStateFlow(SHOW_API_TOKEN_KEY, false)
     private val currentHordeApiToken =
         savedStateHandle.getStateFlow(HORDE_API_TOKEN_KEY, String())
+
+    init {
+        viewModelScope.launch {
+            val preferences = getHordePreferences().first()
+            savedStateHandle[HORDE_API_TOKEN_KEY] = preferences.apiToken
+        }
+    }
+
     val state = combine(
         getPreferences(),
         getHordePreferences(),
@@ -49,6 +58,9 @@ class ConnectionOverviewViewModel(
                 contextToWorker = hordePreferences.contextToWorker,
                 responseToWorker = hordePreferences.responseToWorker,
                 trustedWorkers = hordePreferences.trustedWorkers,
+                userName = hordePreferences.userName,
+                contextSize = hordePreferences.contextSize,
+                responseLength = hordePreferences.responseLength
             )
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())

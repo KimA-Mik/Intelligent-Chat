@@ -14,7 +14,10 @@ data class ConnectionOverviewState(
         val showApiToken: Boolean = false,
         val contextToWorker: Boolean = true,
         val responseToWorker: Boolean = true,
-        val trustedWorkers: Boolean = false
+        val trustedWorkers: Boolean = false,
+        val userName: String = String(),
+        val contextSize: Int = 1024,
+        val responseLength: Int = 256
     )
 }
 
