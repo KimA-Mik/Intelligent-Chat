@@ -44,4 +44,9 @@
     <string name="context_and_response">Context: %1$s, Response: %2$s</string>
     <string name="username_template">Username: %1$s</string>
     <string name="anonymous_username">Anonymous</string>
+    <string name="show_kudos_label">Show kudos</string>
+    <string name="error_get_kudos">Could not get kudos</string>
+    <string name="no_horde_user">There are no user</string>
+    <string name="kudos_template">Kudos: %1$d</string>
+
 </resources>

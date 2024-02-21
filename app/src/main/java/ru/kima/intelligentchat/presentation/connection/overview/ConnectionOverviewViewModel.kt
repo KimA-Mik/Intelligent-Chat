@@ -10,9 +10,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import ru.kima.intelligentchat.common.Event
+import ru.kima.intelligentchat.common.ComposeEvent
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
@@ -31,7 +32,8 @@ class ConnectionOverviewViewModel(
     private val updateContextToWorker: UpdateContextToWorkerUseCase,
     private val updateResponseToWorker: UpdateResponseToWorkerUseCase,
     private val updateTrustedWorkers: UpdateTrustedWorkersUseCase,
-    private val saveApiKey: SaveApiKeyUseCase
+    private val saveApiKey: SaveApiKeyUseCase,
+    private val getKudos: GetKudosUseCase
 ) : ViewModel() {
     private val showApiToken = savedStateHandle.getStateFlow(SHOW_API_TOKEN_KEY, false)
     private val currentHordeApiToken =
@@ -65,7 +67,7 @@ class ConnectionOverviewViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())
 
-    private val _uiEvents = MutableStateFlow(Event<COUiEvent>(null))
+    private val _uiEvents = MutableStateFlow(ComposeEvent<COUiEvent>(null))
     val uiEvents = _uiEvents.asStateFlow()
 
     fun onEvent(event: COUserEvent) {
@@ -77,6 +79,7 @@ class ConnectionOverviewViewModel(
             COUserEvent.ToggleResponseToWorker -> onToggleResponseToWorker()
             COUserEvent.ToggleTrustedWorkers -> onToggleTrustedWorkers()
             COUserEvent.SaveApiKey -> onSaveApiKey()
+            COUserEvent.ShowKudos -> onShowKudos()
         }
     }
 
@@ -108,13 +111,27 @@ class ConnectionOverviewViewModel(
         val userInfoResource = saveApiKey(apiKey = state.value.hordeFragmentState.currentApiToken)
         when (userInfoResource) {
             is Resource.Success -> _uiEvents.value =
-                Event(COUiEvent.ShowMessage(userInfoResource.data!!.userName))
+                ComposeEvent(COUiEvent.ShowMessage(userInfoResource.data!!.userName))
 
             is Resource.Error -> _uiEvents.value =
-                Event(COUiEvent.ShowMessage(userInfoResource.message!!))
+                ComposeEvent(COUiEvent.ShowMessage(userInfoResource.message!!))
 
             else -> {}
         }
+    }
+
+    private fun onShowKudos() = viewModelScope.launch {
+        val event = when (val result = getKudos()) {
+            GetKudosUseCase.KudosResult.Error -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.ErrorGetKudos)
+            GetKudosUseCase.KudosResult.NoUser -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.NoUser)
+            is GetKudosUseCase.KudosResult.Success -> COUiEvent.ShowSnackbar(
+                COUiEvent.COSnackbar.ShowKudos(
+                    result.kudos
+                )
+            )
+        }
+
+        _uiEvents.value = ComposeEvent(event)
     }
 
     companion object {

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
@@ -43,7 +45,8 @@ fun HordeFragment(
 ) {
     Column(
         modifier = modifier
-            .padding(8.dp),
+            .padding(horizontal = 8.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -123,11 +126,21 @@ fun ApiKeyField(
     userName: String,
     onEvent: (COUserEvent) -> Unit
 ) {
-    Text(
-        text = stringResource(R.string.api_key),
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(R.string.api_key),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        TextButton(onClick = { onEvent(COUserEvent.ShowKudos) }) {
+            Text(text = stringResource(R.string.show_kudos_label))
+        }
+    }
     Text(
         text = stringResource(id = R.string.username_template, userName),
         style = MaterialTheme.typography.bodyLarge
@@ -187,8 +200,13 @@ fun Models() {
         }
 
     }
-    ListItem(headlineContent = { Text(text = "Model 1") })
-    ListItem(headlineContent = { Text(text = "Model 2") })
+
+    repeat(10) {
+        ListItem(headlineContent = { Text(text = "Model $it") })
+
+    }
+//    ListItem(headlineContent = { Text(text = "Model 1") })
+//    ListItem(headlineContent = { Text(text = "Model 2") })
 }
 
 @Preview

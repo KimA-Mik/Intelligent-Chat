@@ -4,8 +4,10 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
@@ -30,6 +32,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.common.Event
+import ru.kima.intelligentchat.common.ComposeEvent
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
@@ -54,21 +57,21 @@ import ru.kima.intelligentchat.presentation.connection.overview.fragments.Kobold
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ConnectionOverviewScreen(
     state: ConnectionOverviewState,
-    uiEvents: Event<COUiEvent>,
+    uiEvents: ComposeEvent<COUiEvent>,
     drawerState: DrawerState,
     snackbarHostState: SnackbarHostState,
     onEvent: (COUserEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
-    consumeEvent(uiEvents, snackbarHostState, scope)
+    ConsumeEvent(uiEvents, snackbarHostState, scope)
 
     val scrollBehavior =
-        TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     //Open drawer button kept recomposing, looked ugly
     val openDrawer = remember<() -> Unit> {
@@ -102,6 +105,8 @@ fun ConnectionOverviewScreen(
                 )
             )
         },
+        modifier = Modifier
+            .imePadding(),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         ConnectionOverviewContent(
@@ -115,15 +120,40 @@ fun ConnectionOverviewScreen(
     }
 }
 
-fun consumeEvent(
-    event: Event<COUiEvent>,
+@Composable
+fun ConsumeEvent(
+    event: ComposeEvent<COUiEvent>,
     snackbarHostState: SnackbarHostState,
     scope: CoroutineScope
 ) {
-    event.consume { current ->
-        when (current) {
-            is COUiEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(current.message) }
+    val value = event.value
+    value?.let {
+        when (it) {
+            is COUiEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(it.message) }
+            is COUiEvent.ShowSnackbar -> ShowSnackbar(
+                snackbar = it.snackbar,
+                snackbarHostState = snackbarHostState,
+            )
         }
+    }
+}
+
+@Composable
+fun ShowSnackbar(
+    snackbar: COUiEvent.COSnackbar,
+    snackbarHostState: SnackbarHostState,
+) {
+    val message = when (snackbar) {
+        COUiEvent.COSnackbar.ErrorGetKudos -> stringResource(R.string.error_get_kudos)
+        COUiEvent.COSnackbar.NoUser -> stringResource(R.string.no_horde_user)
+        is COUiEvent.COSnackbar.ShowKudos -> stringResource(
+            R.string.kudos_template,
+            snackbar.kudos.toInt()
+        )
+    }
+
+    LaunchedEffect(snackbar) {
+        snackbarHostState.showSnackbar(message)
     }
 }
 
@@ -224,7 +254,7 @@ fun ConnectionOverviewPreview() {
         Surface(Modifier.fillMaxSize()) {
             ConnectionOverviewScreen(
                 state = ConnectionOverviewState(),
-                uiEvents = Event(COUiEvent.ShowMessage("123")),
+                uiEvents = ComposeEvent(COUiEvent.ShowMessage("123")),
                 drawerState = DrawerState(initialValue = DrawerValue.Closed),
                 snackbarHostState = SnackbarHostState(),
                 onEvent = {}
