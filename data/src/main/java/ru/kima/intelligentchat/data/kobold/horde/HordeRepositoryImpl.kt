@@ -7,9 +7,11 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.create
 import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.data.kobold.horde.mappers.toActiveModel
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toUserInfo
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestError
 import ru.kima.intelligentchat.data.util.jsonConverterFactory.toConverterFactory
+import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.model.UserInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 
@@ -30,23 +32,45 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
     }
 
     override suspend fun findUser(apiKey: String): Resource<UserInfo> {
-        try {
+        return try {
             val response = api.findUser(apiKey)
-            return if (response.isSuccessful) {
+            if (response.isSuccessful) {
                 val res = response.body()!!
                 Resource.Success(res.toUserInfo())
             } else {
-                val message = if (response.errorBody() != null) {
-                    val error = errorConverter.convert(response.errorBody()!!)
-                    "${error?.returnCode} - ${error?.message}"
-                } else {
-                    "Unknown error"
-                }
+                val message = getErrorMessage(response.errorBody())
                 Resource.Error(message)
             }
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
-            return Resource.Error(message)
+            Resource.Error(message)
+        }
+    }
+
+    override suspend fun activeModels(): Resource<List<ActiveModel>> {
+        return try {
+            val response = api.activeModels()
+            if (response.isSuccessful) {
+                val res = response
+                    .body()!!
+                    .map { it.toActiveModel() }
+                Resource.Success(res)
+            } else {
+                val message = getErrorMessage(response.errorBody())
+                Resource.Error(message)
+            }
+        } catch (e: Exception) {
+            val message = e.message ?: e.toString()
+            Resource.Error(message)
+        }
+    }
+
+    private fun getErrorMessage(responseBody: ResponseBody?): String {
+        return try {
+            val error = errorConverter.convert(responseBody!!)
+            error!!.message
+        } catch (e: Exception) {
+            "Unknown error"
         }
     }
 }

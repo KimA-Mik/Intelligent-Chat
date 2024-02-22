@@ -24,6 +24,7 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCas
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
+import ru.kima.intelligentchat.domain.horde.useCase.GetActiveModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
@@ -92,6 +93,7 @@ fun domain(context: Context) = module {
 
     singleOf(::SaveApiKeyUseCase)
     singleOf(::GetKudosUseCase)
+    singleOf(::GetActiveModelsUseCase)
 
     single {
         val vocabStream = context.resources.openRawResource(R.raw.llama_vocabulary)

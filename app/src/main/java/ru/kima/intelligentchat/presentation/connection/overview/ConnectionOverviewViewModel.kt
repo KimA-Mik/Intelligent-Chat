@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.ComposeEvent
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.horde.useCase.GetActiveModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
@@ -33,7 +34,8 @@ class ConnectionOverviewViewModel(
     private val updateResponseToWorker: UpdateResponseToWorkerUseCase,
     private val updateTrustedWorkers: UpdateTrustedWorkersUseCase,
     private val saveApiKey: SaveApiKeyUseCase,
-    private val getKudos: GetKudosUseCase
+    private val getKudos: GetKudosUseCase,
+    private val getActiveModels: GetActiveModelsUseCase
 ) : ViewModel() {
     private val showApiToken = savedStateHandle.getStateFlow(SHOW_API_TOKEN_KEY, false)
     private val currentHordeApiToken =
@@ -80,6 +82,7 @@ class ConnectionOverviewViewModel(
             COUserEvent.ToggleTrustedWorkers -> onToggleTrustedWorkers()
             COUserEvent.SaveApiKey -> onSaveApiKey()
             COUserEvent.ShowKudos -> onShowKudos()
+            COUserEvent.RefreshModels -> onRefreshModels()
         }
     }
 
@@ -132,6 +135,21 @@ class ConnectionOverviewViewModel(
         }
 
         _uiEvents.value = ComposeEvent(event)
+    }
+
+    private fun onRefreshModels() = viewModelScope.launch {
+        val event = when (val modelsResource = getActiveModels()) {
+            is Resource.Error -> COUiEvent.ShowMessage(modelsResource.message!!)
+            is Resource.Success -> COUiEvent.ShowMessage(
+                modelsResource.data!!.map { it.name }.toString()
+            )
+
+            else -> {
+                COUiEvent.ShowMessage("Unreachable")
+            }
+        }
+        _uiEvents.value = ComposeEvent(event)
+
     }
 
     companion object {

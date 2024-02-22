@@ -23,7 +23,7 @@ class GetKudosUseCase(
     }
 
     sealed interface KudosResult {
-        data class Success(val kudos: Float) : KudosResult
+        data class Success(val kudos: Double) : KudosResult
         data object NoUser : KudosResult
         data object Error : KudosResult
     }

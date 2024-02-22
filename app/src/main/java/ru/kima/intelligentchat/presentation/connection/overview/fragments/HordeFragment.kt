@@ -66,7 +66,7 @@ fun HordeFragment(
             onEvent = onEvent
         )
 
-        Models()
+        Models(onEvent = onEvent)
     }
 }
 
@@ -179,7 +179,7 @@ fun ApiKeyField(
 }
 
 @Composable
-fun Models() {
+fun Models(onEvent: (COUserEvent) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
@@ -189,7 +189,7 @@ fun Models() {
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = { onEvent(COUserEvent.RefreshModels) }) {
             Icon(imageVector = Icons.Filled.Refresh, contentDescription = "")
         }
 

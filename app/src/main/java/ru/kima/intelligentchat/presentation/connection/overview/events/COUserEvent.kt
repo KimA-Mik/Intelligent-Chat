@@ -11,4 +11,5 @@ sealed interface COUserEvent {
     data object ToggleTrustedWorkers : COUserEvent
     data object SaveApiKey : COUserEvent
     data object ShowKudos : COUserEvent
+    data object RefreshModels : COUserEvent
 }

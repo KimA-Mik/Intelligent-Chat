@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class UserDetailsDto(
     @SerialName("username") val username: String = "",
     @SerialName("id") val id: Int = 0,
-    @SerialName("kudos") val kudos: Float = 0.0f,
+    @SerialName("kudos") val kudos: Double = 0.0,
     @SerialName("concurrency") val concurrency: Int = 0,
     @SerialName("worker_invited") val workerInvited: Int = 0,
     @SerialName("moderator") val moderator: Boolean = false,

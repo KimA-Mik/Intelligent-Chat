@@ -7,6 +7,6 @@ sealed interface COUiEvent {
     sealed interface COSnackbar {
         data object NoUser : COSnackbar
         data object ErrorGetKudos : COSnackbar
-        data class ShowKudos(val kudos: Float) : COSnackbar
+        data class ShowKudos(val kudos: Double) : COSnackbar
     }
 }
