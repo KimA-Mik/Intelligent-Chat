@@ -30,4 +30,26 @@ class SaveApiKeyUseCase(
 
         return result
     }
+
+    //TODO: Improve return error handling
+    //There are some ideas
+    sealed class SaveApiKeyException(override val cause: Throwable?) : Throwable() {
+        class UserNotFoundException(cause: Throwable) : SaveApiKeyException(cause)
+        class ValidationException(cause: Throwable) : SaveApiKeyException(cause)
+        class UnknownException(cause: Throwable) : SaveApiKeyException(cause)
+
+        companion object {
+            fun extractException(throwable: Throwable): SaveApiKeyException {
+                return if (throwable is SaveApiKeyException)
+                    throwable else UnknownException(throwable)
+            }
+        }
+    }
+
+    sealed interface SaveKeyResult {
+        data class Success(val userInfo: UserInfo) : SaveKeyResult
+        data class UnknownError(val message: String) : SaveKeyResult
+        data object UserNotFound : SaveKeyResult
+        data object ValidationError : SaveKeyResult
+    }
 }
