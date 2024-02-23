@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +36,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewState
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -43,6 +47,14 @@ fun HordeFragment(
     modifier: Modifier,
     onEvent: (COUserEvent) -> Unit
 ) {
+    when {
+        state.showSelectHordeModelsDialog -> SelectHordeModelsAlertDialog(
+            activeModels = state.activeModels,
+            selectedModels = state.dialogSelectedModels,
+            onEvent = onEvent
+        )
+    }
+
     Column(
         modifier = modifier
             .padding(horizontal = 8.dp)
@@ -66,7 +78,10 @@ fun HordeFragment(
             onEvent = onEvent
         )
 
-        Models(onEvent = onEvent)
+        Models(
+            selectedModels = state.selectedModels,
+            onEvent = onEvent
+        )
     }
 }
 
@@ -179,7 +194,10 @@ fun ApiKeyField(
 }
 
 @Composable
-fun Models(onEvent: (COUserEvent) -> Unit) {
+fun Models(
+    selectedModels: Set<String>,
+    onEvent: (COUserEvent) -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
@@ -195,19 +213,95 @@ fun Models(onEvent: (COUserEvent) -> Unit) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        TextButton(onClick = { /*TODO*/ }, modifier = Modifier) {
+        TextButton(
+            onClick = { onEvent(COUserEvent.OpenSelectHordeModelsDialog) },
+            modifier = Modifier
+        ) {
             (Text(text = "Select models"))
         }
 
     }
 
-    repeat(10) {
-        ListItem(headlineContent = { Text(text = "Model $it") })
+    selectedModels.forEach {
+        ListItem(headlineContent = { Text(text = it) })
 
     }
+
 //    ListItem(headlineContent = { Text(text = "Model 1") })
 //    ListItem(headlineContent = { Text(text = "Model 2") })
 }
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun SelectHordeModelsAlertDialog(
+//    activeModels: List<ActiveModel>,
+//    onEvent: (COUserEvent) -> Unit
+//) {
+//    AlertDialog(
+//        onDismissRequest = { onEvent(COUserEvent.DismissSelectHordeModelsDialog) }) {
+//        Column {
+//            LazyColumn {
+//                items(activeModels) {
+//                    Text(text = it.name)
+//                }
+//            }
+//        }
+//    }
+//}
+
+@Composable
+fun SelectHordeModelsAlertDialog(
+    activeModels: List<ActiveModel>,
+    selectedModels: Set<String>,
+    onEvent: (COUserEvent) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { onEvent(COUserEvent.DismissSelectHordeModelsDialog) },
+        confirmButton = {
+            TextButton(onClick = { onEvent(COUserEvent.AcceptSelectHordeModelsDialog) }) {
+                Text(text = "Accept")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onEvent(COUserEvent.DismissSelectHordeModelsDialog) }) {
+                Text(text = "Dismiss")
+            }
+        },
+        title = {
+            Text(text = "Select horde models")
+        },
+        text = {
+            LazyColumn(
+//                    modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(activeModels, key = { it.name }) {
+                    val selected = selectedModels.contains(it.name)
+                    ActiveModelItem(
+                        activeModel = it,
+                        selected = selected,
+                        onEvent = onEvent
+                    )
+                }
+            }
+        },
+    )
+}
+
+@Composable
+fun ActiveModelItem(
+    activeModel: ActiveModel,
+    selected: Boolean,
+    onEvent: (COUserEvent) -> Unit
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Checkbox(
+            checked = selected,
+            onCheckedChange = { onEvent(COUserEvent.CheckHordeModel(activeModel.name)) })
+        Text(text = "${activeModel.name} (ETA: ${activeModel.eta}s, Speed: ${activeModel.performance}, Queue: ${activeModel.queued}, Workers: ${activeModel.count})")
+    }
+}
+
 
 @Preview
 @Composable

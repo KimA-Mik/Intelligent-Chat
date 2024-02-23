@@ -54,5 +54,6 @@
     <string name="horde_validation_error_snackbar">Horde validation error</string>
     <string name="no_internet_connection_snackbar">No internet connection</string>
     <string name="horde_key_empty_snackbar">The Horde key is empty</string>
+    <string name="load_models_snackbar">Load %1$s models</string>
 
 </resources>

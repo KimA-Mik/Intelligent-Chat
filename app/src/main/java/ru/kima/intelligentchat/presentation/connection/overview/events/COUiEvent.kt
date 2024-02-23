@@ -14,5 +14,6 @@ sealed interface COUiEvent {
         data object ApiKeySaved : COSnackbar
         data object EmptyHordeKey : COSnackbar
         data object NoInternet : COSnackbar
+        data class ModelsUpdated(val modelsCount: Int) : COSnackbar
     }
 }

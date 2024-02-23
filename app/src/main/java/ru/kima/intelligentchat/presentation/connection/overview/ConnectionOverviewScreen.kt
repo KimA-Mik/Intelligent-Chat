@@ -160,6 +160,11 @@ fun ShowSnackbar(
             R.string.unknown_horde_error_snackbar,
             snackbar.message
         )
+
+        is COUiEvent.COSnackbar.ModelsUpdated -> stringResource(
+            R.string.load_models_snackbar,
+            snackbar.modelsCount
+        )
     }
 
     LaunchedEffect(snackbar) {

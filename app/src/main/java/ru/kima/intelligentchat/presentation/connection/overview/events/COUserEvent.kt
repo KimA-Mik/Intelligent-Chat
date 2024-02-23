@@ -12,4 +12,8 @@ sealed interface COUserEvent {
     data object SaveApiKey : COUserEvent
     data object ShowKudos : COUserEvent
     data object RefreshModels : COUserEvent
+    data object OpenSelectHordeModelsDialog : COUserEvent
+    data object DismissSelectHordeModelsDialog : COUserEvent
+    data object AcceptSelectHordeModelsDialog : COUserEvent
+    data class CheckHordeModel(val model: String) : COUserEvent
 }
