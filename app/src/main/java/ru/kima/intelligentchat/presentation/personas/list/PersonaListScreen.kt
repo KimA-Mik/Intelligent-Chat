@@ -111,10 +111,8 @@ fun consumeEvent(
     navController: NavController
 ) {
     event.consume { current ->
-        current?.let {
-            when (it) {
-                is UiEvent.NavigateToPersona -> navController.navigateToPersona(it.id)
-            }
+        when (current) {
+            is UiEvent.NavigateToPersona -> navController.navigateToPersona(current.id)
         }
     }
 }

@@ -62,6 +62,8 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 val message = getErrorMessage(response.errorBody())
                 Resource.Error(message)
             }
+        } catch (e: IOException) {
+            Resource.Error("0")
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)

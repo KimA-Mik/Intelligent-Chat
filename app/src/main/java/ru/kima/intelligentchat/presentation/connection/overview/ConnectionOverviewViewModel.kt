@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.ComposeEvent
 import ru.kima.intelligentchat.core.common.API_TYPE
-import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.horde.useCase.GetActiveModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
@@ -131,9 +130,15 @@ class ConnectionOverviewViewModel(
 
     private fun onShowKudos() = viewModelScope.launch {
         val event = when (val result = getKudos()) {
-            GetKudosUseCase.KudosResult.Error -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.ErrorGetKudos)
-            GetKudosUseCase.KudosResult.NoUser -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.NoUser)
-            is GetKudosUseCase.KudosResult.Success -> COUiEvent.ShowSnackbar(
+            GetKudosUseCase.GetKudosResult.NoUser -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.NoUser)
+            GetKudosUseCase.GetKudosResult.NoInternet -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.NoInternet)
+            is GetKudosUseCase.GetKudosResult.UnknownError -> COUiEvent.ShowSnackbar(
+                COUiEvent.COSnackbar.HordeUnknownError(
+                    result.message
+                )
+            )
+
+            is GetKudosUseCase.GetKudosResult.Success -> COUiEvent.ShowSnackbar(
                 COUiEvent.COSnackbar.ShowKudos(
                     result.kudos
                 )
@@ -144,18 +149,20 @@ class ConnectionOverviewViewModel(
     }
 
     private fun onRefreshModels() = viewModelScope.launch {
-        val event = when (val modelsResource = getActiveModels()) {
-            is Resource.Error -> COUiEvent.ShowMessage(modelsResource.message!!)
-            is Resource.Success -> COUiEvent.ShowMessage(
-                modelsResource.data!!.map { it.name }.toString()
+        val event = when (val result = getActiveModels()) {
+            GetActiveModelsUseCase.GetActiveModelsResult.NoInternet -> COUiEvent.ShowSnackbar(
+                COUiEvent.COSnackbar.NoInternet
             )
 
-            else -> {
-                COUiEvent.ShowMessage("Unreachable")
-            }
-        }
-        _uiEvents.value = ComposeEvent(event)
+            is GetActiveModelsUseCase.GetActiveModelsResult.Success -> COUiEvent.ShowMessage(result.models.map { it.name }
+                .toString())
 
+            is GetActiveModelsUseCase.GetActiveModelsResult.UnknownError -> COUiEvent.ShowSnackbar(
+                COUiEvent.COSnackbar.HordeUnknownError(result.message)
+            )
+        }
+
+        _uiEvents.value = ComposeEvent(event)
     }
 
     companion object {

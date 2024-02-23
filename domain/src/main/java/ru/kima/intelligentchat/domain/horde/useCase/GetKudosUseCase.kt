@@ -9,22 +9,26 @@ class GetKudosUseCase(
     private val repository: HordeRepository,
     private val preferences: HordePreferencesHandler
 ) {
-    suspend operator fun invoke(): KudosResult {
+    suspend operator fun invoke(): GetKudosResult {
         val pref = preferences.data.first()
-        if (pref.apiToken.isBlank()) {
-            return KudosResult.NoUser
+        if (pref.userId == 0) {
+            return GetKudosResult.NoUser
         }
 
-        val result = repository.findUser(pref.apiToken)
-        return when (result) {
-            is Resource.Success -> KudosResult.Success(result.data!!.kudos)
-            else -> KudosResult.Error
+        val apiToken = pref.apiToken
+        return when (val result = repository.findUser(apiToken)) {
+            is Resource.Success -> GetKudosResult.Success(result.data!!.kudos)
+            else -> when (result.message) {
+                "0" -> GetKudosResult.NoInternet
+                else -> GetKudosResult.UnknownError(result.message ?: "Very unknown message")
+            }
         }
     }
 
-    sealed interface KudosResult {
-        data class Success(val kudos: Double) : KudosResult
-        data object NoUser : KudosResult
-        data object Error : KudosResult
+    sealed interface GetKudosResult {
+        data class Success(val kudos: Double) : GetKudosResult
+        data object NoUser : GetKudosResult
+        data class UnknownError(val message: String) : GetKudosResult
+        data object NoInternet : GetKudosResult
     }
 }
