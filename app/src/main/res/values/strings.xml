@@ -45,8 +45,14 @@
     <string name="username_template">Username: %1$s</string>
     <string name="anonymous_username">Anonymous</string>
     <string name="show_kudos_label">Show kudos</string>
-    <string name="error_get_kudos">Could not get kudos</string>
-    <string name="no_horde_user">There are no user</string>
-    <string name="kudos_template">Kudos: %1$d</string>
+    <string name="error_get_kudos_snackbar">Could not get kudos</string>
+    <string name="no_horde_user_snackbar">There are no user</string>
+    <string name="kudos_template_snackbar">Kudos: %1$d</string>
+    <string name="horde_api_key_is_saved_snackbar">Horde api key has been saved</string>
+    <string name="unknown_horde_error_snackbar">Unknown horde error %1$s</string>
+    <string name="horde_user_not_found_snackbar">Horde user not found</string>
+    <string name="horde_validation_error_snackbar">Horde validation error</string>
+    <string name="no_internet_connection_snackbar">No internet connection</string>
+    <string name="horde_key_empty_snackbar">The Horde key is empty</string>
 
 </resources>

@@ -14,6 +14,7 @@ import ru.kima.intelligentchat.data.util.jsonConverterFactory.toConverterFactory
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.model.UserInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
+import java.io.IOException
 
 class HordeRepositoryImpl(json: Json) : HordeRepository {
     private val api: HordeApi
@@ -38,9 +39,11 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 val res = response.body()!!
                 Resource.Success(res.toUserInfo())
             } else {
-                val message = getErrorMessage(response.errorBody())
-                Resource.Error(message)
+                val code = response.code().toString()
+                Resource.Error(code)
             }
+        } catch (e: IOException) {
+            Resource.Error("0")
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)

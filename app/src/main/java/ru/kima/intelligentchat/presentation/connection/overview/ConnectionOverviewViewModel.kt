@@ -111,16 +111,22 @@ class ConnectionOverviewViewModel(
     }
 
     private fun onSaveApiKey() = viewModelScope.launch {
-        val userInfoResource = saveApiKey(apiKey = state.value.hordeFragmentState.currentApiToken)
-        when (userInfoResource) {
-            is Resource.Success -> _uiEvents.value =
-                ComposeEvent(COUiEvent.ShowMessage(userInfoResource.data!!.userName))
+        val apiKey = state.value.hordeFragmentState.currentApiToken
 
-            is Resource.Error -> _uiEvents.value =
-                ComposeEvent(COUiEvent.ShowMessage(userInfoResource.message!!))
-
-            else -> {}
+        val event = when (val result = saveApiKey(apiKey)) {
+            is SaveApiKeyUseCase.SaveApiKeyResult.Success -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.ApiKeySaved)
+            SaveApiKeyUseCase.SaveApiKeyResult.UserNotFound -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.HordeUserNotFound)
+            SaveApiKeyUseCase.SaveApiKeyResult.ValidationError -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.HordeValidationError)
+            SaveApiKeyUseCase.SaveApiKeyResult.NoInternet -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.NoInternet)
+            SaveApiKeyUseCase.SaveApiKeyResult.EmtpyKey -> COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.EmptyHordeKey)
+            is SaveApiKeyUseCase.SaveApiKeyResult.UnknownError -> COUiEvent.ShowSnackbar(
+                COUiEvent.COSnackbar.HordeUnknownError(
+                    result.message
+                )
+            )
         }
+
+        _uiEvents.value = ComposeEvent(event)
     }
 
     private fun onShowKudos() = viewModelScope.launch {

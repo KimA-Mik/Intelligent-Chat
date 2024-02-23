@@ -144,11 +144,21 @@ fun ShowSnackbar(
     snackbarHostState: SnackbarHostState,
 ) {
     val message = when (snackbar) {
-        COUiEvent.COSnackbar.ErrorGetKudos -> stringResource(R.string.error_get_kudos)
-        COUiEvent.COSnackbar.NoUser -> stringResource(R.string.no_horde_user)
+        COUiEvent.COSnackbar.ErrorGetKudos -> stringResource(R.string.error_get_kudos_snackbar)
+        COUiEvent.COSnackbar.NoUser -> stringResource(R.string.no_horde_user_snackbar)
         is COUiEvent.COSnackbar.ShowKudos -> stringResource(
-            R.string.kudos_template,
+            R.string.kudos_template_snackbar,
             snackbar.kudos.toInt()
+        )
+
+        COUiEvent.COSnackbar.ApiKeySaved -> stringResource(R.string.horde_api_key_is_saved_snackbar)
+        COUiEvent.COSnackbar.HordeUserNotFound -> stringResource(R.string.horde_user_not_found_snackbar)
+        COUiEvent.COSnackbar.HordeValidationError -> stringResource(R.string.horde_validation_error_snackbar)
+        COUiEvent.COSnackbar.NoInternet -> stringResource(R.string.no_internet_connection_snackbar)
+        COUiEvent.COSnackbar.EmptyHordeKey -> stringResource(R.string.horde_key_empty_snackbar)
+        is COUiEvent.COSnackbar.HordeUnknownError -> stringResource(
+            R.string.unknown_horde_error_snackbar,
+            snackbar.message
         )
     }
 

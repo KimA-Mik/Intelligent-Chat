@@ -8,5 +8,11 @@ sealed interface COUiEvent {
         data object NoUser : COSnackbar
         data object ErrorGetKudos : COSnackbar
         data class ShowKudos(val kudos: Double) : COSnackbar
+        data object HordeUserNotFound : COSnackbar
+        data object HordeValidationError : COSnackbar
+        data class HordeUnknownError(val message: String) : COSnackbar
+        data object ApiKeySaved : COSnackbar
+        data object EmptyHordeKey : COSnackbar
+        data object NoInternet : COSnackbar
     }
 }
