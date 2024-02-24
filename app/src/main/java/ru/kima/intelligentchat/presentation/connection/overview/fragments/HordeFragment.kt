@@ -2,6 +2,7 @@ package ru.kima.intelligentchat.presentation.connection.overview.fragments
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,23 +10,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +41,8 @@ import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEve
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
+private val cardPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp)
+
 @Composable
 fun HordeFragment(
     state: ConnectionOverviewState.HordeFragmentState,
@@ -55,32 +57,37 @@ fun HordeFragment(
     }
 
     Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
             .padding(horizontal = 8.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        SimpleConfig(
-            contextToWorker = state.contextToWorker,
-            responseToWorker = state.responseToWorker,
-            trustedWorkers = state.trustedWorkers,
-            contextSize = state.contextSize,
-            responseLength = state.responseLength,
-            onEvent = onEvent
-        )
+        Card {
+            SimpleConfig(
+                contextToWorker = state.contextToWorker,
+                responseToWorker = state.responseToWorker,
+                trustedWorkers = state.trustedWorkers,
+                contextSize = state.contextSize,
+                responseLength = state.responseLength,
+                onEvent = onEvent
+            )
+        }
 
-        ApiKeyField(
-            currentApiToken = state.currentApiToken,
-            showApiToken = state.showApiToken,
-            userName = state.userName.ifBlank { stringResource(id = R.string.anonymous_username) },
-            onEvent = onEvent
-        )
+        Card {
+            ApiKeyField(
+                currentApiToken = state.currentApiToken,
+                showApiToken = state.showApiToken,
+                userName = state.userName.ifBlank { stringResource(id = R.string.anonymous_username) },
+                onEvent = onEvent
+            )
+        }
 
-        Models(
-            selectedModels = state.selectedModels,
-            onEvent = onEvent
-        )
+        Card {
+            Models(
+                selectedModels = state.selectedModels,
+                onEvent = onEvent
+            )
+        }
     }
 }
 
@@ -93,7 +100,11 @@ fun SimpleConfig(
     responseLength: Int,
     onEvent: (COUserEvent) -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .padding(cardPadding)
+            .fillMaxWidth()
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(checked = contextToWorker, onCheckedChange = {
                 onEvent(COUserEvent.ToggleContextToWorker)
@@ -140,54 +151,58 @@ fun ApiKeyField(
     userName: String,
     onEvent: (COUserEvent) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier.padding(cardPadding)
     ) {
-        Text(
-            text = stringResource(R.string.api_key),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
-
-        TextButton(onClick = { onEvent(COUserEvent.ShowKudos) }) {
-            Text(text = stringResource(R.string.show_kudos_label))
-        }
-    }
-    Text(
-        text = stringResource(id = R.string.username_template, userName),
-        style = MaterialTheme.typography.bodyLarge
-    )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        TextField(
-            value = currentApiToken,
-            onValueChange = { onEvent(COUserEvent.UpdateApiToken(it)) },
-            modifier = Modifier
-                .weight(1f),
-            label = { Text(text = stringResource(R.string.horde_api_token)) },
-            placeholder = { Text(text = "0000000000") },
-            singleLine = true,
-            trailingIcon = {
-                IconButton(onClick = { onEvent(COUserEvent.ToggleHordeTokenVisibility) }) {
-                    Icon(
-                        imageVector = if (showApiToken) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                        contentDescription = "Show / Hide api key"
-                    )
-                }
-            },
-            visualTransformation = if (showApiToken) VisualTransformation.None else PasswordVisualTransformation()
-        )
-
-        IconButton(
-            onClick = { onEvent(COUserEvent.SaveApiKey) },
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(imageVector = Icons.Filled.Save, contentDescription = "")
+            Text(
+                text = stringResource(R.string.api_key),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            TextButton(onClick = { onEvent(COUserEvent.ShowKudos) }) {
+                Text(text = stringResource(R.string.show_kudos_label))
+            }
+        }
+        Text(
+            text = stringResource(id = R.string.username_template, userName),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            OutlinedTextField(
+                value = currentApiToken,
+                onValueChange = { onEvent(COUserEvent.UpdateApiToken(it)) },
+                modifier = Modifier
+                    .weight(1f),
+                label = { Text(text = stringResource(R.string.horde_api_token)) },
+                placeholder = { Text(text = "0000000000") },
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick = { onEvent(COUserEvent.ToggleHordeTokenVisibility) }) {
+                        Icon(
+                            imageVector = if (showApiToken) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                            contentDescription = "Show / Hide api key"
+                        )
+                    }
+                },
+                visualTransformation = if (showApiToken) VisualTransformation.None else PasswordVisualTransformation()
+            )
+
+            IconButton(
+                onClick = { onEvent(COUserEvent.SaveApiKey) },
+            ) {
+                Icon(imageVector = Icons.Filled.Save, contentDescription = "")
+            }
         }
     }
 }
@@ -197,32 +212,37 @@ fun Models(
     selectedModels: List<String>,
     onEvent: (COUserEvent) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier.padding(cardPadding),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = "Models",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
-        IconButton(onClick = { onEvent(COUserEvent.RefreshModels) }) {
-            Icon(imageVector = Icons.Filled.Refresh, contentDescription = "")
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        TextButton(
-            onClick = { onEvent(COUserEvent.OpenSelectHordeModelsDialog) },
-            modifier = Modifier
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            (Text(text = "Select models"))
+            Text(
+                text = "Models",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            IconButton(onClick = { onEvent(COUserEvent.RefreshModels) }) {
+                Icon(imageVector = Icons.Filled.Refresh, contentDescription = "")
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            TextButton(
+                onClick = { onEvent(COUserEvent.OpenSelectHordeModelsDialog) },
+                modifier = Modifier
+            ) {
+                (Text(text = "Select models"))
+            }
+
         }
 
-    }
-
-    selectedModels.forEach {
-        ListItem(headlineContent = { Text(text = it) })
+        selectedModels.forEach {
+            Text(text = it, style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 
@@ -247,9 +267,7 @@ fun SelectHordeModelsAlertDialog(
             Text(text = "Select horde models")
         },
         text = {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            LazyColumn {
                 items(dialogActiveModels, key = { it.name }) {
                     ActiveModelItem(
                         model = it,
@@ -266,12 +284,14 @@ fun ActiveModelItem(
     model: HordeDialogActiveModel,
     onEvent: (COUserEvent) -> Unit
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(
-            checked = model.selected,
-            onCheckedChange = { onEvent(COUserEvent.CheckHordeModel(model.name)) })
-        Text(text = "${model.name} ${model.details}")
-    }
+    ListItem(
+        trailingContent = {
+            Checkbox(
+                checked = model.selected,
+                onCheckedChange = { onEvent(COUserEvent.CheckHordeModel(model.name)) })
+        },
+        headlineContent = { Text(text = "${model.name} ${model.details}") }
+    )
 }
 
 

@@ -2,14 +2,14 @@ package ru.kima.intelligentchat.presentation.connection.overview
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.outlined.Menu
@@ -30,7 +30,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -71,7 +70,7 @@ fun ConnectionOverviewScreen(
     ConsumeEvent(uiEvents, snackbarHostState, scope)
 
     val scrollBehavior =
-        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+        TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     //Open drawer button kept recomposing, looked ugly
     val openDrawer = remember<() -> Unit> {
@@ -100,9 +99,6 @@ fun ConnectionOverviewScreen(
                     }
                 },
                 scrollBehavior = sb,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
-                )
             )
         },
         modifier = Modifier
@@ -115,7 +111,8 @@ fun ConnectionOverviewScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .verticalScroll(rememberScrollState())
+                .nestedScroll(sb.nestedScrollConnection)
         )
     }
 }
@@ -181,20 +178,16 @@ fun ConnectionOverviewContent(
 ) {
     var isApiMenuExpanded by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.Start) {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = modifier
+    ) {
+        //TODO: remake dropdown menu with something more stable
         ExposedDropdownMenuBox(
             expanded = isApiMenuExpanded,
             onExpandedChange = {
                 isApiMenuExpanded = it
             },
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                    shape = MaterialTheme.shapes.medium.copy(
-                        topStart = CornerSize(0.dp),
-                        topEnd = CornerSize(0.dp)
-                    )
-                )
         ) {
             val rotation by animateFloatAsState(
                 targetValue = if (isApiMenuExpanded) 0f else 180f,
