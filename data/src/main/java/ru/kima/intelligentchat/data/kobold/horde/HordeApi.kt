@@ -8,6 +8,9 @@ import ru.kima.intelligentchat.data.kobold.horde.model.ActiveModelDto
 import ru.kima.intelligentchat.data.kobold.horde.model.UserDetailsDto
 
 interface HordeApi {
+    @GET("status/heartbeat")
+    suspend fun heartbeat(): Response<Unit>
+
     @GET("find_user")
     suspend fun findUser(@Header("apikey") apiKey: String): Response<UserDetailsDto>
 

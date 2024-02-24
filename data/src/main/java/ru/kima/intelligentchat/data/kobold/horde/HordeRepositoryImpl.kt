@@ -32,6 +32,22 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
             retrofit.responseBodyConverter(RequestError::class.java, emptyArray())
     }
 
+    override suspend fun heartbeat(): Resource<Unit> {
+        return try {
+            val response = api.heartbeat()
+            if (response.isSuccessful) {
+                Resource.Success(Unit)
+            } else {
+                Resource.Error("The heart of horde doesn't beat for some reason.")
+            }
+        } catch (e: IOException) {
+            Resource.Error("0")
+        } catch (e: Exception) {
+            val message = e.message ?: e.toString()
+            Resource.Error(message)
+        }
+    }
+
     override suspend fun findUser(apiKey: String): Resource<UserInfo> {
         return try {
             val response = api.findUser(apiKey)
