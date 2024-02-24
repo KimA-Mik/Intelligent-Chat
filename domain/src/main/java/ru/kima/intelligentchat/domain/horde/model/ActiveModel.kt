@@ -8,4 +8,8 @@ data class ActiveModel(
     val jobs: Double = 0.0,
     val eta: Int = 0,
     val type: String = String()
-)
+) {
+    val details: String
+        get() = "(ETA: ${this.eta}s, Speed: ${this.performance}, Queue: ${this.queued}, Workers: ${this.count})"
+
+}

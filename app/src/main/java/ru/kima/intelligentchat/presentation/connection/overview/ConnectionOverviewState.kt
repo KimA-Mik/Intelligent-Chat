@@ -2,7 +2,7 @@ package ru.kima.intelligentchat.presentation.connection.overview
 
 import androidx.compose.runtime.Immutable
 import ru.kima.intelligentchat.core.common.API_TYPE
-import ru.kima.intelligentchat.domain.horde.model.ActiveModel
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
 
 @Immutable
 data class ConnectionOverviewState(
@@ -20,9 +20,8 @@ data class ConnectionOverviewState(
         val contextSize: Int = 1024,
         val responseLength: Int = 256,
         val showSelectHordeModelsDialog: Boolean = false,
-        val activeModels: List<ActiveModel> = emptyList(),
-        val selectedModels: Set<String> = emptySet(),
-        val dialogSelectedModels: Set<String> = emptySet()
+        val selectedModels: List<String> = emptyList(),
+        val dialogSelectedModels: List<HordeDialogActiveModel> = emptyList()
     )
 }
 

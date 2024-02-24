@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.ComposeEvent
@@ -23,11 +21,13 @@ import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.SelectHordeModelsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
 
 class ConnectionOverviewViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -39,31 +39,24 @@ class ConnectionOverviewViewModel(
     private val updateTrustedWorkers: UpdateTrustedWorkersUseCase,
     private val saveApiKey: SaveApiKeyUseCase,
     private val getKudos: GetKudosUseCase,
-    private val getActiveModels: GetActiveModelsUseCase
+    private val getActiveModels: GetActiveModelsUseCase,
+    private val selectHordeModels: SelectHordeModelsUseCase
 ) : ViewModel() {
     private val showApiToken = savedStateHandle.getStateFlow(SHOW_API_TOKEN_KEY, false)
     private val currentHordeApiToken =
         savedStateHandle.getStateFlow(HORDE_API_TOKEN_KEY, String())
     private val showSelectHordeModelsDialog = MutableStateFlow(false)
-    private val hordeActiveModels = MutableStateFlow(emptyList<ActiveModel>())
-    private val hordeDialogSelectedModels = MutableStateFlow(setOf<String>())
-    private val hordeSelectedModels = MutableStateFlow(setOf<String>())
-
-    //TODO: Make more efficient representation of models in alert dialog
-    private var hordeActiveModelsSet: Set<String> = emptySet()
+    private val hordeDialogActiveModels = MutableStateFlow(emptyList<HordeDialogActiveModel>())
+    private var _activeModels = emptyList<ActiveModel>()
 
     init {
-        hordeActiveModels.onEach { models ->
-            hordeActiveModelsSet = models.map { it.name }.toSet()
-        }.launchIn(viewModelScope)
-
         viewModelScope.launch {
             val preferences = getHordePreferences().first()
             savedStateHandle[HORDE_API_TOKEN_KEY] = preferences.apiToken
 
             val activeModels = getActiveModels()
             if (activeModels is GetActiveModelsUseCase.GetActiveModelsResult.Success) {
-                hordeActiveModels.value = activeModels.models
+                _activeModels = activeModels.models
             }
         }
     }
@@ -75,18 +68,14 @@ class ConnectionOverviewViewModel(
         currentHordeApiToken,
         showApiToken,
         showSelectHordeModelsDialog,
-        hordeActiveModels,
-        hordeSelectedModels,
-        hordeDialogSelectedModels
+        hordeDialogActiveModels
     ) { args ->
         val preferences = args[0] as AppPreferences
         val hordePreferences = args[1] as HordePreferences
         val currentHordeApiToken = args[2] as String
         val showApiToken = args[3] as Boolean
         val showSelectHordeModelsDialog = args[4] as Boolean
-        val hordeActiveModels = args[5] as List<ActiveModel>
-        val hordeSelectedModels = args[6] as Set<String>
-        val hordeDialogSelectedModels = args[7] as Set<String>
+        val hordeDialogActiveModels = args[5] as List<HordeDialogActiveModel>
         ConnectionOverviewState(
             selectedApiType = preferences.selectedApiType,
             hordeFragmentState = ConnectionOverviewState.HordeFragmentState(
@@ -99,9 +88,8 @@ class ConnectionOverviewViewModel(
                 contextSize = hordePreferences.contextSize,
                 responseLength = hordePreferences.responseLength,
                 showSelectHordeModelsDialog = showSelectHordeModelsDialog,
-                activeModels = hordeActiveModels,
-                selectedModels = hordeSelectedModels,
-                dialogSelectedModels = hordeDialogSelectedModels
+                selectedModels = hordePreferences.selectedModels,
+                dialogSelectedModels = hordeDialogActiveModels
             )
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())
@@ -197,7 +185,7 @@ class ConnectionOverviewViewModel(
             )
 
             is GetActiveModelsUseCase.GetActiveModelsResult.Success -> {
-                hordeActiveModels.value = result.models
+                _activeModels = result.models
                 COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.ModelsUpdated(result.models.size))
             }
 
@@ -214,30 +202,60 @@ class ConnectionOverviewViewModel(
     }
 
     private fun onOpenSelectHordeModelsDialog() {
-        hordeDialogSelectedModels.value = hordeSelectedModels.value.intersect(hordeActiveModelsSet)
+        hordeDialogActiveModels.value =
+            getDialogActiveModes(
+                _activeModels,
+                state.value.hordeFragmentState.selectedModels
+            )
         showSelectHordeModelsDialog.value = true
     }
 
     private fun onCheckHordeModel(model: String) {
-        val set = hordeDialogSelectedModels.value
-        hordeDialogSelectedModels.value = if (set.contains(model)) {
-            val value = set.toMutableSet()
-            value.remove(model)
-            value
-        } else {
-            val value = set.toMutableSet()
-            value.add(model)
-            value
+        val list = hordeDialogActiveModels.value.toMutableList()
+
+        for (i in list.indices) {
+            if (list[i].name != model) {
+                continue
+            }
+
+            val selected = list[i].selected
+            list[i] = list[i].copy(selected = !selected)
+            break
         }
+        hordeDialogActiveModels.value = list
     }
 
-    private fun onAcceptSelectHordeModelsDialog() {
-        hordeSelectedModels.value = hordeDialogSelectedModels.value
+    private fun onAcceptSelectHordeModelsDialog() = viewModelScope.launch {
+        val selectedModels = hordeDialogActiveModels.value
+            .asSequence()
+            .filter { it.selected }
+            .map { it.name }
+            .toList()
+
+        selectHordeModels(selectedModels)
         showSelectHordeModelsDialog.value = false
     }
 
     companion object {
         private const val SHOW_API_TOKEN_KEY = "showApiToken"
         private const val HORDE_API_TOKEN_KEY = "currentHordeApiToken"
+
+        private fun getDialogActiveModes(
+            activeModels: List<ActiveModel>,
+            selectedModels: List<String>
+        ): List<HordeDialogActiveModel> {
+            val selectedModelsOnline = activeModels
+                .map { it.name }
+                .intersect(selectedModels.toSet())
+
+            val result = activeModels.map {
+                HordeDialogActiveModel(
+                    name = it.name,
+                    details = it.details,
+                    selected = selectedModelsOnline.contains(it.name)
+                )
+            }
+            return result
+        }
     }
 }

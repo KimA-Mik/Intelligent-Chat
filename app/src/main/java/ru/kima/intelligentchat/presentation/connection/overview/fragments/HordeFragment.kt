@@ -36,9 +36,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewState
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -49,8 +49,7 @@ fun HordeFragment(
 ) {
     when {
         state.showSelectHordeModelsDialog -> SelectHordeModelsAlertDialog(
-            activeModels = state.activeModels,
-            selectedModels = state.dialogSelectedModels,
+            dialogActiveModels = state.dialogSelectedModels,
             onEvent = onEvent
         )
     }
@@ -195,7 +194,7 @@ fun ApiKeyField(
 
 @Composable
 fun Models(
-    selectedModels: Set<String>,
+    selectedModels: List<String>,
     onEvent: (COUserEvent) -> Unit
 ) {
     Row(
@@ -224,35 +223,12 @@ fun Models(
 
     selectedModels.forEach {
         ListItem(headlineContent = { Text(text = it) })
-
     }
-
-//    ListItem(headlineContent = { Text(text = "Model 1") })
-//    ListItem(headlineContent = { Text(text = "Model 2") })
 }
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun SelectHordeModelsAlertDialog(
-//    activeModels: List<ActiveModel>,
-//    onEvent: (COUserEvent) -> Unit
-//) {
-//    AlertDialog(
-//        onDismissRequest = { onEvent(COUserEvent.DismissSelectHordeModelsDialog) }) {
-//        Column {
-//            LazyColumn {
-//                items(activeModels) {
-//                    Text(text = it.name)
-//                }
-//            }
-//        }
-//    }
-//}
 
 @Composable
 fun SelectHordeModelsAlertDialog(
-    activeModels: List<ActiveModel>,
-    selectedModels: Set<String>,
+    dialogActiveModels: List<HordeDialogActiveModel>,
     onEvent: (COUserEvent) -> Unit
 ) {
     AlertDialog(
@@ -272,14 +248,11 @@ fun SelectHordeModelsAlertDialog(
         },
         text = {
             LazyColumn(
-//                    modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(activeModels, key = { it.name }) {
-                    val selected = selectedModels.contains(it.name)
+                items(dialogActiveModels, key = { it.name }) {
                     ActiveModelItem(
-                        activeModel = it,
-                        selected = selected,
+                        model = it,
                         onEvent = onEvent
                     )
                 }
@@ -290,15 +263,14 @@ fun SelectHordeModelsAlertDialog(
 
 @Composable
 fun ActiveModelItem(
-    activeModel: ActiveModel,
-    selected: Boolean,
+    model: HordeDialogActiveModel,
     onEvent: (COUserEvent) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Checkbox(
-            checked = selected,
-            onCheckedChange = { onEvent(COUserEvent.CheckHordeModel(activeModel.name)) })
-        Text(text = "${activeModel.name} (ETA: ${activeModel.eta}s, Speed: ${activeModel.performance}, Queue: ${activeModel.queued}, Workers: ${activeModel.count})")
+            checked = model.selected,
+            onCheckedChange = { onEvent(COUserEvent.CheckHordeModel(model.name)) })
+        Text(text = "${model.name} ${model.details}")
     }
 }
 

@@ -6,6 +6,14 @@ class HordePreferencesHandler(context: Context) {
     private val store = context.hordePreferencesDataStore
     val data = store.data
 
+    suspend fun selectModels(models: List<String>) {
+        updateData {
+            it.copy(
+                selectedModels = models
+            )
+        }
+    }
+
     suspend fun updateContextToWorker(contextToWorker: Boolean) {
         updateData {
             it.copy(

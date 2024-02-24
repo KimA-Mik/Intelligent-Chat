@@ -14,7 +14,8 @@ data class HordePreferences(
     val userName: String = String(),
     val userId: Int = 0,
     val contextSize: Int = 1024,
-    val responseLength: Int = 256
+    val responseLength: Int = 256,
+    val selectedModels: List<String> = emptyList()
 )
 
 val Context.hordePreferencesDataStore: DataStore<HordePreferences> by dataStore(
