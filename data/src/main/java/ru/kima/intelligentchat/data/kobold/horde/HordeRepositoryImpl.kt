@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.data.kobold.horde
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -9,6 +10,7 @@ import retrofit2.create
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toActiveModel
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toUserInfo
+import ru.kima.intelligentchat.data.kobold.horde.model.ConnectionState
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestError
 import ru.kima.intelligentchat.data.util.jsonConverterFactory.toConverterFactory
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
@@ -36,11 +38,13 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         return try {
             val response = api.heartbeat()
             if (response.isSuccessful) {
+                ConnectionState.isConnected.value = true
                 Resource.Success(Unit)
             } else {
                 Resource.Error("The heart of horde doesn't beat for some reason.")
             }
         } catch (e: IOException) {
+            ConnectionState.isConnected.value = false
             Resource.Error("0")
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
@@ -59,6 +63,7 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 Resource.Error(code)
             }
         } catch (e: IOException) {
+            ConnectionState.isConnected.value = false
             Resource.Error("0")
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
@@ -79,12 +84,15 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 Resource.Error(message)
             }
         } catch (e: IOException) {
+            ConnectionState.isConnected.value = false
             Resource.Error("0")
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
         }
     }
+
+    override fun connectionState(): Flow<Boolean> = ConnectionState.isConnected
 
     private fun getErrorMessage(responseBody: ResponseBody?): String {
         return try {
