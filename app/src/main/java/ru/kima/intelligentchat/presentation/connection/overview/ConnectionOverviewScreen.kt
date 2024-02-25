@@ -2,6 +2,7 @@ package ru.kima.intelligentchat.presentation.connection.overview
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,9 +16,9 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -169,37 +170,29 @@ fun ShowSnackbar(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionOverviewContent(
     state: ConnectionOverviewState,
     modifier: Modifier,
     onEvent: (COUserEvent) -> Unit
 ) {
-    var isApiMenuExpanded by remember { mutableStateOf(false) }
 
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = modifier
     ) {
-        //TODO: remake dropdown menu with something more stable
-        ExposedDropdownMenuBox(
-            expanded = isApiMenuExpanded,
-            onExpandedChange = {
-                isApiMenuExpanded = it
-            },
-        ) {
+        Box {
+            var isApiMenuExpanded by remember { mutableStateOf(false) }
             val rotation by animateFloatAsState(
                 targetValue = if (isApiMenuExpanded) 0f else 180f,
                 label = "rotation"
             )
-
             TextField(
                 value = apiTypeStringResource(state.selectedApiType),
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { isApiMenuExpanded = true }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowDropUp, contentDescription = "",
                             modifier = Modifier.graphicsLayer(
@@ -212,9 +205,8 @@ fun ConnectionOverviewContent(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
-                    .menuAnchor()
             )
-            ExposedDropdownMenu(
+            DropdownMenu(
                 expanded = isApiMenuExpanded,
                 onDismissRequest = { isApiMenuExpanded = false }) {
                 DropdownMenuItem(
