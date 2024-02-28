@@ -2,6 +2,7 @@ package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -106,7 +107,8 @@ fun CardDetailsScreen(
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .imePadding(),
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
