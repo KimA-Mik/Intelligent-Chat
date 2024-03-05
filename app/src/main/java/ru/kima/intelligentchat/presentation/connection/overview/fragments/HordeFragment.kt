@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.connection.overview.fragments
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,7 +17,6 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +24,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -62,7 +63,10 @@ fun HordeFragment(
         modifier = modifier
             .padding(horizontal = 8.dp)
     ) {
-        Card {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 1.dp
+        ) {
             SimpleConfig(
                 contextToWorker = state.contextToWorker,
                 responseToWorker = state.responseToWorker,
@@ -73,7 +77,10 @@ fun HordeFragment(
             )
         }
 
-        Card {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 1.dp
+        ) {
             ApiKeyField(
                 currentApiToken = state.currentApiToken,
                 showApiToken = state.showApiToken,
@@ -82,7 +89,10 @@ fun HordeFragment(
             )
         }
 
-        Card {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 1.dp
+        ) {
             Models(
                 selectedModels = state.selectedModels,
                 onEvent = onEvent
@@ -105,34 +115,56 @@ fun SimpleConfig(
             .padding(cardPadding)
             .fillMaxWidth()
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = contextToWorker, onCheckedChange = {
-                onEvent(COUserEvent.ToggleContextToWorker)
-            })
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(
                 text = stringResource(R.string.adjust_context_size),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
             )
+
+            Switch(
+                checked = contextToWorker, onCheckedChange = {
+                    onEvent(COUserEvent.ToggleContextToWorker)
+                },
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = responseToWorker, onCheckedChange = {
-                onEvent(COUserEvent.ToggleResponseToWorker)
-            })
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(
                 text = stringResource(R.string.adjust_response_length),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
             )
+            Switch(
+                checked = responseToWorker, onCheckedChange = {
+                    onEvent(COUserEvent.ToggleResponseToWorker)
+                },
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = trustedWorkers, onCheckedChange = {
-                onEvent(COUserEvent.ToggleTrustedWorkers)
-            })
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(
                 text = stringResource(R.string.trusted_workers_only),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
+            )
+            Switch(
+                checked = trustedWorkers, onCheckedChange = {
+                    onEvent(COUserEvent.ToggleTrustedWorkers)
+                },
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
         val contextField = if (contextSize > 0) contextSize.toString() else "--"
@@ -295,7 +327,8 @@ fun ActiveModelItem(
 }
 
 
-@Preview
+@Preview(name = "Light Mode")
+@Preview(name = "Night Mode",uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun HordeFragmentPreview() {
     IntelligentChatTheme {
