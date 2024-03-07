@@ -1,32 +1,26 @@
 package ru.kima.intelligentchat
 
 import android.app.Application
+import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import org.koin.dsl.module
-import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
-import ru.kima.intelligentchat.core.preferences.hordePreferences.HordePreferencesHandler
+import ru.kima.intelligentchat.di.core
 import ru.kima.intelligentchat.di.data
 import ru.kima.intelligentchat.di.domain
 import ru.kima.intelligentchat.di.presentation
-
 
 class ChatApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val core = module {
-            single { PreferencesHandler(this@ChatApplication) }
-            single { HordePreferencesHandler(this@ChatApplication) }
-        }
-
         startKoin {
             androidLogger()
+            androidContext(this@ChatApplication)
             modules(
-                core,
-                data(this@ChatApplication),
-                domain(this@ChatApplication),
-                presentation(this@ChatApplication)
+                core(),
+                data(),
+                domain(),
+                presentation()
             )
         }
     }

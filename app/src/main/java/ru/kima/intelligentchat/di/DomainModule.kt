@@ -6,7 +6,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.java.KoinJavaComponent.get
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
 import ru.kima.intelligentchat.data.kobold.horde.HordeRepositoryImpl
@@ -50,10 +52,10 @@ import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 
 @OptIn(ExperimentalSerializationApi::class)
-fun domain(context: Context) = module {
-    single<CharacterCardRepository> { CharacterCardRepositoryImpl(get(), get(), get()) }
-    single<PersonaRepository> { PersonaRepositoryImpl(get(), get()) }
-    single<HordeRepository> { HordeRepositoryImpl(get()) }
+fun domain() = module {
+    singleOf(::CharacterCardRepositoryImpl) bind CharacterCardRepository::class
+    singleOf(::PersonaRepositoryImpl) bind PersonaRepository::class
+    singleOf(::HordeRepositoryImpl) bind HordeRepository::class
 
     singleOf(::GetPreferencesUseCase)
     singleOf(::SetSelectedPersonaIdUseCase)
@@ -79,7 +81,6 @@ fun domain(context: Context) = module {
     singleOf(::DeleteAlternateGreetingUseCase)
     singleOf(::UpdateAlternateGreetingUseCase)
 
-
     singleOf(::CreatePersonaUseCase)
     singleOf(::SubscribeToPersonaUseCase)
     singleOf(::GetPersonaUseCase)
@@ -90,7 +91,6 @@ fun domain(context: Context) = module {
     singleOf(::DeletePersonaUseCase)
     factoryOf(::SelectedPersonaUseCase)
 
-
     factoryOf(::TokenizeTextUseCase)
 
     singleOf(::SaveApiKeyUseCase)
@@ -98,6 +98,7 @@ fun domain(context: Context) = module {
     singleOf(::GetActiveModelsUseCase)
 
     single {
+        val context: Context = get(Context::class.java)
         val vocabStream = context.resources.openRawResource(R.raw.llama_vocabulary)
         val vocabulary: List<String> = Json.decodeFromStream(vocabStream)
         vocabStream.close()
