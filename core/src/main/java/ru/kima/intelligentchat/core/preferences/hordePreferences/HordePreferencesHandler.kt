@@ -6,6 +6,18 @@ class HordePreferencesHandler(context: Context) {
     private val store = context.hordePreferencesDataStore
     val data = store.data
 
+    suspend fun updateGenerationDetails(
+        contextSize: Int = -1,
+        responseLength: Int = -1
+    ) {
+        updateData {
+            it.copy(
+                contextSize = if (contextSize > 0) contextSize else it.contextSize,
+                responseLength = if (responseLength > 0) responseLength else it.responseLength
+            )
+        }
+    }
+
     suspend fun selectModels(models: List<String>) {
         updateData {
             it.copy(

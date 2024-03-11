@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
@@ -18,20 +21,25 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,6 +82,16 @@ fun HordeFragment(
                 contextSize = state.contextSize,
                 responseLength = state.responseLength,
                 onEvent = onEvent
+            )
+        }
+
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 1.dp
+        ) {
+            GenerationConfig(
+                contextSize = state.contextSize,
+                responseLength = state.responseLength,
             )
         }
 
@@ -193,7 +211,7 @@ fun ApiKeyField(
         ) {
             Text(
                 text = stringResource(R.string.api_key),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
@@ -254,7 +272,7 @@ fun Models(
         ) {
             Text(
                 text = "Models",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             IconButton(onClick = { onEvent(COUserEvent.RefreshModels) }) {
@@ -312,6 +330,100 @@ fun SelectHordeModelsAlertDialog(
 }
 
 @Composable
+fun GenerationConfig(
+    contextSize: Int,
+    responseLength: Int
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+
+        DetailedSlider(
+            title = "Response (tokens)",
+            value = 0,
+            leftBorder = 16f,
+            rightBorder = 2048f,
+            updateValue = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+
+        DetailedSlider(
+            title = "Context (tokens)",
+            value = 0,
+            leftBorder = 512f,
+            rightBorder = 8196f,
+            updateValue = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+
+        val contextField = if (contextSize > 0) contextSize.toString() else "--"
+        val responseField = if (responseLength > 0) responseLength.toString() else "--"
+        Text(
+            text = stringResource(id = R.string.context_and_response, contextField, responseField),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DetailedSlider(
+    title: String,
+    value: Int,
+    leftBorder: Float,
+    rightBorder: Float,
+    updateValue: (Float) -> Unit,
+
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            OutlinedTextField(
+                value = value.toString(), onValueChange = {
+                    updateValue(it.toFloat())
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                singleLine = true,
+                modifier = Modifier
+                    .width(100.dp)
+                    .wrapContentWidth()
+            )
+        }
+        val state = remember(leftBorder, rightBorder) {
+            SliderState(
+                value = 0f,
+                steps = (rightBorder - leftBorder).toInt(),
+                valueRange = leftBorder..rightBorder
+            )
+        }
+        Slider(state)
+
+        val steps = remember(leftBorder, rightBorder) {
+            (rightBorder - leftBorder).toInt()
+        }
+
+        Slider(
+            value = 0f,
+            valueRange = leftBorder..rightBorder,
+            steps = steps,
+            onValueChange = updateValue
+        )
+
+    }
+}
+
+@Composable
 fun ActiveModelItem(
     model: HordeDialogActiveModel,
     onEvent: (COUserEvent) -> Unit
@@ -328,7 +440,7 @@ fun ActiveModelItem(
 
 
 @Preview(name = "Light Mode")
-@Preview(name = "Night Mode",uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Night Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun HordeFragmentPreview() {
     IntelligentChatTheme {
