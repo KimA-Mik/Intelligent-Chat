@@ -23,6 +23,7 @@ import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiU
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.SelectHordeModelsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToWorkerUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateGenerationDetailsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
@@ -40,7 +41,8 @@ class ConnectionOverviewViewModel(
     private val saveApiKey: SaveApiKeyUseCase,
     private val getKudos: GetKudosUseCase,
     private val getActiveModels: GetActiveModelsUseCase,
-    private val selectHordeModels: SelectHordeModelsUseCase
+    private val selectHordeModels: SelectHordeModelsUseCase,
+    private val updateGenerationDetails: UpdateGenerationDetailsUseCase,
 ) : ViewModel() {
     private val showApiToken = savedStateHandle.getStateFlow(SHOW_API_TOKEN_KEY, false)
     private val currentHordeApiToken =
@@ -112,6 +114,8 @@ class ConnectionOverviewViewModel(
             COUserEvent.OpenSelectHordeModelsDialog -> onOpenSelectHordeModelsDialog()
             is COUserEvent.CheckHordeModel -> onCheckHordeModel(event.model)
             COUserEvent.AcceptSelectHordeModelsDialog -> onAcceptSelectHordeModelsDialog()
+            is COUserEvent.UpdateHordeContextSize -> onUpdateHordeContextSize(event.newSize)
+            is COUserEvent.UpdateHordeResponseLength -> onUpdateHordeResponseLength(event.newLength)
         }
     }
 
@@ -234,6 +238,14 @@ class ConnectionOverviewViewModel(
 
         selectHordeModels(selectedModels)
         showSelectHordeModelsDialog.value = false
+    }
+
+    private fun onUpdateHordeContextSize(newSize: Float) = viewModelScope.launch {
+        updateGenerationDetails(contextSize = newSize.toInt())
+    }
+
+    private fun onUpdateHordeResponseLength(newLength: Float) = viewModelScope.launch {
+        updateGenerationDetails(responseLength = newLength.toInt())
     }
 
     companion object {

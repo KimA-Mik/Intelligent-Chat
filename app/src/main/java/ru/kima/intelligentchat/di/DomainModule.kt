@@ -45,6 +45,7 @@ import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiU
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.SelectHordeModelsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToWorkerUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateGenerationDetailsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateHordeUserDataUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
@@ -67,6 +68,7 @@ fun domain() = module {
     singleOf(::UpdateResponseToWorkerUseCase)
     singleOf(::UpdateTrustedWorkersUseCase)
     singleOf(::SelectHordeModelsUseCase)
+    singleOf(::UpdateGenerationDetailsUseCase)
 
     factoryOf(::GetCardsUseCase)
     factoryOf(::GetCardsListUseCase)

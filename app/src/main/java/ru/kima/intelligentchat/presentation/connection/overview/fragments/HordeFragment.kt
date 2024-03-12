@@ -8,9 +8,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
@@ -23,15 +27,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +50,7 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewState
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
+import ru.kima.intelligentchat.presentation.ui.components.LesserOutlinedTextField
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 private val cardPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -71,8 +82,19 @@ fun HordeFragment(
                 contextToWorker = state.contextToWorker,
                 responseToWorker = state.responseToWorker,
                 trustedWorkers = state.trustedWorkers,
+                onEvent = onEvent
+            )
+        }
+
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 1.dp
+        ) {
+            GenerationConfig(
                 contextSize = state.contextSize,
+                configContextSize = state.contextSize,
                 responseLength = state.responseLength,
+                configResponseLength = state.responseLength,
                 onEvent = onEvent
             )
         }
@@ -106,8 +128,6 @@ fun SimpleConfig(
     contextToWorker: Boolean,
     responseToWorker: Boolean,
     trustedWorkers: Boolean,
-    contextSize: Int,
-    responseLength: Int,
     onEvent: (COUserEvent) -> Unit
 ) {
     Column(
@@ -167,6 +187,44 @@ fun SimpleConfig(
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
+    }
+}
+
+@Composable
+fun GenerationConfig(
+    contextSize: Int,
+    configContextSize: Int,
+    responseLength: Int,
+    configResponseLength: Int,
+    onEvent: (COUserEvent) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        DetailedSlider(
+            title = "Response (tokens)",
+            value = configResponseLength,
+            leftBorder = 16f,
+            rightBorder = 2048f,
+            updateValue = {
+                onEvent(COUserEvent.UpdateHordeResponseLength(it))
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+
+        DetailedSlider(
+            title = "Context (tokens)",
+            value = configContextSize,
+            leftBorder = 512f,
+            rightBorder = 8196f,
+            updateValue = {
+                onEvent(COUserEvent.UpdateHordeContextSize(it))
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+
         val contextField = if (contextSize > 0) contextSize.toString() else "--"
         val responseField = if (responseLength > 0) responseLength.toString() else "--"
         Text(
@@ -193,7 +251,7 @@ fun ApiKeyField(
         ) {
             Text(
                 text = stringResource(R.string.api_key),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
@@ -254,7 +312,7 @@ fun Models(
         ) {
             Text(
                 text = "Models",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             IconButton(onClick = { onEvent(COUserEvent.RefreshModels) }) {
@@ -312,6 +370,66 @@ fun SelectHordeModelsAlertDialog(
 }
 
 @Composable
+fun DetailedSlider(
+    title: String,
+    value: Int,
+    leftBorder: Float,
+    rightBorder: Float,
+    updateValue: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        var tempValue by remember(value) {
+            mutableFloatStateOf(value.toFloat())
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            LesserOutlinedTextField(
+                value = tempValue.toInt().toString(), onValueChange = {
+                    try {
+                        var newValue = it.toFloat()
+                        if (newValue > rightBorder) newValue = rightBorder
+                        if (newValue < leftBorder) newValue = leftBorder
+                        updateValue(newValue)
+                    } catch (e: NumberFormatException) {
+                        println(e)
+                    }
+                },
+                textStyle = MaterialTheme.typography.bodySmall,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                singleLine = true,
+                modifier = Modifier
+                    .width(64.dp)
+                    .height(40.dp)
+                    .wrapContentWidth()
+            )
+        }
+        val steps = remember(leftBorder, rightBorder) {
+            (rightBorder - leftBorder).toInt()
+        }
+
+        Slider(
+            value = tempValue,
+            onValueChange = {
+                tempValue = it
+            },
+            valueRange = leftBorder..rightBorder,
+            steps = steps,
+            onValueChangeFinished = { updateValue(tempValue) }
+        )
+    }
+}
+
+@Composable
 fun ActiveModelItem(
     model: HordeDialogActiveModel,
     onEvent: (COUserEvent) -> Unit
@@ -328,7 +446,7 @@ fun ActiveModelItem(
 
 
 @Preview(name = "Light Mode")
-@Preview(name = "Night Mode",uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Night Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun HordeFragmentPreview() {
     IntelligentChatTheme {
