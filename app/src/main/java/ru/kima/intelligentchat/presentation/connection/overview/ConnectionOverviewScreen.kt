@@ -176,7 +176,6 @@ fun ConnectionOverviewContent(
     modifier: Modifier,
     onEvent: (COUserEvent) -> Unit
 ) {
-
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = modifier

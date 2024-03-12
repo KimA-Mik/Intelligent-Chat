@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -21,20 +22,21 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -48,6 +50,7 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewState
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
+import ru.kima.intelligentchat.presentation.ui.components.LesserOutlinedTextField
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 private val cardPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -79,8 +82,6 @@ fun HordeFragment(
                 contextToWorker = state.contextToWorker,
                 responseToWorker = state.responseToWorker,
                 trustedWorkers = state.trustedWorkers,
-                contextSize = state.contextSize,
-                responseLength = state.responseLength,
                 onEvent = onEvent
             )
         }
@@ -91,7 +92,10 @@ fun HordeFragment(
         ) {
             GenerationConfig(
                 contextSize = state.contextSize,
+                configContextSize = state.contextSize,
                 responseLength = state.responseLength,
+                configResponseLength = state.responseLength,
+                onEvent = onEvent
             )
         }
 
@@ -124,8 +128,6 @@ fun SimpleConfig(
     contextToWorker: Boolean,
     responseToWorker: Boolean,
     trustedWorkers: Boolean,
-    contextSize: Int,
-    responseLength: Int,
     onEvent: (COUserEvent) -> Unit
 ) {
     Column(
@@ -185,6 +187,44 @@ fun SimpleConfig(
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
+    }
+}
+
+@Composable
+fun GenerationConfig(
+    contextSize: Int,
+    configContextSize: Int,
+    responseLength: Int,
+    configResponseLength: Int,
+    onEvent: (COUserEvent) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        DetailedSlider(
+            title = "Response (tokens)",
+            value = configResponseLength,
+            leftBorder = 16f,
+            rightBorder = 2048f,
+            updateValue = {
+                onEvent(COUserEvent.UpdateHordeResponseLength(it))
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+
+        DetailedSlider(
+            title = "Context (tokens)",
+            value = configContextSize,
+            leftBorder = 512f,
+            rightBorder = 8196f,
+            updateValue = {
+                onEvent(COUserEvent.UpdateHordeContextSize(it))
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+
         val contextField = if (contextSize > 0) contextSize.toString() else "--"
         val responseField = if (responseLength > 0) responseLength.toString() else "--"
         Text(
@@ -330,55 +370,19 @@ fun SelectHordeModelsAlertDialog(
 }
 
 @Composable
-fun GenerationConfig(
-    contextSize: Int,
-    responseLength: Int
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-
-        DetailedSlider(
-            title = "Response (tokens)",
-            value = 0,
-            leftBorder = 16f,
-            rightBorder = 2048f,
-            updateValue = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
-
-        DetailedSlider(
-            title = "Context (tokens)",
-            value = 0,
-            leftBorder = 512f,
-            rightBorder = 8196f,
-            updateValue = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
-
-        val contextField = if (contextSize > 0) contextSize.toString() else "--"
-        val responseField = if (responseLength > 0) responseLength.toString() else "--"
-        Text(
-            text = stringResource(id = R.string.context_and_response, contextField, responseField),
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 fun DetailedSlider(
     title: String,
     value: Int,
     leftBorder: Float,
     rightBorder: Float,
     updateValue: (Float) -> Unit,
-
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
+        var tempValue by remember(value) {
+            mutableFloatStateOf(value.toFloat())
+        }
+
         Row(
             horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
         ) {
@@ -387,39 +391,41 @@ fun DetailedSlider(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            OutlinedTextField(
-                value = value.toString(), onValueChange = {
-                    updateValue(it.toFloat())
+            LesserOutlinedTextField(
+                value = tempValue.toInt().toString(), onValueChange = {
+                    try {
+                        var newValue = it.toFloat()
+                        if (newValue > rightBorder) newValue = rightBorder
+                        if (newValue < leftBorder) newValue = leftBorder
+                        updateValue(newValue)
+                    } catch (e: NumberFormatException) {
+                        println(e)
+                    }
                 },
+                textStyle = MaterialTheme.typography.bodySmall,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
                 singleLine = true,
                 modifier = Modifier
-                    .width(100.dp)
+                    .width(64.dp)
+                    .height(40.dp)
                     .wrapContentWidth()
             )
         }
-        val state = remember(leftBorder, rightBorder) {
-            SliderState(
-                value = 0f,
-                steps = (rightBorder - leftBorder).toInt(),
-                valueRange = leftBorder..rightBorder
-            )
-        }
-        Slider(state)
-
         val steps = remember(leftBorder, rightBorder) {
             (rightBorder - leftBorder).toInt()
         }
 
         Slider(
-            value = 0f,
+            value = tempValue,
+            onValueChange = {
+                tempValue = it
+            },
             valueRange = leftBorder..rightBorder,
             steps = steps,
-            onValueChange = updateValue
+            onValueChangeFinished = { updateValue(tempValue) }
         )
-
     }
 }
 
