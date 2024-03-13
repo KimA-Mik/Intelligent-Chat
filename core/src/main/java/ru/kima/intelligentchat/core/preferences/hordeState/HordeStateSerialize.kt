@@ -26,8 +26,9 @@ object HordeStateSerialize : Serializer<HordeState> {
         }
     }
 
-    override suspend fun writeTo(t: HordePreferences, output: OutputStream) {
-        output.write(ProtoBuf.encodeToByteArray(t))
     override suspend fun writeTo(t: HordeState, output: OutputStream) {
+        withContext(Dispatchers.IO) {
+            output.write(ProtoBuf.encodeToByteArray(t))
+        }
     }
 }
