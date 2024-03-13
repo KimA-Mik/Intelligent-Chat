@@ -9,11 +9,14 @@ import retrofit2.Retrofit
 import retrofit2.create
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toActiveModel
+import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeWorker
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toUserInfo
 import ru.kima.intelligentchat.data.kobold.horde.model.ConnectionState
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestError
+import ru.kima.intelligentchat.data.kobold.horde.model.WorkerDto
 import ru.kima.intelligentchat.data.util.jsonConverterFactory.toConverterFactory
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
+import ru.kima.intelligentchat.domain.horde.model.HordeWorker
 import ru.kima.intelligentchat.domain.horde.model.UserInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import java.io.IOException
@@ -78,6 +81,27 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 val res = response
                     .body()!!
                     .map { it.toActiveModel() }
+                Resource.Success(res)
+            } else {
+                val message = getErrorMessage(response.errorBody())
+                Resource.Error(message)
+            }
+        } catch (e: IOException) {
+            ConnectionState.isConnected.value = false
+            Resource.Error("0")
+        } catch (e: Exception) {
+            val message = e.message ?: e.toString()
+            Resource.Error(message)
+        }
+    }
+
+    override suspend fun workers(): Resource<List<HordeWorker>> {
+        return try {
+            val response = api.getWorkers()
+            if (response.isSuccessful) {
+                val res = response
+                    .body()!!
+                    .map(WorkerDto::toHordeWorker)
                 Resource.Success(res)
             } else {
                 val message = getErrorMessage(response.errorBody())
