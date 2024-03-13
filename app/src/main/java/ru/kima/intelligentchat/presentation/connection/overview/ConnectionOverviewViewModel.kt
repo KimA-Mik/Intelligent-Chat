@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.ComposeEvent
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.core.preferences.appPreferences.AppPreferences
-import ru.kima.intelligentchat.core.preferences.hordePreferences.HordePreferences
+import ru.kima.intelligentchat.core.preferences.hordeState.HordeState
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.useCase.GetActiveModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
@@ -73,7 +73,7 @@ class ConnectionOverviewViewModel(
         hordeDialogActiveModels
     ) { args ->
         val preferences = args[0] as AppPreferences
-        val hordePreferences = args[1] as HordePreferences
+        val hordeState = args[1] as HordeState
         val currentHordeApiToken = args[2] as String
         val showApiToken = args[3] as Boolean
         val showSelectHordeModelsDialog = args[4] as Boolean
@@ -83,14 +83,14 @@ class ConnectionOverviewViewModel(
             hordeFragmentState = ConnectionOverviewState.HordeFragmentState(
                 currentApiToken = currentHordeApiToken,
                 showApiToken = showApiToken,
-                contextToWorker = hordePreferences.contextToWorker,
-                responseToWorker = hordePreferences.responseToWorker,
-                trustedWorkers = hordePreferences.trustedWorkers,
-                userName = hordePreferences.userName,
-                contextSize = hordePreferences.contextSize,
-                responseLength = hordePreferences.responseLength,
+                contextToWorker = hordeState.contextToWorker,
+                responseToWorker = hordeState.responseToWorker,
+                trustedWorkers = hordeState.trustedWorkers,
+                userName = hordeState.userName,
+                contextSize = hordeState.contextSize,
+                responseLength = hordeState.responseLength,
                 showSelectHordeModelsDialog = showSelectHordeModelsDialog,
-                selectedModels = hordePreferences.selectedModels,
+                selectedModels = hordeState.selectedModels,
                 dialogSelectedModels = hordeDialogActiveModels
             )
         )

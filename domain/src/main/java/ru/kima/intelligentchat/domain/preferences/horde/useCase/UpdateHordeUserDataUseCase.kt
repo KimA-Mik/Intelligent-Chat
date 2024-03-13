@@ -1,8 +1,8 @@
 package ru.kima.intelligentchat.domain.preferences.horde.useCase
 
-import ru.kima.intelligentchat.core.preferences.hordePreferences.HordePreferencesHandler
+import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
 
-class UpdateHordeUserDataUseCase(private val handler: HordePreferencesHandler) {
+class UpdateHordeUserDataUseCase(private val handler: HordeStateHandler) {
     suspend operator fun invoke(
         apiKey: String = String(),
         userName: String = String(),

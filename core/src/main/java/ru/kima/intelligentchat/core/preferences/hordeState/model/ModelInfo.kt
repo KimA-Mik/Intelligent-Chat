@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.core.preferences.hordePreferences.model
+package ru.kima.intelligentchat.core.preferences.hordeState.model
 
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.core.preferences.hordePreferences
+package ru.kima.intelligentchat.core.preferences.hordeState
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -6,7 +6,7 @@ import androidx.datastore.dataStore
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class HordePreferences(
+data class HordeState(
     val apiToken: String = String(),
     val contextToWorker: Boolean = true,
     val responseToWorker: Boolean = true,
@@ -18,7 +18,7 @@ data class HordePreferences(
     val selectedModels: List<String> = emptyList()
 )
 
-val Context.hordePreferencesDataStore: DataStore<HordePreferences> by dataStore(
+val Context.hordeStateDataStore: DataStore<HordeState> by dataStore(
     fileName = "horde_preferences.pb",
-    serializer = HordePreferencesSerialize
+    serializer = HordeStateSerialize
 )
