@@ -14,9 +14,9 @@ import ru.kima.intelligentchat.common.ComposeEvent
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.core.preferences.appPreferences.AppPreferences
 import ru.kima.intelligentchat.core.preferences.hordeState.HordeState
-import ru.kima.intelligentchat.domain.horde.model.ActiveModel
-import ru.kima.intelligentchat.domain.horde.useCase.GetActiveModelsUseCase
+import ru.kima.intelligentchat.core.preferences.hordeState.model.HordeModelInfo
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
+import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
@@ -28,6 +28,7 @@ import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseTo
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
+import ru.kima.intelligentchat.presentation.connection.overview.mappers.toDialogActiveModel
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
 
 class ConnectionOverviewViewModel(
@@ -40,7 +41,7 @@ class ConnectionOverviewViewModel(
     private val updateTrustedWorkers: UpdateTrustedWorkersUseCase,
     private val saveApiKey: SaveApiKeyUseCase,
     private val getKudos: GetKudosUseCase,
-    private val getActiveModels: GetActiveModelsUseCase,
+    private val loadActiveModels: LoadHordeModelsUseCase,
     private val selectHordeModels: SelectHordeModelsUseCase,
     private val updateGenerationDetails: UpdateGenerationDetailsUseCase,
 ) : ViewModel() {
@@ -49,17 +50,11 @@ class ConnectionOverviewViewModel(
         savedStateHandle.getStateFlow(HORDE_API_TOKEN_KEY, String())
     private val showSelectHordeModelsDialog = MutableStateFlow(false)
     private val hordeDialogActiveModels = MutableStateFlow(emptyList<HordeDialogActiveModel>())
-    private var _activeModels = emptyList<ActiveModel>()
 
     init {
         viewModelScope.launch {
             val preferences = getHordePreferences().first()
             savedStateHandle[HORDE_API_TOKEN_KEY] = preferences.apiToken
-
-            val activeModels = getActiveModels()
-            if (activeModels is GetActiveModelsUseCase.GetActiveModelsResult.Success) {
-                _activeModels = activeModels.models
-            }
         }
     }
 
@@ -183,17 +178,16 @@ class ConnectionOverviewViewModel(
     }
 
     private fun onRefreshModels() = viewModelScope.launch {
-        val event = when (val result = getActiveModels()) {
-            GetActiveModelsUseCase.GetActiveModelsResult.NoInternet -> COUiEvent.ShowSnackbar(
+        val event = when (val result = loadActiveModels()) {
+            LoadHordeModelsUseCase.LoadHordeModelsResult.NoInternet -> COUiEvent.ShowSnackbar(
                 COUiEvent.COSnackbar.NoInternet
             )
 
-            is GetActiveModelsUseCase.GetActiveModelsResult.Success -> {
-                _activeModels = result.models
-                COUiEvent.ShowSnackbar(COUiEvent.COSnackbar.ModelsUpdated(result.models.size))
-            }
+            is LoadHordeModelsUseCase.LoadHordeModelsResult.Success -> COUiEvent.ShowSnackbar(
+                COUiEvent.COSnackbar.ModelsUpdated(result.modelsCount)
+            )
 
-            is GetActiveModelsUseCase.GetActiveModelsResult.UnknownError -> COUiEvent.ShowSnackbar(
+            is LoadHordeModelsUseCase.LoadHordeModelsResult.UnknownError -> COUiEvent.ShowSnackbar(
                 COUiEvent.COSnackbar.HordeUnknownError(result.message)
             )
         }
@@ -205,10 +199,11 @@ class ConnectionOverviewViewModel(
         showSelectHordeModelsDialog.value = false
     }
 
-    private fun onOpenSelectHordeModelsDialog() {
+    private fun onOpenSelectHordeModelsDialog() = viewModelScope.launch {
+        val modelsInfo = getHordePreferences().first().modelsInfo
         hordeDialogActiveModels.value =
             getDialogActiveModes(
-                _activeModels,
+                modelsInfo,
                 state.value.hordeFragmentState.selectedModels
             )
         showSelectHordeModelsDialog.value = true
@@ -253,7 +248,7 @@ class ConnectionOverviewViewModel(
         private const val HORDE_API_TOKEN_KEY = "currentHordeApiToken"
 
         private fun getDialogActiveModes(
-            activeModels: List<ActiveModel>,
+            activeModels: List<HordeModelInfo>,
             selectedModels: List<String>
         ): List<HordeDialogActiveModel> {
             val selectedModelsOnline = activeModels
@@ -261,11 +256,7 @@ class ConnectionOverviewViewModel(
                 .intersect(selectedModels.toSet())
 
             val result = activeModels.map {
-                HordeDialogActiveModel(
-                    name = it.name,
-                    details = it.details,
-                    selected = selectedModelsOnline.contains(it.name)
-                )
+                it.toDialogActiveModel(selectedModelsOnline.contains(it.name))
             }
             return result
         }

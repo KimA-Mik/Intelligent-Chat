@@ -7,7 +7,7 @@ fun WorkerDto.toHordeWorker(): HordeWorker {
     return HordeWorker(
         id = id,
         maintenanceMode = maintenanceMode,
-        maxContextLength = maxContextLength,
+        maxContextSize = maxContextLength,
         maxLength = maxLength,
         models = models,
         name = name,

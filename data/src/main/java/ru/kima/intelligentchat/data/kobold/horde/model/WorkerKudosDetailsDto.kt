@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class WorkerKudosDetailsDto(
-    @SerialName("generated") val generated: Int,
-    @SerialName("uptime") val uptime: Int
+    @SerialName("generated") val generated: Double = 0.0,
+    @SerialName("uptime") val uptime: Int = 0
 )
