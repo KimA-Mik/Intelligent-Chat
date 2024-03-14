@@ -1,10 +1,19 @@
-package ru.kima.intelligentchat.core.preferences.hordePreferences
+package ru.kima.intelligentchat.core.preferences.hordeState
 
 import android.content.Context
+import ru.kima.intelligentchat.core.preferences.hordeState.model.HordeModelInfo
 
-class HordePreferencesHandler(context: Context) {
-    private val store = context.hordePreferencesDataStore
+class HordeStateHandler(context: Context) {
+    private val store = context.hordeStateDataStore
     val data = store.data
+
+    suspend fun updateHordeModelInfo(modelsInfo: List<HordeModelInfo>) {
+        updateData {
+            it.copy(
+                modelsInfo = modelsInfo
+            )
+        }
+    }
 
     suspend fun updateGenerationDetails(
         contextSize: Int = -1,
@@ -61,8 +70,8 @@ class HordePreferencesHandler(context: Context) {
     }
 
     private suspend fun updateData(
-        transform: suspend (HordePreferences) -> HordePreferences
-    ): HordePreferences {
+        transform: suspend (HordeState) -> HordeState
+    ): HordeState {
         return store.updateData(transform)
     }
 }

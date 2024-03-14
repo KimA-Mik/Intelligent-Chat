@@ -26,8 +26,8 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCas
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
-import ru.kima.intelligentchat.domain.horde.useCase.GetActiveModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
+import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
@@ -97,7 +97,7 @@ fun domain() = module {
 
     singleOf(::SaveApiKeyUseCase)
     singleOf(::GetKudosUseCase)
-    singleOf(::GetActiveModelsUseCase)
+    singleOf(::LoadHordeModelsUseCase)
 
     single {
         val context: Context = get(Context::class.java)

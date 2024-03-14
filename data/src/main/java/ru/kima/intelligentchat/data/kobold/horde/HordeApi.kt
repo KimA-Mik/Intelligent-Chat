@@ -6,6 +6,7 @@ import retrofit2.http.Header
 import retrofit2.http.Query
 import ru.kima.intelligentchat.data.kobold.horde.model.ActiveModelDto
 import ru.kima.intelligentchat.data.kobold.horde.model.UserDetailsDto
+import ru.kima.intelligentchat.data.kobold.horde.model.WorkerDto
 
 interface HordeApi {
     @GET("status/heartbeat")
@@ -16,4 +17,7 @@ interface HordeApi {
 
     @GET("status/models")
     suspend fun activeModels(@Query("type") type: String = "text"): Response<List<ActiveModelDto>>
+
+    @GET("workers")
+    suspend fun getWorkers(@Query("type") type: String = "text"): Response<List<WorkerDto>>
 }

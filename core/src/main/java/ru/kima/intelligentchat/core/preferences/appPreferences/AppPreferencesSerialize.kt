@@ -2,6 +2,8 @@ package ru.kima.intelligentchat.core.preferences.appPreferences
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromByteArray
@@ -25,7 +27,9 @@ object AppPreferencesSerialize : Serializer<AppPreferences> {
     }
 
     override suspend fun writeTo(t: AppPreferences, output: OutputStream) {
-        output.write(ProtoBuf.encodeToByteArray(t))
+        withContext(Dispatchers.IO) {
+            output.write(ProtoBuf.encodeToByteArray(t))
+        }
     }
 }
 
