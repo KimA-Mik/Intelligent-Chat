@@ -30,6 +30,7 @@ import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
+import ru.kima.intelligentchat.domain.horde.useCase.SelectHordePreset
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.DeletePersonaUseCase
@@ -99,9 +100,10 @@ fun domain() = module {
 
     factoryOf(::TokenizeTextUseCase)
 
-    singleOf(::SaveApiKeyUseCase)
     singleOf(::GetKudosUseCase)
     singleOf(::LoadHordeModelsUseCase)
+    singleOf(::SaveApiKeyUseCase)
+    singleOf(::SelectHordePreset)
 
     singleOf(::SubscribeToKoboldPresetsUseCase)
 
