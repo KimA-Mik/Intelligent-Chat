@@ -2,7 +2,7 @@ package ru.kima.intelligentchat.data.kobold.preset.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import ru.kima.intelligentchat.data.Database
+import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.data.kobold.preset.entities.KoboldPresetEntity
 import ru.kima.intelligentchat.data.kobold.preset.mappers.toEntity
 import ru.kima.intelligentchat.data.kobold.preset.mappers.toKoboldPreset
@@ -10,9 +10,9 @@ import ru.kima.intelligentchat.domain.presets.kobold.model.KoboldPreset
 import ru.kima.intelligentchat.domain.presets.kobold.repository.KoboldPresetRepository
 
 class KoboldPresetRepositoryImpl(
-    database: Database
+    wrapper: DatabaseWrapper
 ) : KoboldPresetRepository {
-    private val dao = database.koboldPresetDao()
+    private val dao = wrapper.database.koboldPresetDao()
     override fun subscribeToPresets(): Flow<List<KoboldPreset>> {
         return dao
             .subscribeToAll()
