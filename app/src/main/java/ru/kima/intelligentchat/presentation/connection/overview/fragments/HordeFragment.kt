@@ -524,7 +524,7 @@ fun HordeFragmentPreview() {
         Surface(modifier = Modifier.fillMaxSize()) {
             HordeFragment(
                 state = ConnectionOverviewState.HordeFragmentState(
-                    selectedPreset = HordePreset(1, "0_o")
+                    selectedPreset = HordePreset(1, "Preset")
                 ),
                 modifier = Modifier,
                 onEvent = {})
