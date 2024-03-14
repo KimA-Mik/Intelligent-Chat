@@ -9,8 +9,8 @@ import ru.kima.intelligentchat.data.card.entities.AltGreetingEntity
 import ru.kima.intelligentchat.data.card.entities.CardTagEntity
 import ru.kima.intelligentchat.data.card.entities.CharacterEntity
 import ru.kima.intelligentchat.data.card.entities.TagEntity
-import ru.kima.intelligentchat.data.kobold.config.KoboldConfigDao
-import ru.kima.intelligentchat.data.kobold.config.KoboldConfigEntity
+import ru.kima.intelligentchat.data.kobold.preset.dao.KoboldPresetDao
+import ru.kima.intelligentchat.data.kobold.preset.entities.KoboldPresetEntity
 import ru.kima.intelligentchat.data.persona.PersonaDao
 import ru.kima.intelligentchat.data.persona.PersonaEntity
 
@@ -21,7 +21,7 @@ import ru.kima.intelligentchat.data.persona.PersonaEntity
         CardTagEntity::class,
         PersonaEntity::class,
         AltGreetingEntity::class,
-        KoboldConfigEntity::class
+        KoboldPresetEntity::class
     ],
     version = 1
 )
@@ -30,5 +30,5 @@ abstract class Database : RoomDatabase() {
     abstract fun tagDao(): TagDao
     abstract fun cardTagDao(): CardTagDao
     abstract fun personaDao(): PersonaDao
-    abstract fun koboldConfigDao(): KoboldConfigDao
+    abstract fun koboldPresetDao(): KoboldPresetDao
 }

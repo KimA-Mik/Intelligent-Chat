@@ -12,6 +12,7 @@ import org.koin.java.KoinJavaComponent.get
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
 import ru.kima.intelligentchat.data.kobold.horde.HordeRepositoryImpl
+import ru.kima.intelligentchat.data.kobold.preset.repository.KoboldPresetRepositoryImpl
 import ru.kima.intelligentchat.data.persona.PersonaRepositoryImpl
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
@@ -49,6 +50,8 @@ import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateGeneration
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateHordeUserDataUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
+import ru.kima.intelligentchat.domain.presets.kobold.repository.KoboldPresetRepository
+import ru.kima.intelligentchat.domain.presets.kobold.useCase.SubscribeToKoboldPresetsUseCase
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 
@@ -57,6 +60,7 @@ fun domain() = module {
     singleOf(::CharacterCardRepositoryImpl) bind CharacterCardRepository::class
     singleOf(::PersonaRepositoryImpl) bind PersonaRepository::class
     singleOf(::HordeRepositoryImpl) bind HordeRepository::class
+    singleOf(::KoboldPresetRepositoryImpl) bind KoboldPresetRepository::class
 
     singleOf(::GetPreferencesUseCase)
     singleOf(::SetSelectedPersonaIdUseCase)
@@ -98,6 +102,8 @@ fun domain() = module {
     singleOf(::SaveApiKeyUseCase)
     singleOf(::GetKudosUseCase)
     singleOf(::LoadHordeModelsUseCase)
+
+    singleOf(::SubscribeToKoboldPresetsUseCase)
 
     single {
         val context: Context = get(Context::class.java)
