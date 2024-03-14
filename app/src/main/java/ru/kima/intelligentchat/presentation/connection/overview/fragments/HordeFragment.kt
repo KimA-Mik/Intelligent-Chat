@@ -59,7 +59,9 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewState
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordeModelsWrapper
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordePreset
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordePresetsWrapper
 import ru.kima.intelligentchat.presentation.ui.components.LesserOutlinedTextField
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
@@ -92,8 +94,7 @@ fun HordeFragment(
                 contextToWorker = state.contextToWorker,
                 responseToWorker = state.responseToWorker,
                 trustedWorkers = state.trustedWorkers,
-                presets = state.presets,
-                selectedPreset = state.selectedPreset,
+                wrapper = state.presetsWrapper,
                 onEvent = onEvent
             )
         }
@@ -128,7 +129,7 @@ fun HordeFragment(
             tonalElevation = 1.dp
         ) {
             Models(
-                selectedModels = state.selectedModels,
+                wrapper = state.selectedModelsWrapper,
                 onEvent = onEvent
             )
         }
@@ -140,8 +141,7 @@ fun SimpleConfig(
     contextToWorker: Boolean,
     responseToWorker: Boolean,
     trustedWorkers: Boolean,
-    selectedPreset: HordePreset,
-    presets: List<HordePreset>,
+    wrapper: HordePresetsWrapper,
     onEvent: (COUserEvent) -> Unit
 ) {
     Column(
@@ -171,8 +171,7 @@ fun SimpleConfig(
         )
 
         GenPresetSelector(
-            presets = presets,
-            selectedPreset = selectedPreset,
+            wrapper = wrapper,
             onEvent = onEvent,
             modifier = Modifier.padding(top = 16.dp)
         )
@@ -288,7 +287,7 @@ fun ApiKeyField(
 
 @Composable
 fun Models(
-    selectedModels: List<String>,
+    wrapper: HordeModelsWrapper,
     onEvent: (COUserEvent) -> Unit
 ) {
     Column(
@@ -319,7 +318,7 @@ fun Models(
 
         }
 
-        selectedModels.forEach {
+        wrapper.selectedModels.forEach {
             Text(text = it, style = MaterialTheme.typography.bodySmall)
         }
     }
@@ -384,8 +383,7 @@ fun TitledSwitch(
 
 @Composable
 fun GenPresetSelector(
-    selectedPreset: HordePreset,
-    presets: List<HordePreset>,
+    wrapper: HordePresetsWrapper,
     onEvent: (COUserEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -401,7 +399,7 @@ fun GenPresetSelector(
                 label = "rotation"
             )
             TextField(
-                value = selectedPreset.name, onValueChange = {},
+                value = wrapper.preset.name, onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 trailingIcon = {
@@ -418,7 +416,7 @@ fun GenPresetSelector(
             DropdownMenu(
                 expanded = showMenu,
                 onDismissRequest = { showMenu = false }) {
-                presets.forEach { preset ->
+                wrapper.presets.forEach { preset ->
                     DropdownMenuItem(
                         text = { Text(text = preset.name) },
                         onClick = {
@@ -524,7 +522,7 @@ fun HordeFragmentPreview() {
         Surface(modifier = Modifier.fillMaxSize()) {
             HordeFragment(
                 state = ConnectionOverviewState.HordeFragmentState(
-                    selectedPreset = HordePreset(1, "Preset")
+                    presetsWrapper = HordePresetsWrapper(HordePreset(1, "Preset"))
                 ),
                 modifier = Modifier,
                 onEvent = {})

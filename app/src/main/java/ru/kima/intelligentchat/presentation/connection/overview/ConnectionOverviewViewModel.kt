@@ -38,7 +38,9 @@ import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEve
 import ru.kima.intelligentchat.presentation.connection.overview.mappers.toDialogActiveModel
 import ru.kima.intelligentchat.presentation.connection.overview.mappers.toHordePreset
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordeModelsWrapper
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordePreset
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordePresetsWrapper
 
 class ConnectionOverviewViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -116,10 +118,12 @@ class ConnectionOverviewViewModel(
                 contextSize = hordeState.contextSize,
                 responseLength = hordeState.responseLength,
                 showSelectHordeModelsDialog = showSelectHordeModelsDialog,
-                selectedModels = hordeState.selectedModels,
+                selectedModelsWrapper = HordeModelsWrapper(hordeState.selectedModels),
                 dialogSelectedModels = hordeDialogActiveModels,
-                presets = hordePresets,
-                selectedPreset = selectedHordePreset,
+                presetsWrapper = HordePresetsWrapper(
+                    presets = hordePresets,
+                    preset = selectedHordePreset
+                ),
             )
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())
@@ -238,7 +242,7 @@ class ConnectionOverviewViewModel(
         hordeDialogActiveModels.value =
             getDialogActiveModes(
                 modelsInfo,
-                state.value.hordeFragmentState.selectedModels
+                state.value.hordeFragmentState.selectedModelsWrapper.selectedModels
             )
         showSelectHordeModelsDialog.value = true
     }
