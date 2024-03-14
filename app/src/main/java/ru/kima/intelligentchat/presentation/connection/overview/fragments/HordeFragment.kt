@@ -1,7 +1,9 @@
 package ru.kima.intelligentchat.presentation.connection.overview.fragments
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,12 +18,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -32,13 +38,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,6 +59,7 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewState
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordePreset
 import ru.kima.intelligentchat.presentation.ui.components.LesserOutlinedTextField
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
@@ -82,6 +92,8 @@ fun HordeFragment(
                 contextToWorker = state.contextToWorker,
                 responseToWorker = state.responseToWorker,
                 trustedWorkers = state.trustedWorkers,
+                presets = state.presets,
+                selectedPreset = state.selectedPreset,
                 onEvent = onEvent
             )
         }
@@ -128,6 +140,8 @@ fun SimpleConfig(
     contextToWorker: Boolean,
     responseToWorker: Boolean,
     trustedWorkers: Boolean,
+    selectedPreset: HordePreset,
+    presets: List<HordePreset>,
     onEvent: (COUserEvent) -> Unit
 ) {
     Column(
@@ -135,58 +149,33 @@ fun SimpleConfig(
             .padding(cardPadding)
             .fillMaxWidth()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        TitledSwitch(
+            title = stringResource(R.string.adjust_context_size),
+            checked = contextToWorker,
+            onCheckedChange = { onEvent(COUserEvent.ToggleContextToWorker) },
             modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(R.string.adjust_context_size),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
+        )
 
-            Switch(
-                checked = contextToWorker, onCheckedChange = {
-                    onEvent(COUserEvent.ToggleContextToWorker)
-                },
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        TitledSwitch(
+            title = stringResource(R.string.adjust_response_length),
+            checked = responseToWorker,
+            onCheckedChange = { onEvent(COUserEvent.ToggleResponseToWorker) },
             modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(R.string.adjust_response_length),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Switch(
-                checked = responseToWorker, onCheckedChange = {
-                    onEvent(COUserEvent.ToggleResponseToWorker)
-                },
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        )
+
+        TitledSwitch(
+            title = stringResource(R.string.trusted_workers_only),
+            checked = trustedWorkers,
+            onCheckedChange = { onEvent(COUserEvent.ToggleTrustedWorkers) },
             modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(R.string.trusted_workers_only),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Switch(
-                checked = trustedWorkers, onCheckedChange = {
-                    onEvent(COUserEvent.ToggleTrustedWorkers)
-                },
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-        }
+        )
+
+        GenPresetSelector(
+            presets = presets,
+            selectedPreset = selectedPreset,
+            onEvent = onEvent,
+            modifier = Modifier.padding(top = 16.dp)
+        )
     }
 }
 
@@ -370,6 +359,88 @@ fun SelectHordeModelsAlertDialog(
 }
 
 @Composable
+fun TitledSwitch(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Switch(
+            checked = checked, onCheckedChange = onCheckedChange,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+    }
+}
+
+@Composable
+fun GenPresetSelector(
+    selectedPreset: HordePreset,
+    presets: List<HordePreset>,
+    onEvent: (COUserEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier
+    ) {
+        Box(modifier = Modifier.weight(1f)) {
+            var showMenu by remember { mutableStateOf(false) }
+            val rotation by animateFloatAsState(
+                targetValue = if (showMenu) 0f else 180f,
+                label = "rotation"
+            )
+            TextField(
+                value = selectedPreset.name, onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropUp, contentDescription = "",
+                            modifier = Modifier.graphicsLayer(
+                                rotationZ = rotation
+                            )
+                        )
+                    }
+                }
+            )
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }) {
+                presets.forEach { preset ->
+                    DropdownMenuItem(
+                        text = { Text(text = preset.name) },
+                        onClick = {
+                            showMenu = false
+                            onEvent(COUserEvent.SelectHordePreset(preset.id))
+                        }
+                    )
+                }
+            }
+        }
+
+        IconButton(
+            onClick = {},
+        ) {
+            Icon(imageVector = Icons.Filled.Edit, contentDescription = "")
+        }
+    }
+
+}
+
+
+@Composable
 fun DetailedSlider(
     title: String,
     value: Int,
@@ -452,7 +523,9 @@ fun HordeFragmentPreview() {
     IntelligentChatTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             HordeFragment(
-                state = ConnectionOverviewState.HordeFragmentState(),
+                state = ConnectionOverviewState.HordeFragmentState(
+                    selectedPreset = HordePreset(1, "0_o")
+                ),
                 modifier = Modifier,
                 onEvent = {})
         }

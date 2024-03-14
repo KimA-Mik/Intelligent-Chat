@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.presentation.connection.overview
 import androidx.compose.runtime.Immutable
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordePreset
 
 @Immutable
 data class ConnectionOverviewState(
@@ -21,7 +22,9 @@ data class ConnectionOverviewState(
         val responseLength: Int = 256,
         val showSelectHordeModelsDialog: Boolean = false,
         val selectedModels: List<String> = emptyList(),
-        val dialogSelectedModels: List<HordeDialogActiveModel> = emptyList()
+        val dialogSelectedModels: List<HordeDialogActiveModel> = emptyList(),
+        val selectedPreset: HordePreset = HordePreset(1, "0_o"),
+        val presets: List<HordePreset> = emptyList(),
     )
 }
 

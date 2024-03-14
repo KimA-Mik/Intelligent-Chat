@@ -2,7 +2,7 @@ package ru.kima.intelligentchat.domain.horde.useCase
 
 import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
 
-class SelectHordePreset(
+class SelectActiveHordePresetUseCase(
     private val stateHandler: HordeStateHandler
 ) {
     suspend operator fun invoke(id: Long) {
