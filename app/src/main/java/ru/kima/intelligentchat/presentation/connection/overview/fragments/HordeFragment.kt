@@ -65,7 +65,7 @@ import ru.kima.intelligentchat.presentation.connection.overview.model.HordePrese
 import ru.kima.intelligentchat.presentation.ui.components.LesserOutlinedTextField
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
-private val cardPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp)
+private val cardNoTopPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp)
 
 @Composable
 fun HordeFragment(
@@ -95,7 +95,8 @@ fun HordeFragment(
                 responseToWorker = state.responseToWorker,
                 trustedWorkers = state.trustedWorkers,
                 wrapper = state.presetsWrapper,
-                onEvent = onEvent
+                onEvent = onEvent,
+                modifier = Modifier.padding(8.dp)
             )
         }
 
@@ -108,7 +109,8 @@ fun HordeFragment(
                 configContextSize = state.contextSize,
                 responseLength = state.responseLength,
                 configResponseLength = state.responseLength,
-                onEvent = onEvent
+                onEvent = onEvent,
+                modifier = Modifier.padding(8.dp)
             )
         }
 
@@ -120,7 +122,8 @@ fun HordeFragment(
                 currentApiToken = state.currentApiToken,
                 showApiToken = state.showApiToken,
                 userName = state.userName.ifBlank { stringResource(id = R.string.anonymous_username) },
-                onEvent = onEvent
+                onEvent = onEvent,
+                modifier = Modifier.padding(cardNoTopPadding)
             )
         }
 
@@ -130,7 +133,8 @@ fun HordeFragment(
         ) {
             Models(
                 wrapper = state.selectedModelsWrapper,
-                onEvent = onEvent
+                onEvent = onEvent,
+                modifier = Modifier.padding(cardNoTopPadding)
             )
         }
     }
@@ -142,12 +146,11 @@ fun SimpleConfig(
     responseToWorker: Boolean,
     trustedWorkers: Boolean,
     wrapper: HordePresetsWrapper,
-    onEvent: (COUserEvent) -> Unit
+    onEvent: (COUserEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
-            .padding(cardPadding)
-            .fillMaxWidth()
+        modifier = modifier
     ) {
         TitledSwitch(
             title = stringResource(R.string.adjust_context_size),
@@ -184,9 +187,13 @@ fun GenerationConfig(
     configContextSize: Int,
     responseLength: Int,
     configResponseLength: Int,
+    modifier: Modifier = Modifier,
     onEvent: (COUserEvent) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+    ) {
         DetailedSlider(
             title = "Response (tokens)",
             value = configResponseLength,
@@ -195,9 +202,7 @@ fun GenerationConfig(
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeResponseLength(it))
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
+            modifier = Modifier.fillMaxWidth()
         )
 
         DetailedSlider(
@@ -208,9 +213,7 @@ fun GenerationConfig(
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeContextSize(it))
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
+            modifier = Modifier.fillMaxWidth()
         )
 
         val contextField = if (contextSize > 0) contextSize.toString() else "--"
@@ -227,10 +230,11 @@ fun ApiKeyField(
     currentApiToken: String,
     showApiToken: Boolean,
     userName: String,
-    onEvent: (COUserEvent) -> Unit
+    onEvent: (COUserEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.padding(cardPadding)
+        modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -288,10 +292,11 @@ fun ApiKeyField(
 @Composable
 fun Models(
     wrapper: HordeModelsWrapper,
-    onEvent: (COUserEvent) -> Unit
+    onEvent: (COUserEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.padding(cardPadding),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
