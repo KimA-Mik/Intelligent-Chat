@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "ru.kima.intelligentchat"
+    namespace = "ru.kima.intelligentchat.data"
     compileSdk = 34
 
     defaultConfig {
