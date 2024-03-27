@@ -16,7 +16,7 @@ sealed interface COUserEvent {
     data object DismissSelectHordeModelsDialog : COUserEvent
     data object AcceptSelectHordeModelsDialog : COUserEvent
     data class CheckHordeModel(val model: String) : COUserEvent
-    data class UpdateHordeContextSize(val newSize: Float) : COUserEvent
-    data class UpdateHordeResponseLength(val newLength: Float) : COUserEvent
+    data class UpdateHordeContextSize(val newSize: Int) : COUserEvent
+    data class UpdateHordeResponseLength(val newLength: Int) : COUserEvent
     data class SelectHordePreset(val presetId: Long) : COUserEvent
 }

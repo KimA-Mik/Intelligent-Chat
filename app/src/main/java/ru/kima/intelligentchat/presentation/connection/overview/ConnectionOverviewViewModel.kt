@@ -273,12 +273,12 @@ class ConnectionOverviewViewModel(
         showSelectHordeModelsDialog.value = false
     }
 
-    private fun onUpdateHordeContextSize(newSize: Float) = viewModelScope.launch {
-        updateGenerationDetails(contextSize = newSize.toInt())
+    private fun onUpdateHordeContextSize(newSize: Int) = viewModelScope.launch {
+        updateGenerationDetails(contextSize = newSize)
     }
 
-    private fun onUpdateHordeResponseLength(newLength: Float) = viewModelScope.launch {
-        updateGenerationDetails(responseLength = newLength.toInt())
+    private fun onUpdateHordeResponseLength(newLength: Int) = viewModelScope.launch {
+        updateGenerationDetails(responseLength = newLength)
     }
 
     private fun onSelectHordePreset(presetId: Long) = viewModelScope.launch {

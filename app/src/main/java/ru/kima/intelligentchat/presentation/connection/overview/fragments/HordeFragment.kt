@@ -10,13 +10,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Edit
@@ -33,7 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -41,7 +36,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,7 +55,7 @@ import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialo
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeModelsWrapper
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordePreset
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordePresetsWrapper
-import ru.kima.intelligentchat.presentation.ui.components.LesserOutlinedTextField
+import ru.kima.intelligentchat.presentation.ui.components.TitledFiniteSlider
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 private val cardNoTopPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -194,22 +187,22 @@ fun GenerationConfig(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
-        DetailedSlider(
+        TitledFiniteSlider(
             title = "Response (tokens)",
             value = configResponseLength,
-            leftBorder = 16f,
-            rightBorder = 2048f,
+            leftBorder = 16,
+            rightBorder = 2048,
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeResponseLength(it))
             },
             modifier = Modifier.fillMaxWidth()
         )
 
-        DetailedSlider(
+        TitledFiniteSlider(
             title = "Context (tokens)",
             value = configContextSize,
-            leftBorder = 512f,
-            rightBorder = 8196f,
+            leftBorder = 512,
+            rightBorder = 8196,
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeContextSize(it))
             },
@@ -444,65 +437,6 @@ fun GenPresetSelector(
 }
 
 
-@Composable
-fun DetailedSlider(
-    title: String,
-    value: Int,
-    leftBorder: Float,
-    rightBorder: Float,
-    updateValue: (Float) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier) {
-        var tempValue by remember(value) {
-            mutableFloatStateOf(value.toFloat())
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            LesserOutlinedTextField(
-                value = tempValue.toInt().toString(), onValueChange = {
-                    try {
-                        var newValue = it.toFloat()
-                        if (newValue > rightBorder) newValue = rightBorder
-                        if (newValue < leftBorder) newValue = leftBorder
-                        updateValue(newValue)
-                    } catch (e: NumberFormatException) {
-                        println(e)
-                    }
-                },
-                textStyle = MaterialTheme.typography.bodySmall,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
-                singleLine = true,
-                modifier = Modifier
-                    .width(64.dp)
-                    .height(40.dp)
-                    .wrapContentWidth()
-            )
-        }
-        val steps = remember(leftBorder, rightBorder) {
-            (rightBorder - leftBorder).toInt()
-        }
-
-        Slider(
-            value = tempValue,
-            onValueChange = {
-                tempValue = it
-            },
-            valueRange = leftBorder..rightBorder,
-            steps = steps,
-            onValueChangeFinished = { updateValue(tempValue) }
-        )
-    }
-}
 
 @Composable
 fun ActiveModelItem(
