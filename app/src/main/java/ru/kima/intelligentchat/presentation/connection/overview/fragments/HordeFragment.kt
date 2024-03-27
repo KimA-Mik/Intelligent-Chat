@@ -377,7 +377,8 @@ fun TitledSwitch(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
         )
         Switch(
             checked = checked, onCheckedChange = onCheckedChange,
