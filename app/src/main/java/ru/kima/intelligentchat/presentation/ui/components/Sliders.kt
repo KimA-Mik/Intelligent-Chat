@@ -51,6 +51,9 @@ fun TitledFiniteSlider(
         var textFieldValue by remember(value) {
             mutableStateOf(value.toString())
         }
+        var textFieldDebounceValue by remember {
+            mutableStateOf(textFieldValue)
+        }
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -66,6 +69,7 @@ fun TitledFiniteSlider(
             LesserOutlinedTextField(
                 value = textFieldValue, onValueChange = {
                     textFieldValue = it
+                    textFieldDebounceValue = it
                 },
                 textStyle = MaterialTheme.typography.bodySmall,
                 keyboardOptions = KeyboardOptions(
@@ -93,8 +97,10 @@ fun TitledFiniteSlider(
             onValueChangeFinished = { updateValue(sliderValue.toInt()) }
         )
 
-        LaunchedEffect(key1 = textFieldValue) {
-            var newValue = textFieldValue.toIntOrNull()
+        LaunchedEffect(key1 = textFieldDebounceValue) {
+            var newValue = textFieldDebounceValue
+                .trimEnd(',', '.')
+                .toIntOrNull()
                 ?: Int.MIN_VALUE
 
             if (newValue == value) return@LaunchedEffect
@@ -103,8 +109,10 @@ fun TitledFiniteSlider(
             if (newValue > rightBorder) newValue = rightBorder
             sliderValue = newValue.toFloat()
 
-            delay(2000)
-            println("Updating to $newValue")
+            delay(1000)
+            if (newValue == value) {
+                textFieldValue = newValue.toString()
+            }
             updateValue(newValue)
         }
     }
@@ -123,15 +131,14 @@ fun TitledFloatSlider(
         val sliderRange = remember(leftBorder, rightBorder) {
             leftBorder..rightBorder
         }
-        var tempValue by remember(value) {
+        var sliderValue by remember(value) {
             mutableFloatStateOf(value)
         }
-
-        val valueString = remember(value) {
-            value.formatAndTrim(2)
+        var textFieldValue by remember(value) {
+            mutableStateOf(value.formatAndTrim(2))
         }
-        val textFieldValue by remember {
-            mutableStateOf(String())
+        var textFieldDebounceValue by remember {
+            mutableStateOf(textFieldValue)
         }
 
         Row(
@@ -144,20 +151,15 @@ fun TitledFloatSlider(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
+
             LesserOutlinedTextField(
-                value = tempValue.formatAndTrim(2), onValueChange = {
-                    try {
-                        var newValue = it.toFloat()
-                        if (newValue > rightBorder) newValue = rightBorder
-                        if (newValue < leftBorder) newValue = leftBorder
-                        updateValue(newValue)
-                    } catch (e: NumberFormatException) {
-                        println(e)
-                    }
+                value = textFieldValue, onValueChange = {
+                    textFieldValue = it
+                    textFieldDebounceValue = it
                 },
                 textStyle = MaterialTheme.typography.bodySmall,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal
+                    keyboardType = KeyboardType.Number
                 ),
                 singleLine = true,
                 modifier = Modifier
@@ -168,13 +170,32 @@ fun TitledFloatSlider(
         }
 
         Slider(
-            value = tempValue,
+            value = sliderValue,
             onValueChange = {
-                tempValue = it
+                sliderValue = it
+                textFieldValue = it.formatAndTrim(2)
             },
             valueRange = sliderRange,
-            onValueChangeFinished = { updateValue(tempValue) }
+            onValueChangeFinished = { updateValue(sliderValue) }
         )
+
+        LaunchedEffect(key1 = textFieldDebounceValue) {
+            var newValue = textFieldDebounceValue
+                .toFloatOrNull()
+                ?: -(Float.MAX_VALUE - 1f)
+
+            if (newValue == value) return@LaunchedEffect
+
+            if (newValue < leftBorder) newValue = leftBorder
+            if (newValue > rightBorder) newValue = rightBorder
+            sliderValue = newValue
+
+            delay(1000)
+            if (newValue == value) {
+                textFieldValue = newValue.formatAndTrim(2)
+            }
+            updateValue(newValue)
+        }
     }
 }
 
