@@ -52,7 +52,9 @@ import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateHordeUserD
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.repository.KoboldPresetRepository
+import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.SubscribeToKoboldPresetsUseCase
+import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetUseCase
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 
@@ -105,7 +107,9 @@ fun domain() = module {
     singleOf(::SaveApiKeyUseCase)
     singleOf(::SelectActiveHordePresetUseCase)
 
+    singleOf(::GetKoboldPresetUseCase)
     singleOf(::SubscribeToKoboldPresetsUseCase)
+    singleOf(::UpdateKoboldPresetUseCase)
 
     single {
         val context: Context = get(Context::class.java)
