@@ -5,17 +5,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -46,8 +48,8 @@ fun TitledFiniteSlider(
     leftBorder: Int,
     rightBorder: Int,
     updateValue: (Int) -> Unit,
-    modifier: Modifier = Modifier
     modifier: Modifier = Modifier,
+    textFieldLabel: String? = null,
     tooltipIcon: ImageVector = defaultToolTipIcon,
     tooltipText: String? = null
 ) {
@@ -68,36 +70,46 @@ fun TitledFiniteSlider(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
             )
 
-            LesserOutlinedTextField(
             tooltipText?.let {
                 TooltipIconButton(
                     text = tooltipText,
                     icon = tooltipIcon
                 )
-                Spacer(modifier = Modifier.weight(1f))
             }
+            Spacer(Modifier.weight(1f))
 
-                value = textFieldValue, onValueChange = {
+            val asd = TextFieldDefaults.MinWidth
+            println(asd)
+
+            OutlinedTextField(
+                value = textFieldValue,
+                onValueChange = {
                     textFieldValue = it
                     textFieldDebounceValue = it
                 },
-                textStyle = MaterialTheme.typography.bodySmall,
+                textStyle = LocalTextStyle.current.copy(
+                    textAlign = TextAlign.End
+                ),
+                label = {
+                    textFieldLabel?.let {
+                        Text(text = it)
+                    }
+                },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
                 singleLine = true,
-                modifier = Modifier
-                    .width(64.dp)
-                    .height(40.dp)
-                    .wrapContentWidth()
+                modifier = Modifier.widthIn(64.dp, 280.dp)
             )
         }
         val steps = remember(leftBorder, rightBorder) {
@@ -108,7 +120,7 @@ fun TitledFiniteSlider(
             value = sliderValue,
             onValueChange = {
                 sliderValue = it
-                textFieldValue = it.formatAndTrim(0)
+                textFieldValue = it.toInt().toString()
             },
             valueRange = sliderRange,
             steps = steps,
@@ -144,6 +156,7 @@ fun TitledFloatSlider(
     rightBorder: Float,
     updateValue: (Float) -> Unit,
     modifier: Modifier = Modifier,
+    textFieldLabel: String? = null,
     tooltipIcon: ImageVector = defaultToolTipIcon,
     tooltipText: String? = null
 ) {
@@ -164,11 +177,13 @@ fun TitledFloatSlider(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
@@ -180,20 +195,24 @@ fun TitledFloatSlider(
                 Spacer(modifier = Modifier.weight(1f))
             }
 
-            LesserOutlinedTextField(
+            OutlinedTextField(
                 value = textFieldValue, onValueChange = {
                     textFieldValue = it
                     textFieldDebounceValue = it
                 },
-                textStyle = MaterialTheme.typography.bodySmall,
+                textStyle = LocalTextStyle.current.copy(
+                    textAlign = TextAlign.End
+                ),
+                label = {
+                    textFieldLabel?.let {
+                        Text(text = it)
+                    }
+                },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
+                    keyboardType = KeyboardType.Decimal
                 ),
                 singleLine = true,
-                modifier = Modifier
-                    .width(64.dp)
-                    .height(40.dp)
-                    .wrapContentWidth()
+                modifier = Modifier.widthIn(64.dp, 280.dp)
             )
         }
 
