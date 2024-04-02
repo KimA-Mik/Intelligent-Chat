@@ -40,8 +40,9 @@ fun TooltipIconButton(
             ) {
                 Text(
                     text = text,
+                    modifier = Modifier.padding(8.dp),
                     color = TooltipDefaults.plainTooltipContentColor,
-                    modifier = Modifier.padding(8.dp)
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         },
