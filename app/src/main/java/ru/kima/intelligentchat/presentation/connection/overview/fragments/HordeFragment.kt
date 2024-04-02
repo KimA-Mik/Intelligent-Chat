@@ -188,25 +188,27 @@ fun GenerationConfig(
         modifier = modifier
     ) {
         TitledFiniteSlider(
-            title = "Response (tokens)",
+            title = stringResource(R.string.response_label),
             value = configResponseLength,
             leftBorder = 16,
             rightBorder = 2048,
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeResponseLength(it))
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textFieldLabel = stringResource(R.string.tokens_label)
         )
 
         TitledFiniteSlider(
-            title = "Context (tokens)",
+            title = stringResource(R.string.context_label),
             value = configContextSize,
             leftBorder = 512,
             rightBorder = 8196,
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeContextSize(it))
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textFieldLabel = stringResource(R.string.tokens_label)
         )
 
         val contextField = if (contextSize > 0) contextSize.toString() else "--"

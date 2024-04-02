@@ -55,5 +55,8 @@
     <string name="no_internet_connection_snackbar">No internet connection</string>
     <string name="horde_key_empty_snackbar">The Horde key is empty</string>
     <string name="load_models_snackbar">Load %1$s models</string>
+    <string name="tokens_label">Tokens</string>
+    <string name="response_label">Response</string>
+    <string name="context_label">Context</string>
 
 </resources>
