@@ -20,6 +20,7 @@ fun KoboldPresetEntity.toKoboldPreset(): KoboldPreset {
         mirostat = mirostat,
         mirostatTau = mirostatTau,
         mirostatEta = mirostatEta,
+        minP = minP,
         grammar = grammar,
     )
 }
@@ -41,6 +42,7 @@ fun KoboldPreset.toEntity(): KoboldPresetEntity {
         mirostat = mirostat,
         mirostatTau = mirostatTau,
         mirostatEta = mirostatEta,
+        minP = minP,
         grammar = grammar,
     )
 }

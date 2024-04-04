@@ -27,5 +27,6 @@ data class KoboldPresetEntity(
     val mirostat: Int = 0,
     val mirostatTau: Float = 5f,
     val mirostatEta: Float = 0.1f,
+    val minP: Float = 0f,
     val grammar: String = String()
 )
