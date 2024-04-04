@@ -62,10 +62,16 @@ fun NavGraphBuilder.connectionGraph(
                 }
             }
 
+            val popBack = remember<() -> Unit> {
+                {
+                    navController.popBackStack()
+                }
+            }
+
             HordePresetEditScreen(
-                navController = navController,
                 state = state,
-                onEvent = onEvent
+                onEvent = onEvent,
+                popBack = popBack
             )
         }
     }

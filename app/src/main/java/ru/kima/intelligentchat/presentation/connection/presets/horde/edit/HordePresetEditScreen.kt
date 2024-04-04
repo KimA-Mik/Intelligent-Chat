@@ -38,9 +38,9 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HordePresetEditScreen(
-    navController: NavController,
     state: HordePresetEditScreenState,
     onEvent: (UserEvent) -> Unit
+    popBack: () -> Unit,
 ) {
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -56,7 +56,7 @@ fun HordePresetEditScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = popBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = "Back"
