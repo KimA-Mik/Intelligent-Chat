@@ -28,15 +28,16 @@ fun TooltipIconButton(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    val state = rememberTooltipState()
+    val state = rememberTooltipState(isPersistent = true)
     val scope = rememberCoroutineScope()
-
     TooltipBox(
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
         tooltip = {
             Surface(
+                shape = TooltipDefaults.plainTooltipContainerShape,
                 color = TooltipDefaults.plainTooltipContainerColor,
-                shape = TooltipDefaults.plainTooltipContainerShape
+                contentColor = TooltipDefaults.plainTooltipContainerColor,
+                modifier = Modifier.padding(8.dp)
             ) {
                 Text(
                     text = text,
