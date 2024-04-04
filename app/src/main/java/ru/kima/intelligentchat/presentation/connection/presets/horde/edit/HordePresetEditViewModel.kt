@@ -61,7 +61,6 @@ class HordePresetEditViewModel(
     }
 
     fun onEvent(event: UserEvent) {
-        println(event)
         when (event) {
             is UserEvent.EditTitle -> onEditTitle(event.title)
             is UserEvent.EditTemperature -> onEditTemperature(event.temperature)
