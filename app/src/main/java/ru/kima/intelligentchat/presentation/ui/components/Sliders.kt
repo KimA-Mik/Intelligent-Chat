@@ -70,12 +70,12 @@ fun TitledFiniteSlider(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 8.dp)
             )
 
             tooltipText?.let {
@@ -105,7 +105,9 @@ fun TitledFiniteSlider(
                 ),
                 singleLine = true,
 //                modifier = Modifier.widthIn(64.dp, 280.dp)
-                modifier = Modifier.width(100.dp)
+                modifier = Modifier
+                    .width(100.dp)
+                    .padding(horizontal = 8.dp)
             )
         }
         val steps = remember(leftBorder, rightBorder) {
@@ -174,12 +176,12 @@ fun TitledFloatSlider(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 8.dp)
             )
 
             tooltipText?.let {
@@ -207,7 +209,9 @@ fun TitledFloatSlider(
                     keyboardType = KeyboardType.Decimal
                 ),
                 singleLine = true,
-                modifier = Modifier.width(100.dp)
+                modifier = Modifier
+                    .width(100.dp)
+                    .padding(horizontal = 8.dp)
             )
         }
 
