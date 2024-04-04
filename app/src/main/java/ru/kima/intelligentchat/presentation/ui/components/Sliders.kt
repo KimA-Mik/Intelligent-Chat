@@ -1,12 +1,11 @@
 package ru.kima.intelligentchat.presentation.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
@@ -16,7 +15,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +39,7 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 private val defaultToolTipIcon = Icons.Outlined.Info
 
+//TODO: Fix text field width being outweigh by title
 @Composable
 fun TitledFiniteSlider(
     title: String,
@@ -68,7 +67,6 @@ fun TitledFiniteSlider(
         }
 
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
@@ -86,10 +84,7 @@ fun TitledFiniteSlider(
                     icon = tooltipIcon
                 )
             }
-            Spacer(Modifier.weight(1f))
-
-            val asd = TextFieldDefaults.MinWidth
-            println(asd)
+            Spacer(modifier = Modifier.weight(1f))
 
             OutlinedTextField(
                 value = textFieldValue,
@@ -109,7 +104,8 @@ fun TitledFiniteSlider(
                     keyboardType = KeyboardType.Number
                 ),
                 singleLine = true,
-                modifier = Modifier.widthIn(64.dp, 280.dp)
+//                modifier = Modifier.widthIn(64.dp, 280.dp)
+                modifier = Modifier.width(100.dp)
             )
         }
         val steps = remember(leftBorder, rightBorder) {
@@ -175,7 +171,6 @@ fun TitledFloatSlider(
         }
 
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
@@ -192,8 +187,8 @@ fun TitledFloatSlider(
                     text = tooltipText,
                     icon = tooltipIcon
                 )
-                Spacer(modifier = Modifier.weight(1f))
             }
+            Spacer(modifier = Modifier.weight(1f))
 
             OutlinedTextField(
                 value = textFieldValue, onValueChange = {
@@ -212,7 +207,7 @@ fun TitledFloatSlider(
                     keyboardType = KeyboardType.Decimal
                 ),
                 singleLine = true,
-                modifier = Modifier.widthIn(64.dp, 280.dp)
+                modifier = Modifier.width(100.dp)
             )
         }
 
@@ -267,11 +262,12 @@ fun TitledFloatSliderPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             TitledFloatSlider(
                 title = "Title",
-                value = 25.5f,
+                value = 20.5f,
                 leftBorder = 0f,
                 rightBorder = 50f,
                 updateValue = {},
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                tooltipText = "Tooltip"
             )
         }
     }
