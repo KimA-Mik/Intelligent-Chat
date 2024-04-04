@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import ru.kima.intelligentchat.common.formatAndTrim
+import ru.kima.intelligentchat.common.format
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 //TODO: Fix sliders input field, https://stackoverflow.com/questions/70645803/how-to-detect-if-the-user-stops-writing-to-a-textfield
@@ -164,10 +164,10 @@ fun TitledFloatSlider(
             mutableFloatStateOf(value)
         }
         var textFieldValue by remember(value) {
-            mutableStateOf(value.formatAndTrim(2))
+            mutableStateOf(value.format(2))
         }
         var textFieldDebounceValue by remember {
-            mutableStateOf(textFieldValue)
+            mutableStateOf(String())
         }
 
         Row(
@@ -215,18 +215,19 @@ fun TitledFloatSlider(
             value = sliderValue,
             onValueChange = {
                 sliderValue = it
-                textFieldValue = it.formatAndTrim(2)
+                textFieldValue = it.format(2)
             },
             valueRange = sliderRange,
             onValueChangeFinished = { updateValue(sliderValue) }
         )
 
+        //TODO: Read about float formatting
         LaunchedEffect(key1 = textFieldDebounceValue) {
+            if (textFieldDebounceValue.isBlank()) return@LaunchedEffect
             var newValue = textFieldDebounceValue
+                .replace(',', '.')
                 .toFloatOrNull()
                 ?: -(Float.MAX_VALUE - 1f)
-
-            if (newValue == value) return@LaunchedEffect
 
             if (newValue < leftBorder) newValue = leftBorder
             if (newValue > rightBorder) newValue = rightBorder
@@ -234,7 +235,7 @@ fun TitledFloatSlider(
 
             delay(1000)
             if (newValue == value) {
-                textFieldValue = newValue.formatAndTrim(2)
+                textFieldValue = newValue.format(2)
             }
             updateValue(newValue)
         }
