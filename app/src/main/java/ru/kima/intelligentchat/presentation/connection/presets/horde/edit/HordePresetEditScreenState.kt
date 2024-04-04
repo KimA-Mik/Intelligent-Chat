@@ -1,5 +1,8 @@
 package ru.kima.intelligentchat.presentation.connection.presets.horde.edit
 
-data class HordePresetEditScreenState(
-    val title: String = String()
-)
+import ru.kima.intelligentchat.domain.presets.kobold.model.KoboldPreset
+
+sealed interface HordePresetEditScreenState {
+    data class Preset(val preset: KoboldPreset = KoboldPreset()) : HordePresetEditScreenState
+    data object NoPreset : HordePresetEditScreenState
+}

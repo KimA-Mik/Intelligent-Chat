@@ -430,14 +430,13 @@ fun GenPresetSelector(
         }
 
         IconButton(
-            onClick = {},
+            onClick = { onEvent(COUserEvent.EditPreset) },
         ) {
             Icon(imageVector = Icons.Filled.Edit, contentDescription = "")
         }
     }
 
 }
-
 
 
 @Composable

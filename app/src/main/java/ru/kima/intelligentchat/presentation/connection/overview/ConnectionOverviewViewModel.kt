@@ -149,6 +149,7 @@ class ConnectionOverviewViewModel(
             is COUserEvent.UpdateHordeContextSize -> onUpdateHordeContextSize(event.newSize)
             is COUserEvent.UpdateHordeResponseLength -> onUpdateHordeResponseLength(event.newLength)
             is COUserEvent.SelectHordePreset -> onSelectHordePreset(event.presetId)
+            COUserEvent.EditPreset -> onEditPreset()
         }
     }
 
@@ -283,6 +284,12 @@ class ConnectionOverviewViewModel(
 
     private fun onSelectHordePreset(presetId: Long) = viewModelScope.launch {
         selectActiveHordePreset(presetId)
+    }
+
+    private fun onEditPreset() = viewModelScope.launch {
+        val selectedPreset = selectedHordePreset.first()
+        val event = COUiEvent.EditPreset(selectedPreset.id)
+        _uiEvents.value = ComposeEvent(event)
     }
 
     companion object {
