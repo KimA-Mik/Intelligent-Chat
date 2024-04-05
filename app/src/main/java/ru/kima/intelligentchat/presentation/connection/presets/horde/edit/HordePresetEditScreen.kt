@@ -1,17 +1,29 @@
 package ru.kima.intelligentchat.presentation.connection.presets.horde.edit
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -25,13 +37,21 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
 import ru.kima.intelligentchat.presentation.ui.components.TitledFiniteSlider
@@ -112,7 +132,6 @@ fun Preset(
         modifier = modifier
             .padding(horizontal = 8.dp),
         contentPadding = PaddingValues(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
             Sliders(
@@ -134,10 +153,82 @@ fun Preset(
             )
         }
 
-        items(state.preset.samplerOrder) {
-            val id = samplers.getOrElse(it) { -1 }
-            if (id >= 0) {
-                Text(text = "$it: ${stringResource(id = id)}")
+        itemsIndexed(state.preset.samplerOrder) { index, sampler ->
+            val id = samplers.getOrElse(sampler) { -1 }
+
+            if (id < 0) return@itemsIndexed
+            CardsListElement(
+                itemCount = state.preset.samplerOrder.size,
+                index = index,
+                sampler = sampler,
+                samplerNameId = id
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun LazyItemScope.CardsListElement(
+    itemCount: Int,
+    index: Int,
+    sampler: Int,
+    samplerNameId: Int
+) {
+    LazyColumnCategory(
+        itemCount = itemCount,
+        index = index
+    ) { shape ->
+        var offsetY by remember { mutableFloatStateOf(0f) }
+        var elevated by remember { mutableStateOf(false) }
+
+        val elevation by animateDpAsState(
+            targetValue = if (elevated) 16.dp else 0.dp, label = ""
+        )
+        val animatedOffset by animateFloatAsState(targetValue = offsetY, label = "")
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .animateItemPlacement()
+//                .offset { IntOffset(0, offsetY.roundToInt()) }
+                .graphicsLayer {
+                    this.translationY = animatedOffset
+                    shadowElevation = elevation.toPx()
+                }
+                .zIndex(if (elevated) 1f else 0f),
+            shape = shape,
+            color = CardDefaults.cardColors().containerColor,
+            tonalElevation = elevation,
+            shadowElevation = elevation
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            ) {
+                Text(
+                    text = "$sampler: ${stringResource(id = samplerNameId)}",
+                )
+
+                IconButton(onClick = { /*TODO*/ },
+                    modifier = Modifier.draggable(
+                        orientation = Orientation.Vertical,
+                        state = rememberDraggableState { delta ->
+                            offsetY += delta
+                        },
+                        onDragStarted = {
+                            elevated = true
+                        },
+                        onDragStopped = {
+                            elevated = false
+                            offsetY = 0f
+                        }
+                    )) {
+                    Icon(imageVector = Icons.Filled.DragHandle, contentDescription = null)
+                }
             }
         }
     }
@@ -297,6 +388,34 @@ fun Sliders(
             tooltipText = "Controls learning rate of Mirostat"
         )
     }
+}
+
+@Composable
+fun LazyColumnCategory(
+    itemCount: Int,
+    index: Int,
+    content: @Composable (Shape) -> Unit
+) {
+    val default = MaterialTheme.shapes.medium
+    Column {
+        val shape = when {
+            itemCount == 1 -> default
+            index == 0 -> default.copy(bottomEnd = CornerSize(0.dp), bottomStart = CornerSize(0.dp))
+            index == itemCount - 1 -> default.copy(
+                topEnd = CornerSize(0.dp),
+                topStart = CornerSize(0.dp)
+            )
+
+            else -> RoundedCornerShape(0.dp)
+        }
+
+        content(shape)
+
+        if (index != itemCount - 1) {
+            HorizontalDivider()
+        }
+    }
+    CardDefaults.shape
 }
 
 
