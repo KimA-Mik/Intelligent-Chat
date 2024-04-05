@@ -111,7 +111,7 @@ fun TitledFiniteSlider(
             )
         }
         val steps = remember(leftBorder, rightBorder) {
-            rightBorder - leftBorder
+            rightBorder - leftBorder - 1
         }
 
         Slider(
