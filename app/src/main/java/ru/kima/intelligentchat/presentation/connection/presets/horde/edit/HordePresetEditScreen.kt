@@ -3,14 +3,13 @@ package ru.kima.intelligentchat.presentation.connection.presets.horde.edit
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -93,20 +92,80 @@ fun HordePresetEditScreen(
     }
 }
 
+private val samplers = listOf(
+    R.string.top_k_title,
+    R.string.top_a_title,
+    R.string.top_and_min_p_title,
+    R.string.tail_free_sampling_title,
+    R.string.typical_p_title,
+    R.string.temperature_title,
+    R.string.repetition_penalty_title,
+)
+
 @Composable
 fun Preset(
     state: HordePresetEditScreenState.Preset,
     onEvent: (UserEvent) -> Unit,
     modifier: Modifier
 ) {
-    Column(
+    LazyColumn(
         modifier = modifier
-            .padding(horizontal = 8.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(horizontal = 8.dp),
+        contentPadding = PaddingValues(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            Sliders(
+                name = state.preset.name,
+                temperature = state.preset.temperature,
+                topK = state.preset.topK,
+                topP = state.preset.topP,
+                typical = state.preset.typical,
+                minP = state.preset.minP,
+                topA = state.preset.topA,
+                tailFreeSampling = state.preset.tailFreeSampling,
+                repetitionPenalty = state.preset.repetitionPenalty,
+                repetitionPenaltyRange = state.preset.repetitionPenaltyRange,
+                repetitionPenaltySlope = state.preset.repetitionPenaltySlope,
+                mirostat = state.preset.mirostat,
+                mirostatTau = state.preset.mirostatTau,
+                mirostatEta = state.preset.mirostatEta,
+                onEvent = onEvent,
+            )
+        }
+
+        items(state.preset.samplerOrder) {
+            val id = samplers.getOrElse(it) { -1 }
+            if (id >= 0) {
+                Text(text = "$it: ${stringResource(id = id)}")
+            }
+        }
+    }
+}
+
+@Composable
+fun Sliders(
+    name: String,
+    temperature: Float,
+    topK: Int,
+    topP: Float,
+    typical: Float,
+    minP: Float,
+    topA: Float,
+    tailFreeSampling: Float,
+    repetitionPenalty: Float,
+    repetitionPenaltyRange: Int,
+    repetitionPenaltySlope: Float,
+    mirostat: Int,
+    mirostatTau: Float,
+    mirostatEta: Float,
+    onEvent: (UserEvent) -> Unit,
+) {
+    Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         OutlinedTextField(
-            value = state.preset.name, onValueChange = {
+            value = name, onValueChange = {
                 onEvent(UserEvent.EditTitle(it))
             },
             modifier = Modifier
@@ -118,7 +177,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = stringResource(R.string.temperature_title),
-            value = state.preset.temperature,
+            value = temperature,
             leftBorder = 0f,
             rightBorder = 4f,
             updateValue = { onEvent(UserEvent.EditTemperature(it)) },
@@ -127,7 +186,7 @@ fun Preset(
 
         TitledFiniteSlider(
             title = stringResource(R.string.top_k_title),
-            value = state.preset.topK,
+            value = topK,
             leftBorder = 0,
             rightBorder = 100,
             updateValue = { onEvent(UserEvent.EditTopK(it)) },
@@ -136,7 +195,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = stringResource(R.string.top_p_title),
-            value = state.preset.topP,
+            value = topP,
             leftBorder = 0f,
             rightBorder = 1f,
             updateValue = { onEvent(UserEvent.EditTopP(it)) },
@@ -145,7 +204,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = stringResource(R.string.typical_p_title),
-            value = state.preset.typical,
+            value = typical,
             leftBorder = 0f,
             rightBorder = 1f,
             updateValue = { onEvent(UserEvent.EditTypical(it)) },
@@ -154,7 +213,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = stringResource(R.string.min_p_title),
-            value = state.preset.minP,
+            value = minP,
             leftBorder = 0f,
             rightBorder = 1f,
             updateValue = { onEvent(UserEvent.EditMinP(it)) },
@@ -163,7 +222,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = stringResource(R.string.top_a_title),
-            value = state.preset.topA,
+            value = topA,
             leftBorder = 0f,
             rightBorder = 1f,
             updateValue = { onEvent(UserEvent.EditTopA(it)) },
@@ -172,7 +231,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = stringResource(R.string.tail_free_sampling_title),
-            value = state.preset.tailFreeSampling,
+            value = tailFreeSampling,
             leftBorder = 0f,
             rightBorder = 1f,
             updateValue = { onEvent(UserEvent.EditTailFreeSampling(it)) },
@@ -181,7 +240,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = stringResource(R.string.repetition_penalty_title),
-            value = state.preset.repetitionPenalty,
+            value = repetitionPenalty,
             leftBorder = 1f,
             rightBorder = 3f,
             updateValue = { onEvent(UserEvent.EditRepetitionPenalty(it)) }
@@ -189,7 +248,7 @@ fun Preset(
 
         TitledFiniteSlider(
             title = stringResource(R.string.repetition_penalty_range_title),
-            value = state.preset.repetitionPenaltyRange,
+            value = repetitionPenaltyRange,
             leftBorder = 0,
             rightBorder = 8192,
             updateValue = { onEvent(UserEvent.EditRepetitionPenaltyRange(it)) }
@@ -197,7 +256,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = stringResource(R.string.repetition_penalty_slope_title),
-            value = state.preset.repetitionPenaltySlope,
+            value = repetitionPenaltySlope,
             leftBorder = 0f,
             rightBorder = 10f,
             updateValue = { onEvent(UserEvent.EditRepetitionPenaltySlope(it)) }
@@ -213,7 +272,7 @@ fun Preset(
 
         TitledFiniteSlider(
             title = "Mode",
-            value = state.preset.mirostat,
+            value = mirostat,
             leftBorder = 0,
             rightBorder = 2,
             updateValue = { onEvent(UserEvent.EditMirostatMode(it)) },
@@ -222,7 +281,7 @@ fun Preset(
 
         TitledFloatSlider(
             title = "Tau",
-            value = state.preset.mirostatTau,
+            value = mirostatTau,
             leftBorder = 0f,
             rightBorder = 20f,
             updateValue = { onEvent(UserEvent.EditMirostatTau(it)) },
@@ -231,17 +290,15 @@ fun Preset(
 
         TitledFloatSlider(
             title = "Eta",
-            value = state.preset.mirostatEta,
+            value = mirostatEta,
             leftBorder = 0f,
             rightBorder = 1f,
             updateValue = { onEvent(UserEvent.EditMirostatEta(it)) },
             tooltipText = "Controls learning rate of Mirostat"
         )
-
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
+
 
 @Composable
 fun NoPreset(

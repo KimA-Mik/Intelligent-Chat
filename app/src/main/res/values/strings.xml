@@ -79,5 +79,6 @@
     <string name="repetition_penalty_title">Repetition Penalty</string>
     <string name="repetition_penalty_range_title">Repetition Penalty Range</string>
     <string name="repetition_penalty_slope_title">Repetition Penalty Slope</string>
+    <string name="top_and_min_p_title">Top P <![CDATA[&]]> Min P</string>
 
 </resources>
