@@ -12,5 +12,8 @@ sealed interface UserEvent {
     data class EditRepetitionPenalty(val repetitionPenalty: Float) : UserEvent
     data class EditRepetitionPenaltyRange(val repetitionPenaltyRange: Int) : UserEvent
     data class EditRepetitionPenaltySlope(val repetitionPenaltySlope: Float) : UserEvent
+    data class EditMirostatMode(val mode: Int) : UserEvent
+    data class EditMirostatTau(val tau: Float) : UserEvent
+    data class EditMirostatEta(val eta: Float) : UserEvent
 
 }

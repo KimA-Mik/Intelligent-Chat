@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
@@ -200,6 +202,42 @@ fun Preset(
             rightBorder = 10f,
             updateValue = { onEvent(UserEvent.EditRepetitionPenaltySlope(it)) }
         )
+
+        HorizontalDivider()
+        Text(
+            text = "Mirostat",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(8.dp)
+        )
+
+        TitledFiniteSlider(
+            title = "Mode",
+            value = state.preset.mirostat,
+            leftBorder = 0,
+            rightBorder = 2,
+            updateValue = { onEvent(UserEvent.EditMirostatMode(it)) },
+            tooltipText = "A value of 0 disables Mirostat entirely. 1 is for Mirostat 1.0, and 2 is for Mirostat 2.0"
+        )
+
+        TitledFloatSlider(
+            title = "Tau",
+            value = state.preset.mirostatTau,
+            leftBorder = 0f,
+            rightBorder = 20f,
+            updateValue = { onEvent(UserEvent.EditMirostatTau(it)) },
+            tooltipText = "Controls variability of Mirostat outputs"
+        )
+
+        TitledFloatSlider(
+            title = "Eta",
+            value = state.preset.mirostatEta,
+            leftBorder = 0f,
+            rightBorder = 1f,
+            updateValue = { onEvent(UserEvent.EditMirostatEta(it)) },
+            tooltipText = "Controls learning rate of Mirostat"
+        )
+
 
         Spacer(modifier = Modifier.height(16.dp))
     }

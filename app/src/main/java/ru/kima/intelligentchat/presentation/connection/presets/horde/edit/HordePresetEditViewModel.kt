@@ -73,6 +73,9 @@ class HordePresetEditViewModel(
             is UserEvent.EditRepetitionPenalty -> onEditRepetitionPenalty(event.repetitionPenalty)
             is UserEvent.EditRepetitionPenaltyRange -> onEditRepetitionPenaltyRange(event.repetitionPenaltyRange)
             is UserEvent.EditRepetitionPenaltySlope -> onEditRepetitionPenaltySlope(event.repetitionPenaltySlope)
+            is UserEvent.EditMirostatMode -> onEditMirostatMode(event.mode)
+            is UserEvent.EditMirostatTau -> onEditMirostatTau(event.tau)
+            is UserEvent.EditMirostatEta -> onEditMirostatEta(event.eta)
         }
     }
 
@@ -149,6 +152,27 @@ class HordePresetEditViewModel(
     private fun onEditRepetitionPenaltySlope(repetitionPenaltySlope: Float) {
         val preset = _preset.value.copy(
             repetitionPenaltySlope = repetitionPenaltySlope
+        )
+        _preset.value = preset
+    }
+
+    private fun onEditMirostatMode(mode: Int) {
+        val preset = _preset.value.copy(
+            mirostat = mode
+        )
+        _preset.value = preset
+    }
+
+    private fun onEditMirostatTau(tau: Float) {
+        val preset = _preset.value.copy(
+            mirostatTau = tau
+        )
+        _preset.value = preset
+    }
+
+    private fun onEditMirostatEta(eta: Float) {
+        val preset = _preset.value.copy(
+            mirostatEta = eta
         )
         _preset.value = preset
     }
