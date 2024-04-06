@@ -48,13 +48,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.presentation.common.util.dpToPx
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
 import ru.kima.intelligentchat.presentation.ui.components.TitledFiniteSlider
 import ru.kima.intelligentchat.presentation.ui.components.TitledFloatSlider
@@ -185,7 +185,7 @@ fun CardsListElement(
     onEvent: (UserEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val elementSize = with(LocalDensity.current) { 48.dp.toPx() }
+    val elementSize = 48.dp.dpToPx()
 
     //TODO: Fix jiggering
     //TODO: Add shape animation
