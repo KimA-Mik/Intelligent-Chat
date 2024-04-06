@@ -29,8 +29,6 @@ class HordePresetEditViewModel(
             HordePresetEditScreenState.Preset(it)
         }
     }
-//    private val _state = MutableStateFlow<HordePresetEditScreenState>(HordePresetEditScreenState.NoPreset)
-//    val state = _state.asStateFlow()
 
     init {
         val id = savedStateHandle.get<String>("presetId")?.toLongOrNull()
@@ -76,6 +74,8 @@ class HordePresetEditViewModel(
             is UserEvent.EditMirostatMode -> onEditMirostatMode(event.mode)
             is UserEvent.EditMirostatTau -> onEditMirostatTau(event.tau)
             is UserEvent.EditMirostatEta -> onEditMirostatEta(event.eta)
+            is UserEvent.StartMoveSampler -> onStartMoveSampler(event.startIndex, event.elementSize)
+            is UserEvent.MoveSampler -> onMoveSampler(event.offset)
         }
     }
 
@@ -175,5 +175,42 @@ class HordePresetEditViewModel(
             mirostatEta = eta
         )
         _preset.value = preset
+    }
+
+    private var _initialSamplerOrder = emptyList<Int>()
+    private var _initialSamplerIndex = 0
+    private var _elementSize = 150
+    private var _indexOffset = 0
+
+    private fun onStartMoveSampler(startIndex: Int, elementSize: Int) {
+        _indexOffset = 0
+        _initialSamplerIndex = startIndex
+        _initialSamplerOrder = _preset.value.samplerOrder
+        _elementSize = elementSize
+    }
+
+    private fun onMoveSampler(offset: Int) {
+        val preset = _preset.value
+
+        val verticalAdjustment = _elementSize / 2
+        val currentIndexOffset = (offset + verticalAdjustment) / _elementSize
+        if (currentIndexOffset == 0) return
+        _indexOffset += currentIndexOffset
+        var addIndex = _initialSamplerIndex + _indexOffset
+        if (_indexOffset < 0) addIndex -= 1
+        if (addIndex < 0) addIndex = 0
+        if (addIndex > preset.samplerOrder.lastIndex) addIndex = preset.samplerOrder.lastIndex
+
+        val result = if (_indexOffset != 0) {
+            val temp = _initialSamplerOrder.toMutableList()
+            val sampler = temp.removeAt(_initialSamplerIndex)
+            temp.add(addIndex, sampler)
+            temp
+        } else {
+            _initialSamplerOrder
+        }
+        _preset.value = preset.copy(
+            samplerOrder = result
+        )
     }
 }

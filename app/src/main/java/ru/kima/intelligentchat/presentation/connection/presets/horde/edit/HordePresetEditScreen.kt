@@ -1,5 +1,7 @@
 package ru.kima.intelligentchat.presentation.connection.presets.horde.edit
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -16,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,6 +59,7 @@ import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events
 import ru.kima.intelligentchat.presentation.ui.components.TitledFiniteSlider
 import ru.kima.intelligentchat.presentation.ui.components.TitledFloatSlider
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,6 +125,7 @@ private val samplers = listOf(
     R.string.repetition_penalty_title,
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Preset(
     state: HordePresetEditScreenState.Preset,
@@ -153,7 +157,9 @@ fun Preset(
             )
         }
 
-        itemsIndexed(state.preset.samplerOrder) { index, sampler ->
+        itemsIndexed(state.preset.samplerOrder, key = { _, item ->
+            item
+        }) { index, sampler ->
             val id = samplers.getOrElse(sampler) { -1 }
 
             if (id < 0) return@itemsIndexed
@@ -161,40 +167,53 @@ fun Preset(
                 itemCount = state.preset.samplerOrder.size,
                 index = index,
                 sampler = sampler,
-                samplerNameId = id
+                samplerNameId = id,
+                onEvent = onEvent,
+                modifier = Modifier.animateItemPlacement()
             )
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
-fun LazyItemScope.CardsListElement(
+fun CardsListElement(
     itemCount: Int,
     index: Int,
     sampler: Int,
-    samplerNameId: Int
+    samplerNameId: Int,
+    onEvent: (UserEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val elementSize = with(LocalDensity.current) { 48.dp.toPx() }
+
+    //TODO: Fix jiggering
+    //TODO: Add shape animation
     LazyColumnCategory(
         itemCount = itemCount,
-        index = index
+        index = index,
+        modifier = modifier
     ) { shape ->
-        var offsetY by remember { mutableFloatStateOf(0f) }
+        var offsetY by remember(index) { mutableFloatStateOf(0f) }
         var elevated by remember { mutableStateOf(false) }
 
         val elevation by animateDpAsState(
             targetValue = if (elevated) 16.dp else 0.dp, label = ""
         )
-        val animatedOffset by animateFloatAsState(targetValue = offsetY, label = "")
+        val animatedOffset by animateFloatAsState(
+            targetValue = offsetY,
+            label = "",
+            animationSpec = SpringSpec(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        )
 
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .animateItemPlacement()
-//                .offset { IntOffset(0, offsetY.roundToInt()) }
                 .graphicsLayer {
-                    this.translationY = animatedOffset
-                    shadowElevation = elevation.toPx()
+                    translationY = animatedOffset
                 }
                 .zIndex(if (elevated) 1f else 0f),
             shape = shape,
@@ -213,22 +232,27 @@ fun LazyItemScope.CardsListElement(
                     text = "$sampler: ${stringResource(id = samplerNameId)}",
                 )
 
-                IconButton(onClick = { /*TODO*/ },
-                    modifier = Modifier.draggable(
-                        orientation = Orientation.Vertical,
-                        state = rememberDraggableState { delta ->
-                            offsetY += delta
-                        },
-                        onDragStarted = {
-                            elevated = true
-                        },
-                        onDragStopped = {
-                            elevated = false
-                            offsetY = 0f
-                        }
-                    )) {
-                    Icon(imageVector = Icons.Filled.DragHandle, contentDescription = null)
-                }
+                Icon(
+                    imageVector = Icons.Filled.DragHandle,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .draggable(
+                            orientation = Orientation.Vertical,
+                            state = rememberDraggableState { delta ->
+                                offsetY += delta
+                                onEvent(UserEvent.MoveSampler(offsetY.roundToInt()))
+                            },
+                            onDragStarted = {
+                                elevated = true
+                                onEvent(UserEvent.StartMoveSampler(index, elementSize.roundToInt()))
+                            },
+                            onDragStopped = {
+                                elevated = false
+                                offsetY = 0f
+                            }
+                        )
+                )
             }
         }
     }
@@ -394,10 +418,11 @@ fun Sliders(
 fun LazyColumnCategory(
     itemCount: Int,
     index: Int,
+    modifier: Modifier = Modifier,
     content: @Composable (Shape) -> Unit
 ) {
     val default = MaterialTheme.shapes.medium
-    Column {
+    Column(modifier = modifier) {
         val shape = when {
             itemCount == 1 -> default
             index == 0 -> default.copy(bottomEnd = CornerSize(0.dp), bottomStart = CornerSize(0.dp))
@@ -415,7 +440,6 @@ fun LazyColumnCategory(
             HorizontalDivider()
         }
     }
-    CardDefaults.shape
 }
 
 

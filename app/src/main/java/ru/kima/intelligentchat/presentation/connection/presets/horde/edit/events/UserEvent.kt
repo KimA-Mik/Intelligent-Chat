@@ -15,5 +15,7 @@ sealed interface UserEvent {
     data class EditMirostatMode(val mode: Int) : UserEvent
     data class EditMirostatTau(val tau: Float) : UserEvent
     data class EditMirostatEta(val eta: Float) : UserEvent
+    data class MoveSampler(val offset: Int) : UserEvent
+    data class StartMoveSampler(val startIndex: Int, val elementSize: Int) : UserEvent
 
 }
