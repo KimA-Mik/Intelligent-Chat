@@ -1,16 +1,16 @@
-package ru.kima.intelligentchat.data.kobold.config
+package ru.kima.intelligentchat.data.kobold.preset.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import kotlinx.serialization.Serializable
-import ru.kima.intelligentchat.data.KOBOLD_CONFIG_TABLE_NAME
+import ru.kima.intelligentchat.data.KOBOLD_PRESET_TABLE_NAME
 import ru.kima.intelligentchat.data.common.IntListConverter
 
 @Serializable
-@Entity(KOBOLD_CONFIG_TABLE_NAME)
+@Entity(KOBOLD_PRESET_TABLE_NAME)
 @TypeConverters(IntListConverter::class)
-data class KoboldConfigEntity(
+data class KoboldPresetEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String = String(),
@@ -27,5 +27,6 @@ data class KoboldConfigEntity(
     val mirostat: Int = 0,
     val mirostatTau: Float = 5f,
     val mirostatEta: Float = 0.1f,
+    val minP: Float = 0f,
     val grammar: String = String()
 )

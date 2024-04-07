@@ -1,47 +1,49 @@
 package ru.kima.intelligentchat.presentation.connection.overview.fragments
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,10 +52,13 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewState
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
-import ru.kima.intelligentchat.presentation.ui.components.LesserOutlinedTextField
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordeModelsWrapper
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordePreset
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordePresetsWrapper
+import ru.kima.intelligentchat.presentation.ui.components.TitledFiniteSlider
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
-private val cardPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp)
+private val cardNoTopPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp)
 
 @Composable
 fun HordeFragment(
@@ -82,7 +87,9 @@ fun HordeFragment(
                 contextToWorker = state.contextToWorker,
                 responseToWorker = state.responseToWorker,
                 trustedWorkers = state.trustedWorkers,
-                onEvent = onEvent
+                wrapper = state.presetsWrapper,
+                onEvent = onEvent,
+                modifier = Modifier.padding(8.dp)
             )
         }
 
@@ -95,7 +102,8 @@ fun HordeFragment(
                 configContextSize = state.contextSize,
                 responseLength = state.responseLength,
                 configResponseLength = state.responseLength,
-                onEvent = onEvent
+                onEvent = onEvent,
+                modifier = Modifier.padding(8.dp)
             )
         }
 
@@ -107,7 +115,8 @@ fun HordeFragment(
                 currentApiToken = state.currentApiToken,
                 showApiToken = state.showApiToken,
                 userName = state.userName.ifBlank { stringResource(id = R.string.anonymous_username) },
-                onEvent = onEvent
+                onEvent = onEvent,
+                modifier = Modifier.padding(cardNoTopPadding)
             )
         }
 
@@ -116,8 +125,9 @@ fun HordeFragment(
             tonalElevation = 1.dp
         ) {
             Models(
-                selectedModels = state.selectedModels,
-                onEvent = onEvent
+                wrapper = state.selectedModelsWrapper,
+                onEvent = onEvent,
+                modifier = Modifier.padding(cardNoTopPadding)
             )
         }
     }
@@ -128,65 +138,39 @@ fun SimpleConfig(
     contextToWorker: Boolean,
     responseToWorker: Boolean,
     trustedWorkers: Boolean,
-    onEvent: (COUserEvent) -> Unit
+    wrapper: HordePresetsWrapper,
+    onEvent: (COUserEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
-            .padding(cardPadding)
-            .fillMaxWidth()
+        modifier = modifier
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        TitledSwitch(
+            title = stringResource(R.string.adjust_context_size),
+            checked = contextToWorker,
+            onCheckedChange = { onEvent(COUserEvent.ToggleContextToWorker) },
             modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(R.string.adjust_context_size),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
+        )
 
-            Switch(
-                checked = contextToWorker, onCheckedChange = {
-                    onEvent(COUserEvent.ToggleContextToWorker)
-                },
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        TitledSwitch(
+            title = stringResource(R.string.adjust_response_length),
+            checked = responseToWorker,
+            onCheckedChange = { onEvent(COUserEvent.ToggleResponseToWorker) },
             modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(R.string.adjust_response_length),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Switch(
-                checked = responseToWorker, onCheckedChange = {
-                    onEvent(COUserEvent.ToggleResponseToWorker)
-                },
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        )
+
+        TitledSwitch(
+            title = stringResource(R.string.trusted_workers_only),
+            checked = trustedWorkers,
+            onCheckedChange = { onEvent(COUserEvent.ToggleTrustedWorkers) },
             modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(R.string.trusted_workers_only),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Switch(
-                checked = trustedWorkers, onCheckedChange = {
-                    onEvent(COUserEvent.ToggleTrustedWorkers)
-                },
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-        }
+        )
+
+        GenPresetSelector(
+            wrapper = wrapper,
+            onEvent = onEvent,
+            modifier = Modifier.padding(top = 16.dp)
+        )
     }
 }
 
@@ -196,33 +180,35 @@ fun GenerationConfig(
     configContextSize: Int,
     responseLength: Int,
     configResponseLength: Int,
+    modifier: Modifier = Modifier,
     onEvent: (COUserEvent) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        DetailedSlider(
-            title = "Response (tokens)",
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+    ) {
+        TitledFiniteSlider(
+            title = stringResource(R.string.response_label),
             value = configResponseLength,
-            leftBorder = 16f,
-            rightBorder = 2048f,
+            leftBorder = 16,
+            rightBorder = 2048,
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeResponseLength(it))
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
+            modifier = Modifier.fillMaxWidth(),
+            textFieldLabel = stringResource(R.string.tokens_label)
         )
 
-        DetailedSlider(
-            title = "Context (tokens)",
+        TitledFiniteSlider(
+            title = stringResource(R.string.context_label),
             value = configContextSize,
-            leftBorder = 512f,
-            rightBorder = 8196f,
+            leftBorder = 512,
+            rightBorder = 8196,
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeContextSize(it))
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
+            modifier = Modifier.fillMaxWidth(),
+            textFieldLabel = stringResource(R.string.tokens_label)
         )
 
         val contextField = if (contextSize > 0) contextSize.toString() else "--"
@@ -239,10 +225,11 @@ fun ApiKeyField(
     currentApiToken: String,
     showApiToken: Boolean,
     userName: String,
-    onEvent: (COUserEvent) -> Unit
+    onEvent: (COUserEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.padding(cardPadding)
+        modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -299,11 +286,12 @@ fun ApiKeyField(
 
 @Composable
 fun Models(
-    selectedModels: List<String>,
-    onEvent: (COUserEvent) -> Unit
+    wrapper: HordeModelsWrapper,
+    onEvent: (COUserEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.padding(cardPadding),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
@@ -330,7 +318,7 @@ fun Models(
 
         }
 
-        selectedModels.forEach {
+        wrapper.selectedModels.forEach {
             Text(text = it, style = MaterialTheme.typography.bodySmall)
         }
     }
@@ -370,64 +358,86 @@ fun SelectHordeModelsAlertDialog(
 }
 
 @Composable
-fun DetailedSlider(
+fun TitledSwitch(
     title: String,
-    value: Int,
-    leftBorder: Float,
-    rightBorder: Float,
-    updateValue: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column(modifier) {
-        var tempValue by remember(value) {
-            mutableFloatStateOf(value.toFloat())
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            LesserOutlinedTextField(
-                value = tempValue.toInt().toString(), onValueChange = {
-                    try {
-                        var newValue = it.toFloat()
-                        if (newValue > rightBorder) newValue = rightBorder
-                        if (newValue < leftBorder) newValue = leftBorder
-                        updateValue(newValue)
-                    } catch (e: NumberFormatException) {
-                        println(e)
-                    }
-                },
-                textStyle = MaterialTheme.typography.bodySmall,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
-                singleLine = true,
-                modifier = Modifier
-                    .width(64.dp)
-                    .height(40.dp)
-                    .wrapContentWidth()
-            )
-        }
-        val steps = remember(leftBorder, rightBorder) {
-            (rightBorder - leftBorder).toInt()
-        }
-
-        Slider(
-            value = tempValue,
-            onValueChange = {
-                tempValue = it
-            },
-            valueRange = leftBorder..rightBorder,
-            steps = steps,
-            onValueChangeFinished = { updateValue(tempValue) }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        Switch(
+            checked = checked, onCheckedChange = onCheckedChange,
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
     }
 }
+
+@Composable
+fun GenPresetSelector(
+    wrapper: HordePresetsWrapper,
+    onEvent: (COUserEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier
+    ) {
+        Box(modifier = Modifier.weight(1f)) {
+            var showMenu by remember { mutableStateOf(false) }
+            val rotation by animateFloatAsState(
+                targetValue = if (showMenu) 0f else 180f,
+                label = "rotation"
+            )
+            TextField(
+                value = wrapper.preset.name, onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropUp, contentDescription = "",
+                            modifier = Modifier.graphicsLayer(
+                                rotationZ = rotation
+                            )
+                        )
+                    }
+                }
+            )
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }) {
+                wrapper.presets.forEach { preset ->
+                    DropdownMenuItem(
+                        text = { Text(text = preset.name) },
+                        onClick = {
+                            showMenu = false
+                            onEvent(COUserEvent.SelectHordePreset(preset.id))
+                        }
+                    )
+                }
+            }
+        }
+
+        IconButton(
+            onClick = { onEvent(COUserEvent.EditPreset) },
+        ) {
+            Icon(imageVector = Icons.Filled.Edit, contentDescription = "")
+        }
+    }
+
+}
+
 
 @Composable
 fun ActiveModelItem(
@@ -452,7 +462,9 @@ fun HordeFragmentPreview() {
     IntelligentChatTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             HordeFragment(
-                state = ConnectionOverviewState.HordeFragmentState(),
+                state = ConnectionOverviewState.HordeFragmentState(
+                    presetsWrapper = HordePresetsWrapper(HordePreset(1, "Preset"))
+                ),
                 modifier = Modifier,
                 onEvent = {})
         }

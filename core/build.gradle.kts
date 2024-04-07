@@ -1,7 +1,7 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -35,9 +35,9 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.datastore:datastore:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.3")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.datastore)
+    implementation(libs.kotlinx.serialization.protobuf)
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation(libs.junit.jupiter)
 }

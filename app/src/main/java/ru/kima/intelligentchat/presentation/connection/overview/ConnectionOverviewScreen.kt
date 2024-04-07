@@ -45,6 +45,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
@@ -54,6 +56,7 @@ import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.fragments.HordeFragment
 import ru.kima.intelligentchat.presentation.connection.overview.fragments.KoboldAiFragment
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToHordePreset
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 
@@ -64,11 +67,12 @@ fun ConnectionOverviewScreen(
     uiEvents: ComposeEvent<COUiEvent>,
     drawerState: DrawerState,
     snackbarHostState: SnackbarHostState,
+    navController: NavController,
     onEvent: (COUserEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
-    ConsumeEvent(uiEvents, snackbarHostState, scope)
+    ConsumeEvent(uiEvents, snackbarHostState, scope, navController)
 
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -122,7 +126,8 @@ fun ConnectionOverviewScreen(
 fun ConsumeEvent(
     event: ComposeEvent<COUiEvent>,
     snackbarHostState: SnackbarHostState,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    navController: NavController
 ) {
     val value = event.value
     value?.let {
@@ -132,6 +137,8 @@ fun ConsumeEvent(
                 snackbar = it.snackbar,
                 snackbarHostState = snackbarHostState,
             )
+
+            is COUiEvent.EditPreset -> navController.navigateToHordePreset(it.presetId)
         }
     }
 }
@@ -256,6 +263,7 @@ fun ConnectionOverviewPreview() {
                 uiEvents = ComposeEvent(COUiEvent.ShowMessage("123")),
                 drawerState = DrawerState(initialValue = DrawerValue.Closed),
                 snackbarHostState = SnackbarHostState(),
+                navController = rememberNavController(),
                 onEvent = {}
             )
         }

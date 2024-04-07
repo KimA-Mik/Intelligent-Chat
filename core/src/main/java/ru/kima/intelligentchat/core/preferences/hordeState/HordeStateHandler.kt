@@ -7,6 +7,13 @@ class HordeStateHandler(context: Context) {
     private val store = context.hordeStateDataStore
     val data = store.data
 
+    suspend fun selectPreset(presetId: Long) {
+        updateData {
+            it.copy(
+                selectedPreset = presetId
+            )
+        }
+    }
     suspend fun updateHordeModelInfo(modelsInfo: List<HordeModelInfo>) {
         updateData {
             it.copy(

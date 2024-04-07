@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.presentation.connection.overview.events
 sealed interface COUiEvent {
     data class ShowMessage(val message: String) : COUiEvent
     data class ShowSnackbar(val snackbar: COSnackbar) : COUiEvent
+    data class EditPreset(val presetId: Long) : COUiEvent
 
     sealed interface COSnackbar {
         data object NoUser : COSnackbar

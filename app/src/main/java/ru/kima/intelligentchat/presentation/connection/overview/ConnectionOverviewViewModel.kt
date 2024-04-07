@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.connection.overview
 
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.ComposeEvent
@@ -18,6 +22,7 @@ import ru.kima.intelligentchat.core.preferences.hordeState.model.HordeModelInfo
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
+import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
@@ -26,14 +31,21 @@ import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToW
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateGenerationDetailsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
+import ru.kima.intelligentchat.domain.presets.kobold.model.KoboldPreset
+import ru.kima.intelligentchat.domain.presets.kobold.useCase.SubscribeToKoboldPresetsUseCase
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.mappers.toDialogActiveModel
+import ru.kima.intelligentchat.presentation.connection.overview.mappers.toHordePreset
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordeModelsWrapper
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordePreset
+import ru.kima.intelligentchat.presentation.connection.overview.model.HordePresetsWrapper
 
 class ConnectionOverviewViewModel(
     private val savedStateHandle: SavedStateHandle,
     getPreferences: GetPreferencesUseCase,
+    subscribeToHordePresetsUse: SubscribeToKoboldPresetsUseCase,
     private val updateSelectedApi: UpdateSelectedApiUseCase,
     private val getHordePreferences: GetHordePreferencesUseCase,
     private val updateContextToWorker: UpdateContextToWorkerUseCase,
@@ -44,14 +56,31 @@ class ConnectionOverviewViewModel(
     private val loadActiveModels: LoadHordeModelsUseCase,
     private val selectHordeModels: SelectHordeModelsUseCase,
     private val updateGenerationDetails: UpdateGenerationDetailsUseCase,
+    private val selectActiveHordePreset: SelectActiveHordePresetUseCase
 ) : ViewModel() {
+    private val preferences = getPreferences()
+    private val hordeState = getHordePreferences()
     private val showApiToken = savedStateHandle.getStateFlow(SHOW_API_TOKEN_KEY, false)
     private val currentHordeApiToken =
         savedStateHandle.getStateFlow(HORDE_API_TOKEN_KEY, String())
     private val showSelectHordeModelsDialog = MutableStateFlow(false)
     private val hordeDialogActiveModels = MutableStateFlow(emptyList<HordeDialogActiveModel>())
+    private val hordePresets = subscribeToHordePresetsUse().map { list ->
+        list.map(KoboldPreset::toHordePreset)
+    }
+
+    private val selectedHordePresetId = MutableStateFlow(0L)
+    private val selectedHordePreset =
+        combine(hordePresets, selectedHordePresetId) { hordePresets, selectedHordePresetId ->
+            hordePresets.fastFirstOrNull { it.id == selectedHordePresetId }
+                ?: HordePreset(0, "0_o")
+        }
 
     init {
+        hordeState.onEach {
+            selectedHordePresetId.value = it.selectedPreset
+        }.launchIn(viewModelScope)
+
         viewModelScope.launch {
             val preferences = getHordePreferences().first()
             savedStateHandle[HORDE_API_TOKEN_KEY] = preferences.apiToken
@@ -60,12 +89,14 @@ class ConnectionOverviewViewModel(
 
     @Suppress("UNCHECKED_CAST")
     val state = combine(
-        getPreferences(),
-        getHordePreferences(),
+        preferences,
+        hordeState,
         currentHordeApiToken,
         showApiToken,
         showSelectHordeModelsDialog,
-        hordeDialogActiveModels
+        hordeDialogActiveModels,
+        hordePresets,
+        selectedHordePreset
     ) { args ->
         val preferences = args[0] as AppPreferences
         val hordeState = args[1] as HordeState
@@ -73,6 +104,8 @@ class ConnectionOverviewViewModel(
         val showApiToken = args[3] as Boolean
         val showSelectHordeModelsDialog = args[4] as Boolean
         val hordeDialogActiveModels = args[5] as List<HordeDialogActiveModel>
+        val hordePresets = args[6] as List<HordePreset>
+        val selectedHordePreset = args[7] as HordePreset
         ConnectionOverviewState(
             selectedApiType = preferences.selectedApiType,
             hordeFragmentState = ConnectionOverviewState.HordeFragmentState(
@@ -85,8 +118,12 @@ class ConnectionOverviewViewModel(
                 contextSize = hordeState.contextSize,
                 responseLength = hordeState.responseLength,
                 showSelectHordeModelsDialog = showSelectHordeModelsDialog,
-                selectedModels = hordeState.selectedModels,
-                dialogSelectedModels = hordeDialogActiveModels
+                selectedModelsWrapper = HordeModelsWrapper(hordeState.selectedModels),
+                dialogSelectedModels = hordeDialogActiveModels,
+                presetsWrapper = HordePresetsWrapper(
+                    presets = hordePresets,
+                    preset = selectedHordePreset
+                ),
             )
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())
@@ -111,6 +148,8 @@ class ConnectionOverviewViewModel(
             COUserEvent.AcceptSelectHordeModelsDialog -> onAcceptSelectHordeModelsDialog()
             is COUserEvent.UpdateHordeContextSize -> onUpdateHordeContextSize(event.newSize)
             is COUserEvent.UpdateHordeResponseLength -> onUpdateHordeResponseLength(event.newLength)
+            is COUserEvent.SelectHordePreset -> onSelectHordePreset(event.presetId)
+            COUserEvent.EditPreset -> onEditPreset()
         }
     }
 
@@ -204,7 +243,7 @@ class ConnectionOverviewViewModel(
         hordeDialogActiveModels.value =
             getDialogActiveModes(
                 modelsInfo,
-                state.value.hordeFragmentState.selectedModels
+                state.value.hordeFragmentState.selectedModelsWrapper.selectedModels
             )
         showSelectHordeModelsDialog.value = true
     }
@@ -235,12 +274,22 @@ class ConnectionOverviewViewModel(
         showSelectHordeModelsDialog.value = false
     }
 
-    private fun onUpdateHordeContextSize(newSize: Float) = viewModelScope.launch {
-        updateGenerationDetails(contextSize = newSize.toInt())
+    private fun onUpdateHordeContextSize(newSize: Int) = viewModelScope.launch {
+        updateGenerationDetails(contextSize = newSize)
     }
 
-    private fun onUpdateHordeResponseLength(newLength: Float) = viewModelScope.launch {
-        updateGenerationDetails(responseLength = newLength.toInt())
+    private fun onUpdateHordeResponseLength(newLength: Int) = viewModelScope.launch {
+        updateGenerationDetails(responseLength = newLength)
+    }
+
+    private fun onSelectHordePreset(presetId: Long) = viewModelScope.launch {
+        selectActiveHordePreset(presetId)
+    }
+
+    private fun onEditPreset() = viewModelScope.launch {
+        val selectedPreset = selectedHordePreset.first()
+        val event = COUiEvent.EditPreset(selectedPreset.id)
+        _uiEvents.value = ComposeEvent(event)
     }
 
     companion object {
