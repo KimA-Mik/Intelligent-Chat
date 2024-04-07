@@ -10,10 +10,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.core.utils.clipIntToRange
+import ru.kima.intelligentchat.core.utils.swap
 import ru.kima.intelligentchat.domain.presets.kobold.model.KoboldPreset
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetUseCase
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
+import kotlin.math.abs
+import kotlin.math.sign
 
 @OptIn(FlowPreview::class)
 class HordePresetEditViewModel(
@@ -177,40 +181,27 @@ class HordePresetEditViewModel(
         _preset.value = preset
     }
 
-    private var _initialSamplerOrder = emptyList<Int>()
-    private var _initialSamplerIndex = 0
-    private var _elementSize = 150
-    private var _indexOffset = 0
-
+    private var _elementSize = 0
+    private var _samplerIndex = 0
     private fun onStartMoveSampler(startIndex: Int, elementSize: Int) {
-        _indexOffset = 0
-        _initialSamplerIndex = startIndex
-        _initialSamplerOrder = _preset.value.samplerOrder
+        _samplerIndex = startIndex
         _elementSize = elementSize
     }
 
     private fun onMoveSampler(offset: Int) {
+        if (abs(offset) < _elementSize) return
+
         val preset = _preset.value
+        var newIndex = _samplerIndex + offset.sign
+        newIndex = newIndex.clipIntToRange(0, preset.samplerOrder.lastIndex)
+        if (newIndex == _samplerIndex) return
 
-        val verticalAdjustment = _elementSize / 2
-        val currentIndexOffset = (offset + verticalAdjustment) / _elementSize
-        if (currentIndexOffset == 0) return
-        _indexOffset += currentIndexOffset
-        var addIndex = _initialSamplerIndex + _indexOffset
-        if (_indexOffset < 0) addIndex -= 1
-        if (addIndex < 0) addIndex = 0
-        if (addIndex > preset.samplerOrder.lastIndex) addIndex = preset.samplerOrder.lastIndex
+        val newSamplerOrder = preset.samplerOrder.toMutableList()
+        newSamplerOrder.swap(_samplerIndex, newIndex)
+        _samplerIndex = newIndex
 
-        val result = if (_indexOffset != 0) {
-            val temp = _initialSamplerOrder.toMutableList()
-            val sampler = temp.removeAt(_initialSamplerIndex)
-            temp.add(addIndex, sampler)
-            temp
-        } else {
-            _initialSamplerOrder
-        }
         _preset.value = preset.copy(
-            samplerOrder = result
+            samplerOrder = newSamplerOrder
         )
     }
 }

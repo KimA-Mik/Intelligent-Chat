@@ -38,6 +38,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.common.util.dpToPx
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
@@ -185,36 +185,37 @@ fun CardsListElement(
     modifier: Modifier = Modifier
 ) {
     val elementSize = 48.dp.dpToPx()
+    var offsetY by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(index) {
+        if (offsetY > elementSize) offsetY -= elementSize
+        if (offsetY < -elementSize) offsetY += elementSize
+    }
+    val animatedOffset by animateFloatAsState(
+        targetValue = offsetY,
+        label = "",
+        animationSpec = SpringSpec(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        )
+    )
 
-    //TODO: Fix jiggering
-    //TODO: Add shape animation
+    //TODO: Add shape animation (good for now)
     LazyColumnCategory(
         itemCount = itemCount,
         index = index,
         modifier = modifier
+            .graphicsLayer {
+                translationY = animatedOffset
+            }
     ) { shape ->
-        var offsetY by remember(index) { mutableFloatStateOf(0f) }
         var elevated by remember { mutableStateOf(false) }
-
         val elevation by animateDpAsState(
             targetValue = if (elevated) 16.dp else 0.dp, label = ""
-        )
-        val animatedOffset by animateFloatAsState(
-            targetValue = offsetY,
-            label = "",
-            animationSpec = SpringSpec(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessMediumLow
-            )
         )
 
         Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .graphicsLayer {
-                    translationY = animatedOffset
-                }
-                .zIndex(if (elevated) 1f else 0f),
+                .fillMaxWidth(),
             shape = shape,
             color = CardDefaults.cardColors().containerColor,
             tonalElevation = elevation,
@@ -240,7 +241,7 @@ fun CardsListElement(
                             orientation = Orientation.Vertical,
                             state = rememberDraggableState { delta ->
                                 offsetY += delta
-                                onEvent(UserEvent.MoveSampler(offsetY.roundToInt()))
+                                onEvent(UserEvent.MoveSampler((offsetY).roundToInt()))
                             },
                             onDragStarted = {
                                 elevated = true
