@@ -70,7 +70,6 @@ fun HordePresetEditScreen(
 ) {
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-//    val sb = remember { scrollBehavior }
 
     Scaffold(
         topBar = {
@@ -89,7 +88,7 @@ fun HordePresetEditScreen(
                         )
                     }
                 },
-                scrollBehavior = scrollBehavior,
+                scrollBehavior = remember { scrollBehavior },
             )
         },
         modifier = Modifier
