@@ -56,10 +56,19 @@ import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.common.util.dpToPx
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.components.TitledFiniteSlider
 import ru.kima.intelligentchat.presentation.ui.components.TitledFloatSlider
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 import kotlin.math.roundToInt
+
+private val dropDownMenuItems = listOf(
+    SimpleDropDownMenuItem(
+        R.string.save_preset,
+        onClick = {}
+    )
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,6 +96,9 @@ fun HordePresetEditScreen(
                             contentDescription = "Back"
                         )
                     }
+                },
+                actions = {
+                    SimpleDropdownMenu(menuItems = dropDownMenuItems)
                 },
                 scrollBehavior = remember { scrollBehavior },
             )
