@@ -45,7 +45,10 @@ fun SimpleDropdownMenu(
                 val text = stringResource(id = item.textId)
                 DropdownMenuItem(
                     text = { Text(text = text) },
-                    onClick = item.onClick,
+                    onClick = {
+                        dropdownMenu = false
+                        item.onClick()
+                    },
                     leadingIcon = {
                         item.iconVector?.let {
                             Icon(
