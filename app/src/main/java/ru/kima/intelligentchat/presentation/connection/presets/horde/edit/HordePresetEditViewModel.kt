@@ -3,11 +3,7 @@ package ru.kima.intelligentchat.presentation.connection.presets.horde.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.utils.clipIntToRange
@@ -19,7 +15,6 @@ import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events
 import kotlin.math.abs
 import kotlin.math.sign
 
-@OptIn(FlowPreview::class)
 class HordePresetEditViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val updateKoboldPreset: UpdateKoboldPresetUseCase,
@@ -41,29 +36,13 @@ class HordePresetEditViewModel(
                 val preset = getKoboldPreset(it)
                     ?: return@launch
                 _preset.value = preset
-
-                _preset
-                    .debounce(500)
-                    .collect {
-                        if (it.id > 0L) {
-                            updateKoboldPreset(it)
-                        }
-                    }
-            }
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        MainScope().launch(Dispatchers.IO) {
-            if (_preset.value.id > 0L) {
-                updateKoboldPreset(_preset.value)
             }
         }
     }
 
     fun onEvent(event: UserEvent) {
         when (event) {
+            UserEvent.SavePreset -> onSavePreset()
             is UserEvent.EditTitle -> onEditTitle(event.title)
             is UserEvent.EditTemperature -> onEditTemperature(event.temperature)
             is UserEvent.EditTopK -> onEditTopK(event.topK)
@@ -81,6 +60,10 @@ class HordePresetEditViewModel(
             is UserEvent.StartMoveSampler -> onStartMoveSampler(event.startIndex, event.elementSize)
             is UserEvent.MoveSampler -> onMoveSampler(event.offset)
         }
+    }
+
+    private fun onSavePreset() = viewModelScope.launch {
+        updateKoboldPreset(_preset.value)
     }
 
     private fun onEditTitle(newTitle: String) {

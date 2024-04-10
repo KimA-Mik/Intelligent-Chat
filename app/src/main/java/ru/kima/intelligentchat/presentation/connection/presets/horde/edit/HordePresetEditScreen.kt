@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -63,12 +64,6 @@ import ru.kima.intelligentchat.presentation.ui.components.TitledFloatSlider
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 import kotlin.math.roundToInt
 
-private val dropDownMenuItems = listOf(
-    SimpleDropDownMenuItem(
-        R.string.save_preset,
-        onClick = {}
-    )
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +93,7 @@ fun HordePresetEditScreen(
                     }
                 },
                 actions = {
-                    SimpleDropdownMenu(menuItems = dropDownMenuItems)
+                    SimpleDropdownMenu(menuItems = dropDownMenuItems(onEvent))
                 },
                 scrollBehavior = remember { scrollBehavior },
             )
@@ -124,6 +119,19 @@ fun HordePresetEditScreen(
             )
         }
     }
+}
+
+@Composable
+private fun dropDownMenuItems(
+    onEvent: (UserEvent) -> Unit
+) = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            R.string.save_preset,
+            onClick = { onEvent(UserEvent.SavePreset) },
+            iconVector = Icons.Filled.Save
+        )
+    )
 }
 
 private val samplers = listOf(
