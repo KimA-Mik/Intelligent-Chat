@@ -1,7 +1,6 @@
 package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -9,9 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,10 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -43,6 +37,8 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.Car
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,7 +132,7 @@ fun CardDetailsScreen(
                     }
                 },
                 actions = {
-                    CardDropdownMenu(onEvent)
+                    SimpleDropdownMenu(menuItems = dropdownMenuItems(onEvent))
                 },
             )
         },
@@ -166,30 +162,14 @@ fun CardDetailsScreen(
 }
 
 @Composable
-fun CardDropdownMenu(
+private fun dropdownMenuItems(
     onEvent: (CardDetailUserEvent) -> Unit
-) {
-    Box {
-        var dropdownMenu by remember { mutableStateOf(false) }
-        IconButton(onClick = { dropdownMenu = true }) {
-            Icon(
-                imageVector = Icons.Filled.MoreVert,
-                contentDescription = "Save card",
-            )
-        }
-
-        DropdownMenu(expanded = dropdownMenu, onDismissRequest = { dropdownMenu = false }) {
-            //TODO: Move string constants away
-            DropdownMenuItem(
-                text = { Text(text = "Delete card") },
-                onClick = { onEvent(CardDetailUserEvent.DeleteCardClicked) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Delete card"
-                    )
-                }
-            )
-        }
-    }
+) = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            textId = R.string.delete_card,
+            onClick = { onEvent(CardDetailUserEvent.DeleteCardClicked) },
+            iconVector = Icons.Filled.Delete
+        )
+    )
 }
