@@ -2,7 +2,6 @@ package ru.kima.intelligentchat.presentation.characterCard.cardDetails.model
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.Immutable
-import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 
 @Immutable
@@ -44,12 +43,32 @@ data class ImmutableCard(
             creatorNotes = creatorNotes,
             systemPrompt = systemPrompt,
             postHistoryInstructions = postHistoryInstructions,
-            alternateGreetings = alternateGreetings.map { AltGreeting(id, it.body) },
+            alternateGreetings = alternateGreetings.map { it.toDto() },
             tags = tags,
             creator = creator,
             characterVersion = characterVersion
         )
     }
+}
+
+fun CharacterCard.toImmutable(): ImmutableCard {
+    return ImmutableCard(
+        id = id,
+        photoBytes = photoBytes,
+        name = name,
+        description = description,
+        personality = personality,
+        scenario = scenario,
+        firstMes = firstMes,
+        mesExample = mesExample,
+        creatorNotes = creatorNotes,
+        systemPrompt = systemPrompt,
+        postHistoryInstructions = postHistoryInstructions,
+        alternateGreetings = alternateGreetings.map { it.toImmutable() },
+        tags = tags,
+        creator = creator,
+        characterVersion = characterVersion
+    )
 }
 
 

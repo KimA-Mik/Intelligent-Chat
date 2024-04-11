@@ -10,7 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -88,7 +87,7 @@ fun CardDetailsScreen(
     }
 
     when {
-        state.deleteCardDialog -> SimpleAlertDialog(
+        state.additionalSurfaces.deleteCardDialog -> SimpleAlertDialog(
             onConfirm = { onEvent(CardDetailUserEvent.ConfirmDeleteCard) },
             onDismiss = { onEvent(CardDetailUserEvent.DismissDeleteCard) },
             title = stringResource(R.string.delete_card_dialog_title),
@@ -98,7 +97,7 @@ fun CardDetailsScreen(
             dismissText = stringResource(R.string.cancel_button_text)
         )
 
-        state.deleteAltGreetingDialog -> SimpleAlertDialog(
+        state.additionalSurfaces.deleteAltGreetingDialog -> SimpleAlertDialog(
             onConfirm = { onEvent(CardDetailUserEvent.ConfirmDeleteAltGreeting) },
             onDismiss = { onEvent(CardDetailUserEvent.DismissDeleteAltGreeting) },
             title = stringResource(R.string.delete_alternate_greeting_dialog_title),
@@ -142,7 +141,7 @@ fun CardDetailsScreen(
             )
         },
     ) { contentPadding ->
-        if (state.showAltGreeting) {
+        if (state.additionalSurfaces.showAltGreeting) {
             ModalBottomSheet(onDismissRequest = {
                 onEvent(CardDetailUserEvent.CloseAltGreetingsSheet)
             }) {
@@ -180,7 +179,7 @@ fun CardDropdownMenu(
         }
 
         DropdownMenu(expanded = dropdownMenu, onDismissRequest = { dropdownMenu = false }) {
-            //TODO: Move string constants away when JB fix Android Studio
+            //TODO: Move string constants away
             DropdownMenuItem(
                 text = { Text(text = "Delete card") },
                 onClick = { onEvent(CardDetailUserEvent.DeleteCardClicked) },
@@ -188,16 +187,6 @@ fun CardDropdownMenu(
                     Icon(
                         imageVector = Icons.Filled.Delete,
                         contentDescription = "Delete card"
-                    )
-                }
-            )
-            DropdownMenuItem(
-                text = { Text(text = "Save card") },
-                onClick = { onEvent(CardDetailUserEvent.SaveCard) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Save,
-                        contentDescription = "Save card",
                     )
                 }
             )

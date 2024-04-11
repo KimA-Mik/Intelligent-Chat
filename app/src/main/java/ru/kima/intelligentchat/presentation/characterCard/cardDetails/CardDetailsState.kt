@@ -6,17 +6,26 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.Immu
 @Immutable
 data class CardDetailsState(
     val card: ImmutableCard = ImmutableCard(),
-    val deleteCardDialog: Boolean = false,
-    val showAltGreeting: Boolean = false,
-    val deleteAltGreetingDialog: Boolean = false,
+    val additionalSurfaces: AdditionalSurfaces = AdditionalSurfaces(),
     val editableGreeting: Long = 0,
     val editableGreetingBuffer: String = String(),
-    val nameTokensCount: Int = 0,
-    val descriptionTokensCount: Int = 0,
-    val personalityTokensCount: Int = 0,
-    val scenarioTokensCount: Int = 0,
-    val firstMesTokensCount: Int = 0,
-    val mesExampleTokensCount: Int = 0,
-    val systemPromptTokensCount: Int = 0,
-    val postHistoryInstructionsTokensCount: Int = 0,
-)
+    val tokensCount: TokensCount = TokensCount()
+) {
+    data class TokensCount(
+        val name: Int = 0,
+        val description: Int = 0,
+        val personality: Int = 0,
+        val scenario: Int = 0,
+        val firstMes: Int = 0,
+        val mesExample: Int = 0,
+        val systemPrompt: Int = 0,
+        val postHistoryInstructions: Int = 0,
+    )
+
+    data class AdditionalSurfaces(
+        val deleteCardDialog: Boolean = false,
+        val showAltGreeting: Boolean = false,
+        val deleteAltGreetingDialog: Boolean = false,
+    )
+}
+
