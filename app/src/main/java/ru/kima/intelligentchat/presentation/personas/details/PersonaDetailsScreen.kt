@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +49,8 @@ import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
 import ru.kima.intelligentchat.presentation.personas.details.events.UiEvent
 import ru.kima.intelligentchat.presentation.personas.details.events.UserEvent
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,18 +107,9 @@ fun PersonaDetailsScreen(
                     )
                 }
             }, actions = {
-                IconButton(onClick = { deletePersonaDialog = true }) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = stringResource(R.string.delete_persona_content_description)
-                    )
-                }
-                IconButton(onClick = { onEvent(UserEvent.SavePersona) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Save,
-                        contentDescription = stringResource(R.string.save_persona_content_description)
-                    )
-                }
+                SimpleDropdownMenu(
+                    menuItems = dropdownMenuItems(onEvent)
+                )
             })
         }, snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
         PersonaDetailsContent(
@@ -151,6 +143,19 @@ fun consumeEvent(
             UiEvent.PopBack -> navController.popBackStack()
         }
     }
+}
+
+@Composable
+private fun dropdownMenuItems(
+    onEvent: (UserEvent) -> Unit
+) = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            textId = R.string.delete_persona,
+            onClick = { onEvent(UserEvent.DeletePersona) },
+            iconVector = Icons.Filled.Delete,
+        )
+    )
 }
 
 @Composable
