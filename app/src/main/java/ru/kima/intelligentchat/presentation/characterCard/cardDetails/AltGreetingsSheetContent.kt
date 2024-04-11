@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -57,27 +58,25 @@ fun AltGreetingsSheetContent(
             }
         }
 
-        items(
-            count = greetings.size,
-            key = { greetings[it].id }
-        ) {
-            val greeting = greetings[it]
+        itemsIndexed(
+            items = greetings,
+            key = { _, item -> item.id }
+        ) { index, greeting ->
             val edited = editableGreeting == greeting.id
-
             AnimatedContent(
                 targetState = edited, label = "",
                 modifier = Modifier.animateItemPlacement(),
-            ) { e ->
-                if (e) {
+            ) { editable ->
+                if (editable) {
                     EditableAlternateGreeting(
                         buffer = editableGreetingBuffer,
-                        position = it,
+                        position = index,
                         onEvent = onEvent
                     )
                 } else {
                     AlternateGreeting(
                         greeting = greeting,
-                        position = it,
+                        position = index,
                         onEvent = onEvent
                     )
                 }
