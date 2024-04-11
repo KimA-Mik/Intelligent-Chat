@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -56,10 +57,13 @@ import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.common.util.dpToPx
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.components.TitledFiniteSlider
 import ru.kima.intelligentchat.presentation.ui.components.TitledFloatSlider
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 import kotlin.math.roundToInt
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,6 +92,9 @@ fun HordePresetEditScreen(
                         )
                     }
                 },
+                actions = {
+                    SimpleDropdownMenu(menuItems = dropDownMenuItems(onEvent))
+                },
                 scrollBehavior = remember { scrollBehavior },
             )
         },
@@ -112,6 +119,19 @@ fun HordePresetEditScreen(
             )
         }
     }
+}
+
+@Composable
+private fun dropDownMenuItems(
+    onEvent: (UserEvent) -> Unit
+) = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            R.string.save_preset,
+            onClick = { onEvent(UserEvent.SavePreset) },
+            iconVector = Icons.Filled.Save
+        )
+    )
 }
 
 private val samplers = listOf(

@@ -13,8 +13,7 @@
     <string name="introduce_first_persona">Please introduce your first persona.</string>
     <string name="delete_alternate_greeting_dialog_title">Delete alternate greeting?</string>
     <string name="delete_alternate_greeting_dialog_text">The greeting will be deleted forever. This action cannot be undone.</string>
-
-    <string name="persona_saved_message">The persona has been saved.</string>
+    <string name="delete_card">Delete card</string>
 
     <string name="tokens_count">Tokens: %1$d</string>
 
@@ -29,8 +28,7 @@
     <string name="delete_persona_dialog_text">The persona will be deleted forever, except for the last one.</string>
     <string name="persona_deleted_snackbar">The persona has been deleted.</string>
     <string name="persona_not_deleted_snackbar">The persona can not be deleted.</string>
-    <string name="delete_persona_content_description">Delete persona</string>
-    <string name="save_persona_content_description">Save persona</string>
+    <string name="delete_persona">Delete persona</string>
     <string name="select_persona_button_content_description">Select persona button</string>
 
     <!--    Connection overview screen-->
@@ -80,5 +78,6 @@
     <string name="repetition_penalty_range_title">Repetition Penalty Range</string>
     <string name="repetition_penalty_slope_title">Repetition Penalty Slope</string>
     <string name="top_and_min_p_title">Top P <![CDATA[&]]> Min P</string>
+    <string name="save_preset">Save preset</string>
 
 </resources>

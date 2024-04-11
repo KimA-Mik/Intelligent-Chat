@@ -62,14 +62,14 @@ fun CardDetailContent(
     ) {
         HeadArea(
             name = state.card.name,
-            nameTokensCount = state.nameTokensCount,
+            nameTokensCount = state.tokensCount.name,
             photo = state.card.photoBytes,
             onEvent = onEvent
         )
 
         GeneralInfo(
             text = state.card.description,
-            textTokensCount = state.descriptionTokensCount,
+            textTokensCount = state.tokensCount.description,
             modifier = Modifier.padding(8.dp),
             title = "Description",
             field = CardDetailsViewModel.CardField.Description,
@@ -80,7 +80,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.firstMes,
-            textTokensCount = state.firstMesTokensCount,
+            textTokensCount = state.tokensCount.firstMes,
             modifier = Modifier.padding(8.dp),
             title = "First message",
             field = CardDetailsViewModel.CardField.FirstMes,
@@ -98,7 +98,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.personality,
-            textTokensCount = state.personalityTokensCount,
+            textTokensCount = state.tokensCount.personality,
             modifier = Modifier.padding(8.dp),
             title = "Personality",
             field = CardDetailsViewModel.CardField.Personality,
@@ -109,7 +109,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.scenario,
-            textTokensCount = state.scenarioTokensCount,
+            textTokensCount = state.tokensCount.scenario,
             modifier = Modifier.padding(8.dp),
             title = "Scenario",
             field = CardDetailsViewModel.CardField.Scenario,

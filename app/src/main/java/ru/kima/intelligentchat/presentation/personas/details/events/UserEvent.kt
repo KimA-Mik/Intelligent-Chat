@@ -7,9 +7,6 @@ sealed interface UserEvent {
         val field: PersonaDetailsViewModel.PersonaDetailsField,
         val value: String
     ) : UserEvent
-
-    data object SavePersona : UserEvent
-
     data class UpdatePersonaImage(val bytes: ByteArray) : UserEvent {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

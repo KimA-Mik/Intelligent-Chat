@@ -1,6 +1,7 @@
 package ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events
 
 sealed interface UserEvent {
+    data object SavePreset : UserEvent
     data class EditTitle(val title: String) : UserEvent
     data class EditTemperature(val temperature: Float) : UserEvent
     data class EditTopK(val topK: Int) : UserEvent
