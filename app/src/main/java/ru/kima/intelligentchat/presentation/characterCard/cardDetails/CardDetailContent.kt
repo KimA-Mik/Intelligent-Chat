@@ -70,7 +70,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.description,
-            title = "Description",
+            title = stringResource(R.string.card_description_title),
             field = CardDetailsViewModel.CardField.Description,
             isExpanded = isDescriptionExpanded,
             onExpand = { isDescriptionExpanded = !isDescriptionExpanded },
@@ -82,7 +82,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.firstMes,
-            title = "First message",
+            title = stringResource(R.string.card_first_message_title),
             field = CardDetailsViewModel.CardField.FirstMes,
             isExpanded = isFirstMesExpanded,
             onExpand = { isFirstMesExpanded = !isFirstMesExpanded },
@@ -93,7 +93,7 @@ fun CardDetailContent(
                 TextButton(onClick = {
                     onEvent(CardDetailUserEvent.OpenAltGreetingsSheet)
                 }) {
-                    Text(text = "Alternative greetings")
+                    Text(text = stringResource(R.string.alternate_greetings_button))
                 }
             },
             onEvent = onEvent
@@ -101,7 +101,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.personality,
-            title = "Personality",
+            title = stringResource(R.string.card_personality_title),
             field = CardDetailsViewModel.CardField.Personality,
             isExpanded = isPersonalityExpanded,
             onExpand = { isPersonalityExpanded = !isPersonalityExpanded },
@@ -113,7 +113,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.scenario,
-            title = "Scenario",
+            title = stringResource(R.string.card_scenario_title),
             field = CardDetailsViewModel.CardField.Scenario,
             isExpanded = isScenarioExpanded,
             onExpand = { isScenarioExpanded = !isScenarioExpanded },
@@ -125,7 +125,7 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.creatorNotes,
-            title = "Creator's notes",
+            title = stringResource(R.string.card_creators_note_title),
             field = CardDetailsViewModel.CardField.CreatorNotes,
             isExpanded = isCreatorsNotesExpanded,
             onExpand = { isCreatorsNotesExpanded = !isCreatorsNotesExpanded },
@@ -159,7 +159,7 @@ fun HeadArea(
 
         OutlinedTextField(
             label = {
-                Text(text = "Name")
+                Text(text = stringResource(R.string.card_name_title))
             },
             value = name, onValueChange = { newValue ->
                 onEvent(

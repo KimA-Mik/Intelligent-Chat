@@ -14,6 +14,13 @@
     <string name="delete_alternate_greeting_dialog_title">Delete alternate greeting?</string>
     <string name="delete_alternate_greeting_dialog_text">The greeting will be deleted forever. This action cannot be undone.</string>
     <string name="delete_card">Delete card</string>
+    <string name="card_description_title">Description</string>
+    <string name="card_first_message_title">First message</string>
+    <string name="alternate_greetings_button">Alternate greetings</string>
+    <string name="card_personality_title">Personality</string>
+    <string name="card_scenario_title">Scenario</string>
+    <string name="card_name_title">Name</string>
+    <string name="card_creators_note_title">Creator\'s Note</string>
 
     <string name="tokens_count">Tokens: %1$d</string>
 
