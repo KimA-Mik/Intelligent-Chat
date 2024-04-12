@@ -52,6 +52,7 @@ fun CardDetailContent(
     var isFirstMesExpanded by remember { mutableStateOf(true) }
     var isPersonalityExpanded by remember { mutableStateOf(false) }
     var isScenarioExpanded by remember { mutableStateOf(false) }
+    var isCreatorsNotesExpanded by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
     Column(
@@ -69,23 +70,25 @@ fun CardDetailContent(
 
         GeneralInfo(
             text = state.card.description,
-            textTokensCount = state.tokensCount.description,
-            modifier = Modifier.padding(8.dp),
             title = "Description",
             field = CardDetailsViewModel.CardField.Description,
             isExpanded = isDescriptionExpanded,
-            onEvent = onEvent,
-            onExpand = { isDescriptionExpanded = !isDescriptionExpanded }
+            onExpand = { isDescriptionExpanded = !isDescriptionExpanded },
+            modifier = Modifier.padding(8.dp),
+            textTokensCount = state.tokensCount.description,
+            showTokensCount = true,
+            onEvent = onEvent
         )
 
         GeneralInfo(
             text = state.card.firstMes,
-            textTokensCount = state.tokensCount.firstMes,
-            modifier = Modifier.padding(8.dp),
             title = "First message",
             field = CardDetailsViewModel.CardField.FirstMes,
             isExpanded = isFirstMesExpanded,
-            onEvent = onEvent,
+            onExpand = { isFirstMesExpanded = !isFirstMesExpanded },
+            modifier = Modifier.padding(8.dp),
+            textTokensCount = state.tokensCount.firstMes,
+            showTokensCount = true,
             supportRow = {
                 TextButton(onClick = {
                     onEvent(CardDetailUserEvent.OpenAltGreetingsSheet)
@@ -93,29 +96,41 @@ fun CardDetailContent(
                     Text(text = "Alternative greetings")
                 }
             },
-            onExpand = { isFirstMesExpanded = !isFirstMesExpanded }
+            onEvent = onEvent
         )
 
         GeneralInfo(
             text = state.card.personality,
-            textTokensCount = state.tokensCount.personality,
-            modifier = Modifier.padding(8.dp),
             title = "Personality",
             field = CardDetailsViewModel.CardField.Personality,
             isExpanded = isPersonalityExpanded,
-            onEvent = onEvent,
-            onExpand = { isPersonalityExpanded = !isPersonalityExpanded }
+            onExpand = { isPersonalityExpanded = !isPersonalityExpanded },
+            modifier = Modifier.padding(8.dp),
+            textTokensCount = state.tokensCount.personality,
+            showTokensCount = true,
+            onEvent = onEvent
         )
 
         GeneralInfo(
             text = state.card.scenario,
-            textTokensCount = state.tokensCount.scenario,
-            modifier = Modifier.padding(8.dp),
             title = "Scenario",
             field = CardDetailsViewModel.CardField.Scenario,
             isExpanded = isScenarioExpanded,
-            onEvent = onEvent,
-            onExpand = { isScenarioExpanded = !isScenarioExpanded }
+            onExpand = { isScenarioExpanded = !isScenarioExpanded },
+            modifier = Modifier.padding(8.dp),
+            textTokensCount = state.tokensCount.scenario,
+            showTokensCount = true,
+            onEvent = onEvent
+        )
+
+        GeneralInfo(
+            text = state.card.creatorNotes,
+            title = "Creator's notes",
+            field = CardDetailsViewModel.CardField.CreatorNotes,
+            isExpanded = isCreatorsNotesExpanded,
+            onExpand = { isCreatorsNotesExpanded = !isCreatorsNotesExpanded },
+            modifier = Modifier.padding(8.dp),
+            onEvent = onEvent
         )
     }
 }
@@ -176,7 +191,7 @@ fun GeneralInfo(
     onExpand: () -> Unit,
     modifier: Modifier = Modifier,
     textTokensCount: Int = 0,
-    showTokensCount: Boolean = true,
+    showTokensCount: Boolean = false,
     supportRow: @Composable () -> Unit = {},
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
