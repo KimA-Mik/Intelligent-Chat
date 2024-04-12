@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -192,7 +193,7 @@ fun GeneralInfo(
     modifier: Modifier = Modifier,
     textTokensCount: Int = 0,
     showTokensCount: Boolean = false,
-    supportRow: @Composable () -> Unit = {},
+    supportRow: @Composable RowScope.() -> Unit = {},
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
     val rotation by animateFloatAsState(
