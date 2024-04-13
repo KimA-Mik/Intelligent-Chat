@@ -46,11 +46,12 @@ import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersona
 import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.SelectHordeModelsUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateActualGenerationDetailsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToWorkerUseCase
-import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateGenerationDetailsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateHordeUserDataUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateUserGenerationDetailsUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.repository.KoboldPresetRepository
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.SubscribeToKoboldPresetsUseCase
@@ -75,7 +76,8 @@ fun domain() = module {
     singleOf(::UpdateResponseToWorkerUseCase)
     singleOf(::UpdateTrustedWorkersUseCase)
     singleOf(::SelectHordeModelsUseCase)
-    singleOf(::UpdateGenerationDetailsUseCase)
+    singleOf(::UpdateUserGenerationDetailsUseCase)
+    singleOf(::UpdateActualGenerationDetailsUseCase)
 
     factoryOf(::GetCardsUseCase)
     factoryOf(::GetCardsListUseCase)

@@ -28,9 +28,9 @@ import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiU
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.SelectHordeModelsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToWorkerUseCase
-import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateGenerationDetailsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateUserGenerationDetailsUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.model.KoboldPreset
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.SubscribeToKoboldPresetsUseCase
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
@@ -55,7 +55,7 @@ class ConnectionOverviewViewModel(
     private val getKudos: GetKudosUseCase,
     private val loadActiveModels: LoadHordeModelsUseCase,
     private val selectHordeModels: SelectHordeModelsUseCase,
-    private val updateGenerationDetails: UpdateGenerationDetailsUseCase,
+    private val updateGenerationDetails: UpdateUserGenerationDetailsUseCase,
     private val selectActiveHordePreset: SelectActiveHordePresetUseCase
 ) : ViewModel() {
     private val preferences = getPreferences()
@@ -115,8 +115,10 @@ class ConnectionOverviewViewModel(
                 responseToWorker = hordeState.responseToWorker,
                 trustedWorkers = hordeState.trustedWorkers,
                 userName = hordeState.userName,
-                contextSize = hordeState.contextSize,
-                responseLength = hordeState.responseLength,
+                userContextSize = hordeState.userContextSize,
+                userResponseLength = hordeState.userResponseLength,
+                actualContextSize = hordeState.actualContextSize,
+                actualResponseLength = hordeState.actualResponseLength,
                 showSelectHordeModelsDialog = showSelectHordeModelsDialog,
                 selectedModelsWrapper = HordeModelsWrapper(hordeState.selectedModels),
                 dialogSelectedModels = hordeDialogActiveModels,

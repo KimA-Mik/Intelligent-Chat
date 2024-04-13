@@ -23,14 +23,26 @@ class HordeStateHandler(context: Context) {
         }
     }
 
-    suspend fun updateGenerationDetails(
+    suspend fun updateActualGenerationDetails(
         contextSize: Int = -1,
         responseLength: Int = -1
     ) {
         updateData {
             it.copy(
-                contextSize = if (contextSize > 0) contextSize else it.contextSize,
-                responseLength = if (responseLength > 0) responseLength else it.responseLength
+                actualContextSize = if (contextSize > 0) contextSize else it.actualContextSize,
+                actualResponseLength = if (responseLength > 0) responseLength else it.actualResponseLength
+            )
+        }
+    }
+
+    suspend fun updateUserGenerationDetails(
+        contextSize: Int = -1,
+        responseLength: Int = -1
+    ) {
+        updateData {
+            it.copy(
+                userContextSize = if (contextSize > 0) contextSize else it.userContextSize,
+                userResponseLength = if (responseLength > 0) responseLength else it.userResponseLength
             )
         }
     }
