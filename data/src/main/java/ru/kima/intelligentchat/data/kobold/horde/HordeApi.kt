@@ -5,9 +5,11 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.kima.intelligentchat.data.kobold.horde.model.ActiveModelDto
 import ru.kima.intelligentchat.data.kobold.horde.model.GenerationInputDto
+import ru.kima.intelligentchat.data.kobold.horde.model.HordeRequestStatusDto
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestAsyncDto
 import ru.kima.intelligentchat.data.kobold.horde.model.UserDetailsDto
 import ru.kima.intelligentchat.data.kobold.horde.model.WorkerDto
@@ -30,4 +32,9 @@ interface HordeApi {
         @Header("apikey") apiKey: String,
         @Body generationInput: GenerationInputDto
     ): Response<RequestAsyncDto>
+
+    @GET("generate/text/status/{id}")
+    suspend fun getGenerationStatus(
+        @Path("id") id: String
+    ): Response<HordeRequestStatusDto>
 }

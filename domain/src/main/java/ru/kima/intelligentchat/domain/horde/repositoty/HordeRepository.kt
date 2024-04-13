@@ -5,6 +5,7 @@ import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
 import ru.kima.intelligentchat.domain.horde.model.HordeAsyncRequest
+import ru.kima.intelligentchat.domain.horde.model.HordeRequestStatus
 import ru.kima.intelligentchat.domain.horde.model.HordeWorker
 import ru.kima.intelligentchat.domain.horde.model.UserInfo
 
@@ -17,5 +18,7 @@ interface HordeRepository {
         apiKey: String,
         generationInput: GenerationInput
     ): Resource<HordeAsyncRequest>
+
+    suspend fun getGenerationRequestStatus(id: String): Resource<HordeRequestStatus>
     fun connectionState(): Flow<Boolean>
 }

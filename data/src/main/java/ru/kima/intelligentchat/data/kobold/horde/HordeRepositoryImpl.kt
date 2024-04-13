@@ -11,6 +11,7 @@ import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toActiveModel
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toDto
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeAsyncRequest
+import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeRequestStatus
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeWorker
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toUserInfo
 import ru.kima.intelligentchat.data.kobold.horde.model.ConnectionState
@@ -21,6 +22,7 @@ import ru.kima.intelligentchat.data.util.jsonConverterFactory.toConverterFactory
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
 import ru.kima.intelligentchat.domain.horde.model.HordeAsyncRequest
+import ru.kima.intelligentchat.domain.horde.model.HordeRequestStatus
 import ru.kima.intelligentchat.domain.horde.model.HordeWorker
 import ru.kima.intelligentchat.domain.horde.model.UserInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
@@ -150,6 +152,27 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
             Resource.Error("0")
         } catch (e: NullPointerException) {
             Resource.Error("Unable to deserialize result of generation request")
+        } catch (e: Exception) {
+            val message = e.message ?: e.toString()
+            Resource.Error(message)
+        }
+    }
+
+    override suspend fun getGenerationRequestStatus(id: String): Resource<HordeRequestStatus> {
+        return try {
+            val response = api.getGenerationStatus(id)
+            if (response.isSuccessful) {
+                Resource.Success(
+                    response
+                        .body()!!
+                        .toHordeRequestStatus()
+                )
+            } else {
+                Resource.Error(getErrorMessage(response.errorBody()))
+            }
+        } catch (e: IOException) {
+            ConnectionState.isConnected.value = false
+            Resource.Error("0")
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
