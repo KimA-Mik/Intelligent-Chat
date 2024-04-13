@@ -242,7 +242,7 @@ class ConnectionOverviewViewModel(
         val modelsInfo = getHordePreferences().first().modelsInfo
         hordeDialogActiveModels.value =
             getDialogActiveModes(
-                modelsInfo,
+                modelsInfo.values.toList(),
                 state.value.hordeFragmentState.selectedModelsWrapper.selectedModels
             )
         showSelectHordeModelsDialog.value = true

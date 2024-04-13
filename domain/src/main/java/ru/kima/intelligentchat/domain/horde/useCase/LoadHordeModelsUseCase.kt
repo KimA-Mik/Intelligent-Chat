@@ -3,7 +3,6 @@ package ru.kima.intelligentchat.domain.horde.useCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
-import ru.kima.intelligentchat.core.preferences.hordeState.model.HordeModelInfo
 import ru.kima.intelligentchat.domain.horde.model.HordeWorker
 import ru.kima.intelligentchat.domain.horde.model.ModelInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
@@ -34,17 +33,8 @@ class LoadHordeModelsUseCase(
 
         hordeState.updateHordeModelInfo(
             modelsMap
-                .values
-                .map {
-                    HordeModelInfo(
-                        name = it.name,
-                        count = it.count,
-                        performance = it.performance,
-                        queued = it.queued,
-                        eta = it.eta,
-                        maxContentSize = it.maxContextSize,
-                        maxResponseLength = it.maxResponseLength,
-                    )
+                .mapValues {
+                    it.value.toHordeModelInfo()
                 }
         )
 

@@ -16,7 +16,7 @@ data class HordeState(
     val userId: Int = 0,
     val contextSize: Int = 1024,
     val responseLength: Int = 256,
-    val modelsInfo: List<HordeModelInfo> = emptyList(),
+    val modelsInfo: Map<String, HordeModelInfo> = emptyMap(),
     val selectedModels: List<String> = emptyList(),
     val selectedPreset: Long = 1L,
 )

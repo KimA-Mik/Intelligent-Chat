@@ -14,7 +14,8 @@ class HordeStateHandler(context: Context) {
             )
         }
     }
-    suspend fun updateHordeModelInfo(modelsInfo: List<HordeModelInfo>) {
+
+    suspend fun updateHordeModelInfo(modelsInfo: Map<String, HordeModelInfo>) {
         updateData {
             it.copy(
                 modelsInfo = modelsInfo
