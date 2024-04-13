@@ -20,7 +20,16 @@ data class CardDetailsState(
         val mesExample: Int = 0,
         val systemPrompt: Int = 0,
         val postHistoryInstructions: Int = 0,
-    )
+    ) {
+        val totalTokens = name +
+                description +
+                personality +
+                scenario +
+                firstMes +
+                mesExample +
+                systemPrompt +
+                postHistoryInstructions
+    }
 
     data class AdditionalSurfaces(
         val deleteCardDialog: Boolean = false,

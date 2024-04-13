@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
@@ -64,6 +64,7 @@ fun CardDetailContent(
     ) {
         HeadArea(
             name = state.card.name,
+            cardTokens = state.tokensCount.totalTokens,
             nameTokensCount = state.tokensCount.name,
             photo = state.card.photoBytes,
             onEvent = onEvent
@@ -139,6 +140,7 @@ fun CardDetailContent(
 @Composable
 fun HeadArea(
     name: String,
+    cardTokens: Int,
     nameTokensCount: Int,
     photo: Bitmap?,
     modifier: Modifier = Modifier,
@@ -176,7 +178,20 @@ fun HeadArea(
                 .weight(1f),
             maxLines = 3,
             supportingText = {
-                TokensCountText(tokens = nameTokensCount)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Card tokens: $cardTokens",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (cardTokens < 2048)
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        else
+                            MaterialTheme.colorScheme.error
+                    )
+                    TokensCountText(tokens = nameTokensCount)
+                }
             }
         )
 
