@@ -20,5 +20,6 @@ interface HordeRepository {
     ): Resource<HordeAsyncRequest>
 
     suspend fun getGenerationRequestStatus(id: String): Resource<HordeRequestStatus>
+    suspend fun cancelGenerationRequest(id: String): Resource<HordeRequestStatus>
     fun connectionState(): Flow<Boolean>
 }

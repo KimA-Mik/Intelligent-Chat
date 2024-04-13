@@ -2,6 +2,7 @@ package ru.kima.intelligentchat.data.kobold.horde
 
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PUT
@@ -34,7 +35,8 @@ interface HordeApi {
     ): Response<RequestAsyncDto>
 
     @GET("generate/text/status/{id}")
-    suspend fun getGenerationStatus(
-        @Path("id") id: String
-    ): Response<HordeRequestStatusDto>
+    suspend fun getGenerationStatus(@Path("id") id: String): Response<HordeRequestStatusDto>
+
+    @DELETE("generate/text/status/{id}")
+    suspend fun cancelGenerationRequest(@Path("id") id: String): Response<HordeRequestStatusDto>
 }

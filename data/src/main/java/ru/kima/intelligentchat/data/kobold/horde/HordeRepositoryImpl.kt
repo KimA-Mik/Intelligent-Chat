@@ -179,6 +179,27 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         }
     }
 
+    override suspend fun cancelGenerationRequest(id: String): Resource<HordeRequestStatus> {
+        return try {
+            val response = api.cancelGenerationRequest(id)
+            if (response.isSuccessful) {
+                Resource.Success(
+                    response
+                        .body()!!
+                        .toHordeRequestStatus()
+                )
+            } else {
+                Resource.Error(getErrorMessage(response.errorBody()))
+            }
+        } catch (e: IOException) {
+            ConnectionState.isConnected.value = false
+            Resource.Error("0")
+        } catch (e: Exception) {
+            val message = e.message ?: e.toString()
+            Resource.Error(message)
+        }
+    }
+
     override fun connectionState(): Flow<Boolean> = ConnectionState.isConnected
 
     private fun getErrorMessage(responseBody: ResponseBody?): String {
