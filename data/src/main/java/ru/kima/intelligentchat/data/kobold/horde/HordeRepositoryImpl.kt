@@ -9,13 +9,18 @@ import retrofit2.Retrofit
 import retrofit2.create
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toActiveModel
+import ru.kima.intelligentchat.data.kobold.horde.mappers.toDto
+import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeAsyncRequest
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeWorker
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toUserInfo
 import ru.kima.intelligentchat.data.kobold.horde.model.ConnectionState
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestError
+import ru.kima.intelligentchat.data.kobold.horde.model.RequestValidationError
 import ru.kima.intelligentchat.data.kobold.horde.model.WorkerDto
 import ru.kima.intelligentchat.data.util.jsonConverterFactory.toConverterFactory
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
+import ru.kima.intelligentchat.domain.horde.model.GenerationInput
+import ru.kima.intelligentchat.domain.horde.model.HordeAsyncRequest
 import ru.kima.intelligentchat.domain.horde.model.HordeWorker
 import ru.kima.intelligentchat.domain.horde.model.UserInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
@@ -24,6 +29,7 @@ import java.io.IOException
 class HordeRepositoryImpl(json: Json) : HordeRepository {
     private val api: HordeApi
     private val errorConverter: Converter<ResponseBody, RequestError>
+    private val requestValidationErrorConverter: Converter<ResponseBody, RequestValidationError>
 
     init {
         val contentType = MediaType.get("application/json")
@@ -35,6 +41,8 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         api = retrofit.create()
         errorConverter =
             retrofit.responseBodyConverter(RequestError::class.java, emptyArray())
+        requestValidationErrorConverter =
+            retrofit.responseBodyConverter(RequestValidationError::class.java, emptyArray())
     }
 
     override suspend fun heartbeat(): Resource<Unit> {
@@ -116,6 +124,38 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         }
     }
 
+    override suspend fun requestGeneration(
+        apiKey: String,
+        generationInput: GenerationInput
+    ): Resource<HordeAsyncRequest> {
+        return try {
+            val response = api.generationRequest(apiKey, generationInput.toDto())
+            when (response.code()) {
+                in 200 until 300 -> Resource.Success(
+                    response
+                        .body()!!
+                        .toHordeAsyncRequest()
+                )
+
+                400 -> Resource.Error(
+                    gerValidationErrorMessage(response.errorBody())
+                )
+
+                else -> Resource.Error(
+                    getErrorMessage(response.errorBody())
+                )
+            }
+        } catch (e: IOException) {
+            ConnectionState.isConnected.value = false
+            Resource.Error("0")
+        } catch (e: NullPointerException) {
+            Resource.Error("Unable to deserialize result of generation request")
+        } catch (e: Exception) {
+            val message = e.message ?: e.toString()
+            Resource.Error(message)
+        }
+    }
+
     override fun connectionState(): Flow<Boolean> = ConnectionState.isConnected
 
     private fun getErrorMessage(responseBody: ResponseBody?): String {
@@ -124,6 +164,22 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
             error!!.message
         } catch (e: Exception) {
             "Unknown error"
+        }
+    }
+
+    private fun gerValidationErrorMessage(responseBody: ResponseBody?): String {
+        return try {
+            val error = requestValidationErrorConverter.convert(responseBody!!)!!
+            var res = error.message
+            if (error.errors.additionalProp1.isNotBlank()) res += "\n(${error.errors.additionalProp1})"
+            if (error.errors.additionalProp2.isNotBlank()) res += "\n(${error.errors.additionalProp2})"
+            if (error.errors.additionalProp3.isNotBlank()) res += "\n(${error.errors.additionalProp3})"
+            if (error.errors.additionalProp4.isNotBlank()) res += "\n(${error.errors.additionalProp4})"
+            if (error.errors.additionalProp5.isNotBlank()) res += "\n(${error.errors.additionalProp5})"
+
+            res
+        } catch (e: Exception) {
+            "Unknown validation error"
         }
     }
 }
