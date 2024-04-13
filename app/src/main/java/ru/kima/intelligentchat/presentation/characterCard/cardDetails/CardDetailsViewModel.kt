@@ -191,6 +191,7 @@ class CardDetailsViewModel(
                 CardField.Scenario -> it.copy(scenario = update)
                 CardField.FirstMes -> it.copy(firstMes = update)
                 CardField.MesExample -> it.copy(mesExample = update)
+                CardField.CreatorNotes -> it.copy(creatorNotes = update)
                 else -> {
                     println("Field $field")
                     it
