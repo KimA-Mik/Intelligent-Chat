@@ -193,7 +193,7 @@ fun GeneralInfo(
     modifier: Modifier = Modifier,
     textTokensCount: Int = 0,
     showTokensCount: Boolean = false,
-    supportRow: @Composable RowScope.() -> Unit = {},
+    supportRow: @Composable RowScope.() -> Unit = { Spacer(Modifier.weight(1f)) },
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
     val rotation by animateFloatAsState(
@@ -236,7 +236,7 @@ fun GeneralInfo(
                 },
                 supportingText = {
                     Row(
-                        horizontalArrangement = Arrangement.End,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         supportRow()
@@ -251,11 +251,14 @@ fun GeneralInfo(
 }
 
 @Composable
-fun TokensCountText(tokens: Int) {
+fun TokensCountText(
+    tokens: Int,
+    modifier: Modifier = Modifier
+) {
     Text(
         text = stringResource(id = R.string.tokens_count, tokens),
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.End,
+        modifier = modifier,
+        style = MaterialTheme.typography.bodySmall
     )
 }
 
