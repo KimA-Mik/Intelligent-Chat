@@ -10,6 +10,7 @@ import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOvervi
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.HordePresetEditViewModel
 import ru.kima.intelligentchat.presentation.personas.details.PersonaDetailsViewModel
 import ru.kima.intelligentchat.presentation.personas.list.PersonasListViewModel
+import ru.kima.intelligentchat.presentation.service.horde.HordeConfigService
 import ru.kima.intelligentchat.presentation.showImage.ShowImageViewModel
 
 fun presentation() = module {
@@ -25,4 +26,6 @@ fun presentation() = module {
 
     viewModelOf(::ConnectionOverviewViewModel)
     viewModelOf(::HordePresetEditViewModel)
+
+    singleOf(::HordeConfigService)
 }

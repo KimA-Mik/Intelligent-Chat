@@ -9,7 +9,7 @@ junit = "1.1.5"
 junitJupiter = "5.10.2"
 koin = "3.5.4"
 kotlin = "1.9.23"
-kotlinxCoroutinesCore = "1.8.0"
+kotlinxCoroutines = "1.8.0"
 kotlinxSerialization = "1.6.3"
 ksp = "1.9.23-1.0.19"
 lifecycleRuntimeKtx = "2.7.0"
@@ -42,7 +42,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
 junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "kotlinxSerialization" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }

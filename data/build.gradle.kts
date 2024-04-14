@@ -40,6 +40,7 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(project(mapOf("path" to ":domain")))
     implementation(project(mapOf("path" to ":core")))
 

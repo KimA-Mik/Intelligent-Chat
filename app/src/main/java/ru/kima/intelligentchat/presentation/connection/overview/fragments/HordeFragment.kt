@@ -98,10 +98,10 @@ fun HordeFragment(
             tonalElevation = 1.dp
         ) {
             GenerationConfig(
-                contextSize = state.contextSize,
-                configContextSize = state.contextSize,
-                responseLength = state.responseLength,
-                configResponseLength = state.responseLength,
+                actualContextSize = state.actualContextSize,
+                userContextSize = state.userContextSize,
+                actualResponseLength = state.actualResponseLength,
+                userResponseLength = state.userResponseLength,
                 onEvent = onEvent,
                 modifier = Modifier.padding(8.dp)
             )
@@ -176,10 +176,10 @@ fun SimpleConfig(
 
 @Composable
 fun GenerationConfig(
-    contextSize: Int,
-    configContextSize: Int,
-    responseLength: Int,
-    configResponseLength: Int,
+    actualContextSize: Int,
+    userContextSize: Int,
+    actualResponseLength: Int,
+    userResponseLength: Int,
     modifier: Modifier = Modifier,
     onEvent: (COUserEvent) -> Unit
 ) {
@@ -189,7 +189,7 @@ fun GenerationConfig(
     ) {
         TitledFiniteSlider(
             title = stringResource(R.string.response_label),
-            value = configResponseLength,
+            value = userResponseLength,
             leftBorder = 16,
             rightBorder = 2048,
             updateValue = {
@@ -201,7 +201,7 @@ fun GenerationConfig(
 
         TitledFiniteSlider(
             title = stringResource(R.string.context_label),
-            value = configContextSize,
+            value = userContextSize,
             leftBorder = 512,
             rightBorder = 8196,
             updateValue = {
@@ -211,8 +211,8 @@ fun GenerationConfig(
             textFieldLabel = stringResource(R.string.tokens_label)
         )
 
-        val contextField = if (contextSize > 0) contextSize.toString() else "--"
-        val responseField = if (responseLength > 0) responseLength.toString() else "--"
+        val contextField = if (actualContextSize > 0) actualContextSize.toString() else "--"
+        val responseField = if (actualResponseLength > 0) actualResponseLength.toString() else "--"
         Text(
             text = stringResource(id = R.string.context_and_response, contextField, responseField),
             style = MaterialTheme.typography.bodyMedium

@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.serialization.protobuf)
+    implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit.jupiter)
 }

@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.service.horde
+package ru.kima.intelligentchat.presentation.service.horde
 
 import android.app.Service
 import android.content.Intent
