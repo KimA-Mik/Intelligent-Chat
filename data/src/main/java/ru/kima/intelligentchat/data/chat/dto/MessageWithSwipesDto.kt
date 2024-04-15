@@ -8,8 +8,8 @@ import ru.kima.intelligentchat.data.chat.entities.SwipeEntity
 data class MessageWithSwipesDto(
     @Embedded val message: MessageEntity,
     @Relation(
-        parentColumn = "messageId",
-        entityColumn = "messageId"
+        parentColumn = "message_id",
+        entityColumn = "message_id"
     )
     val swipes: List<SwipeEntity>
 )

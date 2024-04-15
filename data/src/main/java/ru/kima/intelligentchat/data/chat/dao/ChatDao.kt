@@ -11,10 +11,10 @@ import ru.kima.intelligentchat.data.chat.entities.ChatEntity
 @Dao
 interface ChatDao {
     @Insert
-    suspend fun insertChat(chatDao: ChatDao): Long
+    suspend fun insertChat(chatEntity: ChatEntity): Long
 
     @Update
-    suspend fun updateChat(chatDao: ChatDao)
+    suspend fun updateChat(chatEntity: ChatEntity)
 
     @Query("SELECT * FROM $CHATS_TABLE_NAME WHERE chat_id=:chatId")
     fun subscribeToChat(chatId: Long): Flow<ChatEntity>
