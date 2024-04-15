@@ -13,6 +13,8 @@ data class MessageEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "message_id")
     val messageId: Long,
+    @ColumnInfo(name = "chat_id")
+    val chatId: Long,
     @TypeConverters(SenderTypeConverter::class)
     val sender: SenderType,
     @ColumnInfo(name = "sender_id")
