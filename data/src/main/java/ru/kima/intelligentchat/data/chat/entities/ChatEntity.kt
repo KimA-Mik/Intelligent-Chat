@@ -2,8 +2,9 @@ package ru.kima.intelligentchat.data.chat.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import ru.kima.intelligentchat.data.CHATS_TABLE_NAME
 
-@Entity
+@Entity(tableName = CHATS_TABLE_NAME)
 data class ChatEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
