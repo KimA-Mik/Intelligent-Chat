@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 import ru.kima.intelligentchat.data.MESSAGES_TABLE_NAME
 
 @Entity(tableName = MESSAGES_TABLE_NAME)
-data class ChatMessageEntity(
+data class MessageEntity(
     @PrimaryKey(autoGenerate = true)
-    val chatMessageId: Long,
+    val messageId: Long,
     val sender: Int,
     val senderId: Long,
     val index: Int,
