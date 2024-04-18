@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import ru.kima.intelligentchat.data.MESSAGES_TABLE_NAME
-import ru.kima.intelligentchat.data.chat.types.sender.SenderType
 import ru.kima.intelligentchat.data.chat.types.sender.SenderTypeConverter
+import ru.kima.intelligentchat.data.chat.types.sender.SenderTypeDto
 
 @Entity(tableName = MESSAGES_TABLE_NAME)
 data class MessageEntity(
@@ -16,7 +16,7 @@ data class MessageEntity(
     @ColumnInfo(name = "chat_id")
     val chatId: Long,
     @TypeConverters(SenderTypeConverter::class)
-    val sender: SenderType,
+    val sender: SenderTypeDto,
     @ColumnInfo(name = "sender_id")
     val senderId: Long,
     val index: Int,
