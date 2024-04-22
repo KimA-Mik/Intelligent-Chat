@@ -1,6 +1,6 @@
 package ru.kima.intelligentchat.data.chat.types.sender
 
-enum class SenderType {
+enum class SenderTypeDto {
     Character,
     Persona,
 }

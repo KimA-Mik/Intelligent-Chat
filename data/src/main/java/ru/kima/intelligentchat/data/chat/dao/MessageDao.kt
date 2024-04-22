@@ -23,5 +23,17 @@ interface MessageDao {
 
     @Transaction
     @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId ORDER By `index`")
-    fun subscribeToChatMessages(chatId: Long): Flow<MessageWithSwipesDto>
+    fun chatWithMessages(chatId: Long): Flow<List<MessageWithSwipesDto>>
+
+    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId ORDER By `index`")
+    fun chatMessages(chatId: Long): Flow<List<MessageEntity>>
+
+    @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE message_id = :messageId")
+    suspend fun deleteMessage(messageId: Long): Int
+
+    @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE message_id IN (:messageIds)")
+    suspend fun deleteMessages(messageIds: List<Long>): Int
+
+    @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE chat_id = :chatId")
+    suspend fun deleteMessagesForChat(chatId: Long): Int
 }
