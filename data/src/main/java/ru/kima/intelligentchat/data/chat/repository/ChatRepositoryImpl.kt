@@ -2,9 +2,9 @@ package ru.kima.intelligentchat.data.chat.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import ru.kima.intelligentchat.data.chat.ChatNotFoundException
 import ru.kima.intelligentchat.data.chat.mappers.toChat
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
+import ru.kima.intelligentchat.domain.chat.ChatNotFoundException
 import ru.kima.intelligentchat.domain.chat.model.Chat
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 
