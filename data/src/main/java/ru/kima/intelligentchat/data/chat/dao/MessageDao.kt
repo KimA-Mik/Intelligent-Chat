@@ -23,5 +23,8 @@ interface MessageDao {
 
     @Transaction
     @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId ORDER By `index`")
-    fun subscribeToChatMessages(chatId: Long): Flow<List<MessageWithSwipesDto>>
+    fun subscribeToChatWithMessages(chatId: Long): Flow<List<MessageWithSwipesDto>>
+
+    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId ORDER By `index`")
+    fun subscribeToChatMessages(chatId: Long): Flow<List<MessageEntity>>
 }

@@ -17,5 +17,5 @@ interface ChatDao {
     suspend fun updateChat(chatEntity: ChatEntity)
 
     @Query("SELECT * FROM $CHATS_TABLE_NAME WHERE chat_id=:chatId")
-    fun subscribeToChat(chatId: Long): Flow<ChatEntity>
+    fun subscribeToChat(chatId: Long): Flow<ChatEntity?>
 }
