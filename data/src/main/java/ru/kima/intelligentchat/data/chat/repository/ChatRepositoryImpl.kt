@@ -23,4 +23,8 @@ class ChatRepositoryImpl(
                 it.toChat()
             }
     }
+
+    override suspend fun deleteChat(chatId: Long): Boolean {
+        return chatDao.deleteChat(chatId) > 0
+    }
 }

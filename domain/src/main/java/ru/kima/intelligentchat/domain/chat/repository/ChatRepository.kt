@@ -5,4 +5,5 @@ import ru.kima.intelligentchat.domain.chat.model.Chat
 
 interface ChatRepository {
     fun subscribeToChat(chatId: Long): Flow<Chat>
+    suspend fun deleteChat(chatId: Long): Boolean
 }
