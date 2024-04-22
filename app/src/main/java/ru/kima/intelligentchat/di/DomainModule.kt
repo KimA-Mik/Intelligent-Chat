@@ -12,6 +12,8 @@ import org.koin.java.KoinJavaComponent.get
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
 import ru.kima.intelligentchat.data.chat.repository.ChatRepositoryImpl
+import ru.kima.intelligentchat.data.chat.repository.MessageRepositoryImpl
+import ru.kima.intelligentchat.data.chat.repository.SwipeRepositoryImpl
 import ru.kima.intelligentchat.data.kobold.horde.HordeRepositoryImpl
 import ru.kima.intelligentchat.data.kobold.preset.repository.KoboldPresetRepositoryImpl
 import ru.kima.intelligentchat.data.persona.PersonaRepositoryImpl
@@ -28,6 +30,8 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCas
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
+import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
+import ru.kima.intelligentchat.domain.chat.repository.SwipeRepository
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
@@ -68,6 +72,8 @@ fun domain() = module {
     singleOf(::HordeRepositoryImpl) bind HordeRepository::class
     singleOf(::KoboldPresetRepositoryImpl) bind KoboldPresetRepository::class
     singleOf(::ChatRepositoryImpl) bind ChatRepository::class
+    singleOf(::MessageRepositoryImpl) bind MessageRepository::class
+    singleOf(::SwipeRepositoryImpl) bind SwipeRepository::class
 
     singleOf(::GetPreferencesUseCase)
     singleOf(::SetSelectedPersonaIdUseCase)

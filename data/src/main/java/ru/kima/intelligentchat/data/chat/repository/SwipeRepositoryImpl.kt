@@ -1,0 +1,21 @@
+package ru.kima.intelligentchat.data.chat.repository
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import ru.kima.intelligentchat.data.chat.entities.SwipeEntity
+import ru.kima.intelligentchat.data.chat.mappers.toSwipe
+import ru.kima.intelligentchat.data.common.DatabaseWrapper
+import ru.kima.intelligentchat.domain.chat.model.Swipe
+import ru.kima.intelligentchat.domain.chat.repository.SwipeRepository
+
+class SwipeRepositoryImpl(
+    wrapper: DatabaseWrapper
+) : SwipeRepository {
+    private val swipeDao = wrapper.database.swipeDao()
+
+    override fun subscribeSwipesForMessages(messagesId: List<Long>): Flow<List<Swipe>> {
+        return swipeDao
+            .selectSwipesForMessages(messagesId)
+            .map { it.map(SwipeEntity::toSwipe) }
+    }
+}
