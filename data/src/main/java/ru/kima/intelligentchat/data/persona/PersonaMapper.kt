@@ -12,7 +12,8 @@ fun PersonaEntity.toPersona(): Persona {
         charactersWordsCount = charactersWordsCount,
         personaMessages = personaMessages,
         charactersMessages = charactersMessages,
-        swipes = swipes
+        swipes = swipes,
+        deleted = deleted
     )
 }
 
@@ -26,7 +27,8 @@ fun Persona.toEntity(): PersonaEntity {
         charactersWordsCount = charactersWordsCount,
         personaMessages = personaMessages,
         charactersMessages = charactersMessages,
-        swipes = swipes
+        swipes = swipes,
+        deleted = deleted
     )
 }
 
