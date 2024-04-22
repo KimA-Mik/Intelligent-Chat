@@ -25,4 +25,13 @@ interface SwipeDao {
                 "(SELECT message_id FROM $MESSAGES_TABLE_NAME WHERE chat_id = :chatId)"
     )
     fun swipesForChat(chatId: Long): Flow<List<SwipeEntity>>
+
+    @Query("DELETE FROM $SWIPE_TABLE_NAME WHERE swipe_id = :swipeId")
+    suspend fun deleteSwipe(swipeId: Long): Int
+
+    @Query("DELETE FROM $SWIPE_TABLE_NAME WHERE message_id = :messageId")
+    suspend fun deleteSwipesForMessage(messageId: Long): Int
+
+    @Query("DELETE FROM $SWIPE_TABLE_NAME WHERE message_id IN (:messageIds)")
+    suspend fun deleteSwipesForMessages(messageIds: List<Long>): Int
 }

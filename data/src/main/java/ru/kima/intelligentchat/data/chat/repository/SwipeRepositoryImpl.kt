@@ -24,4 +24,16 @@ class SwipeRepositoryImpl(
             .swipesForChat(chatId)
             .map { it.map(SwipeEntity::toSwipe) }
     }
+
+    override suspend fun deleteSwipe(swipeId: Long): Boolean {
+        return swipeDao.deleteSwipe(swipeId) > 0
+    }
+
+    override suspend fun deleteSwipesForMessage(messageId: Long): Boolean {
+        return swipeDao.deleteSwipesForMessage(messageId) > 0
+    }
+
+    override suspend fun deleteSwipesForMessages(messageIds: List<Long>): Boolean {
+        return swipeDao.deleteSwipesForMessages(messageIds) > 0
+    }
 }
