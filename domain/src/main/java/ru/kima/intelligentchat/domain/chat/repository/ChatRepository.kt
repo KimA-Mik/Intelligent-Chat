@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 import ru.kima.intelligentchat.domain.chat.model.Chat
 
 interface ChatRepository {
-    fun subscribeToChat(chatId: Long): Flow<Chat?>
+    fun subscribeToChat(chatId: Long): Flow<Chat>
 }
