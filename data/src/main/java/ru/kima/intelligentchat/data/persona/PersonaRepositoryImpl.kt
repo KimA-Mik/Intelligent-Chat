@@ -50,7 +50,14 @@ class PersonaRepositoryImpl(
         persona.imageName?.let {
             imageStorage.deleteImage(it)
         }
-        personaDao.deletePersona(persona.id)
+        val entity = persona
+            .toEntity()
+            .copy(
+                description = String(),
+                imageFilePath = null,
+                deleted = true
+            )
+        personaDao.updatePersona(entity)
     }
 
     override suspend fun loadPersonaImage(id: Long): PersonaImage {
