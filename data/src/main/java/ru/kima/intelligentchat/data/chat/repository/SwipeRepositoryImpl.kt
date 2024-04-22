@@ -15,7 +15,13 @@ class SwipeRepositoryImpl(
 
     override fun subscribeSwipesForMessages(messagesId: List<Long>): Flow<List<Swipe>> {
         return swipeDao
-            .selectSwipesForMessages(messagesId)
+            .swipesForMessages(messagesId)
+            .map { it.map(SwipeEntity::toSwipe) }
+    }
+
+    override fun subscribeSwipesForChart(chatId: Long): Flow<List<Swipe>> {
+        return swipeDao
+            .swipesForChat(chatId)
             .map { it.map(SwipeEntity::toSwipe) }
     }
 }

@@ -5,4 +5,5 @@ import ru.kima.intelligentchat.domain.chat.model.Swipe
 
 interface SwipeRepository {
     fun subscribeSwipesForMessages(messagesId: List<Long>): Flow<List<Swipe>>
+    fun subscribeSwipesForChart(chatId: Long): Flow<List<Swipe>>
 }

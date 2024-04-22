@@ -32,6 +32,7 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
 import ru.kima.intelligentchat.domain.chat.repository.SwipeRepository
+import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToChatMessagesWithSwipesUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
@@ -121,6 +122,8 @@ fun domain() = module {
     singleOf(::GetKoboldPresetUseCase)
     singleOf(::SubscribeToKoboldPresetsUseCase)
     singleOf(::UpdateKoboldPresetUseCase)
+
+    singleOf(::SubscribeToChatMessagesWithSwipesUseCase)
 
     single {
         val context: Context = get(Context::class.java)
