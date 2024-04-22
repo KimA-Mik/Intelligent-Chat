@@ -4,10 +4,11 @@ import ru.kima.intelligentchat.data.chat.dto.MessageWithSwipesDto
 import ru.kima.intelligentchat.data.chat.entities.MessageEntity
 import ru.kima.intelligentchat.data.chat.entities.SwipeEntity
 import ru.kima.intelligentchat.domain.chat.model.Message
+import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.model.Swipe
 
-fun MessageWithSwipesDto.toMessage(): Message {
-    return Message(
+fun MessageWithSwipesDto.toMessage(): MessageWithSwipes {
+    return MessageWithSwipes(
         messageId = message.messageId,
         chatId = message.chatId,
         sender = message.sender.toSenderType(),
@@ -18,7 +19,7 @@ fun MessageWithSwipesDto.toMessage(): Message {
     )
 }
 
-fun Message.toDto(): MessageWithSwipesDto {
+fun MessageWithSwipes.toDto(): MessageWithSwipesDto {
     return MessageWithSwipesDto(
         message = MessageEntity(
             messageId = messageId,
@@ -29,5 +30,27 @@ fun Message.toDto(): MessageWithSwipesDto {
             selectedSwipeIndex = selectedSwipeIndex,
         ),
         swipes = swipes.map(Swipe::toEntity)
+    )
+}
+
+fun MessageEntity.toMessage(): Message {
+    return Message(
+        messageId = messageId,
+        chatId = chatId,
+        sender = sender.toSenderType(),
+        senderId = senderId,
+        index = index,
+        selectedSwipeIndex = selectedSwipeIndex,
+    )
+}
+
+fun Message.toMessage(): MessageEntity {
+    return MessageEntity(
+        messageId = messageId,
+        chatId = chatId,
+        sender = sender.toDto(),
+        senderId = senderId,
+        index = index,
+        selectedSwipeIndex = selectedSwipeIndex,
     )
 }
