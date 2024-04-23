@@ -9,5 +9,6 @@ data class Persona(
     val charactersWordsCount: Long = 0,
     val personaMessages: Long = 0,
     val charactersMessages: Long = 0,
-    val swipes: Long = 0
+    val swipes: Long = 0,
+    val deleted: Boolean = false
 )

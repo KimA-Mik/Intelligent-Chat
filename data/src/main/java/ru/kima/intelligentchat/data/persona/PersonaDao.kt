@@ -21,7 +21,7 @@ interface PersonaDao {
     @Query("SELECT * FROM $PERSONAS_TABLE_NAME WHERE id = :id")
     suspend fun selectPersona(id: Long): PersonaEntity
 
-    @Query("SELECT * FROM $PERSONAS_TABLE_NAME")
+    @Query("SELECT * FROM $PERSONAS_TABLE_NAME WHERE deleted = 0")
     fun selectPersonas(): Flow<List<PersonaEntity>>
 
     @Query("DELETE FROM $PERSONAS_TABLE_NAME WHERE id = :id")

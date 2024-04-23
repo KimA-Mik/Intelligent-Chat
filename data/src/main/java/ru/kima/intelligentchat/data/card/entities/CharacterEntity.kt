@@ -21,6 +21,8 @@ data class CharacterEntity(
     val creator: String = String(),
     val characterVersion: String = String(),
 //    val extensions: Record<string, any> // see details for explanation
+
+    val deleted: Boolean = false
 ) {
     //https://issuetracker.google.com/issues/70762008
     @Ignore
