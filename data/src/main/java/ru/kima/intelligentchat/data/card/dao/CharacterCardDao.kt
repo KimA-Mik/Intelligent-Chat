@@ -59,13 +59,19 @@ interface CharacterCardDao {
     @Query("SELECT * FROM CharacterEntity WHERE id = :id")
     fun selectCharacterCard(id: Long): Flow<CardEntity>
 
-    @Query("SELECT id, photoFilePath, name, creatorNotes, creator, characterVersion FROM CharacterEntity")
+    @Query("SELECT id, photoFilePath, name, creatorNotes, creator, characterVersion FROM CharacterEntity WHERE deleted = 0")
     fun getCharacterListEntries(): Flow<List<CardListItemEntity>>
 
     @Transaction
     suspend fun deleteTransaction(id: Long) {
         deleteCharacterCardById(id)
         deleteGreetings(id)
+    }
+
+    @Transaction
+    suspend fun softDeleteTransaction(character: CharacterEntity) {
+        updateCharacterCard(character)
+        deleteGreetings(character.id)
     }
 
     @Query("DELETE FROM CharacterEntity WHERE id = :id")

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import ru.kima.intelligentchat.data.card.entities.AltGreetingEntity
 import ru.kima.intelligentchat.data.card.entities.CardEntity
+import ru.kima.intelligentchat.data.card.entities.CharacterEntity
 import ru.kima.intelligentchat.data.card.mappers.toCharacterCard
 import ru.kima.intelligentchat.data.card.mappers.toEntity
 import ru.kima.intelligentchat.data.card.mappers.toEntry
@@ -74,11 +75,19 @@ class CharacterCardRepositoryImpl(
     }
 
     override suspend fun deleteCard(card: CharacterCard) {
-        val entity = card.toEntity()
-        entity.character.photoFilePath?.let {
-            imageStorage.deleteImage(it)
+        card.photoBytes?.let {
+            val name = getCardPhotoName(card.id)
+            imageStorage.deleteImage(name)
         }
-        cardDao.deleteTransaction(entity.character.id)
+
+        val deleted = CharacterEntity(
+            id = card.id,
+            name = card.name,
+            deleted = true
+        )
+
+        cardDao.softDeleteTransaction(deleted)
+//        cardDao.deleteTransaction(entity.character.id)
     }
 
     override suspend fun updateCardAvatar(cardId: Long, bytes: ByteArray) {
