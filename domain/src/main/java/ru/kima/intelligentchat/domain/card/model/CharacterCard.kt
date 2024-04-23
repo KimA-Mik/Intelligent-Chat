@@ -26,4 +26,6 @@ data class CharacterCard(
     val creator: String = String(),
     val characterVersion: String = String(),
 //    val extensions: Record<string, any> // see details for explanation
+
+    val deleted: Boolean = false
 )

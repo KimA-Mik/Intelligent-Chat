@@ -15,8 +15,8 @@ suspend fun CardEntity.toCharacterCard(
     imageStorage: ImageStorage, tags: List<String> = emptyList()
 ): CharacterCard {
     return CharacterCard(
-        character.id,
-        character.photoFilePath?.let {
+        id = character.id,
+        photoBytes = character.photoFilePath?.let {
             coroutineScope {
                 val job = async(Dispatchers.Unconfined, start = CoroutineStart.LAZY) {
                     val image = imageStorage.getImage(it)
@@ -25,19 +25,20 @@ suspend fun CardEntity.toCharacterCard(
                 job.await()
             }
         },
-        character.name,
-        character.description,
-        character.personality,
-        character.scenario,
-        character.firstMes,
-        character.mesExample,
-        character.creatorNotes,
-        character.systemPrompt,
-        character.postHistoryInstructions,
-        altGreetings.map { it.toAltGreeting() },
-        tags,
-        character.creator,
-        character.characterVersion
+        name = character.name,
+        description = character.description,
+        personality = character.personality,
+        scenario = character.scenario,
+        firstMes = character.firstMes,
+        mesExample = character.mesExample,
+        creatorNotes = character.creatorNotes,
+        systemPrompt = character.systemPrompt,
+        postHistoryInstructions = character.postHistoryInstructions,
+        alternateGreetings = altGreetings.map { it.toAltGreeting() },
+        tags = tags,
+        creator = character.creator,
+        characterVersion = character.characterVersion,
+        deleted = character.deleted
     )
 }
 
@@ -55,6 +56,7 @@ fun CharacterCard.toEntity(): CardEntity {
         systemPrompt = systemPrompt,
         postHistoryInstructions = postHistoryInstructions,
         creator = creator,
-        characterVersion = characterVersion
+        characterVersion = characterVersion,
+        deleted = deleted,
     ), altGreetings = alternateGreetings.map { it.toEntity(id) })
 }
