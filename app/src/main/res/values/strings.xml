@@ -24,6 +24,7 @@
 
     <string name="tokens_count">Tokens: %1$d</string>
 
+    <string name="nav_item_chat">Chat</string>
     <string name="nav_item_characters">Characters</string>
     <string name="nav_item_personas">Personas</string>
     <string name="nav_item_connection">Connection</string>

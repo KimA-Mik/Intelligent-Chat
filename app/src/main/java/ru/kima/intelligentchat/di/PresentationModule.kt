@@ -5,6 +5,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsViewModel
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.CharactersListViewModel
+import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenViewModel
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewViewModel
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.HordePresetEditViewModel
@@ -26,6 +27,8 @@ fun presentation() = module {
 
     viewModelOf(::ConnectionOverviewViewModel)
     viewModelOf(::HordePresetEditViewModel)
+
+    viewModelOf(::ChatScreenViewModel)
 
     singleOf(::HordeConfigService)
 }
