@@ -88,4 +88,7 @@
     <string name="top_and_min_p_title">Top P <![CDATA[&]]> Min P</string>
     <string name="save_preset">Save preset</string>
 
+    <!--    Chat Screen    -->
+    <string name="placeholder_enter_your_message">Enter your message</string>
+
 </resources>

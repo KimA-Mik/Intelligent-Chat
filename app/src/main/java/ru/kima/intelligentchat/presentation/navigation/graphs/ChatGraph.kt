@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreen
+import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenState
 import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenViewModel
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.navigation.NavItem
@@ -23,7 +24,7 @@ fun NavGraphBuilder.chatGraph(
 ) = navigation(startDestination = "chatScreen", route = NavItem.Chat.root) {
     composable("chatScreen") {
         val viewModel: ChatScreenViewModel = koinViewModel()
-        val state by viewModel.state.collectAsStateWithLifecycle()
+        val state by viewModel.state.collectAsStateWithLifecycle(ChatScreenState())
         val onEvent = remember<(UserEvent) -> Unit> {
             {
                 viewModel.onEvent(it)
@@ -36,6 +37,8 @@ fun NavGraphBuilder.chatGraph(
         ) {
             ChatScreen(
                 state = state,
+                drawerState = drawerState,
+                snackbarHostState = snackbarHostState,
                 onEvent = onEvent
             )
         }
