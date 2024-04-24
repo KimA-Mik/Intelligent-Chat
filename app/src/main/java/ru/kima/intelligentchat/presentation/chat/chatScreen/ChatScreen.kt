@@ -10,8 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.RememberMe
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,6 +82,12 @@ fun ChatScreen(
                         )
                     }
                 },
+                actions = {
+                    SimpleDropdownMenu(
+                        menuItems = dropdownMenuItems(),
+                        iconVector = Icons.Default.MoreVert
+                    )
+                },
                 scrollBehavior = remember { scrollBehavior }
             )
         },
@@ -97,6 +109,33 @@ fun ChatScreen(
 }
 
 @Composable
+private fun dropdownMenuItems() = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            R.string.menu_item_chat_instances,
+            onClick = {},
+            iconVector = Icons.Default.Feedback
+        ),
+    )
+}
+
+@Composable
+private fun moreMenuItems() = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            R.string.menu_item_impersonate,
+            onClick = {},
+            iconVector = Icons.Default.RememberMe
+        ),
+        SimpleDropDownMenuItem(
+            R.string.menu_item_count_tokens,
+            onClick = {},
+            iconVector = Icons.Default.Numbers
+        )
+    )
+}
+
+@Composable
 fun ChatBottomBar(
     value: String,
     onValueChange: (String) -> Unit
@@ -108,12 +147,11 @@ fun ChatBottomBar(
             .heightIn(max = 150.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { }) {
-            Icon(
-                imageVector = Icons.Filled.MoreHoriz,
-                contentDescription = null
-            )
-        }
+        SimpleDropdownMenu(
+            menuItems = moreMenuItems(),
+            iconVector = Icons.Default.MoreHoriz
+        )
+
         ChatTextField(
             value = value,
             modifier = Modifier.weight(1f),
@@ -122,7 +160,7 @@ fun ChatBottomBar(
         )
         IconButton(onClick = { }) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send,
+                imageVector = Icons.AutoMirrored.Default.Send,
                 contentDescription = null
             )
         }
