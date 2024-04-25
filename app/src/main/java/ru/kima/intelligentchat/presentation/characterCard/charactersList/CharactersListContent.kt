@@ -109,7 +109,7 @@ private fun CharactersList(
                     onEvent(CharactersListUserEvent.ShowCardAvatar(card.id))
                 },
                 onCardClick = {
-
+                    onEvent(CharactersListUserEvent.OpenCardChat(card.id))
                 })
         }
     }

@@ -25,4 +25,5 @@ sealed interface CharactersListUserEvent {
     data object AcceptInitialPersonaName : CharactersListUserEvent
     data object DismissInitialPersonaName : CharactersListUserEvent
     data object OnMenuButtonClicked : CharactersListUserEvent
+    data class OpenCardChat(val cardId: Long) : CharactersListUserEvent
 }
