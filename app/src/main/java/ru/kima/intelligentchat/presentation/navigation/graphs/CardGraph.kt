@@ -23,6 +23,7 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.navigation.NavItem
 import ru.kima.intelligentchat.presentation.navigation.NavigationDrawer
 
+const val CARD_ID_ARGUMENT = "cardId"
 fun NavGraphBuilder.cardGraph(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
@@ -44,9 +45,9 @@ fun NavGraphBuilder.cardGraph(
             }
         }
         composable(
-            route = "cards/{cardId}/edit",
+            route = "cards/{$CARD_ID_ARGUMENT}/edit",
             arguments = listOf(
-                navArgument(name = "cardId") {
+                navArgument(name = CARD_ID_ARGUMENT) {
                     type = NavType.LongType
                     defaultValue = -1L
                 }
@@ -56,9 +57,9 @@ fun NavGraphBuilder.cardGraph(
         }
 
         composable(
-            route = "cards/{cardId}/chat",
+            route = "cards/{$CARD_ID_ARGUMENT}/chat",
             arguments = listOf(
-                navArgument(name = "cardId") {
+                navArgument(name = CARD_ID_ARGUMENT) {
                     type = NavType.LongType
                     defaultValue = -1L
                 }

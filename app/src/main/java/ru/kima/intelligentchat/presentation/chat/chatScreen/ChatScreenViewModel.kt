@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
+import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
 class ChatScreenViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -27,6 +28,10 @@ class ChatScreenViewModel(
             inputMessageBuffer = inputMessageBuffer,
             messages = messages
         )
+    }
+
+    init {
+        val id = savedStateHandle.get<Long>(CARD_ID_ARGUMENT)
     }
 
 
