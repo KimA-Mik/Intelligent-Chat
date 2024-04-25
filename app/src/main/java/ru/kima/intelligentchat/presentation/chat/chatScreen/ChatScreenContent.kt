@@ -12,15 +12,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Feedback
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.RememberMe
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -45,7 +42,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
@@ -56,7 +54,7 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 @Composable
 fun ChatScreenContent(
     state: ChatScreenState.ChatState,
-    drawerState: DrawerState,
+    navController: NavController,
     snackbarHostState: SnackbarHostState,
     onEvent: (UserEvent) -> Unit
 ) {
@@ -74,13 +72,11 @@ fun ChatScreenContent(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        scope.launch {
-                            drawerState.open()
-                        }
+                        navController.popBackStack()
                     }) {
                         Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Navigation menu"
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
                         )
                     }
                 },
@@ -232,7 +228,7 @@ private fun ChatScreenPreview() {
     IntelligentChatTheme {
         ChatScreenContent(
             state = ChatScreenState.ChatState(),
-            drawerState = rememberDrawerState(DrawerValue.Closed),
+            navController = rememberNavController(),
             snackbarHostState = SnackbarHostState(),
             onEvent = {}
         )

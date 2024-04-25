@@ -78,7 +78,7 @@ fun NavGraphBuilder.cardGraph(
             ) {
                 ChatScreen(
                     state = state,
-                    drawerState = drawerState,
+                    navController = navController,
                     snackbarHostState = snackbarHostState,
                     onEvent = onEvent
                 )
