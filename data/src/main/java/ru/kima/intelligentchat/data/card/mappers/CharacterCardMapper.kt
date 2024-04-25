@@ -38,7 +38,8 @@ suspend fun CardEntity.toCharacterCard(
         tags = tags,
         creator = character.creator,
         characterVersion = character.characterVersion,
-        deleted = character.deleted
+        deleted = character.deleted,
+        selectedChat = character.selectedChat
     )
 }
 

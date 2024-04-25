@@ -22,7 +22,8 @@ data class CharacterEntity(
     val characterVersion: String = String(),
 //    val extensions: Record<string, any> // see details for explanation
 
-    val deleted: Boolean = false
+    val deleted: Boolean = false,
+    val selectedChat: Long = 0
 ) {
     //https://issuetracker.google.com/issues/70762008
     @Ignore
