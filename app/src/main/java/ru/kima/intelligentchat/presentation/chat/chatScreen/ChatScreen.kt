@@ -103,6 +103,7 @@ fun ChatScreen(
             state = state,
             modifier = Modifier
                 .padding(padding)
+                .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
         )
     }
@@ -205,19 +206,6 @@ fun ChatTextField(
     }
 }
 
-
-@Composable
-fun ChatScreenContent(
-    state: ChatScreenState,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Now selected persona is ${state.selectedPersona}")
-    }
-}
 
 @Preview
 @Composable
