@@ -94,7 +94,7 @@ class CharactersListViewModel(
 
     fun onUserEvent(event: CharactersListUserEvent) {
         when (event) {
-            is CharactersListUserEvent.CardSelected -> onCardSelected(event.cardId)
+            is CharactersListUserEvent.EditCardClicked -> onEditCardClicked(event.cardId)
             is CharactersListUserEvent.AddCardFromImage -> addCardFromPng(event.imageBytes)
             CharactersListUserEvent.AddCardFromImageClicked -> onAddCardFromImageClicked()
             CharactersListUserEvent.CreateCardClicked -> createEmptyCardClicked()
@@ -107,7 +107,7 @@ class CharactersListViewModel(
         }
     }
 
-    private fun onCardSelected(cardId: Long) {
+    private fun onEditCardClicked(cardId: Long) {
         viewModelScope.launch { _uiEvents.emit(CharactersListUiEvent.NavigateToCard(cardId)) }
     }
 

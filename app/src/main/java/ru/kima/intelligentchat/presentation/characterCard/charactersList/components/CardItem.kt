@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -15,18 +17,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun CardItem(
     card: ImmutableCardEntry,
     modifier: Modifier = Modifier,
+    dropDownMenuItems: List<SimpleDropDownMenuItem> = emptyList(),
     onAvatarClick: () -> Unit,
     onCardClick: () -> Unit
 ) {
@@ -51,13 +58,19 @@ fun CardItem(
                     .padding(8.dp),
                 style = MaterialTheme.typography.titleMedium
             )
+            Column(horizontalAlignment = Alignment.End) {
 
-            Text(
-                text = card.characterVersion,
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                Text(
+                    text = card.characterVersion,
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                if (dropDownMenuItems.isNotEmpty()) {
+                    SimpleDropdownMenu(menuItems = dropDownMenuItems)
+                }
+            }
         }
         Text(
             text = card.creatorNotes,
@@ -85,6 +98,13 @@ fun PreviewCardItem() {
                     characterVersion = "main"
                 ),
                 modifier = Modifier.padding(8.dp),
+                dropDownMenuItems = listOf(
+                    SimpleDropDownMenuItem(
+                        textId = R.string.menu_item_edit_card,
+                        onClick = {},
+                        iconVector = Icons.Default.Create
+                    )
+                ),
                 onAvatarClick = {},
                 onCardClick = {}
             )

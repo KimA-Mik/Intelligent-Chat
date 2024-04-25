@@ -1,7 +1,7 @@
 package ru.kima.intelligentchat.presentation.characterCard.charactersList.events
 
 sealed interface CharactersListUserEvent {
-    data class CardSelected(val cardId: Long) : CharactersListUserEvent
+    data class EditCardClicked(val cardId: Long) : CharactersListUserEvent
     data object AddCardFromImageClicked : CharactersListUserEvent
     data object CreateCardClicked : CharactersListUserEvent
     data class SearchQueryChanged(val query: String) : CharactersListUserEvent
