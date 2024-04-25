@@ -1,7 +1,15 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen
 
-data class ChatScreenState(
-    val selectedPersona: Long = 0,
-    val inputMessageBuffer: String = String(),
-    val messages: List<Long> = emptyList()
-)
+import ru.kima.intelligentchat.domain.card.model.CharacterCard
+
+
+sealed interface ChatScreenState {
+    data class ChatState(
+        val characterCard: CharacterCard = CharacterCard(),
+        val inputMessageBuffer: String = String(),
+        val messages: List<Long> = emptyList()
+    ) : ChatScreenState
+
+    data object ErrorState : ChatScreenState
+}
+
