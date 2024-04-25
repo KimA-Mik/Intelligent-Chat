@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.presentation.navigation.graphs.cardGraph
+import ru.kima.intelligentchat.presentation.navigation.graphs.chatGraph
 import ru.kima.intelligentchat.presentation.navigation.graphs.connectionGraph
 import ru.kima.intelligentchat.presentation.navigation.graphs.personasGraph
 import ru.kima.intelligentchat.presentation.showImage.ShowImageScreen
@@ -26,6 +27,7 @@ fun ChatNavHost(
         cardGraph(navController, snackbarHostState, drawerState)
         personasGraph(navController, snackbarHostState, drawerState)
         connectionGraph(navController, snackbarHostState, drawerState)
+        chatGraph(navController, snackbarHostState, drawerState)
         composable(route = "image/{cardId}", arguments = listOf(
             navArgument(name = "cardId") {
                 type = NavType.LongType

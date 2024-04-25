@@ -24,6 +24,7 @@
 
     <string name="tokens_count">Tokens: %1$d</string>
 
+    <string name="nav_item_chat">Chat</string>
     <string name="nav_item_characters">Characters</string>
     <string name="nav_item_personas">Personas</string>
     <string name="nav_item_connection">Connection</string>
@@ -86,5 +87,12 @@
     <string name="repetition_penalty_slope_title">Repetition Penalty Slope</string>
     <string name="top_and_min_p_title">Top P <![CDATA[&]]> Min P</string>
     <string name="save_preset">Save preset</string>
+
+    <!--    Chat Screen    -->
+    <string name="menu_item_chat_instances">Chat instances</string>
+
+    <string name="menu_item_impersonate">Impersonate</string>
+    <string name="menu_item_count_tokens">Count tokens</string>
+    <string name="placeholder_enter_your_message">Enter your message</string>
 
 </resources>
