@@ -3,8 +3,9 @@ package ru.kima.intelligentchat.data.card.entities
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import ru.kima.intelligentchat.data.CARDS_TABLE_NAME
 
-@Entity
+@Entity(tableName = CARDS_TABLE_NAME)
 data class CharacterEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
