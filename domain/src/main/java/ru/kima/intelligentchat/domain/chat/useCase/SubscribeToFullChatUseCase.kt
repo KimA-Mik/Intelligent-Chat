@@ -11,6 +11,7 @@ import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 
+//TODO: clear up unused use cases
 class SubscribeToFullChatUseCase(
     private val chatRepository: ChatRepository,
     private val chatMessages: SubscribeToChatMessagesWithSwipesUseCase
