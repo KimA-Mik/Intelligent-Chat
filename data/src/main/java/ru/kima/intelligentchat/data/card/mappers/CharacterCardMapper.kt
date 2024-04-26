@@ -39,7 +39,8 @@ suspend fun CardEntity.toCharacterCard(
         creator = character.creator,
         characterVersion = character.characterVersion,
         deleted = character.deleted,
-        selectedChat = character.selectedChat
+        selectedChat = character.selectedChat,
+        selectedGreeting = character.selectedGreeting
     )
 }
 
@@ -59,5 +60,7 @@ fun CharacterCard.toEntity(): CardEntity {
         creator = creator,
         characterVersion = characterVersion,
         deleted = deleted,
+        selectedChat = selectedChat,
+        selectedGreeting = selectedGreeting
     ), altGreetings = alternateGreetings.map { it.toEntity(id) })
 }

@@ -28,5 +28,6 @@ data class CharacterCard(
 //    val extensions: Record<string, any> // see details for explanation
 
     val deleted: Boolean = false,
-    val selectedChat: Long = 0
+    val selectedChat: Long = 0,
+    val selectedGreeting: Int = 1
 )
