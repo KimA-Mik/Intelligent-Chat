@@ -8,4 +8,5 @@ interface ChatRepository {
     fun subscribeToChat(chatId: Long): Flow<Chat>
     fun subscribeToCardChat(cardId: Long): Flow<FullChat>
     suspend fun deleteChat(chatId: Long): Boolean
+    suspend fun insertChat(chat: Chat): Long
 }
