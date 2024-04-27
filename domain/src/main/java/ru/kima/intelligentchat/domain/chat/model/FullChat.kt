@@ -1,10 +1,10 @@
 package ru.kima.intelligentchat.domain.chat.model
 
 data class FullChat(
-    val chatId: Long,
-    val title: String,
-    val cardId: Long,
-    val messages: List<MessageWithSwipes>
+    val chatId: Long = 0,
+    val title: String = String(),
+    val cardId: Long = 0,
+    val messages: List<MessageWithSwipes> = emptyList()
 ) {
     companion object {
         fun fromChatAndMessages(chat: Chat, messages: List<MessageWithSwipes>): FullChat {

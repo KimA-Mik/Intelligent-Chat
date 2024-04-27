@@ -94,7 +94,8 @@ class CharactersListViewModel(
 
     fun onUserEvent(event: CharactersListUserEvent) {
         when (event) {
-            is CharactersListUserEvent.CardSelected -> onCardSelected(event.cardId)
+            is CharactersListUserEvent.EditCardClicked -> onEditCardClicked(event.cardId)
+            is CharactersListUserEvent.OpenCardChat -> onOpenCardChat(event.cardId)
             is CharactersListUserEvent.AddCardFromImage -> addCardFromPng(event.imageBytes)
             CharactersListUserEvent.AddCardFromImageClicked -> onAddCardFromImageClicked()
             CharactersListUserEvent.CreateCardClicked -> createEmptyCardClicked()
@@ -107,8 +108,12 @@ class CharactersListViewModel(
         }
     }
 
-    private fun onCardSelected(cardId: Long) {
-        viewModelScope.launch { _uiEvents.emit(CharactersListUiEvent.NavigateToCard(cardId)) }
+    private fun onEditCardClicked(cardId: Long) = viewModelScope.launch {
+        _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(cardId))
+    }
+
+    private fun onOpenCardChat(cardId: Long) = viewModelScope.launch {
+        _uiEvents.emit(CharactersListUiEvent.NavigateToCardChat(cardId))
     }
 
     private fun addCardFromPng(png: ByteArray) {
@@ -120,7 +125,7 @@ class CharactersListViewModel(
 
                 is Resource.Loading -> {}
                 is Resource.Success -> {
-                    _uiEvents.emit(CharactersListUiEvent.NavigateToCard(resource.data!!))
+                    _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(resource.data!!))
                 }
             }
         }.launchIn(viewModelScope)
@@ -135,7 +140,7 @@ class CharactersListViewModel(
     private fun createEmptyCardClicked() {
         viewModelScope.launch {
             val cardId = putCard(CharacterCard())
-            _uiEvents.emit(CharactersListUiEvent.NavigateToCard(cardId))
+            _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(cardId))
         }
     }
 

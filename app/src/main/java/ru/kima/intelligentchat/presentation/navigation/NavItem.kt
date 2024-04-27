@@ -2,9 +2,7 @@ package ru.kima.intelligentchat.presentation.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.outlined.Article
-import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.filled.Contactless
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Contactless
@@ -18,12 +16,12 @@ enum class NavItem(
     val unselectedIcon: ImageVector,
     val root: String
 ) {
-    Chat(
-        titleId = R.string.nav_item_chat,
-        selectedIcon = Icons.AutoMirrored.Filled.Chat,
-        unselectedIcon = Icons.AutoMirrored.Outlined.Chat,
-        root = "chatRoot"
-    ),
+    //    Chat(
+//        titleId = R.string.nav_item_chat,
+//        selectedIcon = Icons.AutoMirrored.Filled.Chat,
+//        unselectedIcon = Icons.AutoMirrored.Outlined.Chat,
+//        root = "chatRoot"
+//    ),
     Characters(
         titleId = R.string.nav_item_characters,
         selectedIcon = Icons.AutoMirrored.Filled.Article,

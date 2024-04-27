@@ -32,6 +32,8 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
 import ru.kima.intelligentchat.domain.chat.repository.SwipeRepository
+import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToChatMessagesWithSwipesUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
@@ -124,6 +126,8 @@ fun domain() = module {
     singleOf(::SubscribeToKoboldPresetsUseCase)
     singleOf(::UpdateKoboldPresetUseCase)
 
+    singleOf(::CreateAndSelectChatUseCase)
+    singleOf(::SubscribeToCardChatUseCase)
     singleOf(::SubscribeToChatMessagesWithSwipesUseCase)
     singleOf(::SubscribeToFullChatUseCase)
 

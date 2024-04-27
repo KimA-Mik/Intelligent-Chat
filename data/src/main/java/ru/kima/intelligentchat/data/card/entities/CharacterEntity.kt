@@ -3,8 +3,9 @@ package ru.kima.intelligentchat.data.card.entities
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import ru.kima.intelligentchat.data.CARDS_TABLE_NAME
 
-@Entity
+@Entity(tableName = CARDS_TABLE_NAME)
 data class CharacterEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
@@ -22,7 +23,9 @@ data class CharacterEntity(
     val characterVersion: String = String(),
 //    val extensions: Record<string, any> // see details for explanation
 
-    val deleted: Boolean = false
+    val deleted: Boolean = false,
+    val selectedChat: Long = 0,
+    val selectedGreeting: Int = 1,
 ) {
     //https://issuetracker.google.com/issues/70762008
     @Ignore

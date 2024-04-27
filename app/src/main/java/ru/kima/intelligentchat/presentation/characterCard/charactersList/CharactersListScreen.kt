@@ -52,7 +52,8 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
-import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCard
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChat
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardEdit
 import ru.kima.intelligentchat.presentation.navigation.navigateToCardImage
 
 @Composable
@@ -81,8 +82,11 @@ fun CharactersListScreen(
     LaunchedEffect(true) {
         viewModel.uiEvents.collect { event ->
             when (event) {
-                is CharactersListUiEvent.NavigateToCard ->
-                    navController.navigateToCard(event.cardId)
+                is CharactersListUiEvent.NavigateToCardEdit ->
+                    navController.navigateToCardEdit(event.cardId)
+
+                is CharactersListUiEvent.NavigateToCardChat ->
+                    navController.navigateToCardChat(event.cardId)
 
                 is CharactersListUiEvent.SnackbarMessage ->
                     scope.launch {
@@ -101,6 +105,7 @@ fun CharactersListScreen(
                 CharactersListUiEvent.OpenNavigationDrawer -> scope.launch {
                     drawerState.open()
                 }
+
             }
         }
     }

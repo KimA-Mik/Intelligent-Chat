@@ -2,6 +2,7 @@ package ru.kima.intelligentchat.data
 
 const val DATABASE_NAME = "intelligent_database"
 
+const val CARDS_TABLE_NAME = "cards"
 const val TAGS_TABLE_NAME = "tags"
 const val CARD_TAGS_TABLE_NAME = "characters_tags"
 const val PERSONAS_TABLE_NAME = "personas"
