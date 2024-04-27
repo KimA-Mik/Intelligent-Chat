@@ -73,14 +73,14 @@ fun ChatScreenContent(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        state.characterCard.photoBytes?.let {
+                        state.info.characterCard.image.bitmap?.let {
                             CardImage(image = ImmutableBitmap(it),
                                 modifier = Modifier.size(40.dp),
                                 onClick = {}
                             )
                         }
                         Text(
-                            text = state.characterCard.name,
+                            text = state.info.characterCard.name,
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 2
@@ -115,7 +115,7 @@ fun ChatScreenContent(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         Messages(
-            state = state,
+            state = state.info,
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
@@ -156,14 +156,15 @@ private fun moreMenuItems() = remember {
 
 @Composable
 fun Messages(
-    state: ChatScreenState.ChatState,
+    state: ChatScreenState.ChatState.ChatInfo,
     modifier: Modifier
 ) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(state.messages) {
+        items(state.fullChat.messages,
+            key = { it.messageId }) {
             Text(text = it.toString())
         }
     }
