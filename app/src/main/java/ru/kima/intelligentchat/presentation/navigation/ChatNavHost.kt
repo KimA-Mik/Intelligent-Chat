@@ -22,9 +22,10 @@ fun ChatNavHost(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
+    extended: Boolean
 ) {
     NavHost(navController = navController, startDestination = NavItem.entries.first().root) {
-        cardGraph(navController, snackbarHostState, drawerState)
+        cardGraph(navController, snackbarHostState, drawerState, extended)
         personasGraph(navController, snackbarHostState, drawerState)
         connectionGraph(navController, snackbarHostState, drawerState)
         chatGraph(navController, snackbarHostState, drawerState)

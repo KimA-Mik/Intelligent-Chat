@@ -35,10 +35,11 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 fun CharactersListContent(
     modifier: Modifier = Modifier,
     state: CharactersListState,
+    expanded: Boolean,
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
     BoxWithConstraints(modifier) {
-        SearchField(state.searchText, state.personaImage, onEvent)
+        SearchField(state.searchText, state.personaImage, expanded, onEvent)
         CharactersList(state.cards, onEvent)
     }
 }
@@ -48,6 +49,7 @@ fun CharactersListContent(
 fun SearchField(
     query: String,
     personaImage: PersonaImageContainer,
+    expanded: Boolean,
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
     SearchBar(
@@ -65,8 +67,10 @@ fun SearchField(
         },
         onActiveChange = {},
         leadingIcon = {
-            IconButton(onClick = { onEvent(CharactersListUserEvent.OnMenuButtonClicked) }) {
-                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Open menu")
+            if (!expanded) {
+                IconButton(onClick = { onEvent(CharactersListUserEvent.OnMenuButtonClicked) }) {
+                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "Open menu")
+                }
             }
         },
         trailingIcon = {
@@ -131,7 +135,10 @@ fun CharactersListPreview() {
                     creatorNotes = "Notes $index"
                 )
             }
-            CharactersListContent(state = CharactersListState(cards)) {
+            CharactersListContent(
+                state = CharactersListState(cards),
+                expanded = false
+            ) {
 
             }
         }

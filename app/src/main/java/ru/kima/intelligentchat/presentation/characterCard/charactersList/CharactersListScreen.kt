@@ -61,7 +61,8 @@ fun CharactersListScreen(
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
     imagePicker: ImagePicker,
-    viewModel: CharactersListViewModel
+    viewModel: CharactersListViewModel,
+    expanded: Boolean
 ) {
     val onEvent = remember<(CharactersListUserEvent) -> Unit> {
         {
@@ -143,7 +144,9 @@ fun CharactersListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            state = state, onEvent = onEvent
+            state = state,
+            expanded = expanded,
+            onEvent = onEvent
         )
     }
 }
