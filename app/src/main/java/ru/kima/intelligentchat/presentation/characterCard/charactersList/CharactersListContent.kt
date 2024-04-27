@@ -3,7 +3,7 @@ package ru.kima.intelligentchat.presentation.characterCard.charactersList
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,14 +22,17 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.components.CardItem
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImage
 import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -37,7 +41,7 @@ fun CharactersListContent(
     state: CharactersListState,
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
-    BoxWithConstraints(modifier) {
+    Box(modifier) {
         SearchField(state.searchText, state.personaImage, onEvent)
         CharactersList(state.cards, onEvent)
     }
@@ -100,16 +104,30 @@ private fun CharactersList(
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .animateItemPlacement(),
+                dropDownMenuItems = itemDropDownMenuItems(id = card.id, onEvent = onEvent),
                 onAvatarClick = {
                     onEvent(CharactersListUserEvent.ShowCardAvatar(card.id))
                 },
                 onCardClick = {
-                    onEvent(CharactersListUserEvent.CardSelected(card.id))
+                    onEvent(CharactersListUserEvent.OpenCardChat(card.id))
                 })
         }
     }
 }
 
+@Composable
+private fun itemDropDownMenuItems(
+    id: Long,
+    onEvent: (CharactersListUserEvent) -> Unit
+) = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_edit_card,
+            onClick = { onEvent(CharactersListUserEvent.EditCardClicked(id)) },
+            iconVector = Icons.Default.Create
+        )
+    )
+}
 
 @Preview(name = "Characters List Preview light theme")
 @Preview(

@@ -31,6 +31,7 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.Car
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.toImmutable
+import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
 @OptIn(FlowPreview::class)
 class CardDetailsViewModel(
@@ -80,7 +81,7 @@ class CardDetailsViewModel(
     private var greetingToDelete = 0L
 
     init {
-        val id = savedStateHandle.get<Long>(CardField.Id.string)
+        val id = savedStateHandle.get<Long>(CARD_ID_ARGUMENT)
         viewModelScope.launch {
             if (id == null || id == 0L) {
                 _uiEvents.emit(UiEvent.PopBack)

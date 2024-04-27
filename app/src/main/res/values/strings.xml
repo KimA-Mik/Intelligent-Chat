@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Intelligent Chat</string>
 
+    <!--  Cards list screen  -->
+    <string name="menu_item_edit_card">Edit card</string>
+
     <string name="no_such_card">There is no such card.</string>
     <string name="no_card_photo">The card has no photo.</string>
     <string name="delete_card_dialog_title">Delete card?</string>

@@ -3,7 +3,8 @@ package ru.kima.intelligentchat.presentation.characterCard.charactersList.events
 import ru.kima.intelligentchat.R
 
 sealed interface CharactersListUiEvent {
-    data class NavigateToCard(val cardId: Long) : CharactersListUiEvent
+    data class NavigateToCardEdit(val cardId: Long) : CharactersListUiEvent
+    data class NavigateToCardChat(val cardId: Long) : CharactersListUiEvent
     data class ShowCardImage(val cardId: Long) : CharactersListUiEvent
     data class SnackbarMessage(val message: String) : CharactersListUiEvent
     data object SelectPngImage : CharactersListUiEvent

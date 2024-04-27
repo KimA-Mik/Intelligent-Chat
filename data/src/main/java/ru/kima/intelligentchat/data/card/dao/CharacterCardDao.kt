@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import ru.kima.intelligentchat.data.ALT_GREETING_TABLE_NAME
+import ru.kima.intelligentchat.data.CARDS_TABLE_NAME
 import ru.kima.intelligentchat.data.card.entities.AltGreetingEntity
 import ru.kima.intelligentchat.data.card.entities.CardEntity
 import ru.kima.intelligentchat.data.card.entities.CardListItemEntity
@@ -48,18 +49,18 @@ interface CharacterCardDao {
         }
     }
 
-    @Query("UPDATE CharacterEntity SET photoFilePath=:photoFilePath WHERE id = :id")
+    @Query("UPDATE $CARDS_TABLE_NAME SET photoFilePath=:photoFilePath WHERE id = :id")
     suspend fun updatePhotoFilePath(id: Long, photoFilePath: String)
 
     @Transaction
-    @Query("SELECT * FROM CharacterEntity")
+    @Query("SELECT * FROM $CARDS_TABLE_NAME")
     fun selectCharacterCards(): Flow<List<CardEntity>>
 
     @Transaction
-    @Query("SELECT * FROM CharacterEntity WHERE id = :id")
+    @Query("SELECT * FROM $CARDS_TABLE_NAME WHERE id = :id")
     fun selectCharacterCard(id: Long): Flow<CardEntity>
 
-    @Query("SELECT id, photoFilePath, name, creatorNotes, creator, characterVersion FROM CharacterEntity WHERE deleted = 0")
+    @Query("SELECT id, photoFilePath, name, creatorNotes, creator, characterVersion FROM $CARDS_TABLE_NAME WHERE deleted = 0")
     fun getCharacterListEntries(): Flow<List<CardListItemEntity>>
 
     @Transaction
@@ -74,7 +75,7 @@ interface CharacterCardDao {
         deleteGreetings(character.id)
     }
 
-    @Query("DELETE FROM CharacterEntity WHERE id = :id")
+    @Query("DELETE FROM $CARDS_TABLE_NAME WHERE id = :id")
     suspend fun deleteCharacterCardById(id: Long)
 
     @Query("DELETE FROM $ALT_GREETING_TABLE_NAME where cardId=:cardId")
