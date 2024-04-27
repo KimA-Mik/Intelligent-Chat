@@ -62,6 +62,7 @@ fun ChatScreenContent(
 ) {
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val sb = remember { scrollBehavior }
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -103,7 +104,7 @@ fun ChatScreenContent(
                         iconVector = Icons.Default.MoreVert
                     )
                 },
-                scrollBehavior = remember { scrollBehavior }
+                scrollBehavior = sb
             )
         },
         bottomBar = {
@@ -119,7 +120,7 @@ fun ChatScreenContent(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(sb.nestedScrollConnection)
         )
     }
 
