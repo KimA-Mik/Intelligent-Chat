@@ -26,10 +26,10 @@ import ru.kima.intelligentchat.presentation.navigation.NavigationLayout
 
 const val CARD_ID_ARGUMENT = "cardId"
 fun NavGraphBuilder.cardGraph(
+    expanded: Boolean,
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
-    drawerState: DrawerState,
-    expanded: Boolean
+    drawerState: DrawerState
 ) {
     navigation(startDestination = "cards", route = NavItem.Characters.root) {
         composable("cards") {
