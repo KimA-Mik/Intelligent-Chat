@@ -44,6 +44,7 @@ fun NavGraphBuilder.personasGraph(
                     }
 
                 PersonaListScreen(
+                    expanded = expanded,
                     state = state,
                     navController = navController,
                     snackbarHostState = snackbarHostState,
