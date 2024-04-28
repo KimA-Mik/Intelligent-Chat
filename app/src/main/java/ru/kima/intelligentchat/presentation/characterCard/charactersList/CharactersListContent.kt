@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -71,10 +72,10 @@ fun SearchField(
         },
         onActiveChange = {},
         leadingIcon = {
-            if (!expanded) {
-                IconButton(onClick = { onEvent(CharactersListUserEvent.OnMenuButtonClicked) }) {
-                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "Open menu")
-                }
+            AutoNavigationButton(
+                expanded = expanded
+            ) {
+                onEvent(CharactersListUserEvent.OnMenuButtonClicked)
             }
         },
         trailingIcon = {
@@ -131,6 +132,23 @@ private fun itemDropDownMenuItems(
             iconVector = Icons.Default.Create
         )
     )
+}
+
+@Composable
+fun AutoNavigationButton(
+    expanded: Boolean,
+    onNavigationClicked: () -> Unit,
+) {
+    IconButton(onClick = {
+        if (!expanded) {
+            onNavigationClicked()
+        }
+    }) {
+        Icon(
+            imageVector = if (expanded) Icons.Default.Search
+            else Icons.Default.Menu, contentDescription = "Open menu"
+        )
+    }
 }
 
 @Preview(name = "Characters List Preview light theme")
