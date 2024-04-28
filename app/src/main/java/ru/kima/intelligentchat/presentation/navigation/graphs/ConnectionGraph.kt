@@ -44,6 +44,7 @@ fun NavGraphBuilder.connectionGraph(
                 navController = navController, drawerState = drawerState
             ) {
                 ConnectionOverviewScreen(
+                    expanded = expanded,
                     state = state,
                     uiEvents = uiEvents,
                     drawerState = drawerState,
