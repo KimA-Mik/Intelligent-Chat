@@ -20,13 +20,13 @@ fun ApplicationScreen(windowSizeClass: WindowSizeClass) {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val snackbarHostState = remember { SnackbarHostState() }
 
-        val extended = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+        val expanded = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
 
         ChatNavHost(
             navController = navController,
             snackbarHostState = snackbarHostState,
             drawerState = drawerState,
-            extended = extended
+            expanded = expanded
         )
     }
 }

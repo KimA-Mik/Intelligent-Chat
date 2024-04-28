@@ -20,9 +20,10 @@ import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.HordeP
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.HordePresetEditViewModel
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
 import ru.kima.intelligentchat.presentation.navigation.NavItem
-import ru.kima.intelligentchat.presentation.navigation.NavigationDrawer
+import ru.kima.intelligentchat.presentation.navigation.NavigationLayout
 
 fun NavGraphBuilder.connectionGraph(
+    expanded: Boolean,
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
@@ -38,9 +39,9 @@ fun NavGraphBuilder.connectionGraph(
                 }
             }
 
-            NavigationDrawer(
-                drawerState = drawerState,
-                navController = navController
+            NavigationLayout(
+                expanded = expanded,
+                navController = navController, drawerState = drawerState
             ) {
                 ConnectionOverviewScreen(
                     state = state,
