@@ -25,7 +25,7 @@ fun ChatNavHost(
 ) {
     NavHost(navController = navController, startDestination = NavItem.entries.first().root) {
         cardGraph(expanded, navController, snackbarHostState, drawerState)
-        personasGraph(navController, snackbarHostState, drawerState)
+        personasGraph(expanded, navController, snackbarHostState, drawerState)
         connectionGraph(expanded, navController, snackbarHostState, drawerState)
         composable(route = "image/{cardId}", arguments = listOf(
             navArgument(name = "cardId") {

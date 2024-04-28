@@ -15,20 +15,22 @@ import androidx.navigation.navigation
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.kima.intelligentchat.presentation.navigation.NavItem
-import ru.kima.intelligentchat.presentation.navigation.NavigationDrawer
+import ru.kima.intelligentchat.presentation.navigation.NavigationLayout
 import ru.kima.intelligentchat.presentation.personas.details.PersonaDetailsScreen
 import ru.kima.intelligentchat.presentation.personas.details.PersonaDetailsViewModel
 import ru.kima.intelligentchat.presentation.personas.list.PersonaListScreen
 import ru.kima.intelligentchat.presentation.personas.list.PersonasListViewModel
 
 fun NavGraphBuilder.personasGraph(
+    expanded: Boolean,
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
 ) {
     navigation(startDestination = "personas", route = NavItem.Personas.root) {
         composable("personas") {
-            NavigationDrawer(
+            NavigationLayout(
+                expanded = expanded,
                 drawerState = drawerState,
                 navController = navController,
             ) {
