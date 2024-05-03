@@ -19,6 +19,7 @@ import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseC
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayChat
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
 class ChatScreenViewModel(
@@ -29,6 +30,7 @@ class ChatScreenViewModel(
     private val subscribeToCardChat: SubscribeToCardChatUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
+    private val displayCard = MutableStateFlow(DisplayCard())
 
     private val _state = MutableStateFlow<ChatScreenState>(ChatScreenState.ChatState())
     val state = _state.asStateFlow()
@@ -50,6 +52,7 @@ class ChatScreenViewModel(
                     createAndSelectChat(it)
                 }
                 characterCard.value = it
+                displayCard.value = it.toDisplayCard()
             }
         }
 
@@ -64,11 +67,14 @@ class ChatScreenViewModel(
             }
 
         val chatInfo = combine(
-            characterCard, chat
-        ) { characterCard, fullChat ->
+            characterCard, displayCard, chat
+        ) { characterCard, displayCard, fullChat ->
             ChatScreenState.ChatState.ChatInfo(
-                characterCard = characterCard.toDisplayCard(),
-                fullChat = fullChat.toDisplayChat(characterCard)
+                characterCard = displayCard,
+                fullChat = fullChat.toDisplayChat(
+                    card = characterCard,
+                    preloadCardImageBitmap = displayCard.image
+                )
             )
         }
 

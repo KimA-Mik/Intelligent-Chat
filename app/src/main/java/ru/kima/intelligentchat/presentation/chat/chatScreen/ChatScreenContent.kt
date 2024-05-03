@@ -76,6 +76,9 @@ fun ChatScreenContent(
                     ) {
                         state.info.characterCard.image.bitmap?.let {
                             CardImage(image = ImmutableBitmap(it),
+                        state.info.characterCard.image.imageBitmap?.let {
+                            CardImage(
+                                bitmap = state.info.characterCard.image,
                                 modifier = Modifier.size(40.dp),
                                 onClick = {}
                             )
