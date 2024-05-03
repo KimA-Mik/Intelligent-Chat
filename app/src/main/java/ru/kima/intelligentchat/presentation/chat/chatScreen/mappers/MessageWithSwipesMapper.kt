@@ -23,6 +23,7 @@ fun MessageWithSwipes.toDisplayMessage(
             personasImages.getOrElse(senderId) { ImmutableImageBitmap() },
         text = swipes.getOrElse(selectedSwipeIndex - 1) { Swipe(text = "OOB") }.text,
         currentSwipe = selectedSwipeIndex,
-        totalSwipes = swipes.size
+        totalSwipes = swipes.size,
+        index = index
     )
 }

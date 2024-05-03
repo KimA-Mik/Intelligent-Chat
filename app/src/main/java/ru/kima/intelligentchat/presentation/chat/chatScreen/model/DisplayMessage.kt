@@ -15,4 +15,5 @@ data class DisplayMessage(
     val sentTimeMillis: Long = Calendar.getInstance().time.time,
     val currentSwipe: Int = 1,
     val totalSwipes: Int = 1,
+    val index: Int = 0,
 )
