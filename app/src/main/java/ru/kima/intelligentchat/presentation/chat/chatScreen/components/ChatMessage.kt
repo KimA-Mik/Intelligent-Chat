@@ -34,7 +34,10 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 @Composable
 fun ChatMessage(
     message: DisplayMessage,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onImageClick: () -> Unit,
+    onLeftClick: () -> Unit,
+    onRightClick: () -> Unit
 ) {
     Row(
         modifier = modifier.height(IntrinsicSize.Min),
@@ -45,8 +48,8 @@ fun ChatMessage(
             index = message.index,
             modifier = Modifier.fillMaxHeight(),
             tookMs = 0,
-            onImageClick = {},
-            onLeftClick = {}
+            onImageClick = onImageClick,
+            onLeftClick = onLeftClick
         )
 
         Column(
@@ -65,7 +68,7 @@ fun ChatMessage(
             currentSwipe = message.currentSwipe,
             totalSwipes = message.totalSwipes,
             modifier = Modifier.fillMaxHeight(),
-            onRightClick = {}
+            onRightClick = onRightClick
         )
     }
 }
@@ -194,7 +197,10 @@ private fun ChatMessagePreview() {
                     currentSwipe = 2,
                     totalSwipes = 2
                 ),
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                onImageClick = {},
+                onLeftClick = {},
+                onRightClick = {}
             )
         }
     }
