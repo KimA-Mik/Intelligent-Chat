@@ -21,12 +21,12 @@ fun ChatNavHost(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     drawerState: DrawerState,
-    extended: Boolean
+    expanded: Boolean
 ) {
     NavHost(navController = navController, startDestination = NavItem.entries.first().root) {
-        cardGraph(navController, snackbarHostState, drawerState, extended)
-        personasGraph(navController, snackbarHostState, drawerState)
-        connectionGraph(navController, snackbarHostState, drawerState)
+        cardGraph(expanded, navController, snackbarHostState, drawerState)
+        personasGraph(expanded, navController, snackbarHostState, drawerState)
+        connectionGraph(expanded, navController, snackbarHostState, drawerState)
         composable(route = "image/{cardId}", arguments = listOf(
             navArgument(name = "cardId") {
                 type = NavType.LongType

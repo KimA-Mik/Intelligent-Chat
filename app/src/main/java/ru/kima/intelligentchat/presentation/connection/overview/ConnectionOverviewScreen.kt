@@ -63,6 +63,7 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ConnectionOverviewScreen(
+    expanded: Boolean,
     state: ConnectionOverviewState,
     uiEvents: ComposeEvent<COUiEvent>,
     drawerState: DrawerState,
@@ -99,8 +100,10 @@ fun ConnectionOverviewScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = openDrawer) {
-                        Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
+                    if (!expanded) {
+                        IconButton(onClick = openDrawer) {
+                            Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
+                        }
                     }
                 },
                 scrollBehavior = sb,
@@ -259,6 +262,7 @@ fun ConnectionOverviewPreview() {
     IntelligentChatTheme {
         Surface(Modifier.fillMaxSize()) {
             ConnectionOverviewScreen(
+                expanded = false,
                 state = ConnectionOverviewState(),
                 uiEvents = ComposeEvent(COUiEvent.ShowMessage("123")),
                 drawerState = DrawerState(initialValue = DrawerValue.Closed),

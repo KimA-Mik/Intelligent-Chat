@@ -27,12 +27,15 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,6 +57,7 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonaListScreen(
+    expanded: Boolean,
     state: PersonasListState,
     navController: NavController,
     snackbarHostState: SnackbarHostState,
@@ -68,6 +72,8 @@ fun PersonaListScreen(
     }
 
     val scope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val sb = remember { scrollBehavior }
 
     Scaffold(
         topBar = {
@@ -79,14 +85,18 @@ fun PersonaListScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            drawerState.open()
+                    if (!expanded) {
+                        IconButton(onClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }) {
+                            Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
                         }
-                    }) {
-                        Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
                     }
-                })
+                },
+                scrollBehavior = sb
+            )
         },
         floatingActionButton = {
             CreatePersonaFab {
@@ -100,7 +110,8 @@ fun PersonaListScreen(
             thumbnails = state.thumbnails,
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .nestedScroll(sb.nestedScrollConnection),
             onEvent = onEvent
         )
     }
@@ -203,6 +214,7 @@ fun PersonasListScreenPreview() {
     IntelligentChatTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             PersonaListScreen(
+                expanded = false,
                 state = PersonasListState(
                     personas = List(5) {
                         PersonaItem(
