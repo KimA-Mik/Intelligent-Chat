@@ -93,7 +93,7 @@ private fun ImageAndMetaInfo(
         ) {
             MessageSenderImage(
                 imageBitmap = imageBitmap,
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier.size(40.dp),
                 onClick = onImageClick
             )
 
