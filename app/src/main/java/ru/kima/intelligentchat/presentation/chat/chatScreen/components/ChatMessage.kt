@@ -29,6 +29,7 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
+import ru.kima.intelligentchat.presentation.common.markdown.MarkdownText
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -58,9 +59,9 @@ fun ChatMessage(
         ) {
             NameAndTime(name = message.senderName, sentTimeMillis = message.sentTimeMillis)
 
-            Text(
+            MarkdownText(
                 text = message.text,
-                style = MaterialTheme.typography.bodyLarge
+//                style = MaterialTheme.typography.bodyLarge
             )
         }
 
