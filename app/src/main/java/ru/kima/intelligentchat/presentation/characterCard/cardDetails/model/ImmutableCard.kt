@@ -1,14 +1,14 @@
 package ru.kima.intelligentchat.presentation.characterCard.cardDetails.model
 
-import android.graphics.Bitmap
 import androidx.compose.runtime.Immutable
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
+import ru.kima.intelligentchat.presentation.common.image.ImmutableBitmap
 
 @Immutable
 data class ImmutableCard(
     val id: Long = 0,
 
-    val photoBytes: Bitmap? = null,
+    val photoBytes: ImmutableBitmap = ImmutableBitmap(),
 
     val name: String = String(),
     val description: String = String(),
@@ -33,7 +33,7 @@ data class ImmutableCard(
     fun toCard(): CharacterCard {
         return CharacterCard(
             id = id,
-            photoBytes = photoBytes,
+            photoBytes = photoBytes.bitmap,
             name = name,
             description = description,
             personality = personality,
@@ -54,7 +54,7 @@ data class ImmutableCard(
 fun CharacterCard.toImmutable(): ImmutableCard {
     return ImmutableCard(
         id = id,
-        photoBytes = photoBytes,
+        photoBytes = ImmutableBitmap(photoBytes),
         name = name,
         description = description,
         personality = personality,

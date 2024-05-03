@@ -1,7 +1,6 @@
 package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import android.content.res.Configuration
-import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -142,7 +141,7 @@ fun HeadArea(
     name: String,
     cardTokens: Int,
     nameTokensCount: Int,
-    photo: Bitmap?,
+    photo: ImmutableBitmap,
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
@@ -153,7 +152,7 @@ fun HeadArea(
     ) {
         CardImage(
             // FIXME: Fix later
-            ImmutableBitmap(photo),
+            photo,
             modifier = Modifier.size(100.dp)
         ) {
             onEvent(CardDetailUserEvent.SelectImageClicked)

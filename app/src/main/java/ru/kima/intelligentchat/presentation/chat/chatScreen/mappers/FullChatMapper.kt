@@ -1,17 +1,18 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen.mappers
 
-import android.graphics.Bitmap
 import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
+import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 
 fun FullChat.toDisplayChat(
     card: CharacterCard,
+    preloadCardImageBitmap: ImmutableImageBitmap,
     personasNames: Map<Long, String> = emptyMap(),
-    personasImages: Map<Long, Bitmap?> = emptyMap()
+    personasImages: Map<Long, ImmutableImageBitmap> = emptyMap()
 ): DisplayChat {
     val firstMessage = MessageWithSwipes(
         messageId = 0,
@@ -28,14 +29,14 @@ fun FullChat.toDisplayChat(
     val res = mutableListOf(
         firstMessage.toDisplayMessage(
             card.name,
-            card.photoBytes,
+            preloadCardImageBitmap,
             personasNames,
             personasImages
         )
     )
     res.addAll(messages.map {
         it.toDisplayMessage(
-            card.name, card.photoBytes, personasNames, personasImages
+            card.name, preloadCardImageBitmap, personasNames, personasImages
         )
     })
     return DisplayChat(messages = res)

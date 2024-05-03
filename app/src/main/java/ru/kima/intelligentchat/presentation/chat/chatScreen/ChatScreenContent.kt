@@ -46,8 +46,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
-import ru.kima.intelligentchat.presentation.common.image.ImmutableBitmap
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -74,8 +76,9 @@ fun ChatScreenContent(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        state.info.characterCard.image.bitmap?.let {
-                            CardImage(image = ImmutableBitmap(it),
+                        state.info.characterCard.image.imageBitmap?.let {
+                            CardImage(
+                                bitmap = state.info.characterCard.image,
                                 modifier = Modifier.size(40.dp),
                                 onClick = {}
                             )
@@ -166,7 +169,15 @@ fun Messages(
     ) {
         items(state.fullChat.messages,
             key = { it.messageId }) {
-            Text(text = it.toString())
+            ChatMessage(
+                message = it,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                onImageClick = {},
+                onLeftClick = {},
+                onRightClick = {}
+            )
         }
     }
 }
@@ -246,7 +257,19 @@ fun ChatTextField(
 private fun ChatScreenPreview() {
     IntelligentChatTheme {
         ChatScreenContent(
-            state = ChatScreenState.ChatState(),
+            state = ChatScreenState.ChatState(
+                info = ChatScreenState.ChatState.ChatInfo(
+                    fullChat = DisplayChat(
+                        listOf(
+                            DisplayMessage(
+                                messageId = 0,
+                                senderName = "Sender",
+                                text = "Message Text",
+                            )
+                        )
+                    )
+                )
+            ),
             navController = rememberNavController(),
             snackbarHostState = SnackbarHostState(),
             onEvent = {}
