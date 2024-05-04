@@ -13,8 +13,10 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
+import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
@@ -31,7 +33,8 @@ class ChatScreenViewModel(
     private val createAndSelectChat: CreateAndSelectChatUseCase,
     private val subscribeToCardChat: SubscribeToCardChatUseCase,
     private val getPersonas: GetPersonasUseCase,
-    private val loadPersonaImage: LoadPersonaImageUseCase
+    private val loadPersonaImage: LoadPersonaImageUseCase,
+    private val swipeFirstMessage: SwipeFirstMessageUseCase,
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -137,15 +140,15 @@ class ChatScreenViewModel(
         savedStateHandle[MESSAGE_INPUT_BUFFER] = message
     }
 
-    private fun onMessageSwipeLeft(messageId: Long) {
+    private fun onMessageSwipeLeft(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-
+            swipeFirstMessage(cardId = characterCard.value.id, direction = SwipeDirection.Left)
         }
     }
 
-    private fun onMessageSwipeRight(messageId: Long) {
+    private fun onMessageSwipeRight(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-
+            swipeFirstMessage(cardId = characterCard.value.id, direction = SwipeDirection.Right)
         }
     }
 

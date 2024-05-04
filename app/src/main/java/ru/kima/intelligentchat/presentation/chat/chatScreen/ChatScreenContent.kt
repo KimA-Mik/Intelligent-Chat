@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -35,6 +36,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -122,14 +124,16 @@ fun ChatScreenContent(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-        Messages(
-            state = state.info,
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .nestedScroll(sb.nestedScrollConnection),
-            onEvent = onEvent
-        )
+        if (state.info.fullChat.messages.isNotEmpty()) {
+            Messages(
+                state = state.info,
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .nestedScroll(sb.nestedScrollConnection),
+                onEvent = onEvent
+            )
+        }
     }
 }
 
@@ -167,8 +171,22 @@ fun Messages(
     modifier: Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = state.fullChat.messages.lastIndex
+    )
+
+    LaunchedEffect(key1 = state.fullChat.messages) {
+        val lastItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
+
+        listState.scrollToItem(
+            state.fullChat.messages.lastIndex,
+            scrollOffset = lastItem.size
+        )
+    }
+
     LazyColumn(
         modifier = modifier,
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(
