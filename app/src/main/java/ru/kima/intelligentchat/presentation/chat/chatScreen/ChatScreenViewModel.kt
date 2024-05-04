@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.core.utils.combine
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
@@ -20,6 +21,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCa
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayChat
@@ -29,6 +31,7 @@ import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
 class ChatScreenViewModel(
     private val savedStateHandle: SavedStateHandle,
+    private val preferences: GetPreferencesUseCase,
     private val getCharacterCard: GetCardUseCase,
     private val createAndSelectChat: CreateAndSelectChatUseCase,
     private val subscribeToCardChat: SubscribeToCardChatUseCase,
@@ -69,14 +72,16 @@ class ChatScreenViewModel(
         val personasNames = loadPersonasNames(personas)
         val personasImages = loadPersonasImages(personas)
 
+
         val chatInfo = combine(
-            characterCard, displayCard, chat, personasNames, personasImages
-        ) { characterCard, displayCard, fullChat, names, images ->
+            characterCard, displayCard, chat, personasNames, personasImages, preferences()
+        ) { characterCard, displayCard, fullChat, names, images, preferences ->
             ChatScreenState.ChatState.ChatInfo(
                 characterCard = displayCard,
                 fullChat = fullChat.toDisplayChat(
                     card = characterCard,
                     preloadCardImageBitmap = displayCard.image,
+                    selectedPersona = preferences.selectedPersonaId,
                     personasNames = names,
                     personasImages = images
                 )
