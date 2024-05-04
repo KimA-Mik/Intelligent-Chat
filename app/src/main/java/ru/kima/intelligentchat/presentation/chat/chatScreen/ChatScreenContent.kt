@@ -127,11 +127,10 @@ fun ChatScreenContent(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .nestedScroll(sb.nestedScrollConnection)
+                .nestedScroll(sb.nestedScrollConnection),
+            onEvent = onEvent
         )
     }
-
-
 }
 
 @Composable
@@ -165,13 +164,15 @@ private fun moreMenuItems() = remember {
 @Composable
 fun Messages(
     state: ChatScreenState.ChatState.ChatInfo,
-    modifier: Modifier
+    modifier: Modifier,
+    onEvent: (UserEvent) -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(state.fullChat.messages,
+        items(
+            items = state.fullChat.messages,
             key = { it.messageId }) {
             ChatMessage(
                 message = it,
@@ -179,8 +180,8 @@ fun Messages(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
                 onImageClick = {},
-                onLeftClick = {},
-                onRightClick = {}
+                onLeftClick = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
+                onRightClick = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) }
             )
         }
     }

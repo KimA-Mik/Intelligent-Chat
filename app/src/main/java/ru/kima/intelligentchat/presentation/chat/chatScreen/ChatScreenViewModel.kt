@@ -128,11 +128,25 @@ class ChatScreenViewModel(
     fun onEvent(event: UserEvent) {
         when (event) {
             is UserEvent.UpdateInputMessage -> onUpdateInputMessage(event.message)
+            is UserEvent.MessageSwipeLeft -> onMessageSwipeLeft(event.messageId)
+            is UserEvent.MessageSwipeRight -> onMessageSwipeRight(event.messageId)
         }
     }
 
     private fun onUpdateInputMessage(message: String) {
         savedStateHandle[MESSAGE_INPUT_BUFFER] = message
+    }
+
+    private fun onMessageSwipeLeft(messageId: Long) {
+        if (messageId == 0L) {
+
+        }
+    }
+
+    private fun onMessageSwipeRight(messageId: Long) {
+        if (messageId == 0L) {
+
+        }
     }
 
     companion object {
