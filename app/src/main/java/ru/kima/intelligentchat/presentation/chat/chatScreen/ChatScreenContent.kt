@@ -65,6 +65,12 @@ fun ChatScreenContent(
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val sb = remember { scrollBehavior }
+    val popBackStack = remember<() -> Unit> {
+        {
+            navController.popBackStack()
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -92,9 +98,7 @@ fun ChatScreenContent(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    IconButton(onClick = popBackStack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null

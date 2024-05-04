@@ -21,7 +21,6 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenState
 import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenViewModel
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.navigation.NavItem
-import ru.kima.intelligentchat.presentation.navigation.NavigationDrawer
 import ru.kima.intelligentchat.presentation.navigation.NavigationLayout
 
 const val CARD_ID_ARGUMENT = "cardId"
@@ -76,17 +75,12 @@ fun NavGraphBuilder.cardGraph(
                 }
             }
 
-            NavigationDrawer(
-                drawerState = drawerState,
-                navController = navController
-            ) {
-                ChatScreen(
-                    state = state,
-                    navController = navController,
-                    snackbarHostState = snackbarHostState,
-                    onEvent = onEvent
-                )
-            }
+            ChatScreen(
+                state = state,
+                navController = navController,
+                snackbarHostState = snackbarHostState,
+                onEvent = onEvent
+            )
         }
     }
 }
