@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -46,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
@@ -184,6 +187,8 @@ fun Messages(
         )
     }
 
+    val scope = rememberCoroutineScope()
+
     LazyColumn(
         modifier = modifier,
         state = listState,
@@ -196,7 +201,15 @@ fun Messages(
                 message = it,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 8.dp)
+                    .animateContentSize { _, targetValue ->
+                        scope.launch {
+                            listState.animateScrollToItem(
+                                state.fullChat.messages.lastIndex,
+                                scrollOffset = targetValue.height
+                            )
+                        }
+                    },
                 onImageClick = {},
                 onLeftClick = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
                 onRightClick = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) }
