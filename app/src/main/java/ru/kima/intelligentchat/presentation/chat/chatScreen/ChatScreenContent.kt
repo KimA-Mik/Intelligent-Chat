@@ -205,7 +205,7 @@ fun Messages(
                     .animateContentSize { _, targetValue ->
                         scope.launch {
                             listState.animateScrollToItem(
-                                state.fullChat.messages.lastIndex,
+                                it.index,
                                 scrollOffset = targetValue.height
                             )
                         }
