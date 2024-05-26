@@ -12,12 +12,9 @@ kotlin = "2.0.0"
 kotlinxCoroutines = "1.8.1"
 kotlinxSerialization = "1.6.3"
 ksp = "2.0.0-1.0.21"
-lifecycleRuntimeKtx = "2.8.0"
-materialIconsExtendedAndroid = "1.6.7"
 nvaigation = "2.7.7"
 retrofit = "2.11.0"
 room = "2.6.1"
-material3WindowSizeClassAndroid = "1.2.1"
 
 
 [libraries]
@@ -27,11 +24,9 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junit" }
-androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
-androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
-androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose" }
+androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "nvaigation" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
