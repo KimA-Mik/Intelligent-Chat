@@ -10,14 +10,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.core.utils.combine
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
+import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
+import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayChat
@@ -27,11 +31,13 @@ import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
 class ChatScreenViewModel(
     private val savedStateHandle: SavedStateHandle,
+    private val preferences: GetPreferencesUseCase,
     private val getCharacterCard: GetCardUseCase,
     private val createAndSelectChat: CreateAndSelectChatUseCase,
     private val subscribeToCardChat: SubscribeToCardChatUseCase,
     private val getPersonas: GetPersonasUseCase,
-    private val loadPersonaImage: LoadPersonaImageUseCase
+    private val loadPersonaImage: LoadPersonaImageUseCase,
+    private val swipeFirstMessage: SwipeFirstMessageUseCase,
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -66,14 +72,16 @@ class ChatScreenViewModel(
         val personasNames = loadPersonasNames(personas)
         val personasImages = loadPersonasImages(personas)
 
+
         val chatInfo = combine(
-            characterCard, displayCard, chat, personasNames, personasImages
-        ) { characterCard, displayCard, fullChat, names, images ->
+            characterCard, displayCard, chat, personasNames, personasImages, preferences()
+        ) { characterCard, displayCard, fullChat, names, images, preferences ->
             ChatScreenState.ChatState.ChatInfo(
                 characterCard = displayCard,
                 fullChat = fullChat.toDisplayChat(
                     card = characterCard,
                     preloadCardImageBitmap = displayCard.image,
+                    selectedPersona = preferences.selectedPersonaId,
                     personasNames = names,
                     personasImages = images
                 )
@@ -128,11 +136,25 @@ class ChatScreenViewModel(
     fun onEvent(event: UserEvent) {
         when (event) {
             is UserEvent.UpdateInputMessage -> onUpdateInputMessage(event.message)
+            is UserEvent.MessageSwipeLeft -> onMessageSwipeLeft(event.messageId)
+            is UserEvent.MessageSwipeRight -> onMessageSwipeRight(event.messageId)
         }
     }
 
     private fun onUpdateInputMessage(message: String) {
         savedStateHandle[MESSAGE_INPUT_BUFFER] = message
+    }
+
+    private fun onMessageSwipeLeft(messageId: Long) = viewModelScope.launch {
+        if (messageId == 0L) {
+            swipeFirstMessage(cardId = characterCard.value.id, direction = SwipeDirection.Left)
+        }
+    }
+
+    private fun onMessageSwipeRight(messageId: Long) = viewModelScope.launch {
+        if (messageId == 0L) {
+            swipeFirstMessage(cardId = characterCard.value.id, direction = SwipeDirection.Right)
+        }
     }
 
     companion object {

@@ -2,6 +2,13 @@ package ru.kima.intelligentchat.presentation.chat.chatScreen.components
 
 import android.icu.text.DateFormat
 import android.icu.util.Calendar
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -20,9 +27,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
@@ -57,11 +70,14 @@ fun ChatMessage(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            NameAndTime(name = message.senderName, sentTimeMillis = message.sentTimeMillis)
+            NameAndTime(
+                name = message.senderName,
+                sentTimeMillis = message.sentTimeMillis
+            )
 
-            MarkdownText(
+            AnimatedText(
                 text = message.text,
-//                style = MaterialTheme.typography.bodyLarge
+                currentSwipe = message.currentSwipe
             )
         }
 
@@ -70,6 +86,51 @@ fun ChatMessage(
             totalSwipes = message.totalSwipes,
             modifier = Modifier.fillMaxHeight(),
             onRightClick = onRightClick
+        )
+    }
+}
+
+@Composable
+fun AnimatedText(
+    text: String,
+    currentSwipe: Int,
+    modifier: Modifier = Modifier
+) {
+    val swipeRight = remember {
+        slideIn { IntOffset(it.width, 0) } togetherWith slideOut { IntOffset(-it.width, 0) }
+    }
+
+    val swipeLeft = remember {
+        slideIn { IntOffset(-it.width, 0) } togetherWith slideOut { IntOffset(it.width, 0) }
+    }
+
+    val calm = remember {
+        fadeIn(tween(0)) togetherWith fadeOut(tween(0))
+    }
+
+    var prevSwipe by remember { mutableIntStateOf(0) }
+    var animationSpec by remember { mutableStateOf(calm) }
+    println("currentSwipe = $currentSwipe, prevSwipe = $prevSwipe")
+    if (prevSwipe == 0) {
+        prevSwipe = currentSwipe
+    }
+
+    animationSpec = if (prevSwipe == 0 || prevSwipe == currentSwipe)
+        calm
+    else if (currentSwipe > prevSwipe) {
+        swipeRight
+    } else {
+        swipeLeft
+    }
+    prevSwipe = currentSwipe
+
+    AnimatedContent(
+        targetState = text, label = "",
+        modifier = modifier,
+        transitionSpec = { animationSpec }) {
+        MarkdownText(
+            text = it,
+//                style = MaterialTheme.typography.bodyLarge
         )
     }
 }

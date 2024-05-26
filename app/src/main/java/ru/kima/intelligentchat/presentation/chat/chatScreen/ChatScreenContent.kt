@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -35,7 +37,9 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -44,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
@@ -122,16 +127,17 @@ fun ChatScreenContent(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-        Messages(
-            state = state.info,
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .nestedScroll(sb.nestedScrollConnection)
-        )
+        if (state.info.fullChat.messages.isNotEmpty()) {
+            Messages(
+                state = state.info,
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .nestedScroll(sb.nestedScrollConnection),
+                onEvent = onEvent
+            )
+        }
     }
-
-
 }
 
 @Composable
@@ -165,22 +171,48 @@ private fun moreMenuItems() = remember {
 @Composable
 fun Messages(
     state: ChatScreenState.ChatState.ChatInfo,
-    modifier: Modifier
+    modifier: Modifier,
+    onEvent: (UserEvent) -> Unit
 ) {
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = state.fullChat.messages.lastIndex
+    )
+
+    LaunchedEffect(key1 = state.fullChat.messages) {
+        val lastItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
+
+        listState.scrollToItem(
+            state.fullChat.messages.lastIndex,
+            scrollOffset = lastItem.size
+        )
+    }
+
+    val scope = rememberCoroutineScope()
+
     LazyColumn(
         modifier = modifier,
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(state.fullChat.messages,
+        items(
+            items = state.fullChat.messages,
             key = { it.messageId }) {
             ChatMessage(
                 message = it,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 8.dp)
+                    .animateContentSize { _, targetValue ->
+                        scope.launch {
+                            listState.animateScrollToItem(
+                                it.index,
+                                scrollOffset = targetValue.height
+                            )
+                        }
+                    },
                 onImageClick = {},
-                onLeftClick = {},
-                onRightClick = {}
+                onLeftClick = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
+                onRightClick = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) }
             )
         }
     }
