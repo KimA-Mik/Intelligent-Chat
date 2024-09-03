@@ -98,4 +98,9 @@
     <string name="menu_item_count_tokens">Count tokens</string>
     <string name="placeholder_enter_your_message">Enter your message</string>
 
+    <!--  Notifications  -->
+    <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
+    <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>
+    <string name="awaiting_for_message_notification">%1$s is typing</string>
+
 </resources>
