@@ -17,7 +17,7 @@ class LoadMessagingDataUseCase(
     private val getPersona: GetPersonaUseCase,
     private val loadPersonaImageUseCase: LoadPersonaImageUseCase
 ) {
-    suspend operator fun invoke(chatId: Long): Result {
+    suspend operator fun invoke(chatId: Long, personaId: Long): Result {
         val fullChatResult = subscribeToFullChat(chatId).last()
         val fullChat = if (fullChatResult is SubscribeToFullChatUseCase.Result.Success) {
             fullChatResult.fullChat
@@ -34,7 +34,13 @@ class LoadMessagingDataUseCase(
             SenderType.Persona -> loadPersona(lastMessageSenderId)
         }
 
-        return Result.Success(fullChat, lastSender)
+        if (lastSender is LastSender.PersonaSender && lastSender.persona.id == personaId) {
+            return Result.Success(fullChat, lastSender, lastSender.persona, lastSender.image)
+        }
+
+        val persona = getPersona(personaId)
+        val image = loadPersonaImageUseCase(personaId)
+        return Result.Success(fullChat, lastSender, persona, image)
     }
 
     private suspend fun loadCharacter(id: Long): LastSender {
@@ -53,7 +59,12 @@ class LoadMessagingDataUseCase(
     sealed interface Result {
         data object NoChat : Result
         data object EmptyChat : Result
-        data class Success(val fullChat: FullChat, val sender: LastSender) : Result
+        data class Success(
+            val fullChat: FullChat,
+            val sender: LastSender,
+            val persona: Persona,
+            val image: PersonaImage
+        ) : Result
     }
 
     sealed interface LastSender {
