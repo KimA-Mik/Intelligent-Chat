@@ -63,7 +63,7 @@ class LoadMessagingDataUseCase(
             val fullChat: FullChat,
             val sender: LastSender,
             val persona: Persona,
-            val image: PersonaImage
+            val personaImage: PersonaImage
         ) : Result
     }
 
