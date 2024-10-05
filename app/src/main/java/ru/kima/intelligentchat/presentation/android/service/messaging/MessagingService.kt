@@ -22,20 +22,14 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import ru.kima.intelligentchat.ChatApplication
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.domain.messaging.model.MessagingStatus
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 
 class MessagingService : Service(), KoinComponent {
-    sealed interface MessageStatus {
-        data object Done : MessageStatus
-        data object Pending : MessageStatus
-        data object Generating : MessageStatus
-        data class GeneratingWithProgress(val progress: Float) : MessageStatus
-    }
-
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Default + job)
 
-    private val _status = MutableStateFlow(MessageStatus.Done)
+    private val _status = MutableStateFlow(MessagingStatus.Pending)
     private val _binder = MessagingServiceBinder()
 
     private val loadMessagingData: LoadMessagingDataUseCase by inject()

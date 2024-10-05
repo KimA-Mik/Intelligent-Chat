@@ -89,6 +89,14 @@ class HordeStateHandler(context: Context) {
         }
     }
 
+    suspend fun updateGenerationId(generationId: String?) {
+        updateData {
+            it.copy(
+                generationId = generationId
+            )
+        }
+    }
+
     private suspend fun updateData(
         transform: suspend (HordeState) -> HordeState
     ): HordeState {
