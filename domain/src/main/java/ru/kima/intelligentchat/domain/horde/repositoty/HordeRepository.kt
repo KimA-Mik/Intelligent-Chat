@@ -22,4 +22,8 @@ interface HordeRepository {
     suspend fun getGenerationRequestStatus(id: String): Resource<HordeRequestStatus>
     suspend fun cancelGenerationRequest(id: String): Resource<HordeRequestStatus>
     fun connectionState(): Flow<Boolean>
+
+    companion object {
+        const val NO_CONNECTION_ERROR = "0"
+    }
 }

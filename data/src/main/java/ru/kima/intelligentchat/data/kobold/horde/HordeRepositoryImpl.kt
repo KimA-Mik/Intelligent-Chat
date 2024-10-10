@@ -14,7 +14,7 @@ import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeAsyncRequest
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeRequestStatus
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeWorker
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toUserInfo
-import ru.kima.intelligentchat.data.kobold.horde.model.ConnectionState
+import ru.kima.intelligentchat.data.kobold.horde.model.HordeConnectionState
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestError
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestValidationError
 import ru.kima.intelligentchat.data.kobold.horde.model.WorkerDto
@@ -51,14 +51,14 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         return try {
             val response = api.heartbeat()
             if (response.isSuccessful) {
-                ConnectionState.isConnected.value = true
+                HordeConnectionState.isConnected.value = true
                 Resource.Success(Unit)
             } else {
                 Resource.Error("The heart of horde doesn't beat for some reason.")
             }
         } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -76,8 +76,8 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 Resource.Error(code)
             }
         } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -97,8 +97,8 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 Resource.Error(message)
             }
         } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -118,8 +118,8 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 Resource.Error(message)
             }
         } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -148,8 +148,8 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 )
             }
         } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: NullPointerException) {
             Resource.Error("Unable to deserialize result of generation request")
         } catch (e: Exception) {
@@ -171,8 +171,8 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 Resource.Error(getErrorMessage(response.errorBody()))
             }
         } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -192,15 +192,15 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 Resource.Error(getErrorMessage(response.errorBody()))
             }
         } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
         }
     }
 
-    override fun connectionState(): Flow<Boolean> = ConnectionState.isConnected
+    override fun connectionState(): Flow<Boolean> = HordeConnectionState.isConnected
 
     private fun getErrorMessage(responseBody: ResponseBody?): String {
         return try {
