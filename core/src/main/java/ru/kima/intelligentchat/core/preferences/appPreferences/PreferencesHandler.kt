@@ -22,6 +22,13 @@ class PreferencesHandler(context: Context) {
             )
         }
     }
+    suspend fun updateGenerationPending(generationPending: Boolean) {
+        updateData {
+            it.copy(
+                generationPending = generationPending
+            )
+        }
+    }
 
     private suspend fun updateData(
         transform: suspend (AppPreferences) -> AppPreferences
