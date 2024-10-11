@@ -22,14 +22,15 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import ru.kima.intelligentchat.ChatApplication
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.domain.messaging.model.MessagingStatus
+import ru.kima.intelligentchat.core.common.API_TYPE
+import ru.kima.intelligentchat.domain.messaging.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 
 class MessagingService : Service(), KoinComponent {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Default + job)
 
-    private val _status = MutableStateFlow(MessagingStatus.Pending)
+    private val _status = MutableStateFlow(GenerationStatus.Pending)
     private val _binder = MessagingServiceBinder()
 
     private val loadMessagingData: LoadMessagingDataUseCase by inject()
@@ -47,9 +48,13 @@ class MessagingService : Service(), KoinComponent {
 
         val chatId = intent.getLongExtra(CHAT_ID_EXTRA, 0L)
         val personaId = intent.getLongExtra(PERSONA_ID_EXTRA, 0L)
-        if (chatId == 0L || personaId == 0L) return START_NOT_STICKY
+        val apiType = intent.getStringExtra(API_TYPE_EXTRA)?.let {
+            API_TYPE.fromString(it)
+        }
 
-        runForeground(chatId, personaId)
+        if (chatId == 0L || personaId == 0L || apiType == null) return START_NOT_STICKY
+
+        runForeground(chatId, personaId, apiType)
         return START_NOT_STICKY
     }
 
@@ -58,7 +63,7 @@ class MessagingService : Service(), KoinComponent {
         job.cancel()
     }
 
-    private fun runForeground(chatId: Long, personaId: Long) {
+    private fun runForeground(chatId: Long, personaId: Long, apiType: API_TYPE) {
         val handler = CoroutineExceptionHandler { _, exception ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && exception is ForegroundServiceStartNotAllowedException) {
                 Log.e(
@@ -73,11 +78,11 @@ class MessagingService : Service(), KoinComponent {
         }
 
         scope.launch(Dispatchers.Main + handler) {
-            runForegroundAsync(chatId, personaId)
+            runForegroundAsync(chatId, personaId, apiType)
         }
     }
 
-    private suspend fun runForegroundAsync(chatId: Long, personaId: Long) {
+    private suspend fun runForegroundAsync(chatId: Long, personaId: Long, apiType: API_TYPE) {
         val data = loadMessagingData(chatId, personaId)
         if (data !is LoadMessagingDataUseCase.Result.Success) {
             Log.e(TAG, "Failed to load messaging data: $data")
@@ -123,10 +128,16 @@ class MessagingService : Service(), KoinComponent {
 
     companion object {
         private const val TAG = "MessagingService"
-        fun getLaunchIntent(context: Context, chatId: Long, personaId: Long): Intent {
+        fun getLaunchIntent(
+            context: Context,
+            chatId: Long,
+            personaId: Long,
+            apiType: API_TYPE
+        ): Intent {
             val intent = Intent(context, this::class.java)
             intent.putExtra(CHAT_ID_EXTRA, chatId)
             intent.putExtra(PERSONA_ID_EXTRA, personaId)
+            intent.putExtra(API_TYPE_EXTRA, apiType.toString())
             return intent
         }
 
@@ -137,5 +148,6 @@ class MessagingService : Service(), KoinComponent {
 
         private const val CHAT_ID_EXTRA = "chat_id"
         private const val PERSONA_ID_EXTRA = "persona_id"
+        private const val API_TYPE_EXTRA = "api_type"
     }
 }

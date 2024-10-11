@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
 import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
-import ru.kima.intelligentchat.domain.messaging.model.MessagingStatus
+import ru.kima.intelligentchat.domain.messaging.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
 import ru.kima.intelligentchat.presentation.android.service.common.isServiceRunning
 import ru.kima.intelligentchat.presentation.android.service.messaging.MessagingService
@@ -27,12 +27,12 @@ private const val TAG = "MessagingRepositoryImpl"
 class MessagingRepositoryImpl(
     private val context: Context,
     private val hordeStateHandler: HordeStateHandler,
-    preferencesHandler: PreferencesHandler,
+    private val preferencesHandler: PreferencesHandler,
 ) : MessagingRepository {
     private val preferences = preferencesHandler.data
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
-    private val _messagingStatus = MutableStateFlow<MessagingStatus>(MessagingStatus.Available)
+    private val _generationStatus = MutableStateFlow<GenerationStatus>(GenerationStatus.None)
 
     private var _binder: MessagingService.MessagingServiceBinder? = null
     private var binderSubscriptionJob: Job? = null
@@ -43,7 +43,7 @@ class MessagingRepositoryImpl(
                 binderSubscriptionJob?.cancel()
                 binderSubscriptionJob = coroutineScope.launch {
                     binder.status.collect {
-                        _messagingStatus.value = it
+                        _generationStatus.value = it
                     }
                 }
             }
@@ -62,14 +62,23 @@ class MessagingRepositoryImpl(
         }
     }
 
-    override fun messagingStatus(): Flow<MessagingStatus> = _messagingStatus
+    override fun messagingStatus(): Flow<GenerationStatus> = _generationStatus
 
-    override fun sendMessage() {
-        TODO("Not yet implemented")
+    override fun initiateGeneration(chatId: Long, personaId: Long) {
+        coroutineScope.launch {
+            if (context.isServiceRunning<MessagingService>()) {
+                return@launch
+            }
+
+            val api = preferences.last().selectedApiType
+            val intent = MessagingService.getLaunchIntent(context, chatId, personaId, api)
+            context.startService(intent)
+            bindService()
+        }
     }
 
-    override fun cancelMessage() {
-        if (_messagingStatus.value != MessagingStatus.Available) {
+    override fun cancelGeneration() {
+        if (_generationStatus.value != GenerationStatus.None) {
             TODO("Not yet implemented")
         }
     }
@@ -80,6 +89,7 @@ class MessagingRepositoryImpl(
             return
         }
 
+        preferencesHandler.updateGenerationPending(false)
         val currentApi = preferences.last().selectedApiType
         when (currentApi) {
             API_TYPE.HORDE -> initHorde()
