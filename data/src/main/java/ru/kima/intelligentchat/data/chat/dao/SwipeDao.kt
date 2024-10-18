@@ -26,6 +26,9 @@ interface SwipeDao {
     )
     fun swipesForChat(chatId: Long): Flow<List<SwipeEntity>>
 
+    @Query("SELECT * FROM $SWIPE_TABLE_NAME WHERE  swipe_id = :swipeId")
+    suspend fun getSwipe(swipeId: Long): SwipeEntity
+
     @Query("DELETE FROM $SWIPE_TABLE_NAME WHERE swipe_id = :swipeId")
     suspend fun deleteSwipe(swipeId: Long): Int
 

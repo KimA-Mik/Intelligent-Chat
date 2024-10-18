@@ -14,9 +14,11 @@ import ru.kima.intelligentchat.core.utils.combine
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
+import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
+import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
@@ -36,6 +38,7 @@ class ChatScreenViewModel(
     private val getPersonas: GetPersonasUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
+    private val sendMessage: SendMessageUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -132,7 +135,24 @@ class ChatScreenViewModel(
             is UserEvent.UpdateInputMessage -> onUpdateInputMessage(event.message)
             is UserEvent.MessageSwipeLeft -> onMessageSwipeLeft(event.messageId)
             is UserEvent.MessageSwipeRight -> onMessageSwipeRight(event.messageId)
+            UserEvent.SendMessage -> onSendMessage()
         }
+    }
+
+    private fun onSendMessage() = viewModelScope.launch {
+        val state = _state.value
+        if (state !is ChatScreenState.ChatState) {
+            return@launch
+        }
+
+        val text = state.inputMessageBuffer
+        savedStateHandle[MESSAGE_INPUT_BUFFER] = String()
+        sendMessage(
+            chatId = characterCard.value.selectedChat,
+            sender = SenderType.Persona,
+            senderId = state.info.fullChat.selectedPersonaId,
+            text = text,
+        )
     }
 
     private fun onUpdateInputMessage(message: String) {

@@ -54,6 +54,9 @@ fun FullChat.toDisplayChat(
         }
     }
 
-
-    return DisplayChat(messages = chatMessages)
+    return DisplayChat(
+        chatId = chatId,
+        selectedPersonaId = selectedPersona,
+        messages = chatMessages
+    )
 }
