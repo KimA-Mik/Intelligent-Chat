@@ -15,7 +15,6 @@ import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
-import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
@@ -33,7 +32,6 @@ class ChatScreenViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val preferences: GetPreferencesUseCase,
     private val getCharacterCard: GetCardUseCase,
-    private val createAndSelectChat: CreateAndSelectChatUseCase,
     private val subscribeToCardChat: SubscribeToCardChatUseCase,
     private val getPersonas: GetPersonasUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
@@ -62,7 +60,6 @@ class ChatScreenViewModel(
         val chat = subscribeToCardChat(id)
             .map {
                 when (it) {
-                    SubscribeToCardChatUseCase.Result.NotFound -> FullChat()
                     is SubscribeToCardChatUseCase.Result.Success -> it.fullChat
                     SubscribeToCardChatUseCase.Result.UnknownError -> FullChat()
                 }
@@ -107,9 +104,6 @@ class ChatScreenViewModel(
 
     private fun loadCard(id: Long) = viewModelScope.launch {
         getCharacterCard(id).collect {
-            if (it.selectedChat == 0L) {
-                createAndSelectChat(it)
-            }
             characterCard.value = it
             displayCard.value = it.toDisplayCard()
         }
