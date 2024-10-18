@@ -27,8 +27,8 @@ class SwipeFirstMessageUseCase(
         }
 
         var newSwipe = card.selectedGreeting + add
-        if (newSwipe < 1) newSwipe = totalGreetings
-        if (newSwipe > totalGreetings) newSwipe = 1
+        if (newSwipe < 0) newSwipe = totalGreetings - 1
+        if (newSwipe >= totalGreetings) newSwipe = 0
 
         updateCard(card.copy(selectedGreeting = newSwipe))
     }
