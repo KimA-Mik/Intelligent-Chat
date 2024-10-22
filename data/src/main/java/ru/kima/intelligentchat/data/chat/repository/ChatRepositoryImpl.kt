@@ -43,4 +43,8 @@ class ChatRepositoryImpl(
     override suspend fun insertChat(chat: Chat): Long {
         return chatDao.insertChat(chat.toEntity())
     }
+
+    override suspend fun updateChat(chat: Chat) {
+        chatDao.updateChat(chat.toEntity())
+    }
 }
