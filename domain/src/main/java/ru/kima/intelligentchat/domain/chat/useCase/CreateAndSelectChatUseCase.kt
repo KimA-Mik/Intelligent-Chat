@@ -14,7 +14,7 @@ class CreateAndSelectChatUseCase(
 ) {
     suspend operator fun invoke(card: CharacterCard, title: String) {
         try {
-            val chat = Chat(chatId = 0, title = title, cardId = card.id)
+            val chat = Chat(chatId = 0, title = title, cardId = card.id, selectedGreeting = 0)
             val id = chatRepository.insertChat(chat)
             val newCard = card.copy(selectedChat = id)
             updateCard(newCard)

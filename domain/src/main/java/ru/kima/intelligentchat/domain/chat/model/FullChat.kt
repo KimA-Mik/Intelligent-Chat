@@ -4,6 +4,7 @@ data class FullChat(
     val chatId: Long = 0,
     val title: String = String(),
     val cardId: Long = 0,
+    val selectedGreeting: Int = 0,
     val messages: List<MessageWithSwipes> = emptyList()
 ) {
     companion object {
@@ -12,6 +13,7 @@ data class FullChat(
                 chatId = chat.chatId,
                 title = chat.title,
                 cardId = chat.cardId,
+                selectedGreeting = chat.selectedGreeting,
                 messages = messages
             )
         }

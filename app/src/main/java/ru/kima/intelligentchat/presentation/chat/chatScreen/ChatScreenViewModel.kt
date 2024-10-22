@@ -161,13 +161,27 @@ class ChatScreenViewModel(
 
     private fun onMessageSwipeLeft(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-            swipeFirstMessage(cardId = characterCard.value.id, direction = SwipeDirection.Left)
+            val s = _state.value
+            if (s is ChatScreenState.ChatState) {
+                swipeFirstMessage(
+                    cardId = characterCard.value.id,
+                    chatId = s.info.fullChat.chatId,
+                    direction = SwipeDirection.Left
+                )
+            }
         }
     }
 
     private fun onMessageSwipeRight(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-            swipeFirstMessage(cardId = characterCard.value.id, direction = SwipeDirection.Right)
+            val s = _state.value
+            if (s is ChatScreenState.ChatState) {
+                swipeFirstMessage(
+                    cardId = characterCard.value.id,
+                    chatId = s.info.fullChat.chatId,
+                    direction = SwipeDirection.Right
+                )
+            }
         }
     }
 

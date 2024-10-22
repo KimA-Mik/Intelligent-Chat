@@ -12,5 +12,7 @@ data class ChatEntity(
     val chatId: Long,
     val title: String,
     @ColumnInfo(name = "card_id")
-    val cardId: Long
+    val cardId: Long,
+    @ColumnInfo(name = "selected_greeting")
+    val selectedGreeting: Int
 )
