@@ -6,15 +6,14 @@ import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.util.inlineCardName
 import ru.kima.intelligentchat.domain.messaging.util.inlinePersonaName
-import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
+import ru.kima.intelligentchat.domain.persona.model.Persona
 
 class InitializeChatUseCase(
     private val subscribeToChatMessages: SubscribeToFullChatUseCase,
-    private val getSelectedPersona: SelectedPersonaUseCase,
     private val getCard: GetCardUseCase,
     private val createMessage: CreateMessageUseCase
 ) {
-    suspend operator fun invoke(chatId: Long) {
+    suspend operator fun invoke(chatId: Long, persona: Persona) {
         val getChatResult = subscribeToChatMessages(chatId).first()
         if (getChatResult !is SubscribeToFullChatUseCase.Result.Success ||
             getChatResult.fullChat.messages.isNotEmpty()
@@ -23,7 +22,6 @@ class InitializeChatUseCase(
 
         val chat = getChatResult.fullChat
         //TODO: Handle errors
-        val persona = getSelectedPersona().first()
         val card = getCard(getChatResult.fullChat.cardId).first()
         val firstMessage = if (chat.selectedGreeting == 0) {
             card.firstMes
