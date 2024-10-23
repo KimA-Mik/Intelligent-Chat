@@ -23,6 +23,7 @@ import org.koin.core.component.inject
 import ru.kima.intelligentchat.ChatApplication
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.core.common.API_TYPE
+import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.messaging.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 
@@ -51,8 +52,11 @@ class MessagingService : Service(), KoinComponent {
         val apiType = intent.getStringExtra(API_TYPE_EXTRA)?.let {
             API_TYPE.fromString(it)
         }
+        val senderType = intent.getStringExtra(SENDER_TYPE_EXTRA)?.let {
+            SenderType.fromString(it)
+        }
 
-        if (chatId == 0L || personaId == 0L || apiType == null) return START_NOT_STICKY
+        if (chatId == 0L || personaId == 0L || apiType == null || senderType == null) return START_NOT_STICKY
 
         runForeground(chatId, personaId, apiType)
         return START_NOT_STICKY
@@ -132,12 +136,14 @@ class MessagingService : Service(), KoinComponent {
             context: Context,
             chatId: Long,
             personaId: Long,
-            apiType: API_TYPE
+            apiType: API_TYPE,
+            senderType: SenderType
         ): Intent {
             val intent = Intent(context, this::class.java)
             intent.putExtra(CHAT_ID_EXTRA, chatId)
             intent.putExtra(PERSONA_ID_EXTRA, personaId)
             intent.putExtra(API_TYPE_EXTRA, apiType.toString())
+            intent.putExtra(SENDER_TYPE_EXTRA, senderType.toString())
             return intent
         }
 
@@ -149,5 +155,6 @@ class MessagingService : Service(), KoinComponent {
         private const val CHAT_ID_EXTRA = "chat_id"
         private const val PERSONA_ID_EXTRA = "persona_id"
         private const val API_TYPE_EXTRA = "api_type"
+        private const val SENDER_TYPE_EXTRA = "sender_type"
     }
 }

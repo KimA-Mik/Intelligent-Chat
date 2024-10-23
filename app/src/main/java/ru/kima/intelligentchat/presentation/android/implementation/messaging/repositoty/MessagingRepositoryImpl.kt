@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
 import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
+import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.messaging.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
 import ru.kima.intelligentchat.presentation.android.service.common.isServiceRunning
@@ -64,14 +65,15 @@ class MessagingRepositoryImpl(
 
     override fun messagingStatus(): Flow<GenerationStatus> = _generationStatus
 
-    override fun initiateGeneration(chatId: Long, personaId: Long) {
+    override fun initiateGeneration(chatId: Long, personaId: Long, senderType: SenderType) {
         coroutineScope.launch {
             if (context.isServiceRunning<MessagingService>()) {
                 return@launch
             }
 
             val api = preferences.last().selectedApiType
-            val intent = MessagingService.getLaunchIntent(context, chatId, personaId, api)
+            val intent =
+                MessagingService.getLaunchIntent(context, chatId, personaId, api, senderType)
             context.startService(intent)
             bindService()
         }
