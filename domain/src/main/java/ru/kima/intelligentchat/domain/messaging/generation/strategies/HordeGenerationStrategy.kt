@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.domain.messaging.strategies
+package ru.kima.intelligentchat.domain.messaging.generation.strategies
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -7,8 +7,10 @@ import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
 import ru.kima.intelligentchat.domain.horde.model.HordeGenerationParams
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
-import ru.kima.intelligentchat.domain.messaging.model.GenerationStatus
-import ru.kima.intelligentchat.domain.messaging.model.GenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationRequest
+import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
+import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.prompting.constructPrompt
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 
@@ -17,18 +19,15 @@ class HordeGenerationStrategy(
     private val getHordePreferences: GetHordePreferencesUseCase,
     private val getKoboldPreset: GetKoboldPresetUseCase
 ) : GenerationStrategy {
-    override fun generate(
-        generationInput: String,
-        stopSequence: List<String>
-    ): Flow<GenerationStatus> = flow {
+    override fun generate(request: GenerationRequest): Flow<GenerationStatus> = flow {
         emit(GenerationStatus.None)
         val hordeState = getHordePreferences().last()
 
         val apiKey = hordeState.apiToken
         val preset = getKoboldPreset(hordeState.selectedPreset) ?: return@flow
         val params = HordeGenerationParams(
-            maxContextLength = hordeState.actualContextSize,
-            maxLength = hordeState.actualResponseLength,
+            maxContextLength = request.maxContextLength,
+            maxLength = request.maxResponseLength,
             minP = preset.minP,
             mirostat = preset.mirostat,
             mirostatEta = preset.mirostatEta,
@@ -37,7 +36,7 @@ class HordeGenerationStrategy(
             repetitionPenaltyRange = preset.repetitionPenaltyRange,
             repetitionPenaltySlope = preset.repetitionPenaltySlope,
             samplerOrder = preset.samplerOrder,
-            stopSequence = stopSequence,
+            stopSequence = request.stopSequence,
             temperature = preset.temperature,
             tailFreeSampling = preset.tailFreeSampling,
             topA = preset.topA,
@@ -51,7 +50,7 @@ class HordeGenerationStrategy(
         val generationInput = GenerationInput(
             models = hordeState.selectedModels,
             params = params,
-            prompt = generationInput,
+            prompt = request.constructPrompt(),
             trustedWorkers = hordeState.trustedWorkers
         )
 

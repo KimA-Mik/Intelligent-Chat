@@ -18,7 +18,7 @@ import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
 import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
 import ru.kima.intelligentchat.domain.chat.model.SenderType
-import ru.kima.intelligentchat.domain.messaging.model.GenerationStatus
+import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
 import ru.kima.intelligentchat.presentation.android.service.common.isServiceRunning
 import ru.kima.intelligentchat.presentation.android.service.messaging.MessagingService

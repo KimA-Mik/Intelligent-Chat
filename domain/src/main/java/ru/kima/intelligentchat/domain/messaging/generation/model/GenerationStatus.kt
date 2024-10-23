@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.domain.messaging.model
+package ru.kima.intelligentchat.domain.messaging.generation.model
 
 sealed interface GenerationStatus {
     data object None : GenerationStatus

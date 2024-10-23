@@ -24,7 +24,7 @@ import ru.kima.intelligentchat.ChatApplication
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.domain.chat.model.SenderType
-import ru.kima.intelligentchat.domain.messaging.model.GenerationStatus
+import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 
 class MessagingService : Service(), KoinComponent {
