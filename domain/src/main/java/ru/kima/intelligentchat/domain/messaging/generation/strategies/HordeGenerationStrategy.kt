@@ -1,9 +1,11 @@
 package ru.kima.intelligentchat.domain.messaging.generation.strategies
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.last
 import ru.kima.intelligentchat.core.common.ICResult
+import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
 import ru.kima.intelligentchat.domain.horde.model.HordeGenerationParams
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
@@ -13,6 +15,7 @@ import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStrat
 import ru.kima.intelligentchat.domain.messaging.generation.prompting.constructPrompt
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
+import kotlin.random.Random
 
 class HordeGenerationStrategy(
     private val hordeRepository: HordeRepository,
@@ -54,13 +57,45 @@ class HordeGenerationStrategy(
             trustedWorkers = hordeState.trustedWorkers
         )
 
-        when (hordeRepository.requestGeneration(apiKey, generationInput)) {
-            is ICResult.Error -> TODO()
-            is ICResult.Success -> TODO()
+        val hordeRequest = hordeRepository.requestGeneration(apiKey, generationInput).valueOr {
+            emit(GenerationStatus.Error(it))
+            return@flow
+        }
+
+        val id = hordeRequest.id
+        emit(GenerationStatus.Started(id))
+        var status = hordeRepository.getGenerationRequestStatus(id).valueOr {
+            emit(GenerationStatus.Error(it))
+            return@flow
+        }
+
+        while (!status.done && !status.faulted && status.isPossible) {
+            if (status.waiting > 0) {
+                emit(GenerationStatus.Pending)
+            } else if (status.processing > 0) {
+                emit(GenerationStatus.Generating)
+            }
+
+            delay(getDelayTime())
+            status = hordeRepository.getGenerationRequestStatus(id).valueOr {
+                emit(GenerationStatus.Error(it))
+                return@flow
+            }
+        }
+
+        if (status.done && status.generations.isNotEmpty()) {
+            emit(GenerationStatus.Done(status.generations.first().text))
         }
     }
 
-    override suspend fun cancelGeneration(requestId: String) {
-        TODO("Not yet implemented")
+    private fun getDelayTime(): Long {
+        return 1000L + (Random.nextFloat() * 1000L).toLong()
+    }
+
+    override suspend fun cancelGeneration(requestId: String): Boolean {
+        return when (hordeRepository.cancelGenerationRequest(requestId)) {
+            is ICResult.Error -> false
+            is ICResult.Success -> true
+        }
     }
 }

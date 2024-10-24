@@ -11,7 +11,7 @@ class KoboldAiGenerationStrategy : GenerationStrategy {
     }
 
 
-    override suspend fun cancelGeneration(requestId: String) {
+    override suspend fun cancelGeneration(requestId: String): Boolean {
         TODO("Not yet implemented")
     }
 }
