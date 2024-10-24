@@ -1,7 +1,7 @@
 package ru.kima.intelligentchat.di
 
-import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import ru.kima.intelligentchat.presentation.android.notifications.NotificationHandler
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsViewModel
