@@ -8,7 +8,7 @@ import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatu
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStrategy
 
 class KoboldAiGenerationStrategy : GenerationStrategy {
-    override fun generate(request: GenerationRequest): Flow<GenerationStatus> =
+    override fun generation(request: GenerationRequest): Flow<GenerationStatus> =
         flowOf(GenerationStatus.Error(GenerationError.NotImplemented))
 
 

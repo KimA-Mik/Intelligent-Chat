@@ -22,7 +22,7 @@ class HordeGenerationStrategy(
     private val getHordePreferences: GetHordePreferencesUseCase,
     private val getKoboldPreset: GetKoboldPresetUseCase
 ) : GenerationStrategy {
-    override fun generate(request: GenerationRequest): Flow<GenerationStatus> = flow {
+    override fun generation(request: GenerationRequest): Flow<GenerationStatus> = flow {
         emit(GenerationStatus.None)
         val hordeState = getHordePreferences().last()
 
