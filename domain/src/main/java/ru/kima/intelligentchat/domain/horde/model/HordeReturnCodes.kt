@@ -15,4 +15,7 @@ object HordeReturnCodes {
 
     //Request aborted because horde is in maintenance mode
     const val MAINTENANCE_MODE = "MaintenanceMode"
+
+    //Request not found. This probably means it was deleted for inactivity
+    const val REQUEST_NOT_FOUND = "RequestNotFound"
 }

@@ -156,24 +156,26 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         }
     }
 
-    override suspend fun getGenerationRequestStatus(id: String): Resource<HordeRequestStatus> {
+    override suspend fun getGenerationRequestStatus(id: String): ICResult<HordeRequestStatus, HordeError> {
         return try {
             val response = api.getGenerationStatus(id)
             if (response.isSuccessful) {
-                Resource.Success(
+                ICResult.Success(
                     response
                         .body()!!
                         .toHordeRequestStatus()
                 )
             } else {
-                Resource.Error(getErrorMessage(response.errorBody()))
+                ICResult.Error(getHordeError(response.errorBody()))
             }
         } catch (_: IOException) {
             HordeConnectionState.isConnected.value = false
-            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
+            ICResult.Error(HordeError.NoConnection)
+        } catch (_: NullPointerException) {
+            ICResult.Error(HordeError.UnknownError("Unable to deserialize result of check request"))
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
-            Resource.Error(message)
+            ICResult.Error(HordeError.UnknownError(message))
         }
     }
 
@@ -217,6 +219,7 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
             HordeReturnCodes.INVALID_APIKEY -> HordeError.InvalidApiKey
             HordeReturnCodes.TOO_MANY_PROMPTS -> HordeError.TooManyPrompts
             HordeReturnCodes.MAINTENANCE_MODE -> HordeError.MaintenanceMode
+            HordeReturnCodes.REQUEST_NOT_FOUND -> HordeError.RequestNotFound
             else -> HordeError.UnknownError(error.message)
         }
     }
