@@ -179,24 +179,26 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         }
     }
 
-    override suspend fun cancelGenerationRequest(id: String): Resource<HordeRequestStatus> {
+    override suspend fun cancelGenerationRequest(id: String): ICResult<HordeRequestStatus, HordeError> {
         return try {
             val response = api.cancelGenerationRequest(id)
             if (response.isSuccessful) {
-                Resource.Success(
+                ICResult.Success(
                     response
                         .body()!!
                         .toHordeRequestStatus()
                 )
             } else {
-                Resource.Error(getErrorMessage(response.errorBody()))
+                ICResult.Error(getHordeError(response.errorBody()))
             }
         } catch (_: IOException) {
             HordeConnectionState.isConnected.value = false
-            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
+            ICResult.Error(HordeError.NoConnection)
+        } catch (_: NullPointerException) {
+            ICResult.Error(HordeError.UnknownError("Unable to deserialize result of cancel generation request"))
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
-            Resource.Error(message)
+            ICResult.Error(HordeError.UnknownError(message))
         }
     }
 
