@@ -24,17 +24,41 @@ import ru.kima.intelligentchat.ChatApplication
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.domain.chat.model.SenderType
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
+import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
+import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
+import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 
 class MessagingService : Service(), KoinComponent {
+    private val strategies: Map<API_TYPE, GenerationStrategy>
+
+    init {
+        val hordeStrategy: HordeGenerationStrategy by inject()
+        val koboldStrategy: KoboldAiGenerationStrategy by inject()
+        strategies = mapOf(
+            API_TYPE.HORDE to hordeStrategy,
+            API_TYPE.KOBOLD_AI to koboldStrategy
+        )
+    }
+
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Default + job)
 
-    private val _status = MutableStateFlow(GenerationStatus.Pending)
+    private var currentGenerationId: String? = null
+
+    private val _status = MutableStateFlow<MessagingIndicator>(MessagingIndicator.None)
     private val _binder = MessagingServiceBinder()
 
     private val loadMessagingData: LoadMessagingDataUseCase by inject()
+    private val loadMessagingConfig: LoadMessagingConfigUseCase by inject()
+    private val createMessage: CreateMessageUseCase by inject()
+
+    private val tokenizer: LlamaTokenizer by inject()
 
     inner class MessagingServiceBinder : Binder() {
         val status = _status.asStateFlow()
@@ -45,7 +69,10 @@ class MessagingService : Service(), KoinComponent {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent == null) return START_NOT_STICKY
+        if (intent == null) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
         val chatId = intent.getLongExtra(CHAT_ID_EXTRA, 0L)
         val personaId = intent.getLongExtra(PERSONA_ID_EXTRA, 0L)
@@ -56,9 +83,12 @@ class MessagingService : Service(), KoinComponent {
             SenderType.fromString(it)
         }
 
-        if (chatId == 0L || personaId == 0L || apiType == null || senderType == null) return START_NOT_STICKY
+        if (chatId == 0L || personaId == 0L || apiType == null || senderType == null) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
-        runForeground(chatId, personaId, apiType)
+        runForeground(chatId, personaId, apiType, senderType)
         return START_NOT_STICKY
     }
 
@@ -67,7 +97,12 @@ class MessagingService : Service(), KoinComponent {
         job.cancel()
     }
 
-    private fun runForeground(chatId: Long, personaId: Long, apiType: API_TYPE) {
+    private fun runForeground(
+        chatId: Long,
+        personaId: Long,
+        apiType: API_TYPE,
+        senderType: SenderType
+    ) {
         val handler = CoroutineExceptionHandler { _, exception ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && exception is ForegroundServiceStartNotAllowedException) {
                 Log.e(
@@ -82,35 +117,35 @@ class MessagingService : Service(), KoinComponent {
         }
 
         scope.launch(Dispatchers.Main + handler) {
-            runForegroundAsync(chatId, personaId, apiType)
+            runForegroundAsync(chatId, personaId, apiType, senderType)
         }
     }
 
-    private suspend fun runForegroundAsync(chatId: Long, personaId: Long, apiType: API_TYPE) {
-        val data = loadMessagingData(chatId, personaId)
+    private suspend fun runForegroundAsync(
+        chatId: Long,
+        personaId: Long,
+        apiType: API_TYPE,
+        senderType: SenderType
+    ) {
+        val data = loadMessagingData(chatId, personaId, senderType)
         if (data !is LoadMessagingDataUseCase.Result.Success) {
             Log.e(TAG, "Failed to load messaging data: $data")
             return
-        }
-
-        val sender = data.sender
-        val senderName = when (sender) {
-            is LoadMessagingDataUseCase.LastSender.CharacterSender -> sender.card.name
-            is LoadMessagingDataUseCase.LastSender.PersonaSender -> sender.persona.name
-        }
-        val senderImage = when (sender) {
-            is LoadMessagingDataUseCase.LastSender.CharacterSender -> sender.card.photoBytes
-            is LoadMessagingDataUseCase.LastSender.PersonaSender -> sender.image.bitmap
         }
 
         val notificationBuilder = NotificationCompat.Builder(
             this@MessagingService,
             ChatApplication.CHAT_MESSAGE_NOTIFICATIONS_CHANNEL_ID
         )
-            .setContentTitle(getString(R.string.awaiting_for_message_notification, senderName))
+            .setContentTitle(
+                getString(
+                    R.string.awaiting_for_message_notification,
+                    data.sender.name
+                )
+            )
             .setSmallIcon(R.drawable.ic_launcher_foreground)
 
-        senderImage?.let {
+        data.sender.photo?.let {
             notificationBuilder.setLargeIcon(it)
         }
 
@@ -126,9 +161,71 @@ class MessagingService : Service(), KoinComponent {
                     0
             )
         } else {
-            startForeground(100, notification)
+            startForeground(ChatApplication.MESSAGING_SERVICE_ID, notification)
         }
+
+        val strategy = strategies[apiType]
+        if (strategy == null) {
+            stopSelf()
+            return
+        }
+
+        val generationRequest = loadMessagingConfig(
+            apiType = apiType,
+            senderType = senderType,
+            personaName = data.persona.name,
+            cardName = data.card.name
+        ).constructGenerationRequest(
+            persona = data.persona,
+            card = data.card,
+            chat = data.fullChat,
+            generateFor = senderType,
+            tokenizer = tokenizer
+        )
+
+        val senderId = when (senderType) {
+            SenderType.Character -> data.card.id
+            SenderType.Persona -> personaId
+        }
+
+        var resultedMessage: String? = null
+        strategy.generation(generationRequest).collect { generationStatus ->
+            Log.d(TAG, generationStatus.toString())
+            when (generationStatus) {
+                is GenerationStatus.Done -> {
+                    _status.value = MessagingIndicator.None
+                    currentGenerationId = null
+                    resultedMessage = generationStatus.result
+                }
+
+                //TODO: handle errors
+                is GenerationStatus.Error -> {
+                    _status.value = MessagingIndicator.None
+                    currentGenerationId = null
+                }
+
+                GenerationStatus.Generating -> {
+                    _status.value = MessagingIndicator.Generating
+                }
+
+                is GenerationStatus.GeneratingWithProgress -> {
+                    _status.value =
+                        MessagingIndicator.DeterminedGenerating(generationStatus.progression)
+                }
+
+                GenerationStatus.Pending -> {
+                    _status.value = MessagingIndicator.Pending
+                }
+
+                is GenerationStatus.Started -> {
+                    currentGenerationId = generationStatus.generationId
+                }
+            }
+        }
+        resultedMessage?.let { msg -> createMessage(chatId, senderType, senderId, msg) }
+        stopSelf()
     }
+
 
     companion object {
         private const val TAG = "MessagingService"
@@ -139,7 +236,7 @@ class MessagingService : Service(), KoinComponent {
             apiType: API_TYPE,
             senderType: SenderType
         ): Intent {
-            val intent = Intent(context, this::class.java)
+            val intent = Intent(context, MessagingService::class.java)
             intent.putExtra(CHAT_ID_EXTRA, chatId)
             intent.putExtra(PERSONA_ID_EXTRA, personaId)
             intent.putExtra(API_TYPE_EXTRA, apiType.toString())
