@@ -16,19 +16,18 @@ class SendMessageUseCase(
     //TODO: Handle actual sending of a message
     suspend operator fun invoke(
         chatId: Long,
-        sender: SenderType,
-        senderId: Long,
+        personaId: Long,
         text: String
     ) {
         if (text.isBlank()) return
         val selectedPersona = getSelectedPersona().first()
         initializeChat(chatId, selectedPersona)
 
-        createMessage(chatId, sender, senderId, text)
+        createMessage(chatId, SenderType.Persona, personaId, text)
         messagingRepository.initiateGeneration(
             chatId = chatId,
             personaId = selectedPersona.id,
-            senderType = sender
+            senderType = SenderType.Character
         )
     }
 }

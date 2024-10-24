@@ -14,7 +14,6 @@ import ru.kima.intelligentchat.core.utils.combine
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
-import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
@@ -149,8 +148,7 @@ class ChatScreenViewModel(
         savedStateHandle[MESSAGE_INPUT_BUFFER] = String()
         sendMessage(
             chatId = characterCard.value.selectedChat,
-            sender = SenderType.Persona,
-            senderId = state.info.fullChat.selectedPersonaId,
+            personaId = state.info.fullChat.selectedPersonaId,
             text = text,
         )
     }
