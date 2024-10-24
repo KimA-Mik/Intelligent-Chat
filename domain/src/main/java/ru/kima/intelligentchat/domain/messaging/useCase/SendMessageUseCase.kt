@@ -13,7 +13,6 @@ class SendMessageUseCase(
     private val messagingRepository: MessagingRepository,
     private val getSelectedPersona: SelectedPersonaUseCase,
 ) {
-    //TODO: Handle actual sending of a message
     suspend operator fun invoke(
         chatId: Long,
         personaId: Long,
