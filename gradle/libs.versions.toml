@@ -1,18 +1,18 @@
 [versions]
-activityCompose = "1.9.1"
-agp = "8.6.0"
-composeBom = "2024.08.00"
+activityCompose = "1.9.3"
+agp = "8.7.1"
+composeBom = "2024.10.00"
 coreKtx = "1.13.1"
 datastore = "1.1.1"
 espressoCore = "3.6.1"
 junit = "1.2.1"
-junitJupiter = "5.11.0"
-koin = "3.5.6"
-kotlin = "2.0.20"
-kotlinxCoroutines = "1.8.1"
-kotlinxSerialization = "1.7.2"
-ksp = "2.0.20-1.0.24"
-nvaigation = "2.7.7"
+junitJupiter = "5.11.3"
+koin = "4.0.0"
+kotlin = "2.0.21"
+kotlinxCoroutines = "1.9.0"
+kotlinxSerialization = "1.7.3"
+ksp = "2.0.21-1.0.26"
+navigation = "2.8.3"
 retrofit = "2.11.0"
 room = "2.6.1"
 
@@ -27,7 +27,7 @@ androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junit" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose" }
 androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android" }
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "nvaigation" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
