@@ -16,7 +16,7 @@ data class HordeRequestStatusDto(
     //If False, this request will not be able to be completed with the pool of workers currently available.
     @SerialName("is_possible") val isPossible: Boolean = true,
     //The amount of total Kudos this request has consumed until now.
-    @SerialName("kudos") val kudos: Float = 0f,
+    @SerialName("kudos") val kudos: Double = 0.0,
     //The amount of still processing jobs in this request.
     @SerialName("processing") val processing: Int = 0,
     //The position in the requests queue. This position is determined by relative Kudos amounts.

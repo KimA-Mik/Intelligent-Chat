@@ -6,10 +6,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class KudosDetailsDto(
-    @SerialName("accumulated") val accumulated: Int = 0,
-    @SerialName("gifted") val gifted: Int = 0,
-    @SerialName("admin") val admin: Int = 0,
-    @SerialName("received") val received: Int = 0,
-    @SerialName("recurring") val recurring: Int = 0,
-    @SerialName("awarded") val awarded: Int = 0
+    @SerialName("accumulated") val accumulated: Double = 0.0,
+    @SerialName("gifted") val gifted: Double = 0.0,
+    @SerialName("admin") val admin: Double = 0.0,
+    @SerialName("received") val received: Double = 0.0,
+    @SerialName("recurring") val recurring: Double = 0.0,
+    @SerialName("awarded") val awarded: Double = 0.0
 )

@@ -33,17 +33,23 @@ import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
 import ru.kima.intelligentchat.domain.chat.repository.SwipeRepository
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.InitializeChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToChatMessagesWithSwipesUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
+import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
+import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.DeletePersonaUseCase
@@ -132,13 +138,20 @@ fun domain() = module {
     singleOf(::UpdateKoboldPresetUseCase)
 
     singleOf(::CreateAndSelectChatUseCase)
+    singleOf(::InitializeChatUseCase)
     singleOf(::SubscribeToCardChatUseCase)
     singleOf(::SubscribeToChatMessagesWithSwipesUseCase)
     singleOf(::SubscribeToFullChatUseCase)
 
+    singleOf(::CreateMessageUseCase)
     singleOf(::SwipeFirstMessageUseCase)
 
+    singleOf(::LoadMessagingConfigUseCase)
     singleOf(::LoadMessagingDataUseCase)
+    singleOf(::SendMessageUseCase)
+
+    singleOf(::HordeGenerationStrategy)
+    singleOf(::KoboldAiGenerationStrategy)
 
     single {
         val context: Context = get(Context::class.java)

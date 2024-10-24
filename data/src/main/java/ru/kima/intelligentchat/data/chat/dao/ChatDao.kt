@@ -26,6 +26,6 @@ interface ChatDao {
     suspend fun deleteChat(chatId: Long): Int
 
     @Transaction
-    @Query("SELECT * FROM $CHATS_TABLE_NAME WHERE chat_id = (SELECT selectedChat FROM $CARDS_TABLE_NAME WHERE card_id = :cardId)")
+    @Query("SELECT * FROM $CHATS_TABLE_NAME WHERE chat_id = (SELECT chat_id FROM $CARDS_TABLE_NAME WHERE card_id = :cardId)")
     fun subscribeToCardChat(cardId: Long): Flow<ChatWithMessagesDto?>
 }

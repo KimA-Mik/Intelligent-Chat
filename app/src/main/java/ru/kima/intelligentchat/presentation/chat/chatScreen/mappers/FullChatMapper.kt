@@ -22,7 +22,7 @@ fun FullChat.toDisplayChat(
             sender = SenderType.Character,
             senderId = card.id,
             index = 0,
-            selectedSwipeIndex = card.selectedGreeting,
+            selectedSwipeIndex = selectedGreeting,
             swipes = card.alternateGreetings.toMutableList()
                 .apply { add(0, AltGreeting(id = 0, body = card.firstMes)) }
                 .map { it.toSwipe(0) }
@@ -54,6 +54,9 @@ fun FullChat.toDisplayChat(
         }
     }
 
-
-    return DisplayChat(messages = chatMessages)
+    return DisplayChat(
+        chatId = chatId,
+        selectedPersonaId = selectedPersona,
+        messages = chatMessages
+    )
 }

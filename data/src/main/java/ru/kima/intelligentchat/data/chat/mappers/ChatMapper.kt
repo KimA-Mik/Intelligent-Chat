@@ -8,6 +8,7 @@ fun ChatEntity.toChat(): Chat {
         chatId = chatId,
         title = title,
         cardId = cardId,
+        selectedGreeting = selectedGreeting
     )
 }
 
@@ -16,5 +17,6 @@ fun Chat.toEntity(): ChatEntity {
         chatId = chatId,
         title = title,
         cardId = cardId,
+        selectedGreeting = selectedGreeting
     )
 }

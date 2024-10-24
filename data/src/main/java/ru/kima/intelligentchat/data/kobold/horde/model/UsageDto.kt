@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UsageDto(
-    @SerialName("megapixelsteps") val megapixelsteps: Int? = 0,
+    @SerialName("megapixelsteps") val megapixelsteps: Double? = 0.0,
     @SerialName("requests") val requests: Int? = 0
 )

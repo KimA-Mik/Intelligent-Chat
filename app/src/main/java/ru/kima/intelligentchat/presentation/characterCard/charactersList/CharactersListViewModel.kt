@@ -123,7 +123,6 @@ class CharactersListViewModel(
                     _uiEvents.emit(CharactersListUiEvent.SnackbarMessage(resource.message!!))
                 }
 
-                is Resource.Loading -> {}
                 is Resource.Success -> {
                     _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(resource.data!!))
                 }

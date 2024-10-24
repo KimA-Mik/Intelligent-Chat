@@ -21,8 +21,8 @@ interface HordeRepository {
         generationInput: GenerationInput
     ): ICResult<HordeAsyncRequest, HordeError>
 
-    suspend fun getGenerationRequestStatus(id: String): Resource<HordeRequestStatus>
-    suspend fun cancelGenerationRequest(id: String): Resource<HordeRequestStatus>
+    suspend fun getGenerationRequestStatus(id: String): ICResult<HordeRequestStatus, HordeError>
+    suspend fun cancelGenerationRequest(id: String): ICResult<HordeRequestStatus, HordeError>
     fun connectionState(): Flow<Boolean>
 
     companion object {

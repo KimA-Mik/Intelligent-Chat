@@ -1,6 +1,7 @@
 package ru.kima.intelligentchat.domain.messaging.useCase
 
-import kotlinx.coroutines.flow.last
+import android.graphics.Bitmap
+import kotlinx.coroutines.flow.first
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
@@ -13,62 +14,80 @@ import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 
 class LoadMessagingDataUseCase(
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
-    private val getCardUseCase: GetCardUseCase,
+    private val getCard: GetCardUseCase,
     private val getPersona: GetPersonaUseCase,
-    private val loadPersonaImageUseCase: LoadPersonaImageUseCase
+    private val loadPersonaImage: LoadPersonaImageUseCase
 ) {
-    suspend operator fun invoke(chatId: Long, personaId: Long): Result {
-        val fullChatResult = subscribeToFullChat(chatId).last()
+    suspend operator fun invoke(chatId: Long, personaId: Long, senderType: SenderType): Result {
+        val fullChatResult = subscribeToFullChat(chatId).first()
         val fullChat = if (fullChatResult is SubscribeToFullChatUseCase.Result.Success) {
             fullChatResult.fullChat
         } else {
             return Result.NoChat
         }
 
-        val lastMessage = fullChat.messages.lastOrNull() ?: return Result.EmptyChat
-        val lastMessageSenderId = lastMessage.senderId
-        val lastMessageSenderType = lastMessage.sender
-
-        val lastSender = when (lastMessageSenderType) {
-            SenderType.Character -> loadCharacter(lastMessageSenderId)
-            SenderType.Persona -> loadPersona(lastMessageSenderId)
+        val sender = when (senderType) {
+            SenderType.Character -> loadCharacter(fullChat.cardId)
+            SenderType.Persona -> loadPersona(personaId)
         }
 
-        if (lastSender is LastSender.PersonaSender && lastSender.persona.id == personaId) {
-            return Result.Success(fullChat, lastSender, lastSender.persona, lastSender.image)
+        return when (sender) {
+            is Sender.CharacterSender -> Result.Success(
+                card = sender.card,
+                fullChat = fullChat,
+                sender = sender,
+                persona = getPersona(personaId),
+                personaImage = loadPersonaImage(personaId)
+            )
+
+            is Sender.PersonaSender -> Result.Success(
+                card = getCard(chatId).first(),
+                fullChat = fullChat,
+                sender = sender,
+                persona = sender.persona,
+                personaImage = sender.image
+            )
         }
-
-        val persona = getPersona(personaId)
-        val image = loadPersonaImageUseCase(personaId)
-        return Result.Success(fullChat, lastSender, persona, image)
     }
 
-    private suspend fun loadCharacter(id: Long): LastSender {
-        val card = getCardUseCase(id).last()
+    private suspend fun loadCharacter(id: Long): Sender {
+        val card = getCard(id).first()
 
-        return LastSender.CharacterSender(card)
+        return Sender.CharacterSender(card)
     }
 
-    private suspend fun loadPersona(id: Long): LastSender {
+    private suspend fun loadPersona(id: Long): Sender {
         val persona = getPersona(id)
-        val image = loadPersonaImageUseCase(id)
+        val image = loadPersonaImage(id)
 
-        return LastSender.PersonaSender(persona, image)
+        return Sender.PersonaSender(persona, image)
     }
 
     sealed interface Result {
         data object NoChat : Result
-        data object EmptyChat : Result
         data class Success(
+            val card: CharacterCard,
             val fullChat: FullChat,
-            val sender: LastSender,
+            val sender: Sender,
             val persona: Persona,
             val personaImage: PersonaImage
         ) : Result
     }
 
-    sealed interface LastSender {
-        data class CharacterSender(val card: CharacterCard) : LastSender
-        data class PersonaSender(val persona: Persona, val image: PersonaImage) : LastSender
+    sealed interface Sender {
+        data class CharacterSender(val card: CharacterCard) : Sender
+        data class PersonaSender(val persona: Persona, val image: PersonaImage) : Sender
+
+        val name: String
+            get() = when (this) {
+                is CharacterSender -> card.name
+                is PersonaSender -> persona.name
+            }
+
+        val photo: Bitmap?
+            get() = when (this) {
+                is CharacterSender -> card.photoBytes
+                is PersonaSender -> image.bitmap
+            }
     }
 }

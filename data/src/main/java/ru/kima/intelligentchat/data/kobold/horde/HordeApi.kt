@@ -5,7 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.PUT
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.kima.intelligentchat.data.kobold.horde.model.ActiveModelDto
@@ -28,7 +28,7 @@ interface HordeApi {
     @GET("workers")
     suspend fun getWorkers(@Query("type") type: String = "text"): Response<List<WorkerDto>>
 
-    @PUT("generate/text/async")
+    @POST("generate/text/async")
     suspend fun generationRequest(
         @Header("apikey") apiKey: String,
         @Body generationInput: GenerationInputDto
