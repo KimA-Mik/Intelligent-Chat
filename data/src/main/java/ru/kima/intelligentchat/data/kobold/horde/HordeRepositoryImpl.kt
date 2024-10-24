@@ -7,6 +7,7 @@ import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.create
+import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toActiveModel
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toDto
@@ -14,15 +15,17 @@ import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeAsyncRequest
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeRequestStatus
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeWorker
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toUserInfo
-import ru.kima.intelligentchat.data.kobold.horde.model.ConnectionState
+import ru.kima.intelligentchat.data.kobold.horde.model.HordeConnectionState
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestError
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestValidationError
 import ru.kima.intelligentchat.data.kobold.horde.model.WorkerDto
 import ru.kima.intelligentchat.data.util.jsonConverterFactory.toConverterFactory
+import ru.kima.intelligentchat.domain.common.errors.HordeError
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
 import ru.kima.intelligentchat.domain.horde.model.HordeAsyncRequest
 import ru.kima.intelligentchat.domain.horde.model.HordeRequestStatus
+import ru.kima.intelligentchat.domain.horde.model.HordeReturnCodes
 import ru.kima.intelligentchat.domain.horde.model.HordeWorker
 import ru.kima.intelligentchat.domain.horde.model.UserInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
@@ -51,14 +54,14 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         return try {
             val response = api.heartbeat()
             if (response.isSuccessful) {
-                ConnectionState.isConnected.value = true
+                HordeConnectionState.isConnected.value = true
                 Resource.Success(Unit)
             } else {
                 Resource.Error("The heart of horde doesn't beat for some reason.")
             }
-        } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+        } catch (_: IOException) {
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -75,9 +78,9 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 val code = response.code().toString()
                 Resource.Error(code)
             }
-        } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+        } catch (_: IOException) {
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -96,9 +99,9 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 val message = getErrorMessage(response.errorBody())
                 Resource.Error(message)
             }
-        } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+        } catch (_: IOException) {
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -117,9 +120,9 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
                 val message = getErrorMessage(response.errorBody())
                 Resource.Error(message)
             }
-        } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+        } catch (_: IOException) {
+            HordeConnectionState.isConnected.value = false
+            Resource.Error(HordeRepository.NO_CONNECTION_ERROR)
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
             Resource.Error(message)
@@ -129,101 +132,130 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
     override suspend fun requestGeneration(
         apiKey: String,
         generationInput: GenerationInput
-    ): Resource<HordeAsyncRequest> {
+    ): ICResult<HordeAsyncRequest, HordeError> {
         return try {
             val response = api.generationRequest(apiKey, generationInput.toDto())
             when (response.code()) {
-                in 200 until 300 -> Resource.Success(
+                in 200 until 300 -> ICResult.Success(
                     response
                         .body()!!
                         .toHordeAsyncRequest()
                 )
 
-                400 -> Resource.Error(
-                    gerValidationErrorMessage(response.errorBody())
-                )
 
-                else -> Resource.Error(
-                    getErrorMessage(response.errorBody())
-                )
+                else -> ICResult.Error(getHordeError(response.errorBody()))
             }
-        } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
-        } catch (e: NullPointerException) {
-            Resource.Error("Unable to deserialize result of generation request")
+        } catch (_: IOException) {
+            HordeConnectionState.isConnected.value = false
+            ICResult.Error(HordeError.NoConnection)
+        } catch (_: NullPointerException) {
+            ICResult.Error(HordeError.UnknownError("Unable to deserialize result of generation request"))
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
-            Resource.Error(message)
+            ICResult.Error(HordeError.UnknownError(message))
         }
     }
 
-    override suspend fun getGenerationRequestStatus(id: String): Resource<HordeRequestStatus> {
+    override suspend fun getGenerationRequestStatus(id: String): ICResult<HordeRequestStatus, HordeError> {
         return try {
             val response = api.getGenerationStatus(id)
             if (response.isSuccessful) {
-                Resource.Success(
+                ICResult.Success(
                     response
                         .body()!!
                         .toHordeRequestStatus()
                 )
             } else {
-                Resource.Error(getErrorMessage(response.errorBody()))
+                ICResult.Error(getHordeError(response.errorBody()))
             }
-        } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+        } catch (_: IOException) {
+            HordeConnectionState.isConnected.value = false
+            ICResult.Error(HordeError.NoConnection)
+        } catch (_: NullPointerException) {
+            ICResult.Error(HordeError.UnknownError("Unable to deserialize result of check request"))
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
-            Resource.Error(message)
+            ICResult.Error(HordeError.UnknownError(message))
         }
     }
 
-    override suspend fun cancelGenerationRequest(id: String): Resource<HordeRequestStatus> {
+    override suspend fun cancelGenerationRequest(id: String): ICResult<HordeRequestStatus, HordeError> {
         return try {
             val response = api.cancelGenerationRequest(id)
             if (response.isSuccessful) {
-                Resource.Success(
+                ICResult.Success(
                     response
                         .body()!!
                         .toHordeRequestStatus()
                 )
             } else {
-                Resource.Error(getErrorMessage(response.errorBody()))
+                ICResult.Error(getHordeError(response.errorBody()))
             }
-        } catch (e: IOException) {
-            ConnectionState.isConnected.value = false
-            Resource.Error("0")
+        } catch (_: IOException) {
+            HordeConnectionState.isConnected.value = false
+            ICResult.Error(HordeError.NoConnection)
+        } catch (_: NullPointerException) {
+            ICResult.Error(HordeError.UnknownError("Unable to deserialize result of cancel generation request"))
         } catch (e: Exception) {
             val message = e.message ?: e.toString()
-            Resource.Error(message)
+            ICResult.Error(HordeError.UnknownError(message))
         }
     }
 
-    override fun connectionState(): Flow<Boolean> = ConnectionState.isConnected
+    override fun connectionState(): Flow<Boolean> = HordeConnectionState.isConnected
 
     private fun getErrorMessage(responseBody: ResponseBody?): String {
         return try {
             val error = errorConverter.convert(responseBody!!)
             error!!.message
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             "Unknown error"
         }
     }
 
-    private fun gerValidationErrorMessage(responseBody: ResponseBody?): String {
-        return try {
-            val error = requestValidationErrorConverter.convert(responseBody!!)!!
-            var res = error.message
-            if (error.errors.additionalProp1.isNotBlank()) res += "\n(${error.errors.additionalProp1})"
-            if (error.errors.additionalProp2.isNotBlank()) res += "\n(${error.errors.additionalProp2})"
-            if (error.errors.additionalProp3.isNotBlank()) res += "\n(${error.errors.additionalProp3})"
-            if (error.errors.additionalProp4.isNotBlank()) res += "\n(${error.errors.additionalProp4})"
-            if (error.errors.additionalProp5.isNotBlank()) res += "\n(${error.errors.additionalProp5})"
+    private fun getHordeError(responseBody: ResponseBody?): HordeError {
+        val error = errorBodyToResponseError(responseBody) ?: return HordeError.UnknownError()
+        return when (error.returnCode) {
+            HordeReturnCodes.KUDOS_VALIDATION_ERROR -> getValidationError(responseBody, error)
+            HordeReturnCodes.IMAGE_VALIDATION_FAILED -> getValidationError(responseBody, error)
+            HordeReturnCodes.INVALID_APIKEY -> HordeError.InvalidApiKey
+            HordeReturnCodes.TOO_MANY_PROMPTS -> HordeError.TooManyPrompts
+            HordeReturnCodes.MAINTENANCE_MODE -> HordeError.MaintenanceMode
+            HordeReturnCodes.REQUEST_NOT_FOUND -> HordeError.RequestNotFound
+            else -> HordeError.UnknownError(error.message)
+        }
+    }
 
+    private fun errorBodyToResponseError(responseBody: ResponseBody?): RequestError? {
+        return try {
+            errorConverter.convert(responseBody!!)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun getValidationError(responseBody: ResponseBody?, error: RequestError): HordeError {
+        return try {
+            val prompts =
+                gerValidationErrorPrompts(responseBody) ?: return HordeError.UnknownError()
+            return HordeError.ValidationError(error.message, prompts)
+        } catch (_: Exception) {
+            HordeError.UnknownError()
+        }
+    }
+
+    private fun gerValidationErrorPrompts(responseBody: ResponseBody?): List<String>? {
+        return try {
+            val res = mutableListOf<String>()
+            val error = requestValidationErrorConverter.convert(responseBody!!)!!
+            if (error.errors.additionalProp1.isNotBlank()) res.add(error.errors.additionalProp1)
+            if (error.errors.additionalProp2.isNotBlank()) res.add(error.errors.additionalProp2)
+            if (error.errors.additionalProp3.isNotBlank()) res.add(error.errors.additionalProp3)
+            if (error.errors.additionalProp4.isNotBlank()) res.add(error.errors.additionalProp4)
+            if (error.errors.additionalProp5.isNotBlank()) res.add(error.errors.additionalProp5)
             res
-        } catch (e: Exception) {
-            "Unknown validation error"
+        } catch (_: Exception) {
+            return null
         }
     }
 }

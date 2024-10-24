@@ -6,7 +6,7 @@ data class HordeRequestStatus(
     val finished: Int = 0,
     val generations: List<HordeGeneration> = emptyList(),
     val isPossible: Boolean = true,
-    val kudos: Float = 0f,
+    val kudos: Double = 0.0,
     val processing: Int = 0,
     val queuePosition: Int = 0,
     val restarted: Int = 0,

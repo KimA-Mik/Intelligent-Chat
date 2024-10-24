@@ -15,9 +15,9 @@ import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
-import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
+import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
@@ -33,11 +33,11 @@ class ChatScreenViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val preferences: GetPreferencesUseCase,
     private val getCharacterCard: GetCardUseCase,
-    private val createAndSelectChat: CreateAndSelectChatUseCase,
     private val subscribeToCardChat: SubscribeToCardChatUseCase,
     private val getPersonas: GetPersonasUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
+    private val sendMessage: SendMessageUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -62,7 +62,6 @@ class ChatScreenViewModel(
         val chat = subscribeToCardChat(id)
             .map {
                 when (it) {
-                    SubscribeToCardChatUseCase.Result.NotFound -> FullChat()
                     is SubscribeToCardChatUseCase.Result.Success -> it.fullChat
                     SubscribeToCardChatUseCase.Result.UnknownError -> FullChat()
                 }
@@ -107,9 +106,6 @@ class ChatScreenViewModel(
 
     private fun loadCard(id: Long) = viewModelScope.launch {
         getCharacterCard(id).collect {
-            if (it.selectedChat == 0L) {
-                createAndSelectChat(it)
-            }
             characterCard.value = it
             displayCard.value = it.toDisplayCard()
         }
@@ -138,7 +134,23 @@ class ChatScreenViewModel(
             is UserEvent.UpdateInputMessage -> onUpdateInputMessage(event.message)
             is UserEvent.MessageSwipeLeft -> onMessageSwipeLeft(event.messageId)
             is UserEvent.MessageSwipeRight -> onMessageSwipeRight(event.messageId)
+            UserEvent.SendMessage -> onSendMessage()
         }
+    }
+
+    private fun onSendMessage() = viewModelScope.launch {
+        val state = _state.value
+        if (state !is ChatScreenState.ChatState) {
+            return@launch
+        }
+
+        val text = state.inputMessageBuffer
+        savedStateHandle[MESSAGE_INPUT_BUFFER] = String()
+        sendMessage(
+            chatId = characterCard.value.selectedChat,
+            personaId = state.info.fullChat.selectedPersonaId,
+            text = text,
+        )
     }
 
     private fun onUpdateInputMessage(message: String) {
@@ -147,13 +159,27 @@ class ChatScreenViewModel(
 
     private fun onMessageSwipeLeft(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-            swipeFirstMessage(cardId = characterCard.value.id, direction = SwipeDirection.Left)
+            val s = _state.value
+            if (s is ChatScreenState.ChatState) {
+                swipeFirstMessage(
+                    cardId = characterCard.value.id,
+                    chatId = s.info.fullChat.chatId,
+                    direction = SwipeDirection.Left
+                )
+            }
         }
     }
 
     private fun onMessageSwipeRight(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-            swipeFirstMessage(cardId = characterCard.value.id, direction = SwipeDirection.Right)
+            val s = _state.value
+            if (s is ChatScreenState.ChatState) {
+                swipeFirstMessage(
+                    cardId = characterCard.value.id,
+                    chatId = s.info.fullChat.chatId,
+                    direction = SwipeDirection.Right
+                )
+            }
         }
     }
 

@@ -21,6 +21,7 @@ data class HordeState(
     val modelsInfo: Map<String, HordeModelInfo> = emptyMap(),
     val selectedModels: List<String> = emptyList(),
     val selectedPreset: Long = 1L,
+    val generationId: String? = null,
 )
 
 val Context.hordeStateDataStore: DataStore<HordeState> by dataStore(

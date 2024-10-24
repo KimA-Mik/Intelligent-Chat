@@ -1,6 +1,9 @@
 package ru.kima.intelligentchat
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -15,6 +18,7 @@ class ChatApplication : Application() {
     private lateinit var hordeConfigService: HordeConfigService
     override fun onCreate() {
         super.onCreate()
+        createNotificationChannels()
 
         startKoin {
             androidLogger()
@@ -28,5 +32,24 @@ class ChatApplication : Application() {
         }
 
         hordeConfigService = get<HordeConfigService>()
+    }
+
+    private fun createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.awaiting_for_message_notification_channel_name)
+            val descriptionText =
+                getString(R.string.awaiting_for_message_notification_channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val mChannel =
+                NotificationChannel(CHAT_MESSAGE_NOTIFICATIONS_CHANNEL_ID, name, importance)
+            mChannel.description = descriptionText
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(mChannel)
+        }
+    }
+
+    companion object {
+        const val MESSAGING_SERVICE_ID = 69
+        const val CHAT_MESSAGE_NOTIFICATIONS_CHANNEL_ID = "chat_message_notifications"
     }
 }

@@ -1,7 +1,9 @@
 package ru.kima.intelligentchat.domain.horde.repositoty
 
 import kotlinx.coroutines.flow.Flow
+import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.common.errors.HordeError
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
 import ru.kima.intelligentchat.domain.horde.model.HordeAsyncRequest
@@ -17,9 +19,13 @@ interface HordeRepository {
     suspend fun requestGeneration(
         apiKey: String,
         generationInput: GenerationInput
-    ): Resource<HordeAsyncRequest>
+    ): ICResult<HordeAsyncRequest, HordeError>
 
-    suspend fun getGenerationRequestStatus(id: String): Resource<HordeRequestStatus>
-    suspend fun cancelGenerationRequest(id: String): Resource<HordeRequestStatus>
+    suspend fun getGenerationRequestStatus(id: String): ICResult<HordeRequestStatus, HordeError>
+    suspend fun cancelGenerationRequest(id: String): ICResult<HordeRequestStatus, HordeError>
     fun connectionState(): Flow<Boolean>
+
+    companion object {
+        const val NO_CONNECTION_ERROR = "0"
+    }
 }

@@ -122,6 +122,7 @@ fun ChatScreenContent(
         bottomBar = {
             ChatBottomBar(
                 value = state.inputMessageBuffer,
+                onMessageSend = { onEvent(UserEvent.SendMessage) },
                 onValueChange = { onEvent(UserEvent.UpdateInputMessage(it)) },
             )
         },
@@ -221,6 +222,7 @@ fun Messages(
 @Composable
 fun ChatBottomBar(
     value: String,
+    onMessageSend: () -> Unit,
     onValueChange: (String) -> Unit
 ) {
 
@@ -241,7 +243,7 @@ fun ChatBottomBar(
             placeholder = stringResource(R.string.placeholder_enter_your_message),
             onValueChange = onValueChange
         )
-        IconButton(onClick = { }) {
+        IconButton(onClick = onMessageSend) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.Send,
                 contentDescription = null
@@ -296,7 +298,7 @@ private fun ChatScreenPreview() {
             state = ChatScreenState.ChatState(
                 info = ChatScreenState.ChatState.ChatInfo(
                     fullChat = DisplayChat(
-                        listOf(
+                        messages = listOf(
                             DisplayMessage(
                                 messageId = 0,
                                 senderName = "Sender",

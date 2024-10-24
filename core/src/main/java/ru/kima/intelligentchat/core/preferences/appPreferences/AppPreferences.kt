@@ -9,7 +9,8 @@ import ru.kima.intelligentchat.core.common.API_TYPE
 @Serializable
 data class AppPreferences(
     val selectedPersonaId: Long = 0,
-    val selectedApiType: API_TYPE = API_TYPE.HORDE
+    val selectedApiType: API_TYPE = API_TYPE.HORDE,
+    val generationPending: Boolean = false
 )
 
 val Context.preferencesDataStore: DataStore<AppPreferences> by dataStore(

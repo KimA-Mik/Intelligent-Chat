@@ -29,5 +29,5 @@ data class CharacterCard(
 
     val deleted: Boolean = false,
     val selectedChat: Long = 0,
-    val selectedGreeting: Int = 1
+    val selectedGreeting: Int = 0
 )

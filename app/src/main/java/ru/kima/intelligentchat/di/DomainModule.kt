@@ -33,15 +33,23 @@ import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
 import ru.kima.intelligentchat.domain.chat.repository.SwipeRepository
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.InitializeChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToChatMessagesWithSwipesUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
+import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
+import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
+import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.DeletePersonaUseCase
@@ -69,6 +77,7 @@ import ru.kima.intelligentchat.domain.presets.kobold.useCase.SubscribeToKoboldPr
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetUseCase
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
+import ru.kima.intelligentchat.presentation.android.implementation.messaging.repositoty.MessagingRepositoryImpl
 
 @OptIn(ExperimentalSerializationApi::class)
 fun domain() = module {
@@ -79,6 +88,7 @@ fun domain() = module {
     singleOf(::ChatRepositoryImpl) bind ChatRepository::class
     singleOf(::MessageRepositoryImpl) bind MessageRepository::class
     singleOf(::SwipeRepositoryImpl) bind SwipeRepository::class
+    singleOf(::MessagingRepositoryImpl) bind MessagingRepository::class
 
     singleOf(::GetPreferencesUseCase)
     singleOf(::SetSelectedPersonaIdUseCase)
@@ -128,11 +138,20 @@ fun domain() = module {
     singleOf(::UpdateKoboldPresetUseCase)
 
     singleOf(::CreateAndSelectChatUseCase)
+    singleOf(::InitializeChatUseCase)
     singleOf(::SubscribeToCardChatUseCase)
     singleOf(::SubscribeToChatMessagesWithSwipesUseCase)
     singleOf(::SubscribeToFullChatUseCase)
 
+    singleOf(::CreateMessageUseCase)
     singleOf(::SwipeFirstMessageUseCase)
+
+    singleOf(::LoadMessagingConfigUseCase)
+    singleOf(::LoadMessagingDataUseCase)
+    singleOf(::SendMessageUseCase)
+
+    singleOf(::HordeGenerationStrategy)
+    singleOf(::KoboldAiGenerationStrategy)
 
     single {
         val context: Context = get(Context::class.java)

@@ -10,7 +10,6 @@ class AddCardFromPngUseCase(
     private val updatePhoto: UpdateCardAvatarUseCase
 ) {
     operator fun invoke(imageBytes: ByteArray) = flow<Resource<Long>> {
-        emit(Resource.Loading())
         try {
             val parser = PngBlockParser()
             val data = parser.getTextBlock(imageBytes)
