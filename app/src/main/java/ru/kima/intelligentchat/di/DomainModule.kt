@@ -47,6 +47,7 @@ import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCa
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
+import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
@@ -145,6 +146,7 @@ fun domain() = module {
     singleOf(::CreateMessageUseCase)
     singleOf(::SwipeFirstMessageUseCase)
 
+    singleOf(::LoadMessagingConfigUseCase)
     singleOf(::LoadMessagingDataUseCase)
     singleOf(::SendMessageUseCase)
 

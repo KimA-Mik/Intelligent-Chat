@@ -1,5 +1,7 @@
 package ru.kima.intelligentchat.domain.messaging.useCase
 
+import android.graphics.Bitmap
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
@@ -13,9 +15,9 @@ import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 
 class LoadMessagingDataUseCase(
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
-    private val getCardUseCase: GetCardUseCase,
+    private val getCard: GetCardUseCase,
     private val getPersona: GetPersonaUseCase,
-    private val loadPersonaImageUseCase: LoadPersonaImageUseCase
+    private val loadPersonaImage: LoadPersonaImageUseCase
 ) {
     suspend operator fun invoke(chatId: Long, personaId: Long, senderType: SenderType): Result {
         val fullChatResult = subscribeToFullChat(chatId).last()
@@ -30,24 +32,34 @@ class LoadMessagingDataUseCase(
             SenderType.Persona -> loadPersona(personaId)
         }
 
-        if (sender is Sender.PersonaSender) {
-            return Result.Success(fullChat, sender, sender.persona, sender.image)
-        }
+        return when (sender) {
+            is Sender.CharacterSender -> Result.Success(
+                card = sender.card,
+                fullChat = fullChat,
+                sender = sender,
+                persona = getPersona(personaId),
+                personaImage = loadPersonaImage(personaId)
+            )
 
-        val persona = getPersona(personaId)
-        val image = loadPersonaImageUseCase(personaId)
-        return Result.Success(fullChat, sender, persona, image)
+            is Sender.PersonaSender -> Result.Success(
+                card = getCard(chatId).first(),
+                fullChat = fullChat,
+                sender = sender,
+                persona = sender.persona,
+                personaImage = sender.image
+            )
+        }
     }
 
     private suspend fun loadCharacter(id: Long): Sender {
-        val card = getCardUseCase(id).last()
+        val card = getCard(id).first()
 
         return Sender.CharacterSender(card)
     }
 
     private suspend fun loadPersona(id: Long): Sender {
         val persona = getPersona(id)
-        val image = loadPersonaImageUseCase(id)
+        val image = loadPersonaImage(id)
 
         return Sender.PersonaSender(persona, image)
     }
@@ -55,6 +67,7 @@ class LoadMessagingDataUseCase(
     sealed interface Result {
         data object NoChat : Result
         data class Success(
+            val card: CharacterCard,
             val fullChat: FullChat,
             val sender: Sender,
             val persona: Persona,
@@ -65,5 +78,17 @@ class LoadMessagingDataUseCase(
     sealed interface Sender {
         data class CharacterSender(val card: CharacterCard) : Sender
         data class PersonaSender(val persona: Persona, val image: PersonaImage) : Sender
+
+        val name: String
+            get() = when (this) {
+                is CharacterSender -> card.name
+                is PersonaSender -> persona.name
+            }
+
+        val photo: Bitmap?
+            get() = when (this) {
+                is CharacterSender -> card.photoBytes
+                is PersonaSender -> image.bitmap
+            }
     }
 }
