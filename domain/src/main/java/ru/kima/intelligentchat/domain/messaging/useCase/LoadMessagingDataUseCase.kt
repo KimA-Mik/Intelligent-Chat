@@ -17,7 +17,7 @@ class LoadMessagingDataUseCase(
     private val getPersona: GetPersonaUseCase,
     private val loadPersonaImageUseCase: LoadPersonaImageUseCase
 ) {
-    suspend operator fun invoke(chatId: Long, personaId: Long): Result {
+    suspend operator fun invoke(chatId: Long, personaId: Long, senderType: SenderType): Result {
         val fullChatResult = subscribeToFullChat(chatId).last()
         val fullChat = if (fullChatResult is SubscribeToFullChatUseCase.Result.Success) {
             fullChatResult.fullChat
@@ -25,50 +25,45 @@ class LoadMessagingDataUseCase(
             return Result.NoChat
         }
 
-        val lastMessage = fullChat.messages.lastOrNull() ?: return Result.EmptyChat
-        val lastMessageSenderId = lastMessage.senderId
-        val lastMessageSenderType = lastMessage.sender
-
-        val lastSender = when (lastMessageSenderType) {
-            SenderType.Character -> loadCharacter(lastMessageSenderId)
-            SenderType.Persona -> loadPersona(lastMessageSenderId)
+        val sender = when (senderType) {
+            SenderType.Character -> loadCharacter(fullChat.cardId)
+            SenderType.Persona -> loadPersona(personaId)
         }
 
-        if (lastSender is LastSender.PersonaSender && lastSender.persona.id == personaId) {
-            return Result.Success(fullChat, lastSender, lastSender.persona, lastSender.image)
+        if (sender is Sender.PersonaSender) {
+            return Result.Success(fullChat, sender, sender.persona, sender.image)
         }
 
         val persona = getPersona(personaId)
         val image = loadPersonaImageUseCase(personaId)
-        return Result.Success(fullChat, lastSender, persona, image)
+        return Result.Success(fullChat, sender, persona, image)
     }
 
-    private suspend fun loadCharacter(id: Long): LastSender {
+    private suspend fun loadCharacter(id: Long): Sender {
         val card = getCardUseCase(id).last()
 
-        return LastSender.CharacterSender(card)
+        return Sender.CharacterSender(card)
     }
 
-    private suspend fun loadPersona(id: Long): LastSender {
+    private suspend fun loadPersona(id: Long): Sender {
         val persona = getPersona(id)
         val image = loadPersonaImageUseCase(id)
 
-        return LastSender.PersonaSender(persona, image)
+        return Sender.PersonaSender(persona, image)
     }
 
     sealed interface Result {
         data object NoChat : Result
-        data object EmptyChat : Result
         data class Success(
             val fullChat: FullChat,
-            val sender: LastSender,
+            val sender: Sender,
             val persona: Persona,
             val personaImage: PersonaImage
         ) : Result
     }
 
-    sealed interface LastSender {
-        data class CharacterSender(val card: CharacterCard) : LastSender
-        data class PersonaSender(val persona: Persona, val image: PersonaImage) : LastSender
+    sealed interface Sender {
+        data class CharacterSender(val card: CharacterCard) : Sender
+        data class PersonaSender(val persona: Persona, val image: PersonaImage) : Sender
     }
 }
