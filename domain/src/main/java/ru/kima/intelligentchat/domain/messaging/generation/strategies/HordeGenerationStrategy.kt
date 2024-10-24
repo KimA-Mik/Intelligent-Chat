@@ -2,11 +2,12 @@ package ru.kima.intelligentchat.domain.messaging.generation.strategies
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.last
 import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
+import ru.kima.intelligentchat.domain.horde.model.HordeDefaults
 import ru.kima.intelligentchat.domain.horde.model.HordeGenerationParams
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationRequest
@@ -23,10 +24,10 @@ class HordeGenerationStrategy(
     private val getKoboldPreset: GetKoboldPresetUseCase
 ) : GenerationStrategy {
     override fun generation(request: GenerationRequest): Flow<GenerationStatus> = flow {
-        emit(GenerationStatus.None)
-        val hordeState = getHordePreferences().last()
+        emit(GenerationStatus.Pending)
+        val hordeState = getHordePreferences().first()
 
-        val apiKey = hordeState.apiToken
+        val apiKey = hordeState.apiToken.ifBlank { HordeDefaults.API_KEY }
         val preset = getKoboldPreset(hordeState.selectedPreset) ?: return@flow
         val params = HordeGenerationParams(
             maxContextLength = request.maxContextLength,
