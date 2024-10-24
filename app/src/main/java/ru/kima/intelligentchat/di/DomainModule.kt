@@ -45,6 +45,7 @@ import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
@@ -148,6 +149,7 @@ fun domain() = module {
     singleOf(::SendMessageUseCase)
 
     singleOf(::HordeGenerationStrategy)
+    singleOf(::KoboldAiGenerationStrategy)
 
     single {
         val context: Context = get(Context::class.java)
