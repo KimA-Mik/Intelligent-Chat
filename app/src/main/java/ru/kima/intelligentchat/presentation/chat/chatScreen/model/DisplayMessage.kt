@@ -16,4 +16,5 @@ data class DisplayMessage(
     val currentSwipe: Int = 1,
     val totalSwipes: Int = 1,
     val index: Int = 0,
+    val showSwipeInfo: Boolean = false,
 )
