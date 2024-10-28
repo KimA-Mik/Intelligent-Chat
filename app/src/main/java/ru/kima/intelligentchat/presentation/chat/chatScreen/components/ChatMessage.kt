@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
@@ -62,6 +63,7 @@ fun ChatMessage(
             index = message.index,
             modifier = Modifier.fillMaxHeight(),
             tookMs = 0,
+            showLeftArrow = message.showSwipeInfo,
             onImageClick = onImageClick,
             onLeftClick = onLeftClick
         )
@@ -77,16 +79,22 @@ fun ChatMessage(
 
             AnimatedText(
                 text = message.text,
-                currentSwipe = message.currentSwipe
+                currentSwipe = message.currentSwipe,
+                modifier = Modifier.padding(
+                    end =
+                    if (message.showSwipeInfo) 0.dp else 8.dp
+                )
             )
         }
 
-        RightArrow(
-            currentSwipe = message.currentSwipe,
-            totalSwipes = message.totalSwipes,
-            modifier = Modifier.fillMaxHeight(),
-            onRightClick = onRightClick
-        )
+        if (message.showSwipeInfo) {
+            RightArrow(
+                currentSwipe = message.currentSwipe,
+                totalSwipes = message.totalSwipes,
+                modifier = Modifier.fillMaxHeight(),
+                onRightClick = onRightClick
+            )
+        }
     }
 }
 
@@ -110,7 +118,6 @@ fun AnimatedText(
 
     var prevSwipe by remember { mutableIntStateOf(0) }
     var animationSpec by remember { mutableStateOf(calm) }
-    println("currentSwipe = $currentSwipe, prevSwipe = $prevSwipe")
     if (prevSwipe == 0) {
         prevSwipe = currentSwipe
     }
@@ -141,6 +148,7 @@ private fun ImageAndMetaInfo(
     index: Int,
     modifier: Modifier = Modifier,
     tookMs: Long = 0,
+    showLeftArrow: Boolean,
     onImageClick: () -> Unit,
     onLeftClick: () -> Unit
 ) {
@@ -155,7 +163,7 @@ private fun ImageAndMetaInfo(
         ) {
             MessageSenderImage(
                 imageBitmap = imageBitmap,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(ChatDefaults.SENDER_IMAGE_SIZE),
                 onClick = onImageClick
             )
 
@@ -173,8 +181,13 @@ private fun ImageAndMetaInfo(
             }
         }
 
-        IconButton(onClick = onLeftClick) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = "")
+        if (showLeftArrow) {
+            IconButton(
+                onClick = onLeftClick,
+                modifier = Modifier.size(ChatDefaults.SENDER_IMAGE_SIZE)
+            ) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = "")
+            }
         }
     }
 }
@@ -255,9 +268,30 @@ private fun ChatMessagePreview() {
                 message = DisplayMessage(
                     messageId = 0,
                     senderName = "Sender",
+                    text = "Message Text"
+                ),
+                modifier = Modifier.padding(8.dp),
+                onImageClick = {},
+                onLeftClick = {},
+                onRightClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ChatMessageWithSwipesPreview() {
+    IntelligentChatTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            ChatMessage(
+                message = DisplayMessage(
+                    messageId = 0,
+                    senderName = "Sender",
                     text = "Message Text",
                     currentSwipe = 2,
-                    totalSwipes = 2
+                    totalSwipes = 2,
+                    showSwipeInfo = true
                 ),
                 modifier = Modifier.padding(8.dp),
                 onImageClick = {},

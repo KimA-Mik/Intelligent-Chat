@@ -11,6 +11,7 @@ fun MessageWithSwipes.toDisplayMessage(
     cardBitmap: ImmutableImageBitmap = ImmutableImageBitmap(),
     personasNames: Map<Long, String> = emptyMap(),
     personasImages: Map<Long, ImmutableImageBitmap> = emptyMap(),
+    showSwipeInfo: Boolean = false,
 ): DisplayMessage {
     return DisplayMessage(
         messageId = messageId,
@@ -24,6 +25,7 @@ fun MessageWithSwipes.toDisplayMessage(
         text = swipes.getOrElse(selectedSwipeIndex) { Swipe(text = "OOB") }.text,
         currentSwipe = selectedSwipeIndex + 1,
         totalSwipes = swipes.size,
-        index = index
+        index = index,
+        showSwipeInfo = showSwipeInfo
     )
 }

@@ -50,6 +50,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
@@ -303,6 +304,17 @@ private fun ChatScreenPreview() {
                                 messageId = 0,
                                 senderName = "Sender",
                                 text = "Message Text",
+                            ), DisplayMessage(
+                                messageId = 1,
+                                senderName = "Sender",
+                                text = "Message Text",
+                                senderType = SenderType.Persona
+                            ), DisplayMessage(
+                                messageId = 2,
+                                senderName = "Sender",
+                                text = "Message Text",
+                                senderType = SenderType.Character,
+                                showSwipeInfo = true
                             )
                         )
                     )

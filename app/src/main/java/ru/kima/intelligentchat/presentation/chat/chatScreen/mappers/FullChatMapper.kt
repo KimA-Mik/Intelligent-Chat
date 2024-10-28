@@ -43,13 +43,15 @@ fun FullChat.toDisplayChat(
                 card.name,
                 preloadCardImageBitmap,
                 personasNames,
-                personasImages
+                personasImages,
+                showSwipeInfo = firstMessage.swipes.size > 1
             )
         )
     } else {
-        messages.map {
-            it.toDisplayMessage(
-                card.name, preloadCardImageBitmap, personasNames, personasImages
+        messages.mapIndexed { index, message ->
+            message.toDisplayMessage(
+                card.name, preloadCardImageBitmap, personasNames, personasImages,
+                showSwipeInfo = index == messages.lastIndex && message.sender == SenderType.Character
             )
         }
     }
