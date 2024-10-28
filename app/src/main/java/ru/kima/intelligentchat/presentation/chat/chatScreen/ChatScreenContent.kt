@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.presentation.chat.chatScreen
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -34,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
@@ -133,15 +136,40 @@ fun ChatScreenContent(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         if (state.info.fullChat.messages.isNotEmpty()) {
-            Messages(
-                state = state.info,
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .nestedScroll(sb.nestedScrollConnection),
+            ChatBody(
+                state = state,
+                indicator = state.status,
+                scrollBehavior = sb,
+                modifier = Modifier.padding(padding),
                 onEvent = onEvent
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ChatBody(
+    state: ChatScreenState.ChatState,
+    indicator: MessagingIndicator,
+    scrollBehavior: TopAppBarScrollBehavior,
+    modifier: Modifier = Modifier,
+    onEvent: (UserEvent) -> Unit
+) {
+    Column(modifier) {
+        MessageIndicator(
+            indicator = indicator,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp)
+        )
+        Messages(
+            state = state.info,
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            onEvent = onEvent
+        )
     }
 }
 
@@ -170,6 +198,25 @@ private fun moreMenuItems() = remember {
             iconVector = Icons.Default.Numbers
         )
     )
+}
+
+
+@Composable
+fun MessageIndicator(
+    indicator: MessagingIndicator,
+    modifier: Modifier = Modifier
+) {
+    when (indicator) {
+        is MessagingIndicator.DeterminedGenerating -> LinearProgressIndicator(
+            progress = { indicator.progress },
+            modifier
+        )
+
+        MessagingIndicator.Generating -> LinearProgressIndicator(modifier)
+        MessagingIndicator.None -> {}
+        MessagingIndicator.Pending -> LinearProgressIndicator(progress = { 0f }, modifier)
+    }
+
 }
 
 
