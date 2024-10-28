@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.RememberMe
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +52,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.domain.chat.model.SenderType
+import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
@@ -123,6 +125,7 @@ fun ChatScreenContent(
         bottomBar = {
             ChatBottomBar(
                 value = state.inputMessageBuffer,
+                messagingIndicator = state.status,
                 onMessageSend = { onEvent(UserEvent.SendMessage) },
                 onValueChange = { onEvent(UserEvent.UpdateInputMessage(it)) },
             )
@@ -223,6 +226,7 @@ fun Messages(
 @Composable
 fun ChatBottomBar(
     value: String,
+    messagingIndicator: MessagingIndicator,
     onMessageSend: () -> Unit,
     onValueChange: (String) -> Unit
 ) {
@@ -246,7 +250,9 @@ fun ChatBottomBar(
         )
         IconButton(onClick = onMessageSend) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.Send,
+                imageVector =
+                if (messagingIndicator == MessagingIndicator.None) Icons.AutoMirrored.Default.Send
+                else Icons.Default.StopCircle,
                 contentDescription = null
             )
         }
