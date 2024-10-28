@@ -21,12 +21,14 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -450,7 +452,8 @@ fun ActiveModelItem(
                 checked = model.selected,
                 onCheckedChange = { onEvent(COUserEvent.CheckHordeModel(model.name)) })
         },
-        headlineContent = { Text(text = "${model.name} ${model.details}") }
+        headlineContent = { Text(text = "${model.name} ${model.details}") },
+        colors = ListItemDefaults.colors(containerColor = AlertDialogDefaults.containerColor)
     )
 }
 
