@@ -18,6 +18,7 @@ import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
+import ru.kima.intelligentchat.domain.messaging.useCase.SubscribeToMessagingStatus
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
@@ -37,7 +38,8 @@ class ChatScreenViewModel(
     private val getPersonas: GetPersonasUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
-    private val sendMessage: SendMessageUseCase
+    private val sendMessage: SendMessageUseCase,
+    private val messagingStatus: SubscribeToMessagingStatus
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -89,11 +91,13 @@ class ChatScreenViewModel(
 
         val stateFlow = combine(
             chatInfo,
+            messagingStatus(),
             savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, String()),
-        ) { info, inputMessageBuffer ->
+        ) { info, messagingStatus, inputMessageBuffer ->
             ChatScreenState.ChatState(
                 info = info,
                 inputMessageBuffer = inputMessageBuffer,
+                status = messagingStatus
             )
         }
 
