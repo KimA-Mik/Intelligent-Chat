@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "ru.kima.intelligentchat"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "ru.kima.intelligentchat"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 8
         versionName = "0.73"
 
