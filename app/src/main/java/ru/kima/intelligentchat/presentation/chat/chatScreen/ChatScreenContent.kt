@@ -22,9 +22,11 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.RememberMe
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -51,6 +53,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.domain.chat.model.SenderType
+import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
@@ -123,6 +126,7 @@ fun ChatScreenContent(
         bottomBar = {
             ChatBottomBar(
                 value = state.inputMessageBuffer,
+                messagingIndicator = state.status,
                 onMessageSend = { onEvent(UserEvent.SendMessage) },
                 onValueChange = { onEvent(UserEvent.UpdateInputMessage(it)) },
             )
@@ -135,13 +139,12 @@ fun ChatScreenContent(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .nestedScroll(sb.nestedScrollConnection),
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
                 onEvent = onEvent
             )
         }
     }
 }
-
 @Composable
 private fun dropdownMenuItems() = remember {
     listOf(
@@ -167,6 +170,24 @@ private fun moreMenuItems() = remember {
             iconVector = Icons.Default.Numbers
         )
     )
+}
+
+
+@Composable
+fun MessageIndicator(
+    indicator: MessagingIndicator,
+    modifier: Modifier = Modifier
+) {
+    when (indicator) {
+        is MessagingIndicator.DeterminedGenerating -> LinearProgressIndicator(
+            progress = { indicator.progress },
+            modifier
+        )
+
+        MessagingIndicator.Generating -> LinearProgressIndicator(modifier)
+        MessagingIndicator.None -> {}
+        MessagingIndicator.Pending -> LinearProgressIndicator(progress = { 0f }, modifier)
+    }
 }
 
 
@@ -223,9 +244,20 @@ fun Messages(
 @Composable
 fun ChatBottomBar(
     value: String,
+    messagingIndicator: MessagingIndicator,
+    modifier: Modifier = Modifier,
     onMessageSend: () -> Unit,
     onValueChange: (String) -> Unit
+) = Box(
+    modifier = modifier,
+    contentAlignment = Alignment.TopCenter
 ) {
+    MessageIndicator(
+        indicator = messagingIndicator,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp)
+    )
 
     Row(
         modifier = Modifier
@@ -246,7 +278,9 @@ fun ChatBottomBar(
         )
         IconButton(onClick = onMessageSend) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.Send,
+                imageVector =
+                if (messagingIndicator == MessagingIndicator.None) Icons.AutoMirrored.Default.Send
+                else Icons.Default.StopCircle,
                 contentDescription = null
             )
         }
