@@ -233,9 +233,13 @@ fun Messages(
                             )
                         }
                     },
-                onImageClick = {},
-                onLeftClick = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
-                onRightClick = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) }
+                onImageClicked = {},
+                onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
+                onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
+                onEditClicked = {},
+                onDeleteClicked = {},
+                onMoveUpClicked = {},
+                onMoveDownClicked = {}
             )
         }
     }
