@@ -21,6 +21,16 @@ class MessageRepositoryImpl(
             .map { it.map(MessageEntity::toMessage) }
     }
 
+    override suspend fun updateMessage(message: Message) {
+        messageDao.updateMassage(message.toMessage())
+    }
+
+    override suspend fun updateMessages(messages: List<Message>) {
+        messageDao.updateMessages(
+            messages.map { it.toMessage() }
+        )
+    }
+
     override suspend fun deleteMessage(messageId: Long): Boolean {
         return messageDao.deleteMessage(messageId) > 0
     }

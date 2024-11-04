@@ -16,6 +16,7 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SubscribeToMessagingStatus
@@ -39,7 +40,8 @@ class ChatScreenViewModel(
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
     private val sendMessage: SendMessageUseCase,
-    private val messagingStatus: SubscribeToMessagingStatus
+    private val messagingStatus: SubscribeToMessagingStatus,
+    private val deleteMessage: DeleteMessageUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -139,6 +141,14 @@ class ChatScreenViewModel(
             is UserEvent.MessageSwipeLeft -> onMessageSwipeLeft(event.messageId)
             is UserEvent.MessageSwipeRight -> onMessageSwipeRight(event.messageId)
             UserEvent.SendMessage -> onSendMessage()
+            is UserEvent.DeleteMessage -> onDeleteMessage(event.messageId)
+        }
+    }
+
+    private fun onDeleteMessage(messageId: Long) = viewModelScope.launch {
+        val s = _state.value
+        if (messageId > 0 && s is ChatScreenState.ChatState) {
+            deleteMessage(chatId = s.info.fullChat.chatId, messageId = messageId)
         }
     }
 

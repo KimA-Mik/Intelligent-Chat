@@ -237,7 +237,7 @@ fun Messages(
                 onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
                 onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
                 onEditClicked = {},
-                onDeleteClicked = {},
+                onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
                 onMoveUpClicked = {},
                 onMoveDownClicked = {}
             )
