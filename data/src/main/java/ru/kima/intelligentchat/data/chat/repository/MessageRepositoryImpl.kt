@@ -47,6 +47,7 @@ class MessageRepositoryImpl(
             senderId = senderId,
             index = index,
             selectedSwipeIndex = selectedSwipeIndex,
+            deleted = false
         )
 
         return messageDao.insertMessage(message)

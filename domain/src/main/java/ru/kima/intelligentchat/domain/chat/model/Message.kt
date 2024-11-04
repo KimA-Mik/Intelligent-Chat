@@ -7,4 +7,5 @@ data class Message(
     val senderId: Long,
     val index: Int,
     val selectedSwipeIndex: Int,
+    val deleted: Boolean,
 )

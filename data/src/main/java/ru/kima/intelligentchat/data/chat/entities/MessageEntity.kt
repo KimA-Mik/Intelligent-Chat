@@ -21,5 +21,6 @@ data class MessageEntity(
     val senderId: Long,
     val index: Int,
     @ColumnInfo(name = "selected_swipe_index")
-    val selectedSwipeIndex: Int
+    val selectedSwipeIndex: Int,
+    val deleted: Boolean
 )

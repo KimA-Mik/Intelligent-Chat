@@ -22,10 +22,10 @@ interface MessageDao {
     suspend fun updateMessages(messages: List<MessageEntity>)
 
     @Transaction
-    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId ORDER By `index`")
+    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId AND deleted=0 ORDER By `index`")
     fun chatWithMessages(chatId: Long): Flow<List<MessageWithSwipesDto>>
 
-    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId ORDER By `index`")
+    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId AND deleted=0 ORDER By `index`")
     fun chatMessages(chatId: Long): Flow<List<MessageEntity>>
 
     @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE message_id = :messageId")
