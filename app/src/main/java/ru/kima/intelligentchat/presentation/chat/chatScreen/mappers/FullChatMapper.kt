@@ -35,7 +35,8 @@ fun FullChat.toDisplayChat(
                                 body.replace("{{user}}", personaName, true)
                             }
                     )
-                }
+                },
+            deleted = false
         )
 
         mutableListOf(
