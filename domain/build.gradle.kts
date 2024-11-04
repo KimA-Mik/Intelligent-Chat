@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "ru.kima.intelligentchat.domain"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
