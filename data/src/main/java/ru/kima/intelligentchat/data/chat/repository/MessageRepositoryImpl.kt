@@ -2,11 +2,13 @@ package ru.kima.intelligentchat.data.chat.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import ru.kima.intelligentchat.data.chat.dto.MessageWithSwipesDto
 import ru.kima.intelligentchat.data.chat.entities.MessageEntity
 import ru.kima.intelligentchat.data.chat.mappers.toDto
 import ru.kima.intelligentchat.data.chat.mappers.toMessage
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.domain.chat.model.Message
+import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
 
@@ -14,6 +16,12 @@ class MessageRepositoryImpl(
     wrapper: DatabaseWrapper
 ) : MessageRepository {
     private val messageDao = wrapper.database.messageDao()
+
+    override fun subscribeToChatMessagesWithSwipes(chatId: Long): Flow<List<MessageWithSwipes>> {
+        return messageDao
+            .chatWithMessages(chatId)
+            .map { it.map(MessageWithSwipesDto::toMessage) }
+    }
 
     override fun subscribeToChatMessages(chatId: Long): Flow<List<Message>> {
         return messageDao
