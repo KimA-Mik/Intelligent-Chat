@@ -127,7 +127,7 @@ fun ChatScreenContent(
             ChatBottomBar(
                 value = state.inputMessageBuffer,
                 messagingIndicator = state.status,
-                onMessageSend = { onEvent(UserEvent.SendMessage) },
+                onMessageButtonClicked = { onEvent(UserEvent.MessageButtonClicked) },
                 onValueChange = { onEvent(UserEvent.UpdateInputMessage(it)) },
             )
         },
@@ -250,7 +250,7 @@ fun ChatBottomBar(
     value: String,
     messagingIndicator: MessagingIndicator,
     modifier: Modifier = Modifier,
-    onMessageSend: () -> Unit,
+    onMessageButtonClicked: () -> Unit,
     onValueChange: (String) -> Unit
 ) = Box(
     modifier = modifier,
@@ -280,7 +280,7 @@ fun ChatBottomBar(
             placeholder = stringResource(R.string.placeholder_enter_your_message),
             onValueChange = onValueChange
         )
-        IconButton(onClick = onMessageSend) {
+        IconButton(onClick = onMessageButtonClicked) {
             Icon(
                 imageVector =
                 if (messagingIndicator == MessagingIndicator.None) Icons.AutoMirrored.Default.Send

@@ -5,5 +5,5 @@ sealed interface UserEvent {
     data class MessageSwipeLeft(val messageId: Long) : UserEvent
     data class MessageSwipeRight(val messageId: Long) : UserEvent
     data class DeleteMessage(val messageId: Long) : UserEvent
-    data object SendMessage : UserEvent
+    data object MessageButtonClicked : UserEvent
 }

@@ -18,6 +18,8 @@ import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
+import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
+import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SubscribeToMessagingStatus
 import ru.kima.intelligentchat.domain.persona.model.Persona
@@ -41,7 +43,8 @@ class ChatScreenViewModel(
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
     private val sendMessage: SendMessageUseCase,
     private val messagingStatus: SubscribeToMessagingStatus,
-    private val deleteMessage: DeleteMessageUseCase
+    private val deleteMessage: DeleteMessageUseCase,
+    private val cancelMessage: CancelMessageUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -140,8 +143,18 @@ class ChatScreenViewModel(
             is UserEvent.UpdateInputMessage -> onUpdateInputMessage(event.message)
             is UserEvent.MessageSwipeLeft -> onMessageSwipeLeft(event.messageId)
             is UserEvent.MessageSwipeRight -> onMessageSwipeRight(event.messageId)
-            UserEvent.SendMessage -> onSendMessage()
+            UserEvent.MessageButtonClicked -> onMessageButtonClicked()
             is UserEvent.DeleteMessage -> onDeleteMessage(event.messageId)
+        }
+    }
+
+    private fun onMessageButtonClicked() {
+        val s = _state.value
+        if (s !is ChatScreenState.ChatState) return
+
+        when (s.status) {
+            MessagingIndicator.None -> onSendMessage(s)
+            else -> onCancelMessage()
         }
     }
 
@@ -152,12 +165,11 @@ class ChatScreenViewModel(
         }
     }
 
-    private fun onSendMessage() = viewModelScope.launch {
-        val state = _state.value
-        if (state !is ChatScreenState.ChatState) {
-            return@launch
-        }
+    private fun onCancelMessage() = viewModelScope.launch {
+        cancelMessage()
+    }
 
+    private fun onSendMessage(state: ChatScreenState.ChatState) = viewModelScope.launch {
         val text = state.inputMessageBuffer
         savedStateHandle[MESSAGE_INPUT_BUFFER] = String()
         sendMessage(
