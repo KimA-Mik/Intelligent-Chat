@@ -80,14 +80,16 @@ class ChatScreenViewModel(
 
 
         val chatInfo = combine(
-            characterCard, displayCard, chat, personasNames, personasImages, preferences()
-        ) { characterCard, displayCard, fullChat, names, images, preferences ->
+            characterCard, displayCard, chat, personasNames, personasImages, preferences(),
+            savedStateHandle.getStateFlow(EDITED_MESSAGE_ID, EMPTY_EDITED_MESSAGE_ID),
+        ) { characterCard, displayCard, fullChat, names, images, preferences, editedMessageId ->
             ChatScreenState.ChatState.ChatInfo(
                 characterCard = displayCard,
                 fullChat = fullChat.toDisplayChat(
                     card = characterCard,
                     preloadCardImageBitmap = displayCard.image,
                     selectedPersona = preferences.selectedPersonaId,
+                    editedMessageId = editedMessageId,
                     personasNames = names,
                     personasImages = images
                 )
@@ -98,10 +100,12 @@ class ChatScreenViewModel(
             chatInfo,
             messagingStatus(),
             savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, String()),
-        ) { info, messagingStatus, inputMessageBuffer ->
+            savedStateHandle.getStateFlow(MESSAGE_EDIT_BUFFER, String()),
+        ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer ->
             ChatScreenState.ChatState(
                 info = info,
                 inputMessageBuffer = inputMessageBuffer,
+                editMessageBuffer = editMessageBuffer,
                 status = messagingStatus
             )
         }
@@ -145,7 +149,12 @@ class ChatScreenViewModel(
             is UserEvent.MessageSwipeRight -> onMessageSwipeRight(event.messageId)
             UserEvent.MessageButtonClicked -> onMessageButtonClicked()
             is UserEvent.DeleteMessage -> onDeleteMessage(event.messageId)
+            is UserEvent.EditMessage -> onEditMessage(event.messageId)
         }
+    }
+
+    private fun onEditMessage(messageId: Long) {
+        savedStateHandle[EDITED_MESSAGE_ID] = messageId
     }
 
     private fun onMessageButtonClicked() {
@@ -211,5 +220,8 @@ class ChatScreenViewModel(
 
     companion object {
         private const val MESSAGE_INPUT_BUFFER = "MESSAGE_INPUT_BUFFER"
+        private const val MESSAGE_EDIT_BUFFER = "MESSAGE_EDIT_BUFFER"
+        private const val EDITED_MESSAGE_ID = "EDITED_MESSAGE"
+        private const val EMPTY_EDITED_MESSAGE_ID = 0L
     }
 }

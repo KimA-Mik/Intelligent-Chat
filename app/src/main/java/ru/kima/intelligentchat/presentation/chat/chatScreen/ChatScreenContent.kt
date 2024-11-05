@@ -56,6 +56,7 @@ import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessageState
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
@@ -136,6 +137,7 @@ fun ChatScreenContent(
         if (state.info.fullChat.messages.isNotEmpty()) {
             Messages(
                 state = state.info,
+                editMessageBuffer = state.editMessageBuffer,
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
@@ -145,6 +147,7 @@ fun ChatScreenContent(
         }
     }
 }
+
 @Composable
 private fun dropdownMenuItems() = remember {
     listOf(
@@ -194,6 +197,7 @@ fun MessageIndicator(
 @Composable
 fun Messages(
     state: ChatScreenState.ChatState.ChatInfo,
+    editMessageBuffer: String,
     modifier: Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
@@ -222,6 +226,7 @@ fun Messages(
             key = { it.messageId }) {
             ChatMessage(
                 message = it,
+                editStateBuffer = if (it.state == ChatMessageState.Edit) editMessageBuffer else null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
@@ -236,7 +241,7 @@ fun Messages(
                 onImageClicked = {},
                 onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
                 onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
-                onEditClicked = {},
+                onEditClicked = { onEvent(UserEvent.EditMessage(it.messageId)) },
                 onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
                 onMoveUpClicked = {},
                 onMoveDownClicked = {}
@@ -352,7 +357,7 @@ private fun ChatScreenPreview() {
                                 senderName = "Sender",
                                 text = "Message Text",
                                 senderType = SenderType.Character,
-                                showSwipeInfo = true
+                                state = ChatMessageState.Arrows
                             )
                         )
                     )
