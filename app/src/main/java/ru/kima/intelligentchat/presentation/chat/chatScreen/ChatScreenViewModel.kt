@@ -18,6 +18,7 @@ import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
@@ -46,7 +47,8 @@ class ChatScreenViewModel(
     private val messagingStatus: SubscribeToMessagingStatus,
     private val deleteMessage: DeleteMessageUseCase,
     private val cancelMessage: CancelMessageUseCase,
-    private val editMessage: EditMessageUseCase
+    private val editMessage: EditMessageUseCase,
+    private val moveMessage: MoveMessageUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -155,7 +157,29 @@ class ChatScreenViewModel(
             UserEvent.SaveEditedMessage -> onSaveEditedMessage()
             UserEvent.DismissEditedMessage -> onDismissEditedMessage()
             is UserEvent.UpdateEditedMessage -> onUpdateEditedMessage(event.text)
+            is UserEvent.MoveMessageDown -> onMoveMessageDown(event.messageId)
+            is UserEvent.MoveMessageUp -> onMoveMessageUp(event.messageId)
         }
+    }
+
+    private fun onMoveMessageUp(messageId: Long) = viewModelScope.launch {
+        val s = currentState() ?: return@launch
+
+        moveMessage(
+            chatId = s.info.fullChat.chatId,
+            messageId = messageId,
+            direction = MoveMessageUseCase.Direction.Up
+        )
+    }
+
+    private fun onMoveMessageDown(messageId: Long) = viewModelScope.launch {
+        val s = currentState() ?: return@launch
+
+        moveMessage(
+            chatId = s.info.fullChat.chatId,
+            messageId = messageId,
+            direction = MoveMessageUseCase.Direction.Down
+        )
     }
 
     private fun onUpdateEditedMessage(text: String) {
@@ -174,7 +198,6 @@ class ChatScreenViewModel(
     }
 
     private fun onEditMessage(messageId: Long) {
-        println("onEditMessage($messageId)")
         if (messageId < 1L) return
 
         val s = state.value
@@ -188,8 +211,7 @@ class ChatScreenViewModel(
     }
 
     private fun onMessageButtonClicked() {
-        val s = _state.value
-        if (s !is ChatScreenState.ChatState) return
+        val s = currentState() ?: return
 
         when (s.status) {
             MessagingIndicator.None -> onSendMessage(s)
@@ -224,27 +246,34 @@ class ChatScreenViewModel(
 
     private fun onMessageSwipeLeft(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-            val s = _state.value
-            if (s is ChatScreenState.ChatState) {
-                swipeFirstMessage(
-                    cardId = characterCard.value.id,
-                    chatId = s.info.fullChat.chatId,
-                    direction = SwipeDirection.Left
-                )
-            }
+            val s = currentState() ?: return@launch
+
+            swipeFirstMessage(
+                cardId = characterCard.value.id,
+                chatId = s.info.fullChat.chatId,
+                direction = SwipeDirection.Left
+            )
         }
     }
 
     private fun onMessageSwipeRight(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-            val s = _state.value
-            if (s is ChatScreenState.ChatState) {
-                swipeFirstMessage(
-                    cardId = characterCard.value.id,
-                    chatId = s.info.fullChat.chatId,
-                    direction = SwipeDirection.Right
-                )
-            }
+            val s = currentState() ?: return@launch
+
+            swipeFirstMessage(
+                cardId = characterCard.value.id,
+                chatId = s.info.fullChat.chatId,
+                direction = SwipeDirection.Right
+            )
+        }
+    }
+
+    private fun currentState(): ChatScreenState.ChatState? {
+        val s = _state.value
+
+        return when {
+            s is ChatScreenState.ChatState -> s
+            else -> null
         }
     }
 

@@ -1,6 +1,5 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -227,42 +226,48 @@ fun Messages(
         items(
             items = state.fullChat.messages,
             key = { it.messageId }) {
-            AnimatedContent(it.messageId == editMessageId, label = "") { edited ->
-                when (edited) {
-                    true -> EditableChatMessage(
-                        message = it,
-                        buffer = editMessageBuffer,
-                        onType = { text -> onEvent(UserEvent.UpdateEditedMessage(text)) },
-                        onSaveClick = { onEvent(UserEvent.SaveEditedMessage) },
-                        onDismissClick = { onEvent(UserEvent.DismissEditedMessage) },
-                        onImageClick = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                    )
+            val edited = it.messageId == editMessageId
+//            AnimatedContent(
+//                targetState = it.messageId == editMessageId, label = "",
+//                modifier = Modifier.animateItem()
+//            ) { edited ->
+            when (edited) {
+                true -> EditableChatMessage(
+                    message = it,
+                    buffer = editMessageBuffer,
+                    onType = { text -> onEvent(UserEvent.UpdateEditedMessage(text)) },
+                    onSaveClick = { onEvent(UserEvent.SaveEditedMessage) },
+                    onDismissClick = { onEvent(UserEvent.DismissEditedMessage) },
+                    onImageClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .animateItem(),
+                )
 
-                    false -> ChatMessage(
-                        message = it,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                            .animateContentSize { _, targetValue ->
-                                scope.launch {
-                                    listState.animateScrollToItem(
-                                        it.index,
-                                        scrollOffset = targetValue.height
-                                    )
-                                }
-                            },
-                        onImageClicked = {},
-                        onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
-                        onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
-                        onEditClicked = { onEvent(UserEvent.EditMessage(it.messageId)) },
-                        onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
-                        onMoveUpClicked = {},
-                        onMoveDownClicked = {}
-                    )
-                }
+                false -> ChatMessage(
+                    message = it,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .animateContentSize { _, targetValue ->
+                            scope.launch {
+                                listState.animateScrollToItem(
+                                    it.index,
+                                    scrollOffset = targetValue.height
+                                )
+                            }
+                        }
+                        .animateItem(),
+                    onImageClicked = {},
+                    onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
+                    onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
+                    onEditClicked = { onEvent(UserEvent.EditMessage(it.messageId)) },
+                    onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
+                    onMoveUpClicked = { onEvent(UserEvent.MoveMessageUp(it.messageId)) },
+                    onMoveDownClicked = { onEvent(UserEvent.MoveMessageDown(it.messageId)) }
+                )
+//                }
             }
         }
     }

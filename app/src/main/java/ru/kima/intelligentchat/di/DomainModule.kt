@@ -40,6 +40,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
@@ -150,6 +151,7 @@ fun domain() = module {
     singleOf(::CreateMessageUseCase)
     singleOf(::DeleteMessageUseCase)
     singleOf(::EditMessageUseCase)
+    singleOf(::MoveMessageUseCase)
     singleOf(::SwipeFirstMessageUseCase)
 
     singleOf(::CancelMessageUseCase)

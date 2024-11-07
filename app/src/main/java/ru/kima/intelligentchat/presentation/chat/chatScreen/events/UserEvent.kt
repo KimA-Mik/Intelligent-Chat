@@ -10,4 +10,6 @@ sealed interface UserEvent {
     data object DismissEditedMessage : UserEvent
     data class UpdateEditedMessage(val text: String) : UserEvent
     data object MessageButtonClicked : UserEvent
+    data class MoveMessageUp(val messageId: Long) : UserEvent
+    data class MoveMessageDown(val messageId: Long) : UserEvent
 }
