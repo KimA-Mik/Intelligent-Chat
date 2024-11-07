@@ -5,7 +5,6 @@ import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.model.SenderType
-import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessageState
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 
@@ -13,7 +12,6 @@ fun FullChat.toDisplayChat(
     card: CharacterCard,
     preloadCardImageBitmap: ImmutableImageBitmap,
     selectedPersona: Long,
-    editedMessageId: Long,
     personasNames: Map<Long, String> = emptyMap(),
     personasImages: Map<Long, ImmutableImageBitmap> = emptyMap()
 ): DisplayChat {
@@ -47,16 +45,14 @@ fun FullChat.toDisplayChat(
                 preloadCardImageBitmap,
                 personasNames,
                 personasImages,
-                state = if (firstMessage.swipes.size > 1) ChatMessageState.Arrows else ChatMessageState.Common
+                showSwipeInfo = firstMessage.swipes.size > 1
             )
         )
     } else {
         messages.mapIndexed { index, message ->
             message.toDisplayMessage(
                 card.name, preloadCardImageBitmap, personasNames, personasImages,
-                state = if (message.messageId == editedMessageId) ChatMessageState.Edit
-                else if (index == messages.lastIndex && message.sender == SenderType.Character) ChatMessageState.Arrows
-                else ChatMessageState.Common
+                showSwipeInfo = index == messages.lastIndex && message.sender == SenderType.Character
             )
         }
     }

@@ -56,16 +56,9 @@ import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
-enum class ChatMessageState {
-    Common,
-    Arrows,
-    Edit,
-}
-
 @Composable
 fun ChatMessage(
     message: DisplayMessage,
-    editStateBuffer: String?,
     modifier: Modifier = Modifier,
     imageSize: Dp = ChatDefaults.SENDER_IMAGE_SIZE,
     onEditClicked: () -> Unit,
@@ -83,7 +76,7 @@ fun ChatMessage(
         ImageAndMetaInfo(
             imageBitmap = message.senderImage,
             index = message.index,
-            showLeftArrow = message.state == ChatMessageState.Arrows,
+            showLeftArrow = message.showSwipeInfo,
             imageSize = imageSize,
             modifier = Modifier
                 .fillMaxHeight()
@@ -98,7 +91,7 @@ fun ChatMessage(
                 .align(Alignment.TopCenter)
                 .padding(
                     start = imageSize + 8.dp, end =
-                    if (message.state == ChatMessageState.Arrows) 56.dp
+                    if (message.showSwipeInfo) 56.dp
                     else 0.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -108,11 +101,8 @@ fun ChatMessage(
                 sentTimeMillis = message.sentTimeMillis
             )
 
-
-            TextArea(
-                editState = message.state == ChatMessageState.Edit,
-                editStateBuffer = editStateBuffer,
-                solidText = message.text,
+            AnimatedText(
+                text = message.text,
                 currentSwipe = message.currentSwipe,
             )
         }
@@ -127,7 +117,7 @@ fun ChatMessage(
             modifier = Modifier.align(Alignment.TopEnd)
         )
 
-        if (message.state == ChatMessageState.Arrows) {
+        if (message.showSwipeInfo) {
             RightArrow(
                 currentSwipe = message.currentSwipe,
                 totalSwipes = message.totalSwipes,
@@ -167,28 +157,6 @@ private fun dropdownMenuItems(
             iconVector = Icons.Default.ArrowDownward
         ),
     )
-}
-
-@Composable
-fun TextArea(
-    editState: Boolean,
-    editStateBuffer: String?,
-    solidText: String,
-    currentSwipe: Int,
-    modifier: Modifier = Modifier
-) {
-    AnimatedContent(
-        editState,
-        modifier = modifier, label = ""
-    ) { e ->
-        when (e) {
-            true -> TODO()
-            false -> AnimatedText(
-                text = solidText,
-                currentSwipe = currentSwipe,
-            )
-        }
-    }
 }
 
 @Composable
@@ -236,7 +204,7 @@ fun AnimatedText(
 }
 
 @Composable
-private fun ImageAndMetaInfo(
+fun ImageAndMetaInfo(
     imageBitmap: ImmutableImageBitmap,
     index: Int,
     showLeftArrow: Boolean,
@@ -369,7 +337,6 @@ private fun ChatMessagePreview() {
                     senderName = "Sender",
                     text = "Message Text Long Enough To Wrap Around The Line"
                 ),
-                editStateBuffer = null,
                 modifier = Modifier.padding(8.dp),
                 onImageClicked = {},
                 onLeftClicked = {},
@@ -395,9 +362,8 @@ private fun ChatMessageWithSwipesPreview() {
                     text = "Message Text Long Enough To Wrap Around The Line",
                     currentSwipe = 2,
                     totalSwipes = 2,
-                    state = ChatMessageState.Arrows
+                    showSwipeInfo = true
                 ),
-                editStateBuffer = null,
                 modifier = Modifier.padding(8.dp),
                 onImageClicked = {},
                 onLeftClicked = {},
@@ -405,35 +371,7 @@ private fun ChatMessageWithSwipesPreview() {
                 onEditClicked = {},
                 onDeleteClicked = {},
                 onMoveUpClicked = {},
-                onMoveDownClicked = {},
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun ChatMessageEditStatePreview() {
-    IntelligentChatTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            ChatMessage(
-                message = DisplayMessage(
-                    messageId = 0,
-                    senderName = "Sender",
-                    text = "Message Text Long Enough To Wrap Around The Line",
-                    currentSwipe = 2,
-                    totalSwipes = 2,
-                    state = ChatMessageState.Edit
-                ),
-                editStateBuffer = "Message Text Long Enough To Wrap Around The Line",
-                modifier = Modifier.padding(8.dp),
-                onImageClicked = {},
-                onLeftClicked = {},
-                onRightClicked = {},
-                onEditClicked = {},
-                onDeleteClicked = {},
-                onMoveUpClicked = {},
-                onMoveDownClicked = {},
+                onMoveDownClicked = {}
             )
         }
     }

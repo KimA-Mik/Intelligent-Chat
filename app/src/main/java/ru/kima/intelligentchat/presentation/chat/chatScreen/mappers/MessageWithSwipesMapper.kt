@@ -3,7 +3,6 @@ package ru.kima.intelligentchat.presentation.chat.chatScreen.mappers
 import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.model.Swipe
-import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessageState
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 
@@ -12,7 +11,7 @@ fun MessageWithSwipes.toDisplayMessage(
     cardBitmap: ImmutableImageBitmap = ImmutableImageBitmap(),
     personasNames: Map<Long, String> = emptyMap(),
     personasImages: Map<Long, ImmutableImageBitmap> = emptyMap(),
-    state: ChatMessageState = ChatMessageState.Common,
+    showSwipeInfo: Boolean = false,
 ): DisplayMessage {
     return DisplayMessage(
         messageId = messageId,
@@ -27,6 +26,6 @@ fun MessageWithSwipes.toDisplayMessage(
         currentSwipe = selectedSwipeIndex + 1,
         totalSwipes = swipes.size,
         index = index,
-        state = state,
+        showSwipeInfo = showSwipeInfo,
     )
 }

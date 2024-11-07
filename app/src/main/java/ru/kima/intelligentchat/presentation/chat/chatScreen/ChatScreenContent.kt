@@ -56,7 +56,7 @@ import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
-import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessageState
+import ru.kima.intelligentchat.presentation.chat.chatScreen.components.EditableChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
@@ -138,6 +138,7 @@ fun ChatScreenContent(
             Messages(
                 state = state.info,
                 editMessageBuffer = state.editMessageBuffer,
+                editMessageId = state.editMessageId,
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
@@ -198,6 +199,7 @@ fun MessageIndicator(
 fun Messages(
     state: ChatScreenState.ChatState.ChatInfo,
     editMessageBuffer: String,
+    editMessageId: Long,
     modifier: Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
@@ -224,28 +226,44 @@ fun Messages(
         items(
             items = state.fullChat.messages,
             key = { it.messageId }) {
-            ChatMessage(
-                message = it,
-                editStateBuffer = if (it.state == ChatMessageState.Edit) editMessageBuffer else null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .animateContentSize { _, targetValue ->
-                        scope.launch {
-                            listState.animateScrollToItem(
-                                it.index,
-                                scrollOffset = targetValue.height
-                            )
-                        }
-                    },
-                onImageClicked = {},
-                onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
-                onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
-                onEditClicked = { onEvent(UserEvent.EditMessage(it.messageId)) },
-                onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
-                onMoveUpClicked = {},
-                onMoveDownClicked = {}
-            )
+            val edited = it.messageId == editMessageId
+//            AnimatedContent(it.messageId == editMessageId, label = "") { edited ->
+            when (edited) {
+                true -> EditableChatMessage(
+                    message = it,
+                    buffer = editMessageBuffer,
+                    onType = { text -> onEvent(UserEvent.UpdateEditedMessage(text)) },
+                    onSaveClick = { onEvent(UserEvent.SaveEditedMessage) },
+                    onDismissClick = { onEvent(UserEvent.DismissEditedMessage) },
+                    onImageClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                )
+
+                false -> ChatMessage(
+                    message = it,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .animateContentSize { _, targetValue ->
+                            scope.launch {
+                                listState.animateScrollToItem(
+                                    it.index,
+                                    scrollOffset = targetValue.height
+                                )
+                            }
+                        },
+                    onImageClicked = {},
+                    onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
+                    onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
+                    onEditClicked = { onEvent(UserEvent.EditMessage(it.messageId)) },
+                    onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
+                    onMoveUpClicked = {},
+                    onMoveDownClicked = {}
+                )
+//                }
+            }
         }
     }
 }
@@ -357,7 +375,7 @@ private fun ChatScreenPreview() {
                                 senderName = "Sender",
                                 text = "Message Text",
                                 senderType = SenderType.Character,
-                                state = ChatMessageState.Arrows
+                                showSwipeInfo = true
                             )
                         )
                     )
