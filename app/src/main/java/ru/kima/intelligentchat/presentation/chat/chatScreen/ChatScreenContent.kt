@@ -333,12 +333,11 @@ fun ChatTextField(
         modifier = modifier
             .heightIn(min = 56.dp)
             .padding(8.dp),
-        textStyle = MaterialTheme.typography.bodyLarge
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = contentColorFor(color))
     ) { innerTextField ->
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
             color = color,
-            contentColor = MaterialTheme.colorScheme.contentColorFor(color)
         ) {
             Box(
                 modifier = Modifier.padding(8.dp),
