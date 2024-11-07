@@ -23,6 +23,10 @@ class MessageRepositoryImpl(
             .map { it.map(MessageWithSwipesDto::toMessage) }
     }
 
+    override suspend fun getFullMessage(id: Long): MessageWithSwipes? {
+        return messageDao.getFullMessage(id)?.toMessage()
+    }
+
     override fun subscribeToChatMessages(chatId: Long): Flow<List<Message>> {
         return messageDao
             .chatMessages(chatId)

@@ -21,6 +21,9 @@ interface MessageDao {
     @Update
     suspend fun updateMessages(messages: List<MessageEntity>): Int
 
+    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE message_id=:messageId")
+    suspend fun getFullMessage(messageId: Long): MessageWithSwipesDto?
+
     @Transaction
     @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId AND deleted=0 ORDER By `index`")
     fun chatWithMessages(chatId: Long): Flow<List<MessageWithSwipesDto>>

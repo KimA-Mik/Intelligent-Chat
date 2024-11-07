@@ -17,6 +17,7 @@ import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
@@ -44,7 +45,8 @@ class ChatScreenViewModel(
     private val sendMessage: SendMessageUseCase,
     private val messagingStatus: SubscribeToMessagingStatus,
     private val deleteMessage: DeleteMessageUseCase,
-    private val cancelMessage: CancelMessageUseCase
+    private val cancelMessage: CancelMessageUseCase,
+    private val editMessage: EditMessageUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -164,8 +166,11 @@ class ChatScreenViewModel(
         savedStateHandle[EDITED_MESSAGE_ID] = EMPTY_EDITED_MESSAGE_ID
     }
 
-    private fun onSaveEditedMessage() {
+    private fun onSaveEditedMessage() = viewModelScope.launch {
+        val id = savedStateHandle.get<Long>(EDITED_MESSAGE_ID) ?: return@launch
+        val text = savedStateHandle.get<String>(MESSAGE_EDIT_BUFFER) ?: return@launch
         savedStateHandle[EDITED_MESSAGE_ID] = EMPTY_EDITED_MESSAGE_ID
+        editMessage(id, text)
     }
 
     private fun onEditMessage(messageId: Long) {
