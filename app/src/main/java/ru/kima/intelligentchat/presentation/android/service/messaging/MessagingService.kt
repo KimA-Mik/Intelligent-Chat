@@ -20,13 +20,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 import ru.kima.intelligentchat.ChatApplication
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.domain.chat.model.SenderType
-import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.savingResult.DefaultSavingStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SavingStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
@@ -57,7 +60,6 @@ class MessagingService : Service(), KoinComponent {
 
     private val loadMessagingData: LoadMessagingDataUseCase by inject()
     private val loadMessagingConfig: LoadMessagingConfigUseCase by inject()
-    private val createMessage: CreateMessageUseCase by inject()
 
     private val tokenizer: LlamaTokenizer by inject()
 
@@ -82,6 +84,12 @@ class MessagingService : Service(), KoinComponent {
             return START_NOT_STICKY
         }
 
+        val savingStrategy = extractSavingStrategy(intent)
+        if (savingStrategy == null) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         val chatId = intent.getLongExtra(CHAT_ID_EXTRA, 0L)
         val personaId = intent.getLongExtra(PERSONA_ID_EXTRA, 0L)
         val apiType = intent.getStringExtra(API_TYPE_EXTRA)?.let {
@@ -96,7 +104,7 @@ class MessagingService : Service(), KoinComponent {
             return START_NOT_STICKY
         }
 
-        runForeground(chatId, personaId, apiType, senderType)
+        runForeground(chatId, personaId, apiType, senderType, savingStrategy)
         return START_NOT_STICKY
     }
 
@@ -109,7 +117,8 @@ class MessagingService : Service(), KoinComponent {
         chatId: Long,
         personaId: Long,
         apiType: API_TYPE,
-        senderType: SenderType
+        senderType: SenderType,
+        savingStrategy: SavingStrategy
     ) {
         val handler = CoroutineExceptionHandler { _, exception ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && exception is ForegroundServiceStartNotAllowedException) {
@@ -125,7 +134,7 @@ class MessagingService : Service(), KoinComponent {
         }
 
         scope.launch(Dispatchers.Main + handler) {
-            runForegroundAsync(chatId, personaId, apiType, senderType)
+            runForegroundAsync(chatId, personaId, apiType, senderType, savingStrategy)
         }
     }
 
@@ -133,7 +142,8 @@ class MessagingService : Service(), KoinComponent {
         chatId: Long,
         personaId: Long,
         apiType: API_TYPE,
-        senderType: SenderType
+        senderType: SenderType,
+        savingStrategy: SavingStrategy
     ) {
         val data = loadMessagingData(chatId, personaId, senderType)
         if (data !is LoadMessagingDataUseCase.Result.Success) {
@@ -192,11 +202,6 @@ class MessagingService : Service(), KoinComponent {
             tokenizer = tokenizer
         )
 
-        val senderId = when (senderType) {
-            SenderType.Character -> data.card.id
-            SenderType.Persona -> personaId
-        }
-
         var resultedMessage: String? = null
         strategy.generation(generationRequest).collect { generationStatus ->
             Log.d(TAG, generationStatus.toString())
@@ -208,6 +213,7 @@ class MessagingService : Service(), KoinComponent {
 
                 //TODO: handle errors
                 is GenerationStatus.Error -> {
+                    Log.e(TAG, "ERROR: ${generationStatus.error}")
                     _status.value = MessagingIndicator.None
                 }
 
@@ -235,8 +241,53 @@ class MessagingService : Service(), KoinComponent {
         }
         currentGenerationId = null
         currentGenerationStrategy = null
-        resultedMessage?.let { msg -> createMessage(chatId, senderType, senderId, msg) }
+        resultedMessage?.let { msg -> savingStrategy.save(msg, data.sender) }
         stopSelf()
+    }
+
+    private fun extractSavingStrategy(intent: Intent): SavingStrategy? {
+        val launchType = intent.getStringExtra(LAUNCH_TYPE_EXTRA)?.let {
+            LaunchType.fromString(it)
+        } ?: return null
+
+        return when (launchType) {
+            LaunchType.Default -> extractDefaultLaunchType(intent)
+            LaunchType.CreateSwipe -> extractSwipeSavingStrategy(intent)
+        }
+    }
+
+    private fun extractDefaultLaunchType(intent: Intent): DefaultSavingStrategy? {
+        val chatId = intent.getLongExtra(CHAT_ID_EXTRA, 0L)
+        if (chatId == 0L) {
+            return null
+        }
+
+        val res: DefaultSavingStrategy by inject { parametersOf(chatId) }
+        return res
+    }
+
+    private fun extractSwipeSavingStrategy(intent: Intent): SwipeSavingStrategy? {
+        val messageId = intent.getLongExtra(MESSAGE_ID_EXTRA, 0L)
+        if (messageId == 0L) {
+            return null
+        }
+
+        val res: SwipeSavingStrategy by inject { parametersOf(messageId) }
+        return res
+    }
+
+    private enum class LaunchType {
+        Default, CreateSwipe;
+
+        companion object {
+            fun fromString(string: String): LaunchType? {
+                return try {
+                    valueOf(string)
+                } catch (e: IllegalArgumentException) {
+                    null
+                }
+            }
+        }
     }
 
 
@@ -250,8 +301,27 @@ class MessagingService : Service(), KoinComponent {
             senderType: SenderType
         ): Intent {
             val intent = Intent(context, MessagingService::class.java)
+            intent.putExtra(LAUNCH_TYPE_EXTRA, LaunchType.Default.toString())
             intent.putExtra(CHAT_ID_EXTRA, chatId)
             intent.putExtra(PERSONA_ID_EXTRA, personaId)
+            intent.putExtra(API_TYPE_EXTRA, apiType.toString())
+            intent.putExtra(SENDER_TYPE_EXTRA, senderType.toString())
+            return intent
+        }
+
+        fun getCreateSwipeLaunchIntent(
+            context: Context,
+            chatId: Long,
+            messageId: Long,
+            personaId: Long,
+            apiType: API_TYPE,
+            senderType: SenderType
+        ): Intent {
+            val intent = Intent(context, MessagingService::class.java)
+            intent.putExtra(LAUNCH_TYPE_EXTRA, LaunchType.CreateSwipe.toString())
+            intent.putExtra(CHAT_ID_EXTRA, chatId)
+            intent.putExtra(PERSONA_ID_EXTRA, personaId)
+            intent.putExtra(MESSAGE_ID_EXTRA, messageId)
             intent.putExtra(API_TYPE_EXTRA, apiType.toString())
             intent.putExtra(SENDER_TYPE_EXTRA, senderType.toString())
             return intent
@@ -262,9 +332,11 @@ class MessagingService : Service(), KoinComponent {
             return null
         }
 
+        private const val LAUNCH_TYPE_EXTRA = "launch_type"
         private const val CHAT_ID_EXTRA = "chat_id"
         private const val PERSONA_ID_EXTRA = "persona_id"
         private const val API_TYPE_EXTRA = "api_type"
         private const val SENDER_TYPE_EXTRA = "sender_type"
+        private const val MESSAGE_ID_EXTRA = "swipe_id"
     }
 }
