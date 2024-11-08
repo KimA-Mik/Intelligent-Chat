@@ -44,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -327,13 +328,15 @@ fun ChatTextField(
     onValueChange: (String) -> Unit
 ) {
     val color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+    val contentColor = contentColorFor(color)
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
             .heightIn(min = 56.dp)
             .padding(8.dp),
-        textStyle = MaterialTheme.typography.bodyLarge.copy(color = contentColorFor(color))
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = contentColor),
+        cursorBrush = SolidColor(contentColor)
     ) { innerTextField ->
         Surface(
             shape = MaterialTheme.shapes.extraLarge,

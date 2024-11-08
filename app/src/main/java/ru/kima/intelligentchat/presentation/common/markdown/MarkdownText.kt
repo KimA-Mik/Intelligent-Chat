@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.presentation.common.markdown
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -18,7 +19,7 @@ private sealed class Block(val text: String) {
 
 @Composable
 fun MarkdownText(text: String, modifier: Modifier = Modifier) {
-    val mdBlocks = parseText(text)
+    val mdBlocks = remember(text) { parseText(text) }
     Text(
         buildAnnotatedString {
             mdBlocks.forEach { block ->
