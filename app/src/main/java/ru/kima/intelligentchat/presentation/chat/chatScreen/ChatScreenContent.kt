@@ -56,6 +56,7 @@ import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.components.EditableChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
@@ -127,7 +128,7 @@ fun ChatScreenContent(
             ChatBottomBar(
                 value = state.inputMessageBuffer,
                 messagingIndicator = state.status,
-                onMessageSend = { onEvent(UserEvent.SendMessage) },
+                onMessageButtonClicked = { onEvent(UserEvent.MessageButtonClicked) },
                 onValueChange = { onEvent(UserEvent.UpdateInputMessage(it)) },
             )
         },
@@ -136,6 +137,8 @@ fun ChatScreenContent(
         if (state.info.fullChat.messages.isNotEmpty()) {
             Messages(
                 state = state.info,
+                editMessageBuffer = state.editMessageBuffer,
+                editMessageId = state.editMessageId,
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
@@ -145,6 +148,7 @@ fun ChatScreenContent(
         }
     }
 }
+
 @Composable
 private fun dropdownMenuItems() = remember {
     listOf(
@@ -194,6 +198,8 @@ fun MessageIndicator(
 @Composable
 fun Messages(
     state: ChatScreenState.ChatState.ChatInfo,
+    editMessageBuffer: String,
+    editMessageId: Long,
     modifier: Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
@@ -220,23 +226,49 @@ fun Messages(
         items(
             items = state.fullChat.messages,
             key = { it.messageId }) {
-            ChatMessage(
-                message = it,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .animateContentSize { _, targetValue ->
-                        scope.launch {
-                            listState.animateScrollToItem(
-                                it.index,
-                                scrollOffset = targetValue.height
-                            )
+            val edited = it.messageId == editMessageId
+//            AnimatedContent(
+//                targetState = it.messageId == editMessageId, label = "",
+//                modifier = Modifier.animateItem()
+//            ) { edited ->
+            when (edited) {
+                true -> EditableChatMessage(
+                    message = it,
+                    buffer = editMessageBuffer,
+                    onType = { text -> onEvent(UserEvent.UpdateEditedMessage(text)) },
+                    onSaveClick = { onEvent(UserEvent.SaveEditedMessage) },
+                    onDismissClick = { onEvent(UserEvent.DismissEditedMessage) },
+                    onImageClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .animateItem(),
+                )
+
+                false -> ChatMessage(
+                    message = it,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .animateContentSize { _, targetValue ->
+                            scope.launch {
+                                listState.animateScrollToItem(
+                                    it.index,
+                                    scrollOffset = targetValue.height
+                                )
+                            }
                         }
-                    },
-                onImageClick = {},
-                onLeftClick = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
-                onRightClick = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) }
-            )
+                        .animateItem(),
+                    onImageClicked = {},
+                    onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
+                    onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
+                    onEditClicked = { onEvent(UserEvent.EditMessage(it.messageId)) },
+                    onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
+                    onMoveUpClicked = { onEvent(UserEvent.MoveMessageUp(it.messageId)) },
+                    onMoveDownClicked = { onEvent(UserEvent.MoveMessageDown(it.messageId)) }
+                )
+//                }
+            }
         }
     }
 }
@@ -246,7 +278,7 @@ fun ChatBottomBar(
     value: String,
     messagingIndicator: MessagingIndicator,
     modifier: Modifier = Modifier,
-    onMessageSend: () -> Unit,
+    onMessageButtonClicked: () -> Unit,
     onValueChange: (String) -> Unit
 ) = Box(
     modifier = modifier,
@@ -276,7 +308,7 @@ fun ChatBottomBar(
             placeholder = stringResource(R.string.placeholder_enter_your_message),
             onValueChange = onValueChange
         )
-        IconButton(onClick = onMessageSend) {
+        IconButton(onClick = onMessageButtonClicked) {
             Icon(
                 imageVector =
                 if (messagingIndicator == MessagingIndicator.None) Icons.AutoMirrored.Default.Send
@@ -301,12 +333,11 @@ fun ChatTextField(
         modifier = modifier
             .heightIn(min = 56.dp)
             .padding(8.dp),
-        textStyle = MaterialTheme.typography.bodyLarge
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = contentColorFor(color))
     ) { innerTextField ->
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
             color = color,
-            contentColor = MaterialTheme.colorScheme.contentColorFor(color)
         ) {
             Box(
                 modifier = Modifier.padding(8.dp),

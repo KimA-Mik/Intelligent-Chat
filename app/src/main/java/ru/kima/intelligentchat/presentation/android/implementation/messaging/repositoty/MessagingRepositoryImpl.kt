@@ -74,15 +74,13 @@ class MessagingRepositoryImpl(
             val api = preferences.first().selectedApiType
             val intent =
                 MessagingService.getLaunchIntent(context, chatId, personaId, api, senderType)
-            context.startForegroundService(intent)
+            context.startService(intent)
             bindService()
         }
     }
 
-    override fun cancelGeneration() {
-        if (_generationStatus.value != MessagingIndicator.None) {
-            TODO("Not yet implemented")
-        }
+    override suspend fun cancelGeneration() {
+        _binder?.cancelGeneration()
     }
 
     private suspend fun initialize() {

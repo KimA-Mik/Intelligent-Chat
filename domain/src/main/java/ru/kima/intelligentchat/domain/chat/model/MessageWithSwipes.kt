@@ -7,7 +7,8 @@ data class MessageWithSwipes(
     val senderId: Long,
     val index: Int,
     val selectedSwipeIndex: Int,
-    val swipes: List<Swipe>
+    val swipes: List<Swipe>,
+    val deleted: Boolean
 ) {
     companion object {
         fun fromMessageAndSwipes(message: Message, swipes: List<Swipe>): MessageWithSwipes {
@@ -18,7 +19,8 @@ data class MessageWithSwipes(
                 senderId = message.senderId,
                 index = message.index,
                 selectedSwipeIndex = message.selectedSwipeIndex,
-                swipes = swipes
+                swipes = swipes,
+                deleted = message.deleted
             )
         }
     }

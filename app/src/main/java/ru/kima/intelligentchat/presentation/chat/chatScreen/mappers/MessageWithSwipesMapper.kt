@@ -26,6 +26,6 @@ fun MessageWithSwipes.toDisplayMessage(
         currentSwipe = selectedSwipeIndex + 1,
         totalSwipes = swipes.size,
         index = index,
-        showSwipeInfo = showSwipeInfo
+        showSwipeInfo = showSwipeInfo,
     )
 }

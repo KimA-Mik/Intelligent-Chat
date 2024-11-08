@@ -9,4 +9,5 @@ sealed interface GenerationStatus {
     data object Generating : GenerationStatus
     data class GeneratingWithProgress(val progression: Float) : GenerationStatus
     data class Done(val result: String) : GenerationStatus
+    data object Aborted : GenerationStatus
 }

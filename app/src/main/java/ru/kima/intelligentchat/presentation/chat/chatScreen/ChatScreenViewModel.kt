@@ -16,7 +16,12 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
+import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
+import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SubscribeToMessagingStatus
 import ru.kima.intelligentchat.domain.persona.model.Persona
@@ -39,7 +44,11 @@ class ChatScreenViewModel(
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
     private val sendMessage: SendMessageUseCase,
-    private val messagingStatus: SubscribeToMessagingStatus
+    private val messagingStatus: SubscribeToMessagingStatus,
+    private val deleteMessage: DeleteMessageUseCase,
+    private val cancelMessage: CancelMessageUseCase,
+    private val editMessage: EditMessageUseCase,
+    private val moveMessage: MoveMessageUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -75,7 +84,7 @@ class ChatScreenViewModel(
 
 
         val chatInfo = combine(
-            characterCard, displayCard, chat, personasNames, personasImages, preferences()
+            characterCard, displayCard, chat, personasNames, personasImages, preferences(),
         ) { characterCard, displayCard, fullChat, names, images, preferences ->
             ChatScreenState.ChatState.ChatInfo(
                 characterCard = displayCard,
@@ -93,10 +102,14 @@ class ChatScreenViewModel(
             chatInfo,
             messagingStatus(),
             savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, String()),
-        ) { info, messagingStatus, inputMessageBuffer ->
+            savedStateHandle.getStateFlow(MESSAGE_EDIT_BUFFER, String()),
+            savedStateHandle.getStateFlow(EDITED_MESSAGE_ID, EMPTY_EDITED_MESSAGE_ID),
+        ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId ->
             ChatScreenState.ChatState(
                 info = info,
                 inputMessageBuffer = inputMessageBuffer,
+                editMessageBuffer = editMessageBuffer,
+                editMessageId = editMessageId,
                 status = messagingStatus
             )
         }
@@ -138,16 +151,86 @@ class ChatScreenViewModel(
             is UserEvent.UpdateInputMessage -> onUpdateInputMessage(event.message)
             is UserEvent.MessageSwipeLeft -> onMessageSwipeLeft(event.messageId)
             is UserEvent.MessageSwipeRight -> onMessageSwipeRight(event.messageId)
-            UserEvent.SendMessage -> onSendMessage()
+            UserEvent.MessageButtonClicked -> onMessageButtonClicked()
+            is UserEvent.DeleteMessage -> onDeleteMessage(event.messageId)
+            is UserEvent.EditMessage -> onEditMessage(event.messageId)
+            UserEvent.SaveEditedMessage -> onSaveEditedMessage()
+            UserEvent.DismissEditedMessage -> onDismissEditedMessage()
+            is UserEvent.UpdateEditedMessage -> onUpdateEditedMessage(event.text)
+            is UserEvent.MoveMessageDown -> onMoveMessageDown(event.messageId)
+            is UserEvent.MoveMessageUp -> onMoveMessageUp(event.messageId)
         }
     }
 
-    private fun onSendMessage() = viewModelScope.launch {
-        val state = _state.value
-        if (state !is ChatScreenState.ChatState) {
-            return@launch
+    private fun onMoveMessageUp(messageId: Long) = viewModelScope.launch {
+        val s = currentState() ?: return@launch
+
+        moveMessage(
+            chatId = s.info.fullChat.chatId,
+            messageId = messageId,
+            direction = MoveMessageUseCase.Direction.Up
+        )
+    }
+
+    private fun onMoveMessageDown(messageId: Long) = viewModelScope.launch {
+        val s = currentState() ?: return@launch
+
+        moveMessage(
+            chatId = s.info.fullChat.chatId,
+            messageId = messageId,
+            direction = MoveMessageUseCase.Direction.Down
+        )
+    }
+
+    private fun onUpdateEditedMessage(text: String) {
+        savedStateHandle[MESSAGE_EDIT_BUFFER] = text
+    }
+
+    private fun onDismissEditedMessage() {
+        savedStateHandle[EDITED_MESSAGE_ID] = EMPTY_EDITED_MESSAGE_ID
+    }
+
+    private fun onSaveEditedMessage() = viewModelScope.launch {
+        val id = savedStateHandle.get<Long>(EDITED_MESSAGE_ID) ?: return@launch
+        val text = savedStateHandle.get<String>(MESSAGE_EDIT_BUFFER) ?: return@launch
+        savedStateHandle[EDITED_MESSAGE_ID] = EMPTY_EDITED_MESSAGE_ID
+        editMessage(id, text)
+    }
+
+    private fun onEditMessage(messageId: Long) {
+        if (messageId < 1L) return
+
+        val s = state.value
+        if (s !is ChatScreenState.ChatState) return
+
+        s.info.fullChat.messages.find { it.messageId == messageId }?.let {
+            savedStateHandle[MESSAGE_EDIT_BUFFER] = it.text
         }
 
+        savedStateHandle[EDITED_MESSAGE_ID] = messageId
+    }
+
+    private fun onMessageButtonClicked() {
+        val s = currentState() ?: return
+
+        when (s.status) {
+            MessagingIndicator.None -> onSendMessage(s)
+            else -> onCancelMessage()
+        }
+    }
+
+    private fun onDeleteMessage(messageId: Long) = viewModelScope.launch {
+        val s = _state.value
+        if (messageId > 0 && s is ChatScreenState.ChatState) {
+            deleteMessage(chatId = s.info.fullChat.chatId, messageId = messageId)
+        }
+    }
+
+    private fun onCancelMessage() = viewModelScope.launch {
+        cancelMessage()
+    }
+
+    private fun onSendMessage(state: ChatScreenState.ChatState) = viewModelScope.launch {
         val text = state.inputMessageBuffer
         savedStateHandle[MESSAGE_INPUT_BUFFER] = String()
         sendMessage(
@@ -163,31 +246,41 @@ class ChatScreenViewModel(
 
     private fun onMessageSwipeLeft(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-            val s = _state.value
-            if (s is ChatScreenState.ChatState) {
-                swipeFirstMessage(
-                    cardId = characterCard.value.id,
-                    chatId = s.info.fullChat.chatId,
-                    direction = SwipeDirection.Left
-                )
-            }
+            val s = currentState() ?: return@launch
+
+            swipeFirstMessage(
+                cardId = characterCard.value.id,
+                chatId = s.info.fullChat.chatId,
+                direction = SwipeDirection.Left
+            )
         }
     }
 
     private fun onMessageSwipeRight(messageId: Long) = viewModelScope.launch {
         if (messageId == 0L) {
-            val s = _state.value
-            if (s is ChatScreenState.ChatState) {
-                swipeFirstMessage(
-                    cardId = characterCard.value.id,
-                    chatId = s.info.fullChat.chatId,
-                    direction = SwipeDirection.Right
-                )
-            }
+            val s = currentState() ?: return@launch
+
+            swipeFirstMessage(
+                cardId = characterCard.value.id,
+                chatId = s.info.fullChat.chatId,
+                direction = SwipeDirection.Right
+            )
+        }
+    }
+
+    private fun currentState(): ChatScreenState.ChatState? {
+        val s = _state.value
+
+        return when {
+            s is ChatScreenState.ChatState -> s
+            else -> null
         }
     }
 
     companion object {
         private const val MESSAGE_INPUT_BUFFER = "MESSAGE_INPUT_BUFFER"
+        private const val MESSAGE_EDIT_BUFFER = "MESSAGE_EDIT_BUFFER"
+        private const val EDITED_MESSAGE_ID = "EDITED_MESSAGE"
+        private const val EMPTY_EDITED_MESSAGE_ID = -1L
     }
 }

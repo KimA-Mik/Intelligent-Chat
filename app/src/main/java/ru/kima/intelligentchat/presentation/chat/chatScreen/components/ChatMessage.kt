@@ -10,9 +10,11 @@ import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +22,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,8 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
@@ -44,32 +52,48 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
 import ru.kima.intelligentchat.presentation.common.markdown.MarkdownText
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun ChatMessage(
     message: DisplayMessage,
     modifier: Modifier = Modifier,
-    onImageClick: () -> Unit,
-    onLeftClick: () -> Unit,
-    onRightClick: () -> Unit
+    imageSize: Dp = ChatDefaults.SENDER_IMAGE_SIZE,
+    onEditClicked: () -> Unit,
+    onDeleteClicked: () -> Unit,
+    onMoveUpClicked: () -> Unit,
+    onMoveDownClicked: () -> Unit,
+    onImageClicked: () -> Unit,
+    onLeftClicked: () -> Unit,
+    onRightClicked: () -> Unit
 ) {
-    Row(
-        modifier = modifier.height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    Box(
+        modifier = modifier
+            .height(IntrinsicSize.Min)
     ) {
         ImageAndMetaInfo(
             imageBitmap = message.senderImage,
             index = message.index,
-            modifier = Modifier.fillMaxHeight(),
-            tookMs = 0,
             showLeftArrow = message.showSwipeInfo,
-            onImageClick = onImageClick,
-            onLeftClick = onLeftClick
+            imageSize = imageSize,
+            modifier = Modifier
+                .fillMaxHeight()
+                .align(Alignment.TopStart),
+            tookMs = 0,
+            onImageClick = onImageClicked,
+            onLeftClick = onLeftClicked
         )
 
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(
+                    start = imageSize + 8.dp, end =
+                    if (message.showSwipeInfo) 56.dp
+                    else 0.dp
+                ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             NameAndTime(
@@ -80,22 +104,59 @@ fun ChatMessage(
             AnimatedText(
                 text = message.text,
                 currentSwipe = message.currentSwipe,
-                modifier = Modifier.padding(
-                    end =
-                    if (message.showSwipeInfo) 0.dp else 8.dp
-                )
             )
         }
+
+        SimpleDropdownMenu(
+            dropdownMenuItems(
+                onEditClicked = onEditClicked,
+                onDeleteClicked = onDeleteClicked,
+                onMoveUpClicked = onMoveUpClicked,
+                onMoveDownClicked = onMoveDownClicked
+            ),
+            modifier = Modifier.align(Alignment.TopEnd)
+        )
 
         if (message.showSwipeInfo) {
             RightArrow(
                 currentSwipe = message.currentSwipe,
                 totalSwipes = message.totalSwipes,
-                modifier = Modifier.fillMaxHeight(),
-                onRightClick = onRightClick
+                modifier = Modifier.align(Alignment.BottomEnd),
+                onRightClick = onRightClicked
             )
         }
     }
+}
+
+@Composable
+private fun dropdownMenuItems(
+    onEditClicked: () -> Unit,
+    onDeleteClicked: () -> Unit,
+    onMoveUpClicked: () -> Unit,
+    onMoveDownClicked: () -> Unit
+) = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_edit_message,
+            onClick = onEditClicked,
+            iconVector = Icons.Default.Edit
+        ),
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_delete_message,
+            onClick = onDeleteClicked,
+            iconVector = Icons.Default.Delete
+        ),
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_move_message_up,
+            onClick = onMoveUpClicked,
+            iconVector = Icons.Default.ArrowUpward
+        ),
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_move_message_down,
+            onClick = onMoveDownClicked,
+            iconVector = Icons.Default.ArrowDownward
+        ),
+    )
 }
 
 @Composable
@@ -143,12 +204,13 @@ fun AnimatedText(
 }
 
 @Composable
-private fun ImageAndMetaInfo(
+fun ImageAndMetaInfo(
     imageBitmap: ImmutableImageBitmap,
     index: Int,
+    showLeftArrow: Boolean,
+    imageSize: Dp,
     modifier: Modifier = Modifier,
     tookMs: Long = 0,
-    showLeftArrow: Boolean,
     onImageClick: () -> Unit,
     onLeftClick: () -> Unit
 ) {
@@ -163,7 +225,7 @@ private fun ImageAndMetaInfo(
         ) {
             MessageSenderImage(
                 imageBitmap = imageBitmap,
-                modifier = Modifier.size(ChatDefaults.SENDER_IMAGE_SIZE),
+                modifier = Modifier.size(imageSize),
                 onClick = onImageClick
             )
 
@@ -209,15 +271,20 @@ fun NameAndTime(
             modifier = Modifier.alignByBaseline()
         )
 
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = sentTimeMillis
-        val format = DateFormat.getInstance()
-        val date = format.format(calendar.time)
+        val date = remember(sentTimeMillis) {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = sentTimeMillis
+            val format = DateFormat.getInstance()
+            format.format(calendar.time)
+        }
+
         Text(
             text = date,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.alignByBaseline()
         )
+
+        Spacer(Modifier.weight(1f))
     }
 }
 
@@ -268,12 +335,16 @@ private fun ChatMessagePreview() {
                 message = DisplayMessage(
                     messageId = 0,
                     senderName = "Sender",
-                    text = "Message Text"
+                    text = "Message Text Long Enough To Wrap Around The Line"
                 ),
                 modifier = Modifier.padding(8.dp),
-                onImageClick = {},
-                onLeftClick = {},
-                onRightClick = {}
+                onImageClicked = {},
+                onLeftClicked = {},
+                onRightClicked = {},
+                onEditClicked = {},
+                onDeleteClicked = {},
+                onMoveUpClicked = {},
+                onMoveDownClicked = {}
             )
         }
     }
@@ -288,15 +359,19 @@ private fun ChatMessageWithSwipesPreview() {
                 message = DisplayMessage(
                     messageId = 0,
                     senderName = "Sender",
-                    text = "Message Text",
+                    text = "Message Text Long Enough To Wrap Around The Line",
                     currentSwipe = 2,
                     totalSwipes = 2,
                     showSwipeInfo = true
                 ),
                 modifier = Modifier.padding(8.dp),
-                onImageClick = {},
-                onLeftClick = {},
-                onRightClick = {}
+                onImageClicked = {},
+                onLeftClicked = {},
+                onRightClicked = {},
+                onEditClicked = {},
+                onDeleteClicked = {},
+                onMoveUpClicked = {},
+                onMoveDownClicked = {}
             )
         }
     }

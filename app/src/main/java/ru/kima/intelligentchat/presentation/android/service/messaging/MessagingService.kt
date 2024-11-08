@@ -50,6 +50,7 @@ class MessagingService : Service(), KoinComponent {
     private val scope = CoroutineScope(Dispatchers.Default + job)
 
     private var currentGenerationId: String? = null
+    private var currentGenerationStrategy: GenerationStrategy? = null
 
     private val _status = MutableStateFlow<MessagingIndicator>(MessagingIndicator.None)
     private val _binder = MessagingServiceBinder()
@@ -62,6 +63,13 @@ class MessagingService : Service(), KoinComponent {
 
     inner class MessagingServiceBinder : Binder() {
         val status = _status.asStateFlow()
+
+        suspend fun cancelGeneration() {
+            if (_status.value == MessagingIndicator.None) return
+            currentGenerationId?.let {
+                currentGenerationStrategy?.cancelGeneration(it)
+            }
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -169,6 +177,7 @@ class MessagingService : Service(), KoinComponent {
             stopSelf()
             return
         }
+        currentGenerationStrategy = strategy
 
         val generationRequest = loadMessagingConfig(
             apiType = apiType,
@@ -194,14 +203,12 @@ class MessagingService : Service(), KoinComponent {
             when (generationStatus) {
                 is GenerationStatus.Done -> {
                     _status.value = MessagingIndicator.None
-                    currentGenerationId = null
                     resultedMessage = generationStatus.result
                 }
 
                 //TODO: handle errors
                 is GenerationStatus.Error -> {
                     _status.value = MessagingIndicator.None
-                    currentGenerationId = null
                 }
 
                 GenerationStatus.Generating -> {
@@ -220,8 +227,14 @@ class MessagingService : Service(), KoinComponent {
                 is GenerationStatus.Started -> {
                     currentGenerationId = generationStatus.generationId
                 }
+
+                GenerationStatus.Aborted -> {
+                    _status.value = MessagingIndicator.None
+                }
             }
         }
+        currentGenerationId = null
+        currentGenerationStrategy = null
         resultedMessage?.let { msg -> createMessage(chatId, senderType, senderId, msg) }
         stopSelf()
     }

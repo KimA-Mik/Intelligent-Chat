@@ -38,6 +38,9 @@ import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToChatMessagesWithSwipesUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
@@ -47,6 +50,7 @@ import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCa
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
+import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
@@ -145,8 +149,12 @@ fun domain() = module {
     singleOf(::SubscribeToFullChatUseCase)
 
     singleOf(::CreateMessageUseCase)
+    singleOf(::DeleteMessageUseCase)
+    singleOf(::EditMessageUseCase)
+    singleOf(::MoveMessageUseCase)
     singleOf(::SwipeFirstMessageUseCase)
 
+    singleOf(::CancelMessageUseCase)
     singleOf(::LoadMessagingConfigUseCase)
     singleOf(::LoadMessagingDataUseCase)
     singleOf(::SendMessageUseCase)

@@ -23,7 +23,10 @@ class HordeGenerationStrategy(
     private val getHordePreferences: GetHordePreferencesUseCase,
     private val getKoboldPreset: GetKoboldPresetUseCase
 ) : GenerationStrategy {
+    private var cancelled = false
+
     override fun generation(request: GenerationRequest): Flow<GenerationStatus> = flow {
+        cancelled = false
         emit(GenerationStatus.Pending)
         val hordeState = getHordePreferences().first()
 
@@ -70,7 +73,7 @@ class HordeGenerationStrategy(
             return@flow
         }
 
-        while (!status.done && !status.faulted && status.isPossible) {
+        while (!cancelled && !status.done && !status.faulted && status.isPossible) {
             if (status.waiting > 0) {
                 emit(GenerationStatus.Pending)
             } else if (status.processing > 0) {
@@ -86,6 +89,8 @@ class HordeGenerationStrategy(
 
         if (status.done && status.generations.isNotEmpty()) {
             emit(GenerationStatus.Done(status.generations.first().text))
+        } else if (cancelled) {
+            emit(GenerationStatus.Aborted)
         }
     }
 
@@ -94,6 +99,7 @@ class HordeGenerationStrategy(
     }
 
     override suspend fun cancelGeneration(requestId: String): Boolean {
+        cancelled = true
         return when (hordeRepository.cancelGenerationRequest(requestId)) {
             is ICResult.Error -> false
             is ICResult.Success -> true

@@ -16,6 +16,7 @@ fun MessageWithSwipesDto.toMessage(): MessageWithSwipes {
         index = message.index,
         selectedSwipeIndex = message.selectedSwipeIndex,
         swipes = swipes.map(SwipeEntity::toSwipe),
+        deleted = message.deleted
     )
 }
 
@@ -28,6 +29,7 @@ fun MessageWithSwipes.toDto(): MessageWithSwipesDto {
             senderId = senderId,
             index = index,
             selectedSwipeIndex = selectedSwipeIndex,
+            deleted = deleted
         ),
         swipes = swipes.map(Swipe::toEntity)
     )
@@ -41,6 +43,7 @@ fun MessageEntity.toMessage(): Message {
         senderId = senderId,
         index = index,
         selectedSwipeIndex = selectedSwipeIndex,
+        deleted = deleted,
     )
 }
 
@@ -52,5 +55,6 @@ fun Message.toMessage(): MessageEntity {
         senderId = senderId,
         index = index,
         selectedSwipeIndex = selectedSwipeIndex,
+        deleted = deleted,
     )
 }

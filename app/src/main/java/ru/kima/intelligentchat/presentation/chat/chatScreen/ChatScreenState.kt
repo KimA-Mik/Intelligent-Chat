@@ -9,7 +9,9 @@ sealed interface ChatScreenState {
     data class ChatState(
         val info: ChatInfo = ChatInfo(),
         val inputMessageBuffer: String = String(),
-        val status: MessagingIndicator = MessagingIndicator.None
+        val editMessageBuffer: String = String(),
+        val editMessageId: Long = 0L,
+        val status: MessagingIndicator = MessagingIndicator.None,
     ) : ChatScreenState {
         data class ChatInfo(
             val characterCard: DisplayCard = DisplayCard(),

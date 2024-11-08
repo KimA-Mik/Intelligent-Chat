@@ -7,5 +7,5 @@ import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 interface MessagingRepository {
     fun messagingStatus(): Flow<MessagingIndicator>
     fun initiateGeneration(chatId: Long, personaId: Long, senderType: SenderType)
-    fun cancelGeneration()
+    suspend fun cancelGeneration()
 }
