@@ -63,6 +63,8 @@ class MessagingRepositoryImpl(
         }
     }
 
+    override fun isGenerationAvailable() = !context.isServiceRunning<MessagingService>()
+
     override fun messagingStatus(): Flow<MessagingIndicator> = _generationStatus
 
     override fun initiateGeneration(chatId: Long, personaId: Long, senderType: SenderType) {
@@ -74,6 +76,32 @@ class MessagingRepositoryImpl(
             val api = preferences.first().selectedApiType
             val intent =
                 MessagingService.getLaunchIntent(context, chatId, personaId, api, senderType)
+            context.startService(intent)
+            bindService()
+        }
+    }
+
+    override fun initiateSwipeGeneration(
+        chatId: Long,
+        messageId: Long,
+        personaId: Long,
+        senderType: SenderType
+    ) {
+        coroutineScope.launch {
+            if (context.isServiceRunning<MessagingService>()) {
+                return@launch
+            }
+
+            val api = preferences.first().selectedApiType
+            val intent =
+                MessagingService.getCreateSwipeLaunchIntent(
+                    context = context,
+                    chatId = chatId,
+                    messageId = messageId,
+                    personaId = personaId,
+                    apiType = api,
+                    senderType = senderType
+                )
             context.startService(intent)
             bindService()
         }

@@ -42,6 +42,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
@@ -155,6 +156,7 @@ fun domain() = module {
     singleOf(::EditMessageUseCase)
     singleOf(::MoveMessageUseCase)
     singleOf(::SwipeFirstMessageUseCase)
+    singleOf(::SwipeMessageUseCase)
 
     singleOf(::CancelMessageUseCase)
     singleOf(::LoadMessagingConfigUseCase)

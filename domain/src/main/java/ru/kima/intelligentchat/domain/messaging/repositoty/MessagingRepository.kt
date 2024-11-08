@@ -6,6 +6,13 @@ import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 
 interface MessagingRepository {
     fun messagingStatus(): Flow<MessagingIndicator>
+    fun isGenerationAvailable(): Boolean
     fun initiateGeneration(chatId: Long, personaId: Long, senderType: SenderType)
+    fun initiateSwipeGeneration(
+        chatId: Long,
+        messageId: Long,
+        personaId: Long,
+        senderType: SenderType
+    )
     suspend fun cancelGeneration()
 }

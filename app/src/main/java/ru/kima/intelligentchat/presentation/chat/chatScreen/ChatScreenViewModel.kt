@@ -20,6 +20,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
@@ -38,17 +39,18 @@ import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 class ChatScreenViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val preferences: GetPreferencesUseCase,
-    private val getCharacterCard: GetCardUseCase,
-    private val subscribeToCardChat: SubscribeToCardChatUseCase,
+    private val editMessage: EditMessageUseCase,
     private val getPersonas: GetPersonasUseCase,
+    private val sendMessage: SendMessageUseCase,
+    private val moveMessage: MoveMessageUseCase,
+    private val swipeMessage: SwipeMessageUseCase,
+    private val cancelMessage: CancelMessageUseCase,
+    private val deleteMessage: DeleteMessageUseCase,
+    private val messagingStatus: SubscribeToMessagingStatus,
+    private val getCharacterCard: GetCardUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
-    private val sendMessage: SendMessageUseCase,
-    private val messagingStatus: SubscribeToMessagingStatus,
-    private val deleteMessage: DeleteMessageUseCase,
-    private val cancelMessage: CancelMessageUseCase,
-    private val editMessage: EditMessageUseCase,
-    private val moveMessage: MoveMessageUseCase
+    private val subscribeToCardChat: SubscribeToCardChatUseCase,
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -245,25 +247,25 @@ class ChatScreenViewModel(
     }
 
     private fun onMessageSwipeLeft(messageId: Long) = viewModelScope.launch {
-        if (messageId == 0L) {
-            val s = currentState() ?: return@launch
+        onMessageSwipe(messageId, SwipeDirection.Left)
+    }
 
+    private fun onMessageSwipeRight(messageId: Long) = viewModelScope.launch {
+        onMessageSwipe(messageId, SwipeDirection.Right)
+    }
+
+    private suspend fun onMessageSwipe(messageId: Long, direction: SwipeDirection) {
+        val s = currentState() ?: return
+        if (messageId == 0L) {
             swipeFirstMessage(
                 cardId = characterCard.value.id,
                 chatId = s.info.fullChat.chatId,
                 direction = SwipeDirection.Left
             )
-        }
-    }
-
-    private fun onMessageSwipeRight(messageId: Long) = viewModelScope.launch {
-        if (messageId == 0L) {
-            val s = currentState() ?: return@launch
-
-            swipeFirstMessage(
-                cardId = characterCard.value.id,
-                chatId = s.info.fullChat.chatId,
-                direction = SwipeDirection.Right
+        } else {
+            swipeMessage(
+                messageId = messageId,
+                direction = direction
             )
         }
     }
