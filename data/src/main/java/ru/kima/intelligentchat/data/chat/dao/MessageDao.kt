@@ -21,6 +21,7 @@ interface MessageDao {
     @Update
     suspend fun updateMessages(messages: List<MessageEntity>): Int
 
+    @Transaction
     @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE message_id=:messageId")
     suspend fun getFullMessage(messageId: Long): MessageWithSwipesDto?
 
