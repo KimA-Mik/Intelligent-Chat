@@ -1,7 +1,6 @@
 package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,7 +30,6 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.Car
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableAltGreeting
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AltGreetingsSheetContent(
     greetings: List<ImmutableAltGreeting>,
@@ -65,7 +63,7 @@ fun AltGreetingsSheetContent(
             val edited = editableGreeting == greeting.id
             AnimatedContent(
                 targetState = edited, label = "",
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
             ) { editable ->
                 if (editable) {
                     EditableAlternateGreeting(

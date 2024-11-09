@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -144,7 +143,6 @@ private val samplers = listOf(
     R.string.repetition_penalty_title,
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Preset(
     state: HordePresetEditScreenState.Preset,
@@ -188,7 +186,7 @@ fun Preset(
                 sampler = sampler,
                 samplerNameId = id,
                 onEvent = onEvent,
-                modifier = Modifier.animateItemPlacement()
+                modifier = Modifier.animateItem()
             )
         }
     }
