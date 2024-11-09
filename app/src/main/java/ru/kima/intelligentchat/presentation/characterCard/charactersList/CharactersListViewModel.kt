@@ -138,7 +138,7 @@ class CharactersListViewModel(
 
     private fun createEmptyCardClicked() {
         viewModelScope.launch {
-            val cardId = putCard(CharacterCard())
+            val cardId = putCard(CharacterCard.default())
             _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(cardId))
         }
     }

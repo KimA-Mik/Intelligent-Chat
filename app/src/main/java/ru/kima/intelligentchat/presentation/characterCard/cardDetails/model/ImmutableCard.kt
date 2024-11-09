@@ -29,6 +29,10 @@ data class ImmutableCard(
     val creator: String = String(),
     val characterVersion: String = String(),
 //    val extensions: Record<string, any> // see details for explanation
+
+    val deleted: Boolean = false,
+    val selectedChat: Long = 0,
+    val selectedGreeting: Int = 0,
 ) {
     fun toCard(): CharacterCard {
         return CharacterCard(
@@ -46,7 +50,10 @@ data class ImmutableCard(
             alternateGreetings = alternateGreetings.map { it.toDto() },
             tags = tags,
             creator = creator,
-            characterVersion = characterVersion
+            characterVersion = characterVersion,
+            deleted = deleted,
+            selectedChat = selectedChat,
+            selectedGreeting = selectedGreeting
         )
     }
 }
@@ -67,7 +74,10 @@ fun CharacterCard.toImmutable(): ImmutableCard {
         alternateGreetings = alternateGreetings.map { it.toImmutable() },
         tags = tags,
         creator = creator,
-        characterVersion = characterVersion
+        characterVersion = characterVersion,
+        deleted = deleted,
+        selectedChat = selectedChat,
+        selectedGreeting = selectedGreeting
     )
 }
 
