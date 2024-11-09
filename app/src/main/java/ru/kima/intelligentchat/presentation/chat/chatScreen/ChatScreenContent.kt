@@ -54,13 +54,13 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.domain.chat.model.SenderType
-import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.EditableChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -180,18 +180,18 @@ private fun moreMenuItems() = remember {
 
 @Composable
 fun MessageIndicator(
-    indicator: MessagingIndicator,
+    indicator: ImmutableMessagingIndicator,
     modifier: Modifier = Modifier
 ) {
     when (indicator) {
-        is MessagingIndicator.DeterminedGenerating -> LinearProgressIndicator(
+        is ImmutableMessagingIndicator.DeterminedGenerating -> LinearProgressIndicator(
             progress = { indicator.progress },
             modifier
         )
 
-        MessagingIndicator.Generating -> LinearProgressIndicator(modifier)
-        MessagingIndicator.None -> {}
-        MessagingIndicator.Pending -> LinearProgressIndicator(progress = { 0f }, modifier)
+        ImmutableMessagingIndicator.Generating -> LinearProgressIndicator(modifier)
+        ImmutableMessagingIndicator.None -> {}
+        ImmutableMessagingIndicator.Pending -> LinearProgressIndicator(progress = { 0f }, modifier)
     }
 }
 
@@ -277,7 +277,7 @@ fun Messages(
 @Composable
 fun ChatBottomBar(
     value: String,
-    messagingIndicator: MessagingIndicator,
+    messagingIndicator: ImmutableMessagingIndicator,
     modifier: Modifier = Modifier,
     onMessageButtonClicked: () -> Unit,
     onValueChange: (String) -> Unit
@@ -312,7 +312,7 @@ fun ChatBottomBar(
         IconButton(onClick = onMessageButtonClicked) {
             Icon(
                 imageVector =
-                if (messagingIndicator == MessagingIndicator.None) Icons.AutoMirrored.Default.Send
+                if (messagingIndicator == ImmutableMessagingIndicator.None) Icons.AutoMirrored.Default.Send
                 else Icons.Default.StopCircle,
                 contentDescription = null
             )

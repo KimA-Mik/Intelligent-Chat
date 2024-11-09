@@ -1,8 +1,8 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen
 
-import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
 
 
 sealed interface ChatScreenState {
@@ -11,7 +11,7 @@ sealed interface ChatScreenState {
         val inputMessageBuffer: String = String(),
         val editMessageBuffer: String = String(),
         val editMessageId: Long = 0L,
-        val status: MessagingIndicator = MessagingIndicator.None,
+        val status: ImmutableMessagingIndicator = ImmutableMessagingIndicator.None,
     ) : ChatScreenState {
         data class ChatInfo(
             val characterCard: DisplayCard = DisplayCard(),

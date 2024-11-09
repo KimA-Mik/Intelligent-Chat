@@ -21,7 +21,6 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
-import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SubscribeToMessagingStatus
@@ -32,7 +31,9 @@ import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseC
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayChat
+import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toImmutable
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
 import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
@@ -112,7 +113,7 @@ class ChatScreenViewModel(
                 inputMessageBuffer = inputMessageBuffer,
                 editMessageBuffer = editMessageBuffer,
                 editMessageId = editMessageId,
-                status = messagingStatus
+                status = messagingStatus.toImmutable()
             )
         }
 
@@ -216,7 +217,7 @@ class ChatScreenViewModel(
         val s = currentState() ?: return
 
         when (s.status) {
-            MessagingIndicator.None -> onSendMessage(s)
+            ImmutableMessagingIndicator.None -> onSendMessage(s)
             else -> onCancelMessage()
         }
     }
