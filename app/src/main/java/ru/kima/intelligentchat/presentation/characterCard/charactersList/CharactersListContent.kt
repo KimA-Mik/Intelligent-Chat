@@ -1,7 +1,6 @@
 package ru.kima.intelligentchat.presentation.characterCard.charactersList
 
 import android.content.res.Configuration
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -105,7 +104,6 @@ fun SearchField(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CharactersList(
     cards: List<ImmutableCardEntry>,
@@ -124,7 +122,7 @@ private fun CharactersList(
                 .padding(horizontal = 8.dp)
             CardItem(
                 card = card,
-                modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                modifier = Modifier.animateItem(),
                 dropDownMenuItems = itemDropDownMenuItems(id = card.id, onEvent = onEvent),
                 onAvatarClick = {
                     onEvent(CharactersListUserEvent.ShowCardAvatar(card.id))
