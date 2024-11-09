@@ -86,9 +86,9 @@ fun GenerationRequest.constructPrompt() = buildString {
 
     val promptMessages = preparePromptMessages(chat.messages, persona, card)
     var messagesTokenBudget = tokenizer.encode("$CHAT_BEGINNING\n").size
-    var totalMessages = 0
-    var canFitExamples = true
 
+    var canFitExamples = true
+    val inputMessages = ArrayDeque<PromptMessage>()
     for (i in promptMessages.lastIndex downTo 0) {
         val message = promptMessages[i]
 
@@ -98,8 +98,8 @@ fun GenerationRequest.constructPrompt() = buildString {
             break
         }
 
+        inputMessages.addLast(message)
         messagesTokenBudget += bodyTokens
-        totalMessages++
     }
 
     if (canFitExamples) {
@@ -111,8 +111,7 @@ fun GenerationRequest.constructPrompt() = buildString {
         ).forEach { append(it) }
     }
 
-    putMessages(promptMessages, totalMessages)
-
+    putMessages(inputMessages)
     append(end)
 }
 
@@ -156,11 +155,10 @@ private fun extractExamples(
     return res
 }
 
-private fun StringBuilder.putMessages(messages: List<PromptMessage>, amount: Int) {
-    if (amount == 0) return
-
-    for (i in messages.size - amount until messages.size) {
-        append(messages[i].text)
+private fun StringBuilder.putMessages(messages: ArrayDeque<PromptMessage>) {
+    while (messages.isNotEmpty()) {
+        val message = messages.removeLast()
+        append(message.text)
     }
 }
 
@@ -169,7 +167,11 @@ private fun preparePromptMessages(
     persona: Persona,
     card: CharacterCard
 ): List<PromptMessage> {
-    val promptMessages = messages.map {
+    val promptMessages = messages.mapNotNull {
+        if (it.selectedSwipeIndex > it.swipes.lastIndex) {
+            return@mapNotNull null
+        }
+
         PromptMessage(
             senderType = it.sender,
             senderName = when (it.sender) {

@@ -1,12 +1,12 @@
 package ru.kima.intelligentchat.domain.messaging.useCase
 
-import android.graphics.Bitmap
 import kotlinx.coroutines.flow.first
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
+import ru.kima.intelligentchat.domain.messaging.model.Sender
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonaUseCase
@@ -72,22 +72,5 @@ class LoadMessagingDataUseCase(
             val persona: Persona,
             val personaImage: PersonaImage
         ) : Result
-    }
-
-    sealed interface Sender {
-        data class CharacterSender(val card: CharacterCard) : Sender
-        data class PersonaSender(val persona: Persona, val image: PersonaImage) : Sender
-
-        val name: String
-            get() = when (this) {
-                is CharacterSender -> card.name
-                is PersonaSender -> persona.name
-            }
-
-        val photo: Bitmap?
-            get() = when (this) {
-                is CharacterSender -> card.photoBytes
-                is PersonaSender -> image.bitmap
-            }
     }
 }

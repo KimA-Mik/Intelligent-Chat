@@ -42,11 +42,14 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
+import ru.kima.intelligentchat.domain.messaging.generation.savingResult.DefaultSavingStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
@@ -153,6 +156,7 @@ fun domain() = module {
     singleOf(::EditMessageUseCase)
     singleOf(::MoveMessageUseCase)
     singleOf(::SwipeFirstMessageUseCase)
+    singleOf(::SwipeMessageUseCase)
 
     singleOf(::CancelMessageUseCase)
     singleOf(::LoadMessagingConfigUseCase)
@@ -162,6 +166,9 @@ fun domain() = module {
 
     singleOf(::HordeGenerationStrategy)
     singleOf(::KoboldAiGenerationStrategy)
+
+    factoryOf(::DefaultSavingStrategy)
+    factoryOf(::SwipeSavingStrategy)
 
     single {
         val context: Context = get(Context::class.java)
