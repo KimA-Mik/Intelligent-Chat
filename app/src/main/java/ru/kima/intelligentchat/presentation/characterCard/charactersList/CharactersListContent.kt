@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,7 +46,14 @@ fun CharactersListContent(
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
     Box(modifier) {
-        SearchField(state.searchText, state.personaImage, expanded, onEvent)
+        SearchField(
+            state.searchText, state.personaImage, expanded,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .height(56.dp)
+                .fillMaxWidth(),
+            onEvent = onEvent
+        )
         CharactersList(state.cards, onEvent)
     }
 }
@@ -55,38 +64,45 @@ fun SearchField(
     query: String,
     personaImage: PersonaImageContainer,
     expanded: Boolean,
+    modifier: Modifier = Modifier,
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
     SearchBar(
-        query = query,
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .height(56.dp),
-        onQueryChange = { newQuery ->
-            onEvent(CharactersListUserEvent.SearchQueryChanged(newQuery))
-        },
-        onSearch = {},
-        active = false,
-        placeholder = {
-            Text(text = "Search")
-        },
-        onActiveChange = {},
-        leadingIcon = {
-            AutoNavigationButton(
-                expanded = expanded
-            ) {
-                onEvent(CharactersListUserEvent.OnMenuButtonClicked)
-            }
-        },
-        trailingIcon = {
-            PersonaImage(
-                container = personaImage,
-                onClick = {},
-                border = false,
-                modifier = Modifier.size(30.dp)
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = query,
+                onQueryChange = { newQuery ->
+                    onEvent(CharactersListUserEvent.SearchQueryChanged(newQuery))
+                },
+                onSearch = {},
+                expanded = false,
+                onExpandedChange = {},
+                enabled = true,
+                placeholder = {
+                    Text(text = "Search")
+                },
+                leadingIcon = {
+                    AutoNavigationButton(
+                        expanded = expanded
+                    ) {
+                        onEvent(CharactersListUserEvent.OnMenuButtonClicked)
+                    }
+                },
+                trailingIcon = {
+                    PersonaImage(
+                        container = personaImage,
+                        onClick = {},
+                        border = false,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
             )
         },
-        content = {})
+        expanded = false,
+        onExpandedChange = {},
+        modifier = modifier,
+        content = {},
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -104,11 +120,11 @@ private fun CharactersList(
     ) {
         items(cards, key = { item -> item.id }) { card ->
             //TODO: decode image from bytes cause lags
+            Modifier
+                .padding(horizontal = 8.dp)
             CardItem(
                 card = card,
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .animateItemPlacement(),
+                modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
                 dropDownMenuItems = itemDropDownMenuItems(id = card.id, onEvent = onEvent),
                 onAvatarClick = {
                     onEvent(CharactersListUserEvent.ShowCardAvatar(card.id))
@@ -174,6 +190,35 @@ fun CharactersListPreview() {
             CharactersListContent(
                 state = CharactersListState(cards),
                 expanded = false
+            ) {
+
+            }
+        }
+    }
+}
+
+@Preview(
+    name = "Characters List Preview expanded",
+    widthDp = 600
+)
+@Composable
+fun CharactersListPreviewExpanded() {
+    IntelligentChatTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val cards = List(100) { index ->
+                ImmutableCardEntry(
+                    id = index.toLong(),
+                    name = "Name $index",
+                    characterVersion = "Version $index",
+                    creatorNotes = "Notes $index"
+                )
+            }
+            CharactersListContent(
+                state = CharactersListState(cards),
+                expanded = true
             ) {
 
             }
