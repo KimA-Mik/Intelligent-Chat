@@ -10,9 +10,9 @@ class RequestBodyConverter<T>(
     private val json: Json,
     private val strategy: SerializationStrategy<T>,
     private val contentType: MediaType
-) : Converter<T, RequestBody> {
-    override fun convert(value: T): RequestBody {
-        val string = json.encodeToString(strategy, value)
+) : Converter<T, RequestBody?> {
+    override fun convert(p0: T): RequestBody? {
+        val string = json.encodeToString(strategy, p0)
         return RequestBody.create(contentType, string)
     }
 }

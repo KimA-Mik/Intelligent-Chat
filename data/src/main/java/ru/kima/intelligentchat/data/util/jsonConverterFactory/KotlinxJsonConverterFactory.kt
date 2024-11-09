@@ -19,7 +19,7 @@ class KotlinxJsonConverterFactory(
         parameterAnnotations: Array<out Annotation>,
         methodAnnotations: Array<out Annotation>,
         retrofit: Retrofit
-    ): Converter<*, RequestBody> {
+    ): Converter<*, RequestBody?> {
         val strategy = json.serializersModule.serializer(type)
         return RequestBodyConverter(json, strategy, contentType)
     }
