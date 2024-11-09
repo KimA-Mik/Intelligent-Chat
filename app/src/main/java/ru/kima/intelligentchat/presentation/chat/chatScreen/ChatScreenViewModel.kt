@@ -261,7 +261,7 @@ class ChatScreenViewModel(
             swipeFirstMessage(
                 cardId = characterCard.value.id,
                 chatId = s.info.fullChat.chatId,
-                direction = SwipeDirection.Left
+                direction = direction
             )
         } else {
             swipeMessage(
