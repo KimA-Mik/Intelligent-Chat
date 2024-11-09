@@ -52,7 +52,7 @@ class ChatScreenViewModel(
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
     private val subscribeToCardChat: SubscribeToCardChatUseCase,
 ) : ViewModel() {
-    private val characterCard = MutableStateFlow(CharacterCard())
+    private val characterCard = MutableStateFlow(CharacterCard.default())
     private val displayCard = MutableStateFlow(DisplayCard())
 
     private val _state = MutableStateFlow<ChatScreenState>(ChatScreenState.ChatState())
