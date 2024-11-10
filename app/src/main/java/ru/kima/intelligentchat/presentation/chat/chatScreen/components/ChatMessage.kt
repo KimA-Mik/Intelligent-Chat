@@ -10,13 +10,9 @@ import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -45,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.conditional
 import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
@@ -68,44 +65,43 @@ fun ChatMessage(
     onImageClicked: () -> Unit,
     onLeftClicked: () -> Unit,
     onRightClicked: () -> Unit
+) = Column(
+    modifier = modifier
+//            .height(IntrinsicSize.Min)
+    , horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.SpaceBetween
 ) {
-    Box(
-        modifier = modifier
-            .height(IntrinsicSize.Min)
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         ImageAndMetaInfo(
             imageBitmap = message.senderImage,
             index = message.index,
-            showLeftArrow = message.showSwipeInfo,
             imageSize = imageSize,
-            modifier = Modifier
-                .fillMaxHeight()
-                .align(Alignment.TopStart),
             tookMs = 0,
             onImageClick = onImageClicked,
-            onLeftClick = onLeftClicked
         )
 
-        Column(
+        Text(
+            text = message.senderName,
+            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(
-                    start = imageSize + 8.dp, end =
-                    if (message.showSwipeInfo) 56.dp
-                    else 0.dp
-                ),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            NameAndTime(
-                name = message.senderName,
-                sentTimeMillis = message.sentTimeMillis
-            )
+                .alignByBaseline()
+                .weight(1f)
+        )
 
-            AnimatedText(
-                text = message.text,
-                currentSwipe = message.currentSwipe,
-            )
+        val date = remember(message.sentTimeMillis) {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = message.sentTimeMillis
+            val format = DateFormat.getInstance()
+            format.format(calendar.time)
         }
+        Text(
+            text = date,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.alignByBaseline()
+        )
 
         SimpleDropdownMenu(
             dropdownMenuItems(
@@ -114,14 +110,35 @@ fun ChatMessage(
                 onMoveUpClicked = onMoveUpClicked,
                 onMoveDownClicked = onMoveDownClicked
             ),
-            modifier = Modifier.align(Alignment.TopEnd)
+        )
+    }
+
+    Row(
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+    ) {
+        if (message.showSwipeInfo) {
+            IconButton(
+                onClick = onLeftClicked,
+                modifier = Modifier
+            ) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = "")
+            }
+        }
+
+        AnimatedText(
+            text = message.text,
+            currentSwipe = message.currentSwipe,
+            modifier = Modifier
+                .weight(1f)
+                .conditional(!message.showSwipeInfo) { padding(horizontal = 8.dp) }
         )
 
         if (message.showSwipeInfo) {
             RightArrow(
                 currentSwipe = message.currentSwipe,
                 totalSwipes = message.totalSwipes,
-                modifier = Modifier.align(Alignment.BottomEnd),
                 onRightClick = onRightClicked
             )
         }
@@ -207,12 +224,10 @@ fun AnimatedText(
 fun ImageAndMetaInfo(
     imageBitmap: ImmutableImageBitmap,
     index: Int,
-    showLeftArrow: Boolean,
     imageSize: Dp,
     modifier: Modifier = Modifier,
     tookMs: Long = 0,
     onImageClick: () -> Unit,
-    onLeftClick: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -240,15 +255,6 @@ fun ImageAndMetaInfo(
                     text = "${seconds}S",
                     style = MaterialTheme.typography.bodySmall
                 )
-            }
-        }
-
-        if (showLeftArrow) {
-            IconButton(
-                onClick = onLeftClick,
-                modifier = Modifier.size(ChatDefaults.SENDER_IMAGE_SIZE)
-            ) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = "")
             }
         }
     }
@@ -283,8 +289,6 @@ fun NameAndTime(
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.alignByBaseline()
         )
-
-        Spacer(Modifier.weight(1f))
     }
 }
 
@@ -334,10 +338,12 @@ private fun ChatMessagePreview() {
             ChatMessage(
                 message = DisplayMessage(
                     messageId = 0,
-                    senderName = "Sender",
+                    senderName = "Very Long Sender Name",
                     text = "Message Text Long Enough To Wrap Around The Line"
                 ),
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
                 onImageClicked = {},
                 onLeftClicked = {},
                 onRightClicked = {},
@@ -358,13 +364,15 @@ private fun ChatMessageWithSwipesPreview() {
             ChatMessage(
                 message = DisplayMessage(
                     messageId = 0,
-                    senderName = "Sender",
+                    senderName = "Very Long Sender Name",
                     text = "Message Text Long Enough To Wrap Around The Line",
                     currentSwipe = 2,
                     totalSwipes = 2,
                     showSwipeInfo = true
                 ),
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
                 onImageClicked = {},
                 onLeftClicked = {},
                 onRightClicked = {},

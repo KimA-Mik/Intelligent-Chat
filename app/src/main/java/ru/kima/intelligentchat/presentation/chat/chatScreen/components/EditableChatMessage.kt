@@ -46,12 +46,12 @@ fun EditableChatMessage(
         ImageAndMetaInfo(
             imageBitmap = message.senderImage,
             index = message.index,
-            showLeftArrow = false,
+//            showLeftArrow = false,
             imageSize = imageSize,
             modifier = Modifier.fillMaxHeight(),
             tookMs = 0,
             onImageClick = onImageClick,
-            onLeftClick = {}
+//            onLeftClick = {}
         )
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
