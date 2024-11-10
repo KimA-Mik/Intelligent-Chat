@@ -11,10 +11,12 @@ import androidx.compose.animation.slideOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
@@ -36,6 +38,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -86,6 +90,8 @@ fun ChatMessage(
         Text(
             text = message.senderName,
             style = MaterialTheme.typography.headlineSmall,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .alignByBaseline()
                 .weight(1f)
@@ -100,7 +106,10 @@ fun ChatMessage(
         Text(
             text = date,
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.alignByBaseline()
+            textAlign = TextAlign.End,
+            modifier = Modifier
+                .alignByBaseline()
+                .width(IntrinsicSize.Min)
         )
 
         SimpleDropdownMenu(
@@ -338,7 +347,7 @@ private fun ChatMessagePreview() {
             ChatMessage(
                 message = DisplayMessage(
                     messageId = 0,
-                    senderName = "Very Long Sender Name",
+                    senderName = "Very Longggggggggg Sender Name",
                     text = "Message Text Long Enough To Wrap Around The Line"
                 ),
                 modifier = Modifier
