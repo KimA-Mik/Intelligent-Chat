@@ -12,4 +12,5 @@ sealed interface UserEvent {
     data object MessageButtonClicked : UserEvent
     data class MoveMessageUp(val messageId: Long) : UserEvent
     data class MoveMessageDown(val messageId: Long) : UserEvent
+    data object OpenChatList : UserEvent
 }

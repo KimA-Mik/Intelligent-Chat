@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.core.utils.combine
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
@@ -28,6 +29,7 @@ import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
+import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayChat
@@ -58,6 +60,9 @@ class ChatScreenViewModel(
 
     private val _state = MutableStateFlow<ChatScreenState>(ChatScreenState.ChatState())
     val state = _state.asStateFlow()
+
+    private val _uiEvent = MutableStateFlow(Event<UiEvent>(null))
+    val uiEvent = _uiEvent.asStateFlow()
 
     init {
         initialize()
@@ -162,7 +167,12 @@ class ChatScreenViewModel(
             is UserEvent.UpdateEditedMessage -> onUpdateEditedMessage(event.text)
             is UserEvent.MoveMessageDown -> onMoveMessageDown(event.messageId)
             is UserEvent.MoveMessageUp -> onMoveMessageUp(event.messageId)
+            UserEvent.OpenChatList -> onOpenChatList()
         }
+    }
+
+    private fun onOpenChatList() {
+        _uiEvent.value = Event(UiEvent.OpenChatList)
     }
 
     private fun onMoveMessageUp(messageId: Long) = viewModelScope.launch {

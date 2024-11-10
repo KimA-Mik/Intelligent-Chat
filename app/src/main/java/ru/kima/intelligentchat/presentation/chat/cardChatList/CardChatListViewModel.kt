@@ -36,7 +36,7 @@ class CardChatListViewModel(
 
     private fun initialize() {
         val cardId = savedStateHandle.get<Long>(CARD_ID_ARGUMENT)
-        if (cardId == null) {
+        if (cardId == null || cardId < 1) {
             _uiEvent.update { Event(UiEvent.IncorrectInitialization) }
             return
         }

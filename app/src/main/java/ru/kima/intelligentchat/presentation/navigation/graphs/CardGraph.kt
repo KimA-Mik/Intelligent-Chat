@@ -72,6 +72,7 @@ fun NavGraphBuilder.cardGraph(
         ) {
             val viewModel: ChatScreenViewModel = koinViewModel()
             val state by viewModel.state.collectAsStateWithLifecycle(ChatScreenState.ChatState())
+            val uiEvent by viewModel.uiEvent.collectAsStateWithLifecycle()
             val onEvent = remember<(UserEvent) -> Unit> {
                 {
                     viewModel.onEvent(it)
@@ -80,6 +81,7 @@ fun NavGraphBuilder.cardGraph(
 
             ChatScreen(
                 state = state,
+                uiEvent = uiEvent,
                 navController = navController,
                 snackbarHostState = snackbarHostState,
                 onEvent = onEvent

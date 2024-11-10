@@ -40,6 +40,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -53,15 +54,18 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.EditableChatMessage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChatList
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -70,6 +74,7 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 @Composable
 fun ChatScreenContent(
     state: ChatScreenState.ChatState,
+    uiEvent: Event<UiEvent>,
     navController: NavController,
     snackbarHostState: SnackbarHostState,
     onEvent: (UserEvent) -> Unit
@@ -80,6 +85,12 @@ fun ChatScreenContent(
     val popBackStack = remember<() -> Unit> {
         {
             navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(uiEvent) {
+        uiEvent.consume {
+            consumeEvent(it, state.info.characterCard.id, navController)
         }
     }
 
@@ -119,7 +130,7 @@ fun ChatScreenContent(
                 },
                 actions = {
                     SimpleDropdownMenu(
-                        menuItems = dropdownMenuItems(),
+                        menuItems = dropdownMenuItems(onEvent),
                         iconVector = Icons.Default.MoreVert
                     )
                 },
@@ -151,12 +162,18 @@ fun ChatScreenContent(
     }
 }
 
+private fun consumeEvent(event: UiEvent, cardId: Long, navController: NavController) {
+    when (event) {
+        UiEvent.OpenChatList -> navController.navigateToCardChatList(cardId)
+    }
+}
+
 @Composable
-private fun dropdownMenuItems() = remember {
+private fun dropdownMenuItems(onEvent: (UserEvent) -> Unit) = remember {
     listOf(
         SimpleDropDownMenuItem(
             R.string.menu_item_chat_instances,
-            onClick = {},
+            onClick = { onEvent(UserEvent.OpenChatList) },
             iconVector = Icons.Default.Feedback
         ),
     )
@@ -391,6 +408,7 @@ private fun ChatScreenPreview() {
             ),
             navController = rememberNavController(),
             snackbarHostState = SnackbarHostState(),
+            uiEvent = Event(null),
             onEvent = {}
         )
     }
