@@ -6,6 +6,7 @@ import org.koin.dsl.module
 import ru.kima.intelligentchat.presentation.android.notifications.NotificationHandler
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsViewModel
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.CharactersListViewModel
+import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListViewModel
 import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenViewModel
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewViewModel
@@ -32,6 +33,7 @@ fun presentation() = module {
     viewModelOf(::HordePresetEditViewModel)
 
     viewModelOf(::ChatScreenViewModel)
+    viewModelOf(::CardChatListViewModel)
 
     singleOf(::HordeConfigService)
 }
