@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.presentation.chat.chatScreen
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,7 +40,6 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -58,6 +58,7 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.EditableChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
@@ -104,7 +105,7 @@ fun ChatScreenContent(
                             text = state.info.characterCard.name,
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 2
+                            maxLines = 1
                         )
                     }
                 },
@@ -208,21 +209,22 @@ fun Messages(
         initialFirstVisibleItemIndex = state.fullChat.messages.lastIndex
     )
 
-    LaunchedEffect(key1 = state.fullChat.messages) {
-        val lastItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
-
-        listState.scrollToItem(
-            state.fullChat.messages.lastIndex,
-            scrollOffset = lastItem.size
-        )
-    }
+//    LaunchedEffect(key1 = state.fullChat.messages) {
+//        val lastItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
+//
+//        listState.scrollToItem(
+//            state.fullChat.messages.lastIndex,
+//            scrollOffset = lastItem.size
+//        )
+//    }
 
     val scope = rememberCoroutineScope()
 
     LazyColumn(
         modifier = modifier,
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(8.dp)
     ) {
         items(
             items = state.fullChat.messages,
@@ -242,7 +244,6 @@ fun Messages(
                     onImageClick = {},
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
                         .animateItem(),
                 )
 
@@ -250,7 +251,6 @@ fun Messages(
                     message = it,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
                         .animateContentSize { _, targetValue ->
                             scope.launch {
                                 listState.animateScrollToItem(
@@ -366,6 +366,7 @@ private fun ChatScreenPreview() {
         ChatScreenContent(
             state = ChatScreenState.ChatState(
                 info = ChatScreenState.ChatState.ChatInfo(
+                    characterCard = DisplayCard(name = "Sender"),
                     fullChat = DisplayChat(
                         messages = listOf(
                             DisplayMessage(

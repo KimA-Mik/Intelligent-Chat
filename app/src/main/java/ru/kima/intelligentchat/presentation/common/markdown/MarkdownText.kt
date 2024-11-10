@@ -47,7 +47,8 @@ fun MarkdownText(text: String, modifier: Modifier = Modifier) {
                 }
             }
         },
-        modifier = modifier
+        modifier = modifier,
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 
