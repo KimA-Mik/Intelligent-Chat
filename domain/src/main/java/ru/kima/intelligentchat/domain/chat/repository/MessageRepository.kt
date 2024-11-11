@@ -12,7 +12,7 @@ interface MessageRepository {
     suspend fun updateMessage(message: Message)
     suspend fun updateMessages(messages: List<Message>)
     suspend fun deleteMessage(messageId: Long): Boolean
-    suspend fun deleteMessages(messageIds: List<Long>): Boolean
+    suspend fun deleteMessages(messages: List<Message>)
     suspend fun deleteMessagesChat(chatId: Long): Boolean
     suspend fun createMessage(
         chatId: Long,

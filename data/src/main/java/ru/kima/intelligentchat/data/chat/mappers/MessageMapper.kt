@@ -7,7 +7,7 @@ import ru.kima.intelligentchat.domain.chat.model.Message
 import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.model.Swipe
 
-fun MessageWithSwipesDto.toMessage(): MessageWithSwipes {
+fun MessageWithSwipesDto.toEntity(): MessageWithSwipes {
     return MessageWithSwipes(
         messageId = message.messageId,
         chatId = message.chatId,
@@ -35,7 +35,7 @@ fun MessageWithSwipes.toDto(): MessageWithSwipesDto {
     )
 }
 
-fun MessageEntity.toMessage(): Message {
+fun MessageEntity.toEntity(): Message {
     return Message(
         messageId = messageId,
         chatId = chatId,
@@ -47,7 +47,7 @@ fun MessageEntity.toMessage(): Message {
     )
 }
 
-fun Message.toMessage(): MessageEntity {
+fun Message.toEntity(): MessageEntity {
     return MessageEntity(
         messageId = messageId,
         chatId = chatId,

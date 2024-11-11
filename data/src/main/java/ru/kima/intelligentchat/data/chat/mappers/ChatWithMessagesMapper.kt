@@ -6,7 +6,7 @@ import ru.kima.intelligentchat.domain.chat.model.ChatWithMessages
 fun SimpleChatWithMessagesDto.toChatWithMessages(): ChatWithMessages {
     return ChatWithMessages(
         chat = chat.toChat(),
-        messages = messages.map { it.toMessage() }
+        messages = messages.map { it.toEntity() }
     )
 }
 
