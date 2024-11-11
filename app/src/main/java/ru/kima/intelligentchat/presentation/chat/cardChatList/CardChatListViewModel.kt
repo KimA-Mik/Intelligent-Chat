@@ -12,6 +12,8 @@ import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.ChatWithMessages
+import ru.kima.intelligentchat.domain.chat.useCase.CreateChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.SelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatsUseCase
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UserEvent
@@ -21,8 +23,10 @@ import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
 class CardChatListViewModel(
     private val savedStateHandle: SavedStateHandle,
+    private val createChat: CreateChatUseCase,
     private val getCharacterCard: GetCardUseCase,
-    private val subscribeToCardChats: SubscribeToCardChatsUseCase,
+    private val selectChatUseCase: SelectChatUseCase,
+    private val subscribeToCardChats: SubscribeToCardChatsUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableStateFlow(Event<UiEvent>(null))
     val uiEvent = _uiEvent.asStateFlow()
@@ -63,6 +67,26 @@ class CardChatListViewModel(
     }
 
     fun onEvent(event: UserEvent) {
+        when (event) {
+            UserEvent.CreateChat -> onCreateChat()
+            is UserEvent.DeleteChat -> onDeleteChat(event.chatId)
+            is UserEvent.RenameChat -> onRenameChat(event.chatId)
+            is UserEvent.SelectChat -> onSelectChat(event.chatId)
+        }
+    }
 
+    private fun onSelectChat(chatId: Long) = viewModelScope.launch {
+        selectChatUseCase(
+            chatId = chatId,
+            cardId = card.value.id
+        )
+    }
+
+    private fun onRenameChat(chatId: Long) {}
+
+    private fun onDeleteChat(chatId: Long) {}
+
+    private fun onCreateChat() = viewModelScope.launch {
+        createChat(card.value.id)
     }
 }

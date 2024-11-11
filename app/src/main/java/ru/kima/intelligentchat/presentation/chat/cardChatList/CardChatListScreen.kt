@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -32,12 +34,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.cardChatList.model.ChatListItem
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
@@ -114,7 +118,6 @@ fun CardChatListScreenContent(
     modifier: Modifier = Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
-
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(bottom = 72.dp)
@@ -124,17 +127,43 @@ fun CardChatListScreenContent(
             key = { it.id }) {
             ListItem(
                 headlineContent = { Text(it.name) },
-                modifier = Modifier.clickable {
-                    onEvent(UserEvent.SelectChat(it.id))
-                },
+                modifier = Modifier
+                    .clickable {
+                        onEvent(UserEvent.SelectChat(it.id))
+                    }
+                    .animateItem(),
                 trailingContent = {
-                    SimpleDropdownMenu(emptyList())
+                    SimpleDropdownMenu(
+                        listDropdownMenuItems(
+                            chatId = it.id,
+                            onEvent = onEvent
+                        )
+                    )
                 },
                 tonalElevation = if (it.selected) 4.dp else ListItemDefaults.Elevation,
                 shadowElevation = if (it.selected) 4.dp else ListItemDefaults.Elevation,
             )
         }
     }
+}
+
+@Composable
+private fun listDropdownMenuItems(
+    chatId: Long,
+    onEvent: (UserEvent) -> Unit
+) = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_rename_chat,
+            onClick = { onEvent(UserEvent.RenameChat(chatId)) },
+            iconVector = Icons.Default.EditNote
+        ),
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_delete_chat,
+            onClick = { onEvent(UserEvent.DeleteChat(chatId)) },
+            iconVector = Icons.Default.Delete
+        )
+    )
 }
 
 @Preview
