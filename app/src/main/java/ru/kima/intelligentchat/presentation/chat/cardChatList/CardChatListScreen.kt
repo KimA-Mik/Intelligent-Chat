@@ -146,7 +146,7 @@ fun CardChatListScreen(
         }
     ) { paddingValues ->
         CardChatListScreenContent(
-            state = state,
+            chats = state.chats,
             modifier = Modifier.padding(paddingValues),
             onEvent = onEvent
         )
@@ -155,7 +155,7 @@ fun CardChatListScreen(
 
 @Composable
 fun CardChatListScreenContent(
-    state: CardChatListState,
+    chats: List<ChatListItem>,
     modifier: Modifier = Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
@@ -165,7 +165,7 @@ fun CardChatListScreenContent(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(
-            items = state.chats,
+            items = chats,
             key = { it.id }) {
             ListItem(
                 headlineContent = { Text(it.name) },
