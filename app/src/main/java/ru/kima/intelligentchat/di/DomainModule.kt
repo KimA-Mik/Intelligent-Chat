@@ -36,6 +36,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.CreateChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.DeleteChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.InitializeChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.RenameChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatsUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToChatMessagesWithSwipesUseCase
@@ -152,6 +153,7 @@ fun domain() = module {
     singleOf(::CreateChatUseCase)
     singleOf(::DeleteChatUseCase)
     singleOf(::InitializeChatUseCase)
+    singleOf(::RenameChatUseCase)
     singleOf(::SelectChatUseCase)
     singleOf(::SubscribeToCardChatsUseCase)
     singleOf(::SubscribeToChatMessagesWithSwipesUseCase)

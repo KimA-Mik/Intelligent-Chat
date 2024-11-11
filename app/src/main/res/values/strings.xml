@@ -110,6 +110,7 @@
     <string name="menu_item_rename_chat">Rename</string>
     <string name="menu_item_delete_chat">Delete</string>
 
+    <string name="rename_chat_dialog_title">Choose new name</string>
     <string name="delete_chat_alert_dialog_title">Delete chat</string>
     <string name="delete_chat_alert_dialog_text">The chat will be deleted forever</string>
 

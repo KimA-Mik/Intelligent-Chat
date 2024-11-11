@@ -14,6 +14,7 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.ChatWithMessages
 import ru.kima.intelligentchat.domain.chat.useCase.CreateChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.DeleteChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.RenameChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatsUseCase
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UiEvent
@@ -25,10 +26,11 @@ import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 class CardChatListViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val createChat: CreateChatUseCase,
+    private val deleteChat: DeleteChatUseCase,
+    private val renameChat: RenameChatUseCase,
     private val getCharacterCard: GetCardUseCase,
     private val selectChatUseCase: SelectChatUseCase,
     private val subscribeToCardChats: SubscribeToCardChatsUseCase,
-    private val deleteChat: DeleteChatUseCase,
 ) : ViewModel() {
     private val _uiEvent = MutableStateFlow(Event<UiEvent>(null))
     val uiEvent = _uiEvent.asStateFlow()
@@ -86,7 +88,33 @@ class CardChatListViewModel(
             is UserEvent.SelectChat -> onSelectChat(event.chatId)
             UserEvent.DeleteChatAccept -> onDeleteChatAccept()
             UserEvent.DeleteChatDismiss -> onDeleteChatDismiss()
+            UserEvent.RenameChatAccept -> onRenameChatAccept()
+            UserEvent.RenameChatDismiss -> onRenameChatDismiss()
+            is UserEvent.RenameChatUpdateBuffer -> onRenameChatUpdateBuffer(event.buffer)
         }
+    }
+
+    private fun onRenameChatUpdateBuffer(buffer: String) {
+        savedStateHandle[RENAME_CHAT_BUFFER_KEY] = buffer
+    }
+
+    private fun onRenameChatDismiss() {
+        savedStateHandle[RENAME_CHAT_DIALOG_KEY] = false
+        savedStateHandle[RENAME_CHAT_BUFFER_KEY] = String()
+        savedStateHandle[RENAME_CHAT_ID_KEY] = EMPTY_ID
+    }
+
+    private fun onRenameChatAccept() = viewModelScope.launch {
+        savedStateHandle[RENAME_CHAT_DIALOG_KEY] = false
+
+        val chatId = savedStateHandle.get<Long>(RENAME_CHAT_ID_KEY)
+        if (chatId == null || chatId < 1L) return@launch
+        val newTitle = savedStateHandle.get<String>(RENAME_CHAT_BUFFER_KEY) ?: return@launch
+
+        renameChat(chatId, newTitle)
+
+        savedStateHandle[RENAME_CHAT_BUFFER_KEY] = String()
+        savedStateHandle[RENAME_CHAT_ID_KEY] = EMPTY_ID
     }
 
     private fun onDeleteChatDismiss() {
@@ -109,7 +137,12 @@ class CardChatListViewModel(
         )
     }
 
-    private fun onRenameChat(chatId: Long) {}
+    private fun onRenameChat(chatId: Long) {
+        val chat = chats.value.find { it.chat.chatId == chatId } ?: return
+        savedStateHandle[RENAME_CHAT_BUFFER_KEY] = chat.chat.title
+        savedStateHandle[RENAME_CHAT_ID_KEY] = chatId
+        savedStateHandle[RENAME_CHAT_DIALOG_KEY] = true
+    }
 
     private fun onDeleteChat(chatId: Long) {
         savedStateHandle[DELETE_CHAT_ID_KEY] = chatId
