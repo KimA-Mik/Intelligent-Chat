@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +18,8 @@ import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
-import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
@@ -53,7 +56,8 @@ class ChatScreenViewModel(
     private val getCharacterCard: GetCardUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
-    private val subscribeToCardChat: SubscribeToCardChatUseCase,
+    private val subscribeToFullChat: SubscribeToFullChatUseCase,
+    private val createAndSelectChatUseCase: CreateAndSelectChatUseCase,
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard.default())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -63,6 +67,9 @@ class ChatScreenViewModel(
 
     private val _uiEvent = MutableStateFlow(Event<UiEvent>(null))
     val uiEvent = _uiEvent.asStateFlow()
+
+    private var chatJob: Job? = null
+    private val _fullChat = MutableStateFlow(FullChat())
 
     init {
         initialize()
@@ -77,22 +84,31 @@ class ChatScreenViewModel(
 
         loadCard(id)
 
-
-        val chat = subscribeToCardChat(id)
-            .map {
-                when (it) {
-                    is SubscribeToCardChatUseCase.Result.Success -> it.fullChat
-                    SubscribeToCardChatUseCase.Result.UnknownError -> FullChat()
+        viewModelScope.launch(Dispatchers.IO) {
+            characterCard.collect { card ->
+                if (card.id < 1L) return@collect
+                chatJob?.cancel()
+                chatJob = viewModelScope.launch {
+                    subscribeToFullChat(card.selectedChat).collect {
+                        _fullChat.value = when (it) {
+                            is SubscribeToFullChatUseCase.Result.Success -> it.fullChat
+                            SubscribeToFullChatUseCase.Result.UnknownError -> FullChat()
+                            SubscribeToFullChatUseCase.Result.ChatNotFound -> {
+                                createAndSelectChatUseCase(id)
+                                FullChat()
+                            }
+                        }
+                    }
                 }
             }
+        }
 
         val personas = getPersonas()
         val personasNames = loadPersonasNames(personas)
         val personasImages = loadPersonasImages(personas)
 
-
         val chatInfo = combine(
-            characterCard, displayCard, chat, personasNames, personasImages, preferences(),
+            characterCard, displayCard, _fullChat, personasNames, personasImages, preferences(),
         ) { characterCard, displayCard, fullChat, names, images, preferences ->
             ChatScreenState.ChatState.ChatInfo(
                 characterCard = displayCard,
@@ -129,7 +145,7 @@ class ChatScreenViewModel(
         }
     }
 
-    private fun loadCard(id: Long) = viewModelScope.launch {
+    private fun loadCard(id: Long) = viewModelScope.launch(Dispatchers.IO) {
         getCharacterCard(id).collect {
             characterCard.value = it
             displayCard.value = it.toDisplayCard()

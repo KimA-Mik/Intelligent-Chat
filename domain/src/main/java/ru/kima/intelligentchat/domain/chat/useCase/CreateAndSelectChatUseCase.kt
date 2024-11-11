@@ -1,7 +1,8 @@
 package ru.kima.intelligentchat.domain.chat.useCase
 
+import kotlinx.coroutines.flow.first
 import ru.kima.intelligentchat.core.common.ICResult
-import ru.kima.intelligentchat.domain.card.model.CharacterCard
+import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.Chat
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
@@ -9,11 +10,13 @@ import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 
 class CreateAndSelectChatUseCase(
     private val updateCard: UpdateCardUseCase,
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    private val cardRepository: CharacterCardRepository
 ) {
-    suspend operator fun invoke(card: CharacterCard, title: String): ICResult<Long, Throwable> {
+    suspend operator fun invoke(cardId: Long): ICResult<Long, Throwable> {
         return try {
-            val chat = Chat(chatId = 0, title = title, cardId = card.id, selectedGreeting = 0)
+            val card = cardRepository.getCharacterCard(cardId).first()
+            val chat = Chat(chatId = 0, title = card.name, cardId = card.id, selectedGreeting = 0)
             val id = chatRepository.insertChat(chat)
             val newCard = card.copy(selectedChat = id)
             updateCard(newCard)
