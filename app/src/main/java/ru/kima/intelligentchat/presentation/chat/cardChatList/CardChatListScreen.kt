@@ -1,17 +1,26 @@
 package ru.kima.intelligentchat.presentation.chat.cardChatList
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -27,6 +36,9 @@ import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UserEvent
+import ru.kima.intelligentchat.presentation.chat.cardChatList.model.ChatListItem
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,18 +90,51 @@ fun CardChatListScreen(
                     }
                 },
             )
-
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onEvent(UserEvent.CreateChat) }
+            ) {
+                Icon(Icons.Default.Create, contentDescription = null)
+            }
         }
     ) { paddingValues ->
         CardChatListScreenContent(
-            modifier = Modifier.padding(paddingValues)
+            state = state,
+            modifier = Modifier.padding(paddingValues),
+            onEvent = onEvent
         )
     }
 }
 
 @Composable
-fun CardChatListScreenContent(modifier: Modifier = Modifier) {
+fun CardChatListScreenContent(
+    state: CardChatListState,
+    modifier: Modifier = Modifier,
+    onEvent: (UserEvent) -> Unit
+) {
 
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(bottom = 72.dp)
+    ) {
+        items(
+            items = state.chats,
+            key = { it.id }) {
+            ListItem(
+                headlineContent = { Text(it.name) },
+                modifier = Modifier.clickable {
+                    onEvent(UserEvent.SelectChat(it.id))
+                },
+                trailingContent = {
+                    SimpleDropdownMenu(emptyList())
+                },
+                tonalElevation = if (it.selected) 4.dp else ListItemDefaults.Elevation,
+                shadowElevation = if (it.selected) 4.dp else ListItemDefaults.Elevation,
+            )
+        }
+    }
 }
 
 @Preview
@@ -97,7 +142,16 @@ fun CardChatListScreenContent(modifier: Modifier = Modifier) {
 private fun CardChatListScreenPreview() {
     IntelligentChatTheme {
         CardChatListScreen(
-            state = CardChatListState(),
+            state = CardChatListState(
+                displayCard = DisplayCard(name = "Card"),
+                chats = List(10) {
+                    ChatListItem(
+                        id = it.toLong(),
+                        name = it.toString(),
+                        selected = it == 1,
+                    )
+                }
+            ),
             uiEvent = Event(null),
             navController = rememberNavController(),
             snackbarHostState = SnackbarHostState(),
