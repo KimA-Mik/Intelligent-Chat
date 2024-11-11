@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -30,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -41,6 +43,7 @@ import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.cardChatList.model.ChatListItem
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
+import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -59,6 +62,18 @@ fun CardChatListScreen(
         {
             navController.popBackStack()
         }
+    }
+
+    when {
+        state.deleteChatDialog -> SimpleAlertDialog(
+            onConfirm = { onEvent(UserEvent.DeleteChatAccept) },
+            onDismiss = { onEvent(UserEvent.DeleteChatDismiss) },
+            title = stringResource(R.string.delete_chat_alert_dialog_title),
+            text = stringResource(R.string.delete_chat_alert_dialog_text),
+            icon = Icons.Default.DeleteForever,
+            confirmText = stringResource(R.string.alert_dialog_accept),
+            dismissText = stringResource(R.string.alert_dialog_dismiss)
+        )
     }
 
     Scaffold(

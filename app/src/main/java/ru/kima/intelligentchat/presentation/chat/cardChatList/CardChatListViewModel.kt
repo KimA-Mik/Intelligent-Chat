@@ -13,6 +13,7 @@ import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.ChatWithMessages
 import ru.kima.intelligentchat.domain.chat.useCase.CreateChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.DeleteChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatsUseCase
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UiEvent
@@ -26,19 +27,30 @@ class CardChatListViewModel(
     private val createChat: CreateChatUseCase,
     private val getCharacterCard: GetCardUseCase,
     private val selectChatUseCase: SelectChatUseCase,
-    private val subscribeToCardChats: SubscribeToCardChatsUseCase
+    private val subscribeToCardChats: SubscribeToCardChatsUseCase,
+    private val deleteChat: DeleteChatUseCase,
 ) : ViewModel() {
     private val _uiEvent = MutableStateFlow(Event<UiEvent>(null))
     val uiEvent = _uiEvent.asStateFlow()
 
     private val card = MutableStateFlow(CharacterCard.default())
     private val chats = MutableStateFlow(emptyList<ChatWithMessages>())
-    val state = combine(card, chats) { card, chats ->
+    private val cardAndChats = combine(card, chats) { card, chats ->
+        card.toDisplayCard() to chats.map { it.toListItem(selected = it.chat.chatId == card.selectedChat) }
+    }
+
+    val state = combine(
+        cardAndChats,
+        savedStateHandle.getStateFlow<Boolean>(DELETE_CHAT_DIALOG_KEY, false),
+        savedStateHandle.getStateFlow<Boolean>(RENAME_CHAT_DIALOG_KEY, false),
+        savedStateHandle.getStateFlow<String>(RENAME_CHAT_BUFFER_KEY, ""),
+    ) { cardAndChats, deleteChatDialog, renameChatDialog, renameChatBuffer ->
         CardChatListState(
-            displayCard = card.toDisplayCard(),
-            chats = chats.map {
-                it.toListItem(selected = it.chat.chatId == card.selectedChat)
-            },
+            displayCard = cardAndChats.first,
+            chats = cardAndChats.second,
+            deleteChatDialog = deleteChatDialog,
+            renameChatDialog = renameChatDialog,
+            renameChatBuffer = renameChatBuffer
         )
     }
 
@@ -72,7 +84,22 @@ class CardChatListViewModel(
             is UserEvent.DeleteChat -> onDeleteChat(event.chatId)
             is UserEvent.RenameChat -> onRenameChat(event.chatId)
             is UserEvent.SelectChat -> onSelectChat(event.chatId)
+            UserEvent.DeleteChatAccept -> onDeleteChatAccept()
+            UserEvent.DeleteChatDismiss -> onDeleteChatDismiss()
         }
+    }
+
+    private fun onDeleteChatDismiss() {
+        savedStateHandle[DELETE_CHAT_DIALOG_KEY] = false
+        savedStateHandle[DELETE_CHAT_ID_KEY] = EMPTY_ID
+    }
+
+    private fun onDeleteChatAccept() = viewModelScope.launch {
+        savedStateHandle[DELETE_CHAT_DIALOG_KEY] = false
+        val deleteChatId = savedStateHandle.get<Long>(DELETE_CHAT_ID_KEY) ?: return@launch
+        if (deleteChatId < 1L) return@launch
+        deleteChat(deleteChatId)
+        savedStateHandle[DELETE_CHAT_ID_KEY] = EMPTY_ID
     }
 
     private fun onSelectChat(chatId: Long) = viewModelScope.launch {
@@ -84,9 +111,21 @@ class CardChatListViewModel(
 
     private fun onRenameChat(chatId: Long) {}
 
-    private fun onDeleteChat(chatId: Long) {}
+    private fun onDeleteChat(chatId: Long) {
+        savedStateHandle[DELETE_CHAT_ID_KEY] = chatId
+        savedStateHandle[DELETE_CHAT_DIALOG_KEY] = true
+    }
 
     private fun onCreateChat() = viewModelScope.launch {
         createChat(card.value.id)
+    }
+
+    companion object {
+        private const val DELETE_CHAT_DIALOG_KEY = "delete_chat_dialog"
+        private const val DELETE_CHAT_ID_KEY = "delete_chat_id"
+        private const val RENAME_CHAT_DIALOG_KEY = "rename_chat_dialog"
+        private const val RENAME_CHAT_BUFFER_KEY = "rename_chat_buffer"
+        private const val RENAME_CHAT_ID_KEY = "rename_chat_id"
+        private const val EMPTY_ID = 0L
     }
 }

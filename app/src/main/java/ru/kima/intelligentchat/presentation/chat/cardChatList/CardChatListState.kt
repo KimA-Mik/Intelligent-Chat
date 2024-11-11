@@ -7,5 +7,8 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 @Immutable
 data class CardChatListState(
     val displayCard: DisplayCard = DisplayCard(),
-    val chats: List<ChatListItem> = emptyList()
+    val chats: List<ChatListItem> = emptyList(),
+    val deleteChatDialog: Boolean = false,
+    val renameChatDialog: Boolean = false,
+    val renameChatBuffer: String = String(),
 )
