@@ -106,6 +106,7 @@
     <string name="placeholder_enter_your_message">Enter your message</string>
 
     <!--  Chats List Screen  -->
+    <string name="menu_item_select_chat">Select</string>
     <string name="menu_item_rename_chat">Rename</string>
     <string name="menu_item_delete_chat">Delete</string>
 

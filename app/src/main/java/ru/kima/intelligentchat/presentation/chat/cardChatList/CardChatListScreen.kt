@@ -1,6 +1,5 @@
 package ru.kima.intelligentchat.presentation.chat.cardChatList
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EditNote
@@ -120,7 +120,8 @@ fun CardChatListScreenContent(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(bottom = 72.dp)
+        contentPadding = PaddingValues(bottom = 72.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(
             items = state.chats,
@@ -128,9 +129,9 @@ fun CardChatListScreenContent(
             ListItem(
                 headlineContent = { Text(it.name) },
                 modifier = Modifier
-                    .clickable {
-                        onEvent(UserEvent.SelectChat(it.id))
-                    }
+//                    .clickable {
+//                        onEvent(UserEvent.SelectChat(it.id))
+//                    }
                     .animateItem(),
                 trailingContent = {
                     SimpleDropdownMenu(
@@ -153,6 +154,11 @@ private fun listDropdownMenuItems(
     onEvent: (UserEvent) -> Unit
 ) = remember {
     listOf(
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_select_chat,
+            onClick = { onEvent(UserEvent.SelectChat(chatId)) },
+            iconVector = Icons.Default.Check
+        ),
         SimpleDropDownMenuItem(
             textId = R.string.menu_item_rename_chat,
             onClick = { onEvent(UserEvent.RenameChat(chatId)) },
