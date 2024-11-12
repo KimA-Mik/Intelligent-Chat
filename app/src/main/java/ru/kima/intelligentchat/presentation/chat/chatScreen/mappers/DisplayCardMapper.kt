@@ -9,6 +9,7 @@ fun CharacterCard.toDisplayCard(): DisplayCard {
     val imageBitmap = photoBytes?.asImageBitmap()
     imageBitmap?.prepareToDraw()
     return DisplayCard(
+        id = id,
         name = name,
         image = ImmutableImageBitmap(imageBitmap)
     )

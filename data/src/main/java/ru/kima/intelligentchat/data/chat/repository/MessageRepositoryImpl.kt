@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.map
 import ru.kima.intelligentchat.data.chat.dto.MessageWithSwipesDto
 import ru.kima.intelligentchat.data.chat.entities.MessageEntity
 import ru.kima.intelligentchat.data.chat.mappers.toDto
-import ru.kima.intelligentchat.data.chat.mappers.toMessage
+import ru.kima.intelligentchat.data.chat.mappers.toEntity
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.domain.chat.model.Message
 import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
@@ -15,44 +15,44 @@ import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
 class MessageRepositoryImpl(
     wrapper: DatabaseWrapper
 ) : MessageRepository {
-    private val messageDao = wrapper.database.messageDao()
+    private val chatDao = wrapper.database.chatDao()
 
     override fun subscribeToChatMessagesWithSwipes(chatId: Long): Flow<List<MessageWithSwipes>> {
-        return messageDao
+        return chatDao
             .chatWithMessages(chatId)
-            .map { it.map(MessageWithSwipesDto::toMessage) }
+            .map { it.map(MessageWithSwipesDto::toEntity) }
     }
 
     override suspend fun getFullMessage(id: Long): MessageWithSwipes? {
-        return messageDao.getFullMessage(id)?.toMessage()
+        return chatDao.getFullMessage(id)?.toEntity()
     }
 
     override fun subscribeToChatMessages(chatId: Long): Flow<List<Message>> {
-        return messageDao
+        return chatDao
             .chatMessages(chatId)
-            .map { it.map(MessageEntity::toMessage) }
+            .map { it.map(MessageEntity::toEntity) }
     }
 
     override suspend fun updateMessage(message: Message) {
-        messageDao.updateMassage(message.toMessage())
+        chatDao.updateMassage(message.toEntity())
     }
 
     override suspend fun updateMessages(messages: List<Message>) {
-        messageDao.updateMessages(
-            messages.map { it.toMessage() }
+        chatDao.updateMessages(
+            messages.map { it.toEntity() }
         )
     }
 
     override suspend fun deleteMessage(messageId: Long): Boolean {
-        return messageDao.deleteMessage(messageId) > 0
+        return chatDao.deleteMessage(messageId) > 0
     }
 
-    override suspend fun deleteMessages(messageIds: List<Long>): Boolean {
-        return messageDao.deleteMessages(messageIds) > 0
+    override suspend fun deleteMessages(messageIds: List<Message>) {
+        chatDao.deleteMessages(messageIds.map { it.toEntity() })
     }
 
     override suspend fun deleteMessagesChat(chatId: Long): Boolean {
-        return messageDao.deleteMessagesForChat(chatId) > 0
+        return chatDao.deleteMessagesForChat(chatId) > 0
     }
 
     override suspend fun createMessage(
@@ -72,6 +72,6 @@ class MessageRepositoryImpl(
             deleted = false
         )
 
-        return messageDao.insertMessage(message)
+        return chatDao.insertMessage(message)
     }
 }

@@ -10,8 +10,6 @@ import ru.kima.intelligentchat.data.card.entities.CardTagEntity
 import ru.kima.intelligentchat.data.card.entities.CharacterEntity
 import ru.kima.intelligentchat.data.card.entities.TagEntity
 import ru.kima.intelligentchat.data.chat.dao.ChatDao
-import ru.kima.intelligentchat.data.chat.dao.MessageDao
-import ru.kima.intelligentchat.data.chat.dao.SwipeDao
 import ru.kima.intelligentchat.data.chat.entities.ChatEntity
 import ru.kima.intelligentchat.data.chat.entities.MessageEntity
 import ru.kima.intelligentchat.data.chat.entities.SwipeEntity
@@ -41,6 +39,4 @@ abstract class Database : RoomDatabase() {
     abstract fun personaDao(): PersonaDao
     abstract fun koboldPresetDao(): KoboldPresetDao
     abstract fun chatDao(): ChatDao
-    abstract fun messageDao(): MessageDao
-    abstract fun swipeDao(): SwipeDao
 }

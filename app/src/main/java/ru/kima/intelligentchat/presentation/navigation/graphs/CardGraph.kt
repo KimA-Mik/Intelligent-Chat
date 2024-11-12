@@ -16,6 +16,9 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsScreen
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.CharactersListScreen
+import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListScreen
+import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListState
+import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListViewModel
 import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreen
 import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenState
 import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenViewModel
@@ -65,10 +68,11 @@ fun NavGraphBuilder.cardGraph(
                 navArgument(name = CARD_ID_ARGUMENT) {
                     type = NavType.LongType
                     defaultValue = -1L
-                }
-            )) {
+                })
+        ) {
             val viewModel: ChatScreenViewModel = koinViewModel()
             val state by viewModel.state.collectAsStateWithLifecycle(ChatScreenState.ChatState())
+            val uiEvent by viewModel.uiEvent.collectAsStateWithLifecycle()
             val onEvent = remember<(UserEvent) -> Unit> {
                 {
                     viewModel.onEvent(it)
@@ -77,9 +81,37 @@ fun NavGraphBuilder.cardGraph(
 
             ChatScreen(
                 state = state,
+                uiEvent = uiEvent,
                 navController = navController,
                 snackbarHostState = snackbarHostState,
                 onEvent = onEvent
+            )
+        }
+
+        composable(
+            route = "cards/{$CARD_ID_ARGUMENT}/chat/list",
+            arguments = listOf(
+                navArgument(name = CARD_ID_ARGUMENT) {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                })
+        ) {
+            val viewModel: CardChatListViewModel = koinViewModel()
+            val state by viewModel.state.collectAsStateWithLifecycle(CardChatListState())
+            val uiEvent by viewModel.uiEvent.collectAsStateWithLifecycle()
+            val onEvent =
+                remember<(ru.kima.intelligentchat.presentation.chat.cardChatList.events.UserEvent) -> Unit> {
+                    {
+                        viewModel.onEvent(it)
+                    }
+                }
+
+            CardChatListScreen(
+                state = state,
+                uiEvent = uiEvent,
+                navController = navController,
+                snackbarHostState = snackbarHostState,
+                onEvent = onEvent,
             )
         }
     }
@@ -90,3 +122,6 @@ fun NavController.navigateToCardEdit(cardId: Long) =
 
 fun NavController.navigateToCardChat(cardId: Long) =
     this.navigate("cards/${cardId}/chat") { launchSingleTop = true }
+
+fun NavController.navigateToCardChatList(cardId: Long) =
+    this.navigate("cards/${cardId}/chat/list") { launchSingleTop = true }

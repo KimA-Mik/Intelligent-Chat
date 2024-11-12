@@ -12,34 +12,30 @@ import ru.kima.intelligentchat.domain.chat.repository.SwipeRepository
 class SwipeRepositoryImpl(
     wrapper: DatabaseWrapper
 ) : SwipeRepository {
-    private val swipeDao = wrapper.database.swipeDao()
+    private val chatDao = wrapper.database.chatDao()
 
     override fun subscribeSwipesForMessages(messagesId: List<Long>): Flow<List<Swipe>> {
-        return swipeDao
+        return chatDao
             .swipesForMessages(messagesId)
             .map { it.map(SwipeEntity::toSwipe) }
     }
 
     override fun subscribeSwipesForChart(chatId: Long): Flow<List<Swipe>> {
-        return swipeDao
+        return chatDao
             .swipesForChat(chatId)
             .map { it.map(SwipeEntity::toSwipe) }
     }
 
-    override suspend fun deleteSwipe(swipeId: Long): Boolean {
-        return swipeDao.deleteSwipe(swipeId) > 0
-    }
-
     override suspend fun getSwipe(swipeId: Long): Swipe {
-        return swipeDao.getSwipe(swipeId).toSwipe()
+        return chatDao.getSwipe(swipeId).toSwipe()
     }
 
     override suspend fun deleteSwipesForMessage(messageId: Long): Boolean {
-        return swipeDao.deleteSwipesForMessage(messageId) > 0
+        return chatDao.deleteSwipesForMessage(messageId) > 0
     }
 
     override suspend fun deleteSwipesForMessages(messageIds: List<Long>): Boolean {
-        return swipeDao.deleteSwipesForMessages(messageIds) > 0
+        return chatDao.deleteSwipesForMessages(messageIds) > 0
     }
 
     override suspend fun createSwipe(messageId: Long, text: String): Long {
@@ -49,10 +45,10 @@ class SwipeRepositoryImpl(
             text = text
         )
 
-        return swipeDao.insertSwipe(swipe)
+        return chatDao.insertSwipe(swipe)
     }
 
     override suspend fun updateSwipe(swipe: Swipe) {
-        swipeDao.updateSwipe(swipe.toEntity())
+        chatDao.updateSwipe(swipe.toEntity())
     }
 }

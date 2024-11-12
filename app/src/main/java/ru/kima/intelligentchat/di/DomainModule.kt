@@ -33,8 +33,12 @@ import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
 import ru.kima.intelligentchat.domain.chat.repository.SwipeRepository
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.CreateChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.DeleteChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.InitializeChatUseCase
-import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.RenameChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.SelectChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToCardChatsUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToChatMessagesWithSwipesUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
@@ -146,8 +150,12 @@ fun domain() = module {
     singleOf(::UpdateKoboldPresetUseCase)
 
     singleOf(::CreateAndSelectChatUseCase)
+    singleOf(::CreateChatUseCase)
+    singleOf(::DeleteChatUseCase)
     singleOf(::InitializeChatUseCase)
-    singleOf(::SubscribeToCardChatUseCase)
+    singleOf(::RenameChatUseCase)
+    singleOf(::SelectChatUseCase)
+    singleOf(::SubscribeToCardChatsUseCase)
     singleOf(::SubscribeToChatMessagesWithSwipesUseCase)
     singleOf(::SubscribeToFullChatUseCase)
 

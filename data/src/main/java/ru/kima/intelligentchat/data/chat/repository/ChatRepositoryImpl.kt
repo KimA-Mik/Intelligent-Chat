@@ -2,11 +2,16 @@ package ru.kima.intelligentchat.data.chat.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import ru.kima.intelligentchat.data.chat.dto.SimpleChatWithMessagesDto
 import ru.kima.intelligentchat.data.chat.mappers.toChat
+import ru.kima.intelligentchat.data.chat.mappers.toChatWithMessages
+import ru.kima.intelligentchat.data.chat.mappers.toDto
 import ru.kima.intelligentchat.data.chat.mappers.toEntity
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.domain.chat.ChatNotFoundException
 import ru.kima.intelligentchat.domain.chat.model.Chat
+import ru.kima.intelligentchat.domain.chat.model.ChatWithMessages
+import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 
 class ChatRepositoryImpl(
@@ -25,8 +30,13 @@ class ChatRepositoryImpl(
             }
     }
 
-    override suspend fun deleteChat(chatId: Long): Boolean {
-        return chatDao.deleteChat(chatId) > 0
+    override fun subscribeToCardChats(cardId: Long): Flow<List<ChatWithMessages>> {
+        return chatDao.subscribeToCardChats(cardId)
+            .map { it.map(SimpleChatWithMessagesDto::toChatWithMessages) }
+    }
+
+    override suspend fun deleteChat(chat: FullChat) {
+        return chatDao.deleteChat(chat.toDto())
     }
 
     override suspend fun insertChat(chat: Chat): Long {
