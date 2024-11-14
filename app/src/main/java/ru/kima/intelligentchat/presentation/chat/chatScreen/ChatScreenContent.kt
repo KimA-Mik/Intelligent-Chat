@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen
 
+import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,8 +31,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -47,11 +50,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
@@ -88,9 +93,19 @@ fun ChatScreenContent(
         }
     }
 
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(uiEvent) {
         uiEvent.consume {
-            consumeEvent(it, state.info.characterCard.id, navController)
+            consumeEvent(
+                event = it,
+                context = context,
+                cardId = state.info.characterCard.id,
+                navController = navController,
+                coroutineScope = coroutineScope,
+                snackbarHostState = snackbarHostState,
+                onEvent = onEvent
+            )
         }
     }
 
@@ -162,9 +177,30 @@ fun ChatScreenContent(
     }
 }
 
-private fun consumeEvent(event: UiEvent, cardId: Long, navController: NavController) {
+private fun consumeEvent(
+    event: UiEvent,
+    context: Context,
+    cardId: Long,
+    navController: NavController,
+    coroutineScope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    onEvent: (UserEvent) -> Unit,
+) {
     when (event) {
         UiEvent.OpenChatList -> navController.navigateToCardChatList(cardId)
+        is UiEvent.RestoreMessage -> coroutineScope.launch {
+            val result = snackbarHostState.showSnackbar(
+                message = context.getString(R.string.message_deleted_snackbar_message),
+                actionLabel = context.getString(R.string.restore_message_snackbar_action),
+                withDismissAction = true,
+                duration = SnackbarDuration.Long
+            )
+
+            when (result) {
+                SnackbarResult.Dismissed -> {}
+                SnackbarResult.ActionPerformed -> onEvent(UserEvent.RestoreMessage(event.messageId))
+            }
+        }
     }
 }
 

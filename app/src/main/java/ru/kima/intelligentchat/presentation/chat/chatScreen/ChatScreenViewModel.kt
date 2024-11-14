@@ -189,7 +189,12 @@ class ChatScreenViewModel(
             is UserEvent.MoveMessageUp -> onMoveMessageUp(event.messageId)
             UserEvent.OpenChatList -> onOpenChatList()
             is UserEvent.BranchFromMessage -> onBranchFromMessage(event.messageId)
+            is UserEvent.RestoreMessage -> onRestoreMessage(event.messageId)
         }
+    }
+
+    private fun onRestoreMessage(messageId: Long) {
+
     }
 
     private fun onBranchFromMessage(messageId: Long) = viewModelScope.launch {
@@ -267,6 +272,7 @@ class ChatScreenViewModel(
         if (messageId > 0 && s is ChatScreenState.ChatState) {
             deleteMessage(chatId = s.info.fullChat.chatId, messageId = messageId)
         }
+        _uiEvent.value = Event(UiEvent.RestoreMessage(messageId))
     }
 
     private fun onCancelMessage() = viewModelScope.launch {
