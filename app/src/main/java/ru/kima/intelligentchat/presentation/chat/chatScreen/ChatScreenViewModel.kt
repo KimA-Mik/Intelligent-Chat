@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
+import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.core.utils.combine
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
@@ -90,12 +91,13 @@ class ChatScreenViewModel(
                 chatJob?.cancel()
                 chatJob = viewModelScope.launch {
                     subscribeToFullChat(card.selectedChat).collect {
-                        _fullChat.value = when (it) {
-                            is SubscribeToFullChatUseCase.Result.Success -> it.fullChat
-                            SubscribeToFullChatUseCase.Result.UnknownError -> FullChat()
-                            SubscribeToFullChatUseCase.Result.ChatNotFound -> {
-                                createAndSelectChatUseCase(id)
-                                FullChat()
+                        _fullChat.value = it.valueOr { error ->
+                            when (error) {
+                                SubscribeToFullChatUseCase.Error.UnknownError -> FullChat()
+                                SubscribeToFullChatUseCase.Error.ChatNotFound -> {
+                                    createAndSelectChatUseCase(id)
+                                    FullChat()
+                                }
                             }
                         }
                     }
