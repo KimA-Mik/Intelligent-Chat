@@ -100,6 +100,7 @@
     <string name="menu_item_delete_message">Delete</string>
     <string name="menu_item_move_message_up">Move up</string>
     <string name="menu_item_move_message_down">Move down</string>
+    <string name="menu_item_branch_chat">Branch from here</string>
 
     <string name="menu_item_impersonate">Impersonate</string>
     <string name="menu_item_count_tokens">Count tokens</string>

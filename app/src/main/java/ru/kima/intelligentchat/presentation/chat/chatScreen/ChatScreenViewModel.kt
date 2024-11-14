@@ -184,7 +184,12 @@ class ChatScreenViewModel(
             is UserEvent.MoveMessageDown -> onMoveMessageDown(event.messageId)
             is UserEvent.MoveMessageUp -> onMoveMessageUp(event.messageId)
             UserEvent.OpenChatList -> onOpenChatList()
+            is UserEvent.BranchFromMessage -> onBranchFromMessage(event.messageId)
         }
+    }
+
+    private fun onBranchFromMessage(messageId: Long) {
+
     }
 
     private fun onOpenChatList() {
