@@ -1,6 +1,7 @@
 package ru.kima.intelligentchat.domain.chat.useCase
 
 import kotlinx.coroutines.flow.first
+import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
@@ -14,15 +15,14 @@ class InitializeChatUseCase(
     private val createMessage: CreateMessageUseCase
 ) {
     suspend operator fun invoke(chatId: Long, persona: Persona) {
-        val getChatResult = subscribeToChatMessages(chatId).first()
-        if (getChatResult !is SubscribeToFullChatUseCase.Result.Success ||
-            getChatResult.fullChat.messages.isNotEmpty()
-        ) return
+        val chat = subscribeToChatMessages(chatId).first().valueOr {
+            return
+        }
 
+        if (chat.messages.isNotEmpty()) return
 
-        val chat = getChatResult.fullChat
         //TODO: Handle errors
-        val card = getCard(getChatResult.fullChat.cardId).first()
+        val card = getCard(chat.cardId).first()
         val firstMessage = if (chat.selectedGreeting == 0) {
             card.firstMes
         } else {

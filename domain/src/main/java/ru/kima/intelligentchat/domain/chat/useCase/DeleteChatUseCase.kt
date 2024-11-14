@@ -1,6 +1,7 @@
 package ru.kima.intelligentchat.domain.chat.useCase
 
 import kotlinx.coroutines.flow.first
+import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 
@@ -10,10 +11,8 @@ class DeleteChatUseCase(
     private val subscribeToFullChatUseCase: SubscribeToFullChatUseCase,
 ) {
     suspend operator fun invoke(chatId: Long) {
-        val fullChatResult = subscribeToFullChatUseCase(chatId).first()
-        val fullChat = when (fullChatResult) {
-            is SubscribeToFullChatUseCase.Result.Success -> fullChatResult.fullChat
-            else -> return
+        val fullChat = subscribeToFullChatUseCase(chatId).first().valueOr {
+            return
         }
 
         val card = characterCardRepository.getCharacterCard(fullChat.cardId).first()

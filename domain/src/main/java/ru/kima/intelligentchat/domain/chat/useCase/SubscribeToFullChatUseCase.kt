@@ -1,8 +1,8 @@
 package ru.kima.intelligentchat.domain.chat.useCase
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.domain.chat.ChatNotFoundException
 import ru.kima.intelligentchat.domain.chat.model.Chat
 import ru.kima.intelligentchat.domain.chat.model.FullChat
@@ -14,22 +14,21 @@ class SubscribeToFullChatUseCase(
     private val chatRepository: ChatRepository,
     private val chatMessages: SubscribeToChatMessagesWithSwipesUseCase,
 ) {
-    operator fun invoke(chatId: Long): Flow<Result> =
-        combine<Chat, List<MessageWithSwipes>, Result>(
+    operator fun invoke(chatId: Long) =
+        combine<Chat, List<MessageWithSwipes>, ICResult<FullChat, Error>>(
             chatRepository.subscribeToChat(chatId),
             chatMessages(chatId)
         ) { chat, messages ->
-            Result.Success(FullChat.fromChatAndMessages(chat, messages))
+            ICResult.Success(FullChat.fromChatAndMessages(chat, messages))
         }.catch {
             when (it) {
-                is ChatNotFoundException -> emit(Result.ChatNotFound)
-                else -> emit(Result.UnknownError)
+                is ChatNotFoundException -> emit(ICResult.Error(Error.ChatNotFound))
+                else -> emit(ICResult.Error(Error.UnknownError))
             }
         }
 
-    sealed interface Result {
-        data class Success(val fullChat: FullChat) : Result
-        data object ChatNotFound : Result
-        data object UnknownError : Result
+    sealed interface Error {
+        data object ChatNotFound : Error
+        data object UnknownError : Error
     }
 }

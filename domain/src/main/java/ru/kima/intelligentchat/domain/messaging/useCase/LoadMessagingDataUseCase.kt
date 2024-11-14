@@ -1,6 +1,7 @@
 package ru.kima.intelligentchat.domain.messaging.useCase
 
 import kotlinx.coroutines.flow.first
+import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
@@ -19,10 +20,7 @@ class LoadMessagingDataUseCase(
     private val loadPersonaImage: LoadPersonaImageUseCase
 ) {
     suspend operator fun invoke(chatId: Long, personaId: Long, senderType: SenderType): Result {
-        val fullChatResult = subscribeToFullChat(chatId).first()
-        val fullChat = if (fullChatResult is SubscribeToFullChatUseCase.Result.Success) {
-            fullChatResult.fullChat
-        } else {
+        val fullChat = subscribeToFullChat(chatId).first().valueOr {
             return Result.NoChat
         }
 
