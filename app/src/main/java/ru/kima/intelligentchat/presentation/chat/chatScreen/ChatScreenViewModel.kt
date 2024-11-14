@@ -21,6 +21,7 @@ import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.BranchChatFromMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
@@ -58,7 +59,8 @@ class ChatScreenViewModel(
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
-    private val createAndSelectChatUseCase: CreateAndSelectChatUseCase,
+    private val createAndSelectChat: CreateAndSelectChatUseCase,
+    private val branchChatFromMessage: BranchChatFromMessageUseCase,
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard.default())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -95,7 +97,7 @@ class ChatScreenViewModel(
                             when (error) {
                                 SubscribeToFullChatUseCase.Error.UnknownError -> FullChat()
                                 SubscribeToFullChatUseCase.Error.ChatNotFound -> {
-                                    createAndSelectChatUseCase(id)
+                                    createAndSelectChat(id)
                                     FullChat()
                                 }
                             }
@@ -190,8 +192,13 @@ class ChatScreenViewModel(
         }
     }
 
-    private fun onBranchFromMessage(messageId: Long) {
+    private fun onBranchFromMessage(messageId: Long) = viewModelScope.launch {
+        val s = currentState() ?: return@launch
 
+        branchChatFromMessage(
+            chatId = s.info.fullChat.chatId,
+            messageId = messageId
+        )
     }
 
     private fun onOpenChatList() {
