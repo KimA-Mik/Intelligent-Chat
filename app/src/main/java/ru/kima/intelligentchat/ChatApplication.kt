@@ -4,6 +4,9 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -12,9 +15,11 @@ import ru.kima.intelligentchat.di.core
 import ru.kima.intelligentchat.di.data
 import ru.kima.intelligentchat.di.domain
 import ru.kima.intelligentchat.di.presentation
+import ru.kima.intelligentchat.domain.common.useCase.CleanUpUseCase
 import ru.kima.intelligentchat.presentation.service.horde.HordeConfigService
 
 class ChatApplication : Application() {
+    private val applicationScope = CoroutineScope(Dispatchers.Default)
     private lateinit var hordeConfigService: HordeConfigService
     override fun onCreate() {
         super.onCreate()
@@ -32,6 +37,11 @@ class ChatApplication : Application() {
         }
 
         hordeConfigService = get<HordeConfigService>()
+
+        val cleanUp = get<CleanUpUseCase>()
+        applicationScope.launch {
+            cleanUp()
+        }
     }
 
     private fun createNotificationChannels() {
