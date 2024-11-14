@@ -46,4 +46,8 @@ class ChatRepositoryImpl(
     override suspend fun updateChat(chat: Chat) {
         chatDao.updateChat(chat.toEntity())
     }
+
+    override suspend fun copyChat(fullChat: FullChat): Long {
+        return chatDao.copyChat(fullChat.toDto())
+    }
 }

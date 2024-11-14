@@ -38,6 +38,9 @@ interface ChatDao {
     @Insert
     suspend fun insertMessage(messageEntity: MessageEntity): Long
 
+    @Insert
+    suspend fun insertMessages(messages: List<MessageEntity>): LongArray
+
     @Update
     suspend fun updateMassage(messageEntity: MessageEntity)
 
@@ -66,6 +69,9 @@ interface ChatDao {
 
     @Insert
     suspend fun insertSwipe(swipeEntity: SwipeEntity): Long
+
+    @Insert
+    suspend fun insertSwipes(swipes: List<SwipeEntity>): LongArray
 
     @Update
     suspend fun updateSwipe(swipeEntity: SwipeEntity)
@@ -98,5 +104,30 @@ interface ChatDao {
         deleteChat(chatWithMessagesDto.chat)
         deleteMessages(messages)
         deleteSwipes(swipes)
+    }
+
+    @Transaction
+    suspend fun copyChat(chatWithMessagesDto: ChatWithMessagesDto): Long {
+        val chat = chatWithMessagesDto.chat.copy(chatId = 0L)
+        val chatId = insertChat(chat)
+        if (chatWithMessagesDto.messages.isEmpty()) return chatId
+
+        val swipes = mutableListOf<SwipeEntity>()
+        val messageEntities = chatWithMessagesDto.messages.mapIndexed { index, dto ->
+            dto.message.copy(
+                messageId = 0L, chatId = chatId, index = index + 1
+            )
+        }
+
+        val messageIds = insertMessages(messageEntities)
+        for (i in messageIds.indices) {
+            val messageId = messageIds[i]
+            for (swipe in chatWithMessagesDto.messages[i].swipes) {
+                swipes.add(swipe.copy(swipeId = 0L, messageId = messageId))
+            }
+        }
+
+        insertSwipes(swipes)
+        return chatId
     }
 }

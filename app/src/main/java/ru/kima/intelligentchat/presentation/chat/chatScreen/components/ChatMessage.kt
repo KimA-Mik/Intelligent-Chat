@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.ArrowDownward
@@ -66,6 +67,7 @@ fun ChatMessage(
     onDeleteClicked: () -> Unit,
     onMoveUpClicked: () -> Unit,
     onMoveDownClicked: () -> Unit,
+    onBranchChatClicked: () -> Unit,
     onImageClicked: () -> Unit,
     onLeftClicked: () -> Unit,
     onRightClicked: () -> Unit
@@ -117,7 +119,8 @@ fun ChatMessage(
                 onEditClicked = onEditClicked,
                 onDeleteClicked = onDeleteClicked,
                 onMoveUpClicked = onMoveUpClicked,
-                onMoveDownClicked = onMoveDownClicked
+                onMoveDownClicked = onMoveDownClicked,
+                onBranchChatClicked = onBranchChatClicked
             ),
         )
     }
@@ -159,7 +162,8 @@ private fun dropdownMenuItems(
     onEditClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
     onMoveUpClicked: () -> Unit,
-    onMoveDownClicked: () -> Unit
+    onMoveDownClicked: () -> Unit,
+    onBranchChatClicked: () -> Unit
 ) = remember {
     listOf(
         SimpleDropDownMenuItem(
@@ -181,6 +185,11 @@ private fun dropdownMenuItems(
             textId = R.string.menu_item_move_message_down,
             onClick = onMoveDownClicked,
             iconVector = Icons.Default.ArrowDownward
+        ),
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_branch_chat,
+            onClick = onBranchChatClicked,
+            iconVector = Icons.AutoMirrored.Default.AltRoute
         ),
     )
 }
@@ -359,7 +368,8 @@ private fun ChatMessagePreview() {
                 onEditClicked = {},
                 onDeleteClicked = {},
                 onMoveUpClicked = {},
-                onMoveDownClicked = {}
+                onMoveDownClicked = {},
+                onBranchChatClicked = {}
             )
         }
     }
@@ -388,7 +398,8 @@ private fun ChatMessageWithSwipesPreview() {
                 onEditClicked = {},
                 onDeleteClicked = {},
                 onMoveUpClicked = {},
-                onMoveDownClicked = {}
+                onMoveDownClicked = {},
+                onBranchChatClicked = {}
             )
         }
     }

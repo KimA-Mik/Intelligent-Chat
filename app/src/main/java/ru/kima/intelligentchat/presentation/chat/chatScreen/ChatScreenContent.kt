@@ -283,7 +283,8 @@ fun Messages(
                     onEditClicked = { onEvent(UserEvent.EditMessage(it.messageId)) },
                     onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
                     onMoveUpClicked = { onEvent(UserEvent.MoveMessageUp(it.messageId)) },
-                    onMoveDownClicked = { onEvent(UserEvent.MoveMessageDown(it.messageId)) }
+                    onMoveDownClicked = { onEvent(UserEvent.MoveMessageDown(it.messageId)) },
+                    onBranchChatClicked = { onEvent(UserEvent.BranchFromMessage(it.messageId)) }
                 )
 //                }
             }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
+import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.core.utils.combine
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
@@ -20,6 +21,7 @@ import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.BranchChatFromMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
@@ -57,7 +59,8 @@ class ChatScreenViewModel(
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
-    private val createAndSelectChatUseCase: CreateAndSelectChatUseCase,
+    private val createAndSelectChat: CreateAndSelectChatUseCase,
+    private val branchChatFromMessage: BranchChatFromMessageUseCase,
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard.default())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -90,12 +93,13 @@ class ChatScreenViewModel(
                 chatJob?.cancel()
                 chatJob = viewModelScope.launch {
                     subscribeToFullChat(card.selectedChat).collect {
-                        _fullChat.value = when (it) {
-                            is SubscribeToFullChatUseCase.Result.Success -> it.fullChat
-                            SubscribeToFullChatUseCase.Result.UnknownError -> FullChat()
-                            SubscribeToFullChatUseCase.Result.ChatNotFound -> {
-                                createAndSelectChatUseCase(id)
-                                FullChat()
+                        _fullChat.value = it.valueOr { error ->
+                            when (error) {
+                                SubscribeToFullChatUseCase.Error.UnknownError -> FullChat()
+                                SubscribeToFullChatUseCase.Error.ChatNotFound -> {
+                                    createAndSelectChat(id)
+                                    FullChat()
+                                }
                             }
                         }
                     }
@@ -184,7 +188,17 @@ class ChatScreenViewModel(
             is UserEvent.MoveMessageDown -> onMoveMessageDown(event.messageId)
             is UserEvent.MoveMessageUp -> onMoveMessageUp(event.messageId)
             UserEvent.OpenChatList -> onOpenChatList()
+            is UserEvent.BranchFromMessage -> onBranchFromMessage(event.messageId)
         }
+    }
+
+    private fun onBranchFromMessage(messageId: Long) = viewModelScope.launch {
+        val s = currentState() ?: return@launch
+
+        branchChatFromMessage(
+            chatId = s.info.fullChat.chatId,
+            messageId = messageId
+        )
     }
 
     private fun onOpenChatList() {

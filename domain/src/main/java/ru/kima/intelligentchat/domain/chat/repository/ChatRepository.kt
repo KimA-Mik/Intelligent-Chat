@@ -11,4 +11,5 @@ interface ChatRepository {
     suspend fun deleteChat(chat: FullChat)
     suspend fun insertChat(chat: Chat): Long
     suspend fun updateChat(chat: Chat)
+    suspend fun copyChat(fullChat: FullChat): Long
 }
