@@ -93,7 +93,7 @@
 
     <!--    Chat Screen    -->
     <!--  TopBar Dropdown Menu  -->
-    <string name="menu_item_chat_instances">Chat instances</string>
+    <string name="menu_item_chat_instances">All chats</string>
 
     <!--  Message Dropdown Menu  -->
     <string name="menu_item_edit_message">Edit</string>
