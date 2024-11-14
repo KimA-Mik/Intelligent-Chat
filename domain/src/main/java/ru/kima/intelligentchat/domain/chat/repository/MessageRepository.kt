@@ -9,6 +9,7 @@ interface MessageRepository {
     fun subscribeToChatMessages(chatId: Long): Flow<List<Message>>
     fun subscribeToChatMessagesWithSwipes(chatId: Long): Flow<List<MessageWithSwipes>>
     suspend fun getFullMessage(id: Long): MessageWithSwipes?
+    suspend fun getMessage(id: Long): Message?
     suspend fun updateMessage(message: Message)
     suspend fun updateMessages(messages: List<Message>)
     suspend fun deleteMessage(messageId: Long): Boolean

@@ -27,6 +27,10 @@ class MessageRepositoryImpl(
         return chatDao.getFullMessage(id)?.toEntity()
     }
 
+    override suspend fun getMessage(id: Long): Message? {
+        return chatDao.getMessage(id)?.toEntity()
+    }
+
     override fun subscribeToChatMessages(chatId: Long): Flow<List<Message>> {
         return chatDao
             .chatMessages(chatId)
@@ -47,8 +51,8 @@ class MessageRepositoryImpl(
         return chatDao.deleteMessage(messageId) > 0
     }
 
-    override suspend fun deleteMessages(messageIds: List<Message>) {
-        chatDao.deleteMessages(messageIds.map { it.toEntity() })
+    override suspend fun deleteMessages(messages: List<Message>) {
+        chatDao.deleteMessages(messages.map { it.toEntity() })
     }
 
     override suspend fun deleteMessagesChat(chatId: Long): Boolean {
