@@ -24,8 +24,8 @@ class MoveMessageUseCase(
 
         if (expectedIndex < 0 || expectedIndex > messages.lastIndex) return
         val resultList = listOf(
-            messages[index].copy(index = expectedIndex),
-            messages[expectedIndex].copy(index = index)
+            messages[index].copy(index = expectedIndex + 1),
+            messages[expectedIndex].copy(index = index + 1)
         )
         messageRepository.updateMessages(resultList)
     }
