@@ -42,7 +42,8 @@ class SwipeRepositoryImpl(
         val swipe = SwipeEntity(
             swipeId = 0,
             messageId = messageId,
-            text = text
+            text = text,
+            deleted = false
         )
 
         return chatDao.insertSwipe(swipe)
