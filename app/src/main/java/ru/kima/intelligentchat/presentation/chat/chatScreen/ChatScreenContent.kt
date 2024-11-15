@@ -2,6 +2,10 @@ package ru.kima.intelligentchat.presentation.chat.chatScreen
 
 import android.content.Context
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,12 +17,14 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
@@ -70,6 +76,7 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
+import ru.kima.intelligentchat.presentation.common.components.AnimatedFab
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChatList
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
@@ -93,14 +100,16 @@ fun ChatScreenContent(
         }
     }
 
+    val listState = rememberLazyListState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(uiEvent) {
         uiEvent.consume {
             consumeEvent(
+                cardId = state.info.characterCard.id,
                 event = it,
                 context = context,
-                cardId = state.info.characterCard.id,
+                listState = listState,
                 navController = navController,
                 coroutineScope = coroutineScope,
                 snackbarHostState = snackbarHostState,
@@ -160,11 +169,22 @@ fun ChatScreenContent(
                 onValueChange = { onEvent(UserEvent.UpdateInputMessage(it)) },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            AnimatedFab(
+                visible = listState.canScrollForward,
+                onClick = { onEvent(UserEvent.ScrollDown) },
+                enter = scaleIn() + slideInHorizontally(initialOffsetX = { it }),
+                exit = scaleOut() + slideOutHorizontally(targetOffsetX = { it })
+            ) {
+                Icon(Icons.Default.ArrowDownward, null)
+            }
+        }
     ) { padding ->
         if (state.info.fullChat.messages.isNotEmpty()) {
             Messages(
                 state = state.info,
+                listState = listState,
                 editMessageBuffer = state.editMessageBuffer,
                 editMessageId = state.editMessageId,
                 modifier = Modifier
@@ -178,9 +198,10 @@ fun ChatScreenContent(
 }
 
 private fun consumeEvent(
+    cardId: Long,
     event: UiEvent,
     context: Context,
-    cardId: Long,
+    listState: LazyListState,
     navController: NavController,
     coroutineScope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
@@ -200,6 +221,10 @@ private fun consumeEvent(
                 SnackbarResult.Dismissed -> {}
                 SnackbarResult.ActionPerformed -> onEvent(UserEvent.RestoreMessage(event.messageId))
             }
+        }
+
+        UiEvent.ScrollDown -> coroutineScope.launch {
+            listState.animateScrollToItem(listState.layoutInfo.totalItemsCount)
         }
     }
 }
@@ -253,26 +278,12 @@ fun MessageIndicator(
 @Composable
 fun Messages(
     state: ChatScreenState.ChatState.ChatInfo,
+    listState: LazyListState,
     editMessageBuffer: String,
     editMessageId: Long,
     modifier: Modifier,
     onEvent: (UserEvent) -> Unit
 ) {
-    val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = state.fullChat.messages.lastIndex
-    )
-
-//    LaunchedEffect(key1 = state.fullChat.messages) {
-//        val lastItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
-//
-//        listState.scrollToItem(
-//            state.fullChat.messages.lastIndex,
-//            scrollOffset = lastItem.size
-//        )
-//    }
-
-    val scope = rememberCoroutineScope()
-
     LazyColumn(
         modifier = modifier,
         state = listState,
@@ -283,10 +294,6 @@ fun Messages(
             items = state.fullChat.messages,
             key = { it.messageId }) {
             val edited = it.messageId == editMessageId
-//            AnimatedContent(
-//                targetState = it.messageId == editMessageId, label = "",
-//                modifier = Modifier.animateItem()
-//            ) { edited ->
             when (edited) {
                 true -> EditableChatMessage(
                     message = it,
@@ -304,14 +311,7 @@ fun Messages(
                     message = it,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .animateContentSize { _, targetValue ->
-                            scope.launch {
-                                listState.animateScrollToItem(
-                                    it.index,
-                                    scrollOffset = targetValue.height
-                                )
-                            }
-                        }
+                        .animateContentSize()
                         .animateItem(),
                     onImageClicked = {},
                     onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
@@ -322,10 +322,26 @@ fun Messages(
                     onMoveDownClicked = { onEvent(UserEvent.MoveMessageDown(it.messageId)) },
                     onBranchChatClicked = { onEvent(UserEvent.BranchFromMessage(it.messageId)) }
                 )
-//                }
             }
         }
     }
+
+//    var lastIndex by remember { mutableIntStateOf(state.fullChat.messages.lastIndex) }
+//    LaunchedEffect(key1 = state.fullChat.messages.lastIndex) {
+//        if (state.fullChat.messages.lastIndex <= lastIndex) {
+//            lastIndex = state.fullChat.messages.lastIndex
+//            return@LaunchedEffect
+//        }
+//
+//        lastIndex = state.fullChat.messages.lastIndex
+//        if (lastIndex < 0) return@LaunchedEffect
+//
+//        val lastItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
+//        listState.scrollToItem(
+//            lastItem.index,
+//            lastItem.size
+//        )
+//    }
 }
 
 @Composable

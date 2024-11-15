@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -204,10 +205,8 @@ class MessagingService : Service(), KoinComponent {
 
         var resultedMessage: String? = null
         strategy.generation(generationRequest).collect { generationStatus ->
-            Log.d(TAG, generationStatus.toString())
             when (generationStatus) {
                 is GenerationStatus.Done -> {
-                    _status.value = MessagingIndicator.None
                     resultedMessage = generationStatus.result
                 }
 
@@ -241,7 +240,13 @@ class MessagingService : Service(), KoinComponent {
         }
         currentGenerationId = null
         currentGenerationStrategy = null
-        resultedMessage?.let { msg -> savingStrategy.save(msg, data.sender) }
+        resultedMessage?.let { msg ->
+            savingStrategy.save(msg, data.sender)
+            _status.value = MessagingIndicator.Done
+            //Dirty hack
+            delay(10)
+        }
+        _status.value = MessagingIndicator.None
         stopSelf()
     }
 

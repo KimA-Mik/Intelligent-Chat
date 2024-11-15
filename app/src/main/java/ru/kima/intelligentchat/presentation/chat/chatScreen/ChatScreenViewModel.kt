@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.core.common.valueOr
@@ -28,6 +29,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
+import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SubscribeToMessagingStatus
@@ -130,7 +132,8 @@ class ChatScreenViewModel(
 
         val stateFlow = combine(
             chatInfo,
-            messagingStatus(),
+            messagingStatus()
+                .onEach { if (it is MessagingIndicator.Done) _uiEvent.emit(Event(UiEvent.ScrollDown)) },
             savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, String()),
             savedStateHandle.getStateFlow(MESSAGE_EDIT_BUFFER, String()),
             savedStateHandle.getStateFlow(EDITED_MESSAGE_ID, EMPTY_EDITED_MESSAGE_ID),
@@ -192,7 +195,12 @@ class ChatScreenViewModel(
             UserEvent.OpenChatList -> onOpenChatList()
             is UserEvent.BranchFromMessage -> onBranchFromMessage(event.messageId)
             is UserEvent.RestoreMessage -> onRestoreMessage(event.messageId)
+            UserEvent.ScrollDown -> onScrollDown()
         }
+    }
+
+    private fun onScrollDown() {
+        _uiEvent.value = Event(UiEvent.ScrollDown)
     }
 
     private fun onRestoreMessage(messageId: Long) = viewModelScope.launch {
