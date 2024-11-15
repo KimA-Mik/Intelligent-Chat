@@ -196,7 +196,12 @@ class ChatScreenViewModel(
             is UserEvent.BranchFromMessage -> onBranchFromMessage(event.messageId)
             is UserEvent.RestoreMessage -> onRestoreMessage(event.messageId)
             UserEvent.ScrollDown -> onScrollDown()
+            is UserEvent.DeleteCurrentSwipe -> onDeleteCurrentSwipe(event.messageId)
         }
+    }
+
+    private fun onDeleteCurrentSwipe(messageId: Long) {
+
     }
 
     private fun onScrollDown() {

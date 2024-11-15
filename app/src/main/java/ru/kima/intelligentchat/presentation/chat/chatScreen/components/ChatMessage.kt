@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material3.Icon
@@ -65,6 +66,7 @@ fun ChatMessage(
     imageSize: Dp = ChatDefaults.SENDER_IMAGE_SIZE,
     onEditClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
+    onDeleteSwipeClicked: () -> Unit,
     onMoveUpClicked: () -> Unit,
     onMoveDownClicked: () -> Unit,
     onBranchChatClicked: () -> Unit,
@@ -94,30 +96,34 @@ fun ChatMessage(
                 .weight(1f)
         )
 
-        val date = remember(message.sentTimeMillis) {
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = message.sentTimeMillis
-            val format = DateFormat.getInstance()
-            format.format(calendar.time)
-        }
-        Text(
-            text = date,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.End,
-            modifier = Modifier
-                .alignByBaseline()
-                .width(IntrinsicSize.Min)
-        )
+        if (message.index > 0) {
+            val date = remember(message.sentTimeMillis) {
+                val calendar = Calendar.getInstance()
+                calendar.timeInMillis = message.sentTimeMillis
+                val format = DateFormat.getInstance()
+                format.format(calendar.time)
+            }
+            Text(
+                text = date,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .alignByBaseline()
+                    .width(IntrinsicSize.Min)
+            )
 
-        SimpleDropdownMenu(
-            dropdownMenuItems(
-                onEditClicked = onEditClicked,
-                onDeleteClicked = onDeleteClicked,
-                onMoveUpClicked = onMoveUpClicked,
-                onMoveDownClicked = onMoveDownClicked,
-                onBranchChatClicked = onBranchChatClicked
-            ),
-        )
+            SimpleDropdownMenu(
+                dropdownMenuItems(
+                    addDeleteSwipe = message.showSwipeInfo && message.totalSwipes > 1,
+                    onEditClicked = onEditClicked,
+                    onDeleteClicked = onDeleteClicked,
+                    onDeleteSwipeClicked = onDeleteSwipeClicked,
+                    onMoveUpClicked = onMoveUpClicked,
+                    onMoveDownClicked = onMoveDownClicked,
+                    onBranchChatClicked = onBranchChatClicked
+                )
+            )
+        }
     }
 
     Row(
@@ -154,39 +160,64 @@ fun ChatMessage(
 
 @Composable
 private fun dropdownMenuItems(
+    addDeleteSwipe: Boolean,
     onEditClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
+    onDeleteSwipeClicked: () -> Unit,
     onMoveUpClicked: () -> Unit,
     onMoveDownClicked: () -> Unit,
     onBranchChatClicked: () -> Unit
-) = remember {
-    listOf(
-        SimpleDropDownMenuItem(
-            textId = R.string.menu_item_edit_message,
-            onClick = onEditClicked,
-            iconVector = Icons.Default.Edit
-        ),
-        SimpleDropDownMenuItem(
-            textId = R.string.menu_item_delete_message,
-            onClick = onDeleteClicked,
-            iconVector = Icons.Default.Delete
-        ),
-        SimpleDropDownMenuItem(
-            textId = R.string.menu_item_move_message_up,
-            onClick = onMoveUpClicked,
-            iconVector = Icons.Default.ArrowUpward
-        ),
-        SimpleDropDownMenuItem(
-            textId = R.string.menu_item_move_message_down,
-            onClick = onMoveDownClicked,
-            iconVector = Icons.Default.ArrowDownward
-        ),
-        SimpleDropDownMenuItem(
-            textId = R.string.menu_item_branch_chat,
-            onClick = onBranchChatClicked,
-            iconVector = Icons.AutoMirrored.Default.AltRoute
-        ),
-    )
+) = remember(addDeleteSwipe) {
+    buildList {
+        add(
+            SimpleDropDownMenuItem(
+                textId = R.string.menu_item_edit_message,
+                onClick = onEditClicked,
+                iconVector = Icons.Default.Edit
+            )
+        )
+
+        add(
+            SimpleDropDownMenuItem(
+                textId = R.string.menu_item_delete_message,
+                onClick = onDeleteClicked,
+                iconVector = Icons.Default.Delete
+            )
+        )
+
+        if (addDeleteSwipe)
+            add(
+                SimpleDropDownMenuItem(
+                    textId = R.string.menu_item_delete_swipe,
+                    onClick = onDeleteSwipeClicked,
+                    iconVector = Icons.Default.DeleteSweep
+                )
+            )
+
+        add(
+            SimpleDropDownMenuItem(
+                textId = R.string.menu_item_move_message_up,
+                onClick = onMoveUpClicked,
+                iconVector = Icons.Default.ArrowUpward
+            )
+        )
+
+        add(
+            SimpleDropDownMenuItem(
+                textId = R.string.menu_item_move_message_down,
+                onClick = onMoveDownClicked,
+                iconVector = Icons.Default.ArrowDownward
+            )
+        )
+
+        add(
+            SimpleDropDownMenuItem(
+                textId = R.string.menu_item_branch_chat,
+                onClick = onBranchChatClicked,
+                iconVector = Icons.AutoMirrored.Default.AltRoute
+            )
+        )
+    }
 }
 
 @Composable
@@ -274,38 +305,6 @@ fun ImageAndMetaInfo(
 }
 
 @Composable
-fun NameAndTime(
-    name: String,
-    sentTimeMillis: Long,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.alignByBaseline()
-        )
-
-        val date = remember(sentTimeMillis) {
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = sentTimeMillis
-            val format = DateFormat.getInstance()
-            format.format(calendar.time)
-        }
-
-        Text(
-            text = date,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.alignByBaseline()
-        )
-    }
-}
-
-@Composable
 fun RightArrow(
     currentSwipe: Int,
     totalSwipes: Int,
@@ -362,6 +361,7 @@ private fun ChatMessagePreview() {
                 onRightClicked = {},
                 onEditClicked = {},
                 onDeleteClicked = {},
+                onDeleteSwipeClicked = {},
                 onMoveUpClicked = {},
                 onMoveDownClicked = {},
                 onBranchChatClicked = {}
@@ -392,6 +392,7 @@ private fun ChatMessageWithSwipesPreview() {
                 onRightClicked = {},
                 onEditClicked = {},
                 onDeleteClicked = {},
+                onDeleteSwipeClicked = {},
                 onMoveUpClicked = {},
                 onMoveDownClicked = {},
                 onBranchChatClicked = {}

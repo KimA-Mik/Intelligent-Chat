@@ -318,6 +318,7 @@ fun Messages(
                     onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },
                     onEditClicked = { onEvent(UserEvent.EditMessage(it.messageId)) },
                     onDeleteClicked = { onEvent(UserEvent.DeleteMessage(it.messageId)) },
+                    onDeleteSwipeClicked = { onEvent(UserEvent.DeleteCurrentSwipe(it.messageId)) },
                     onMoveUpClicked = { onEvent(UserEvent.MoveMessageUp(it.messageId)) },
                     onMoveDownClicked = { onEvent(UserEvent.MoveMessageDown(it.messageId)) },
                     onBranchChatClicked = { onEvent(UserEvent.BranchFromMessage(it.messageId)) }
@@ -325,23 +326,6 @@ fun Messages(
             }
         }
     }
-
-//    var lastIndex by remember { mutableIntStateOf(state.fullChat.messages.lastIndex) }
-//    LaunchedEffect(key1 = state.fullChat.messages.lastIndex) {
-//        if (state.fullChat.messages.lastIndex <= lastIndex) {
-//            lastIndex = state.fullChat.messages.lastIndex
-//            return@LaunchedEffect
-//        }
-//
-//        lastIndex = state.fullChat.messages.lastIndex
-//        if (lastIndex < 0) return@LaunchedEffect
-//
-//        val lastItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
-//        listState.scrollToItem(
-//            lastItem.index,
-//            lastItem.size
-//        )
-//    }
 }
 
 @Composable

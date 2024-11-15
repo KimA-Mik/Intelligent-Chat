@@ -16,4 +16,5 @@ sealed interface UserEvent {
     data class BranchFromMessage(val messageId: Long) : UserEvent
     data class RestoreMessage(val messageId: Long) : UserEvent
     data object ScrollDown : UserEvent
+    data class DeleteCurrentSwipe(val messageId: Long) : UserEvent
 }
