@@ -2,6 +2,10 @@ package ru.kima.intelligentchat.presentation.chat.chatScreen
 
 import android.content.Context
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -97,15 +101,15 @@ fun ChatScreenContent(
     }
 
     val listState = rememberLazyListState()
-
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(uiEvent) {
         uiEvent.consume {
             consumeEvent(
+                cardId = state.info.characterCard.id,
                 event = it,
                 context = context,
-                cardId = state.info.characterCard.id,
+                listState = listState,
                 navController = navController,
                 coroutineScope = coroutineScope,
                 snackbarHostState = snackbarHostState,
@@ -169,7 +173,9 @@ fun ChatScreenContent(
         floatingActionButton = {
             AnimatedFab(
                 visible = listState.canScrollForward,
-                onClick = {},
+                onClick = { onEvent(UserEvent.ScrollDown) },
+                enter = scaleIn() + slideInHorizontally(initialOffsetX = { it }),
+                exit = scaleOut() + slideOutHorizontally(targetOffsetX = { it })
             ) {
                 Icon(Icons.Default.ArrowDownward, null)
             }
@@ -192,9 +198,10 @@ fun ChatScreenContent(
 }
 
 private fun consumeEvent(
+    cardId: Long,
     event: UiEvent,
     context: Context,
-    cardId: Long,
+    listState: LazyListState,
     navController: NavController,
     coroutineScope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
@@ -214,6 +221,10 @@ private fun consumeEvent(
                 SnackbarResult.Dismissed -> {}
                 SnackbarResult.ActionPerformed -> onEvent(UserEvent.RestoreMessage(event.messageId))
             }
+        }
+
+        UiEvent.ScrollDown -> coroutineScope.launch {
+            listState.animateScrollToItem(listState.layoutInfo.totalItemsCount)
         }
     }
 }

@@ -192,7 +192,12 @@ class ChatScreenViewModel(
             UserEvent.OpenChatList -> onOpenChatList()
             is UserEvent.BranchFromMessage -> onBranchFromMessage(event.messageId)
             is UserEvent.RestoreMessage -> onRestoreMessage(event.messageId)
+            UserEvent.ScrollDown -> onScrollDown()
         }
+    }
+
+    private fun onScrollDown() {
+        _uiEvent.value = Event(UiEvent.ScrollDown)
     }
 
     private fun onRestoreMessage(messageId: Long) = viewModelScope.launch {
