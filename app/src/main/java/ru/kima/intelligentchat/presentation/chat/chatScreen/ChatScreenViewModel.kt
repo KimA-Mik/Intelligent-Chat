@@ -23,6 +23,7 @@ import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.BranchChatFromMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteCurrentSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
@@ -62,6 +63,7 @@ class ChatScreenViewModel(
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val messagingStatus: SubscribeToMessagingStatus,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
+    private val deleteCurrentSwipe: DeleteCurrentSwipeUseCase,
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
     private val createAndSelectChat: CreateAndSelectChatUseCase,
     private val branchChatFromMessage: BranchChatFromMessageUseCase
@@ -200,8 +202,8 @@ class ChatScreenViewModel(
         }
     }
 
-    private fun onDeleteCurrentSwipe(messageId: Long) {
-
+    private fun onDeleteCurrentSwipe(messageId: Long) = viewModelScope.launch {
+        deleteCurrentSwipe(messageId)
     }
 
     private fun onScrollDown() {

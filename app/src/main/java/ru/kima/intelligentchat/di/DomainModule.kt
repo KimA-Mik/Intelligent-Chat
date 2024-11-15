@@ -43,6 +43,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToChatMessagesWithSw
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.BranchChatFromMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteCurrentSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
@@ -166,6 +167,7 @@ fun domain() = module {
 
     singleOf(::BranchChatFromMessageUseCase)
     singleOf(::CreateMessageUseCase)
+    singleOf(::DeleteCurrentSwipeUseCase)
     singleOf(::DeleteMessageUseCase)
     singleOf(::EditMessageUseCase)
     singleOf(::MoveMessageUseCase)

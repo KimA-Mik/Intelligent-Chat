@@ -41,6 +41,10 @@ class MessageRepositoryImpl(
         chatDao.updateMassage(message.toEntity())
     }
 
+    override suspend fun updateMessageWithSwipes(message: MessageWithSwipes) {
+        chatDao.updateMessageDto(message.toDto())
+    }
+
     override suspend fun updateMessages(messages: List<Message>) {
         chatDao.updateMessages(
             messages.map { it.toEntity() }

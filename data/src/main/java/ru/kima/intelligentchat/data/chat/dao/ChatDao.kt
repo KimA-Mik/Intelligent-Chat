@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.data.chat.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -77,6 +78,9 @@ interface ChatDao {
     @Update
     suspend fun updateSwipe(swipeEntity: SwipeEntity)
 
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun updateSwipes(swipes: List<SwipeEntity>)
+
     @Query("SELECT * FROM $SWIPE_TABLE_NAME WHERE message_id in (:messagesIds)")
     fun swipesForMessages(messagesIds: List<Long>): Flow<List<SwipeEntity>>
 
@@ -104,6 +108,12 @@ interface ChatDao {
         val swipes = dtos.flatMap { it.swipes }
         deleteMessages(messages)
         deleteSwipes(swipes)
+    }
+
+    @Transaction
+    suspend fun updateMessageDto(dto: MessageWithSwipesDto) {
+        updateMassage(dto.message)
+        updateSwipes(dto.swipes)
     }
 
     @Transaction
