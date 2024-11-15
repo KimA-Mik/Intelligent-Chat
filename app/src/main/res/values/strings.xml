@@ -115,6 +115,9 @@
     <string name="delete_chat_alert_dialog_title">Delete chat</string>
     <string name="delete_chat_alert_dialog_text">The chat will be deleted forever</string>
 
+    <string name="message_deleted_snackbar_message">Message has been deleted</string>
+    <string name="restore_message_snackbar_action">Restore</string>
+
 
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>

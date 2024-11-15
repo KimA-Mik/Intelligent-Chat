@@ -14,4 +14,5 @@ sealed interface UserEvent {
     data class MoveMessageDown(val messageId: Long) : UserEvent
     data object OpenChatList : UserEvent
     data class BranchFromMessage(val messageId: Long) : UserEvent
+    data class RestoreMessage(val messageId: Long) : UserEvent
 }

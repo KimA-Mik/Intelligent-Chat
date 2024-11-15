@@ -46,8 +46,10 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
+import ru.kima.intelligentchat.domain.common.useCase.CleanUpUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
@@ -102,6 +104,8 @@ fun domain() = module {
     singleOf(::MessageRepositoryImpl) bind MessageRepository::class
     singleOf(::SwipeRepositoryImpl) bind SwipeRepository::class
     singleOf(::MessagingRepositoryImpl) bind MessagingRepository::class
+
+    factoryOf(::CleanUpUseCase)
 
     singleOf(::GetPreferencesUseCase)
     singleOf(::SetSelectedPersonaIdUseCase)
@@ -165,6 +169,7 @@ fun domain() = module {
     singleOf(::DeleteMessageUseCase)
     singleOf(::EditMessageUseCase)
     singleOf(::MoveMessageUseCase)
+    singleOf(::RestoreMessageUseCase)
     singleOf(::SwipeFirstMessageUseCase)
     singleOf(::SwipeMessageUseCase)
 

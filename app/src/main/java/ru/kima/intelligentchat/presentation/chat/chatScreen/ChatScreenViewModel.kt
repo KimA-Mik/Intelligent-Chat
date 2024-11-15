@@ -25,6 +25,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.BranchChatFromMessageU
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
@@ -51,16 +52,17 @@ class ChatScreenViewModel(
     private val getPersonas: GetPersonasUseCase,
     private val sendMessage: SendMessageUseCase,
     private val moveMessage: MoveMessageUseCase,
+    private val getCharacterCard: GetCardUseCase,
     private val swipeMessage: SwipeMessageUseCase,
     private val cancelMessage: CancelMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
-    private val messagingStatus: SubscribeToMessagingStatus,
-    private val getCharacterCard: GetCardUseCase,
+    private val restoreMessage: RestoreMessageUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
+    private val messagingStatus: SubscribeToMessagingStatus,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
     private val createAndSelectChat: CreateAndSelectChatUseCase,
-    private val branchChatFromMessage: BranchChatFromMessageUseCase,
+    private val branchChatFromMessage: BranchChatFromMessageUseCase
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard.default())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -189,7 +191,12 @@ class ChatScreenViewModel(
             is UserEvent.MoveMessageUp -> onMoveMessageUp(event.messageId)
             UserEvent.OpenChatList -> onOpenChatList()
             is UserEvent.BranchFromMessage -> onBranchFromMessage(event.messageId)
+            is UserEvent.RestoreMessage -> onRestoreMessage(event.messageId)
         }
+    }
+
+    private fun onRestoreMessage(messageId: Long) = viewModelScope.launch {
+        restoreMessage(messageId)
     }
 
     private fun onBranchFromMessage(messageId: Long) = viewModelScope.launch {
@@ -267,6 +274,7 @@ class ChatScreenViewModel(
         if (messageId > 0 && s is ChatScreenState.ChatState) {
             deleteMessage(chatId = s.info.fullChat.chatId, messageId = messageId)
         }
+        _uiEvent.value = Event(UiEvent.RestoreMessage(messageId))
     }
 
     private fun onCancelMessage() = viewModelScope.launch {

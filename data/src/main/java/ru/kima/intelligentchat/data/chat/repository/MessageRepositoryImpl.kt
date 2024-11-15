@@ -27,6 +27,10 @@ class MessageRepositoryImpl(
         return chatDao.getFullMessage(id)?.toEntity()
     }
 
+    override suspend fun getMessage(id: Long): Message? {
+        return chatDao.getMessage(id)?.toEntity()
+    }
+
     override fun subscribeToChatMessages(chatId: Long): Flow<List<Message>> {
         return chatDao
             .chatMessages(chatId)
@@ -43,16 +47,12 @@ class MessageRepositoryImpl(
         )
     }
 
-    override suspend fun deleteMessage(messageId: Long): Boolean {
-        return chatDao.deleteMessage(messageId) > 0
+    override suspend fun getMarkedMessages(): List<MessageWithSwipes> {
+        return chatDao.markedMessages().map { it.toEntity() }
     }
 
-    override suspend fun deleteMessages(messageIds: List<Message>) {
-        chatDao.deleteMessages(messageIds.map { it.toEntity() })
-    }
-
-    override suspend fun deleteMessagesChat(chatId: Long): Boolean {
-        return chatDao.deleteMessagesForChat(chatId) > 0
+    override suspend fun deleteMessages(messages: List<MessageWithSwipes>) {
+        chatDao.deleteMessagesDto(messages.map { it.toDto() })
     }
 
     override suspend fun createMessage(

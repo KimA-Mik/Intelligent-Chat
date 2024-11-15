@@ -51,6 +51,9 @@ interface ChatDao {
     @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE message_id=:messageId")
     suspend fun getFullMessage(messageId: Long): MessageWithSwipesDto?
 
+    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE message_id=:messageId")
+    suspend fun getMessage(messageId: Long): MessageEntity?
+
     @Transaction
     @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId AND deleted=0 ORDER By `index`")
     fun chatWithMessages(chatId: Long): Flow<List<MessageWithSwipesDto>>
@@ -58,14 +61,12 @@ interface ChatDao {
     @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE chat_id=:chatId AND deleted=0 ORDER By `index`")
     fun chatMessages(chatId: Long): Flow<List<MessageEntity>>
 
-    @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE message_id = :messageId")
-    suspend fun deleteMessage(messageId: Long): Int
+    @Transaction
+    @Query("SELECT * FROM $MESSAGES_TABLE_NAME WHERE deleted=1")
+    suspend fun markedMessages(): List<MessageWithSwipesDto>
 
     @Delete
     suspend fun deleteMessages(messages: List<MessageEntity>)
-
-    @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE chat_id = :chatId")
-    suspend fun deleteMessagesForChat(chatId: Long): Int
 
     @Insert
     suspend fun insertSwipe(swipeEntity: SwipeEntity): Long
@@ -98,12 +99,17 @@ interface ChatDao {
     suspend fun deleteSwipes(swipes: List<SwipeEntity>)
 
     @Transaction
-    suspend fun deleteChat(chatWithMessagesDto: ChatWithMessagesDto) {
-        val messages = chatWithMessagesDto.messages.map { it.message }
-        val swipes = chatWithMessagesDto.messages.flatMap { it.swipes }
-        deleteChat(chatWithMessagesDto.chat)
+    suspend fun deleteMessagesDto(dtos: List<MessageWithSwipesDto>) {
+        val messages = dtos.map { it.message }
+        val swipes = dtos.flatMap { it.swipes }
         deleteMessages(messages)
         deleteSwipes(swipes)
+    }
+
+    @Transaction
+    suspend fun deleteChat(chatWithMessagesDto: ChatWithMessagesDto) {
+        deleteChat(chatWithMessagesDto.chat)
+        deleteMessagesDto(chatWithMessagesDto.messages)
     }
 
     @Transaction
