@@ -37,10 +37,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -77,6 +75,7 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
 import ru.kima.intelligentchat.presentation.common.components.AnimatedFab
+import ru.kima.intelligentchat.presentation.common.util.runSnackbar
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChatList
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
@@ -210,21 +209,33 @@ private fun consumeEvent(
     when (event) {
         UiEvent.OpenChatList -> navController.navigateToCardChatList(cardId)
         is UiEvent.RestoreMessage -> coroutineScope.launch {
-            val result = snackbarHostState.showSnackbar(
+            runSnackbar(
+                snackbarHostState,
                 message = context.getString(R.string.message_deleted_snackbar_message),
-                actionLabel = context.getString(R.string.restore_message_snackbar_action),
-                withDismissAction = true,
-                duration = SnackbarDuration.Long
+                onActionPerformed = { onEvent(UserEvent.RestoreMessage(event.messageId)) },
+                actionLabel = context.getString(R.string.restore_snackbar_action)
             )
-
-            when (result) {
-                SnackbarResult.Dismissed -> {}
-                SnackbarResult.ActionPerformed -> onEvent(UserEvent.RestoreMessage(event.messageId))
-            }
         }
 
         UiEvent.ScrollDown -> coroutineScope.launch {
             listState.animateScrollToItem(listState.layoutInfo.totalItemsCount)
+        }
+
+        is UiEvent.RestoreSwipe -> coroutineScope.launch {
+            runSnackbar(
+                snackbarHostState,
+                message = context.getString(R.string.swipe_deleted_snackbar_message),
+                onActionPerformed = {
+                    onEvent(
+                        UserEvent.RestoreSwipe(
+                            messageId = event.messageId,
+                            swipeId = event.swipeId,
+                            swipeIndex = event.swipeIndex
+                        )
+                    )
+                },
+                actionLabel = context.getString(R.string.restore_snackbar_action)
+            )
         }
     }
 }

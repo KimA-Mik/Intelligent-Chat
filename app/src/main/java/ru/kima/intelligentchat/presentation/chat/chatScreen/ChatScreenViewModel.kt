@@ -199,11 +199,29 @@ class ChatScreenViewModel(
             is UserEvent.RestoreMessage -> onRestoreMessage(event.messageId)
             UserEvent.ScrollDown -> onScrollDown()
             is UserEvent.DeleteCurrentSwipe -> onDeleteCurrentSwipe(event.messageId)
+            is UserEvent.RestoreSwipe -> onRestoreSwipe(
+                event.messageId,
+                event.swipeId,
+                event.swipeIndex
+            )
         }
     }
 
+    private fun onRestoreSwipe(messageId: Long, swipeId: Long, swipeIndex: Int) {
+
+    }
+
     private fun onDeleteCurrentSwipe(messageId: Long) = viewModelScope.launch {
-        deleteCurrentSwipe(messageId)
+        val deletionResult = deleteCurrentSwipe(messageId).valueOr {
+            return@launch
+        }
+        _uiEvent.value = Event(
+            UiEvent.RestoreSwipe(
+                messageId = messageId,
+                swipeId = deletionResult.deletedSwipeId,
+                swipeIndex = deletionResult.deletedIndex
+            )
+        )
     }
 
     private fun onScrollDown() {

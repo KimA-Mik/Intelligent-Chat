@@ -117,7 +117,8 @@
     <string name="delete_chat_alert_dialog_text">The chat will be deleted forever</string>
 
     <string name="message_deleted_snackbar_message">Message has been deleted</string>
-    <string name="restore_message_snackbar_action">Restore</string>
+    <string name="swipe_deleted_snackbar_message">Swipe has been deleted</string>
+    <string name="restore_snackbar_action">Restore</string>
 
 
     <!--  Notifications  -->
