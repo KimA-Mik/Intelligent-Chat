@@ -1,13 +1,8 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
@@ -38,45 +33,36 @@ fun EditableChatMessage(
     onImageClick: () -> Unit,
     modifier: Modifier = Modifier,
     imageSize: Dp = ChatDefaults.SENDER_IMAGE_SIZE,
-) {
-    Row(
-        modifier = modifier.height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+) = Column(modifier = modifier) {
+    Row(verticalAlignment = Alignment.Top) {
         ImageAndMetaInfo(
             imageBitmap = message.senderImage,
             index = message.index,
-//            showLeftArrow = false,
             imageSize = imageSize,
-            modifier = Modifier.fillMaxHeight(),
             tookMs = 0,
             onImageClick = onImageClick,
-//            onLeftClick = {}
         )
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
-            ) {
-                Text(
-                    text = message.senderName,
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.alignByBaseline()
-                )
-                Spacer(Modifier.weight(1f))
-                IconButton(onClick = onSaveClick) {
-                    Icon(imageVector = Icons.Default.Save, contentDescription = null)
-                }
-                IconButton(onClick = onDismissClick) {
-                    Icon(imageVector = Icons.Default.Cancel, contentDescription = null)
-                }
-            }
-            OutlinedTextField(
-                value = buffer, onValueChange = onType,
-                modifier = Modifier.fillMaxWidth()
-            )
+
+        Text(
+            text = message.senderName,
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp)
+                .alignByBaseline()
+                .weight(1f)
+        )
+        IconButton(onClick = onSaveClick) {
+            Icon(imageVector = Icons.Default.Save, contentDescription = null)
+        }
+        IconButton(onClick = onDismissClick) {
+            Icon(imageVector = Icons.Default.Cancel, contentDescription = null)
         }
     }
+    OutlinedTextField(
+        value = buffer, onValueChange = onType,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Preview

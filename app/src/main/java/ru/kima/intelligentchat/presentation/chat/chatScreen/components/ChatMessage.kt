@@ -71,15 +71,10 @@ fun ChatMessage(
     onImageClicked: () -> Unit,
     onLeftClicked: () -> Unit,
     onRightClicked: () -> Unit
-) = Column(
-    modifier = modifier
-//            .height(IntrinsicSize.Min)
-    , horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.SpaceBetween
-) {
+) = Column(modifier = modifier) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         ImageAndMetaInfo(
             imageBitmap = message.senderImage,
