@@ -12,5 +12,6 @@ fun MessagingIndicator.toImmutable(): ImmutableMessagingIndicator {
         MessagingIndicator.Generating -> ImmutableMessagingIndicator.Generating
         MessagingIndicator.None -> ImmutableMessagingIndicator.None
         MessagingIndicator.Pending -> ImmutableMessagingIndicator.Pending
+        MessagingIndicator.Done -> ImmutableMessagingIndicator.None
     }
 }
