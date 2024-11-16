@@ -1,7 +1,9 @@
 package ru.kima.intelligentchat.domain.chat.useCase
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.domain.chat.ChatNotFoundException
 import ru.kima.intelligentchat.domain.chat.model.Chat
@@ -20,7 +22,7 @@ class SubscribeToFullChatUseCase(
             chatMessages(chatId)
         ) { chat, messages ->
             ICResult.Success(FullChat.fromChatAndMessages(chat, messages))
-        }.catch {
+        }.flowOn(Dispatchers.Default).catch {
             when (it) {
                 is ChatNotFoundException -> emit(ICResult.Error(Error.ChatNotFound))
                 else -> emit(ICResult.Error(Error.UnknownError))

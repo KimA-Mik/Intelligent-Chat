@@ -8,6 +8,7 @@ fun SwipeEntity.toSwipe(): Swipe {
         swipeId = swipeId,
         messageId = messageId,
         text = text,
+        deleted = deleted,
     )
 }
 
@@ -16,5 +17,6 @@ fun Swipe.toEntity(): SwipeEntity {
         swipeId = swipeId,
         messageId = messageId,
         text = text,
+        deleted = deleted
     )
 }

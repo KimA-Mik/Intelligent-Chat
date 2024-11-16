@@ -30,19 +30,12 @@ class SwipeRepositoryImpl(
         return chatDao.getSwipe(swipeId).toSwipe()
     }
 
-    override suspend fun deleteSwipesForMessage(messageId: Long): Boolean {
-        return chatDao.deleteSwipesForMessage(messageId) > 0
-    }
-
-    override suspend fun deleteSwipesForMessages(messageIds: List<Long>): Boolean {
-        return chatDao.deleteSwipesForMessages(messageIds) > 0
-    }
-
     override suspend fun createSwipe(messageId: Long, text: String): Long {
         val swipe = SwipeEntity(
             swipeId = 0,
             messageId = messageId,
-            text = text
+            text = text,
+            deleted = false
         )
 
         return chatDao.insertSwipe(swipe)
@@ -50,5 +43,13 @@ class SwipeRepositoryImpl(
 
     override suspend fun updateSwipe(swipe: Swipe) {
         chatDao.updateSwipe(swipe.toEntity())
+    }
+
+    override suspend fun getMarkedSwipes(): List<Swipe> {
+        return chatDao.markedSwipes().map { it.toSwipe() }
+    }
+
+    override suspend fun deleteSwipes(swipes: List<Swipe>) {
+        chatDao.deleteSwipes(swipes.map { it.toEntity() })
     }
 }

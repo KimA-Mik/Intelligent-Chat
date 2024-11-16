@@ -16,7 +16,9 @@ class SubscribeToChatMessagesWithSwipesUseCase(
     operator fun invoke(chatId: Long): Flow<List<MessageWithSwipes>> = combine(
         messageRepository.subscribeToChatMessages(chatId),
         swipeRepository.subscribeSwipesForChart(chatId).map { swipes ->
-            swipes.groupBy { it.messageId }
+            swipes
+                .filter { !it.deleted }
+                .groupBy { it.messageId }
         }
     ) { messages, swipes ->
         messages.map { message ->

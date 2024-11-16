@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.data.chat.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -77,6 +78,9 @@ interface ChatDao {
     @Update
     suspend fun updateSwipe(swipeEntity: SwipeEntity)
 
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun updateSwipes(swipes: List<SwipeEntity>)
+
     @Query("SELECT * FROM $SWIPE_TABLE_NAME WHERE message_id in (:messagesIds)")
     fun swipesForMessages(messagesIds: List<Long>): Flow<List<SwipeEntity>>
 
@@ -89,11 +93,8 @@ interface ChatDao {
     @Query("SELECT * FROM $SWIPE_TABLE_NAME WHERE  swipe_id = :swipeId")
     suspend fun getSwipe(swipeId: Long): SwipeEntity
 
-    @Query("DELETE FROM $SWIPE_TABLE_NAME WHERE message_id = :messageId")
-    suspend fun deleteSwipesForMessage(messageId: Long): Int
-
-    @Query("DELETE FROM $SWIPE_TABLE_NAME WHERE message_id IN (:messageIds)")
-    suspend fun deleteSwipesForMessages(messageIds: List<Long>): Int
+    @Query("SELECT * FROM $SWIPE_TABLE_NAME WHERE  deleted = 1")
+    suspend fun markedSwipes(): List<SwipeEntity>
 
     @Delete
     suspend fun deleteSwipes(swipes: List<SwipeEntity>)
@@ -104,6 +105,12 @@ interface ChatDao {
         val swipes = dtos.flatMap { it.swipes }
         deleteMessages(messages)
         deleteSwipes(swipes)
+    }
+
+    @Transaction
+    suspend fun updateMessageDto(dto: MessageWithSwipesDto) {
+        updateMassage(dto.message)
+        updateSwipes(dto.swipes)
     }
 
     @Transaction

@@ -97,7 +97,8 @@
 
     <!--  Message Dropdown Menu  -->
     <string name="menu_item_edit_message">Edit</string>
-    <string name="menu_item_delete_message">Delete</string>
+    <string name="menu_item_delete_message">Delete message</string>
+    <string name="menu_item_delete_swipe">Delete current swipe</string>
     <string name="menu_item_move_message_up">Move up</string>
     <string name="menu_item_move_message_down">Move down</string>
     <string name="menu_item_branch_chat">Branch from here</string>
@@ -116,7 +117,8 @@
     <string name="delete_chat_alert_dialog_text">The chat will be deleted forever</string>
 
     <string name="message_deleted_snackbar_message">Message has been deleted</string>
-    <string name="restore_message_snackbar_action">Restore</string>
+    <string name="swipe_deleted_snackbar_message">Swipe has been deleted</string>
+    <string name="restore_snackbar_action">Restore</string>
 
 
     <!--  Notifications  -->

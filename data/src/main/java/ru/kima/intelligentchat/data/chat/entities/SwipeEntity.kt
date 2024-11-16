@@ -12,5 +12,7 @@ data class SwipeEntity(
     val swipeId: Long,
     @ColumnInfo(name = "message_id")
     val messageId: Long,
-    val text: String
+    val text: String,
+    @ColumnInfo(defaultValue = "0")
+    val deleted: Boolean,
 )

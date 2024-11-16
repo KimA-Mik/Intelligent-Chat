@@ -12,6 +12,7 @@ interface MessageRepository {
     suspend fun getMessage(id: Long): Message?
     suspend fun updateMessage(message: Message)
     suspend fun updateMessages(messages: List<Message>)
+    suspend fun updateMessageWithSwipes(message: MessageWithSwipes)
     suspend fun getMarkedMessages(): List<MessageWithSwipes>
     suspend fun deleteMessages(messages: List<MessageWithSwipes>)
     suspend fun createMessage(

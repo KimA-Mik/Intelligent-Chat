@@ -23,10 +23,12 @@ import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.BranchChatFromMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteCurrentSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
@@ -56,12 +58,14 @@ class ChatScreenViewModel(
     private val moveMessage: MoveMessageUseCase,
     private val getCharacterCard: GetCardUseCase,
     private val swipeMessage: SwipeMessageUseCase,
+    private val restoreSwipe: RestoreSwipeUseCase,
     private val cancelMessage: CancelMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
     private val restoreMessage: RestoreMessageUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase,
     private val messagingStatus: SubscribeToMessagingStatus,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
+    private val deleteCurrentSwipe: DeleteCurrentSwipeUseCase,
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
     private val createAndSelectChat: CreateAndSelectChatUseCase,
     private val branchChatFromMessage: BranchChatFromMessageUseCase
@@ -196,7 +200,25 @@ class ChatScreenViewModel(
             is UserEvent.BranchFromMessage -> onBranchFromMessage(event.messageId)
             is UserEvent.RestoreMessage -> onRestoreMessage(event.messageId)
             UserEvent.ScrollDown -> onScrollDown()
+            is UserEvent.DeleteCurrentSwipe -> onDeleteCurrentSwipe(event.messageId)
+            is UserEvent.RestoreSwipe -> onRestoreSwipe(event.messageId, event.swipeId)
         }
+    }
+
+    private fun onRestoreSwipe(messageId: Long, swipeId: Long) = viewModelScope.launch {
+        restoreSwipe(messageId, swipeId)
+    }
+
+    private fun onDeleteCurrentSwipe(messageId: Long) = viewModelScope.launch {
+        val deletionResult = deleteCurrentSwipe(messageId).valueOr {
+            return@launch
+        }
+        _uiEvent.value = Event(
+            UiEvent.RestoreSwipe(
+                messageId = messageId,
+                swipeId = deletionResult.deletedSwipeId,
+            )
+        )
     }
 
     private fun onScrollDown() {
