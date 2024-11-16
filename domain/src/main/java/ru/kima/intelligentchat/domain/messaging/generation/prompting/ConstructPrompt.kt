@@ -53,12 +53,16 @@ fun GenerationRequest.constructPrompt() = buildString {
     val appendToPrompt = fun(prefix: String, field: String): Boolean {
         if (field.isBlank()) return true
 
+        val inlinedField = field
+            .inlineCardName(card.name)
+            .inlinePersonaName(persona.name)
+
         var tokens = tokenizer.encode(prefix).size
-        tokens += tokenizer.encode(field).size
+        tokens += tokenizer.encode(inlinedField).size
         if (tokens + tokenBudget >= maxContextLength) return false
         tokenBudget += tokens
         append(prefix)
-        append(field)
+        append(inlinedField)
 
         return true
     }
