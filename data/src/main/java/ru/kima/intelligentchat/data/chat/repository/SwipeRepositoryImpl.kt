@@ -35,7 +35,8 @@ class SwipeRepositoryImpl(
             swipeId = 0,
             messageId = messageId,
             text = text,
-            deleted = false
+            deleted = false,
+            sendTime = System.currentTimeMillis()
         )
 
         return chatDao.insertSwipe(swipe)

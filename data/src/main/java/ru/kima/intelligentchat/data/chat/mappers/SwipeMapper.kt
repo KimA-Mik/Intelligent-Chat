@@ -9,6 +9,7 @@ fun SwipeEntity.toSwipe(): Swipe {
         messageId = messageId,
         text = text,
         deleted = deleted,
+        sendTime = sendTime
     )
 }
 
@@ -17,6 +18,7 @@ fun Swipe.toEntity(): SwipeEntity {
         swipeId = swipeId,
         messageId = messageId,
         text = text,
-        deleted = deleted
+        deleted = deleted,
+        sendTime = sendTime
     )
 }
