@@ -15,4 +15,9 @@ data class SwipeEntity(
     val text: String,
     @ColumnInfo(defaultValue = "0")
     val deleted: Boolean,
+    @ColumnInfo(
+        name = "send_time",
+        defaultValue = "0"
+    )
+    val sendTime: Long,
 )
