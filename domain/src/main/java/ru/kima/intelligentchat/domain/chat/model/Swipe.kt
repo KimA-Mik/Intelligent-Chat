@@ -5,5 +5,5 @@ data class Swipe(
     val messageId: Long = 0,
     val text: String = String(),
     val deleted: Boolean = false,
-    val sendTime: Long,
+    val sendTime: Long = 0L,
 )

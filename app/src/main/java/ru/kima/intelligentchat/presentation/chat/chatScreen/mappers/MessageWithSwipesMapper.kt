@@ -13,6 +13,12 @@ fun MessageWithSwipes.toDisplayMessage(
     personasImages: Map<Long, ImmutableImageBitmap> = emptyMap(),
     showSwipeInfo: Boolean = false,
 ): DisplayMessage {
+    val selectedSwipe = swipes.getOrElse(selectedSwipeIndex) {
+        Swipe(
+            text = "...",
+            sendTime = System.currentTimeMillis()
+        )
+    }
     return DisplayMessage(
         messageId = messageId,
         senderName = if (sender == SenderType.Character) cardName else personasNames.getOrElse(
@@ -22,7 +28,8 @@ fun MessageWithSwipes.toDisplayMessage(
             cardBitmap
         else
             personasImages.getOrElse(senderId) { ImmutableImageBitmap() },
-        text = swipes.getOrElse(selectedSwipeIndex) { Swipe(text = "...") }.text,
+        text = selectedSwipe.text,
+        sentTimeMillis = selectedSwipe.sendTime,
         currentSwipe = selectedSwipeIndex + 1,
         totalSwipes = swipes.size,
         index = index,
