@@ -93,11 +93,8 @@ interface ChatDao {
     @Query("SELECT * FROM $SWIPE_TABLE_NAME WHERE  swipe_id = :swipeId")
     suspend fun getSwipe(swipeId: Long): SwipeEntity
 
-    @Query("DELETE FROM $SWIPE_TABLE_NAME WHERE message_id = :messageId")
-    suspend fun deleteSwipesForMessage(messageId: Long): Int
-
-    @Query("DELETE FROM $SWIPE_TABLE_NAME WHERE message_id IN (:messageIds)")
-    suspend fun deleteSwipesForMessages(messageIds: List<Long>): Int
+    @Query("SELECT * FROM $SWIPE_TABLE_NAME WHERE  deleted = 1")
+    suspend fun markedSwipes(): List<SwipeEntity>
 
     @Delete
     suspend fun deleteSwipes(swipes: List<SwipeEntity>)
