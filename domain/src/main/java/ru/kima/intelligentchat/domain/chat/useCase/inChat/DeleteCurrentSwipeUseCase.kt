@@ -25,7 +25,7 @@ class DeleteCurrentSwipeUseCase(
         )
 
         messageRepository.updateMessageWithSwipes(updatedMessage)
-        return ICResult.Success(Success(swipe.swipeId, message.selectedSwipeIndex))
+        return ICResult.Success(Success(swipe.swipeId))
     }
 
     sealed interface Error {
@@ -34,5 +34,5 @@ class DeleteCurrentSwipeUseCase(
         data object IncorrectSelectedSwipeId : Error
     }
 
-    data class Success(val deletedSwipeId: Long, val deletedIndex: Int)
+    data class Success(val deletedSwipeId: Long)
 }

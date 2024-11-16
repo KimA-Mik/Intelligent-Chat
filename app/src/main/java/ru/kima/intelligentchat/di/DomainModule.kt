@@ -48,6 +48,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.common.useCase.CleanUpUseCase
@@ -172,6 +173,7 @@ fun domain() = module {
     singleOf(::EditMessageUseCase)
     singleOf(::MoveMessageUseCase)
     singleOf(::RestoreMessageUseCase)
+    singleOf(::RestoreSwipeUseCase)
     singleOf(::SwipeFirstMessageUseCase)
     singleOf(::SwipeMessageUseCase)
 

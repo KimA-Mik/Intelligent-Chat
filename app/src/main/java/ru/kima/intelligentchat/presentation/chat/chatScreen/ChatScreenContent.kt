@@ -230,7 +230,6 @@ private fun consumeEvent(
                         UserEvent.RestoreSwipe(
                             messageId = event.messageId,
                             swipeId = event.swipeId,
-                            swipeIndex = event.swipeIndex
                         )
                     )
                 },

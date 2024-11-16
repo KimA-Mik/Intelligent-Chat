@@ -28,6 +28,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.DeleteMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.EditMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.MoveMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreMessageUseCase
+import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
@@ -57,6 +58,7 @@ class ChatScreenViewModel(
     private val moveMessage: MoveMessageUseCase,
     private val getCharacterCard: GetCardUseCase,
     private val swipeMessage: SwipeMessageUseCase,
+    private val restoreSwipe: RestoreSwipeUseCase,
     private val cancelMessage: CancelMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
     private val restoreMessage: RestoreMessageUseCase,
@@ -199,16 +201,12 @@ class ChatScreenViewModel(
             is UserEvent.RestoreMessage -> onRestoreMessage(event.messageId)
             UserEvent.ScrollDown -> onScrollDown()
             is UserEvent.DeleteCurrentSwipe -> onDeleteCurrentSwipe(event.messageId)
-            is UserEvent.RestoreSwipe -> onRestoreSwipe(
-                event.messageId,
-                event.swipeId,
-                event.swipeIndex
-            )
+            is UserEvent.RestoreSwipe -> onRestoreSwipe(event.messageId, event.swipeId)
         }
     }
 
-    private fun onRestoreSwipe(messageId: Long, swipeId: Long, swipeIndex: Int) {
-
+    private fun onRestoreSwipe(messageId: Long, swipeId: Long) = viewModelScope.launch {
+        restoreSwipe(messageId, swipeId)
     }
 
     private fun onDeleteCurrentSwipe(messageId: Long) = viewModelScope.launch {
@@ -219,7 +217,6 @@ class ChatScreenViewModel(
             UiEvent.RestoreSwipe(
                 messageId = messageId,
                 swipeId = deletionResult.deletedSwipeId,
-                swipeIndex = deletionResult.deletedIndex
             )
         )
     }
