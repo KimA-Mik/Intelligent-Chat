@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.domain.chat.ChatNotFoundException
 import ru.kima.intelligentchat.domain.chat.model.Chat
@@ -20,16 +19,7 @@ class SubscribeToFullChatUseCase(
     operator fun invoke(chatId: Long) =
         combine<Chat, List<MessageWithSwipes>, ICResult<FullChat, Error>>(
             chatRepository.subscribeToChat(chatId),
-            chatMessages(chatId).map { messages ->
-                messages.map { message ->
-                    val actualSwipes = message.swipes.filter { !it.deleted }
-                    if (message.swipes.size != actualSwipes.size) {
-                        message.copy(swipes = actualSwipes)
-                    } else {
-                        message
-                    }
-                }
-            }
+            chatMessages(chatId)
         ) { chat, messages ->
             ICResult.Success(FullChat.fromChatAndMessages(chat, messages))
         }.flowOn(Dispatchers.Default).catch {
