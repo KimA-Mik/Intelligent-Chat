@@ -7,6 +7,10 @@ class DeleteCardUseCase(
     private val characterRepository: CharacterCardRepository,
 ) {
     suspend operator fun invoke(card: CharacterCard) {
-        characterRepository.deleteCard(card)
+        characterRepository.updateCharacterCard(
+            card.copy(
+                deleted = true
+            )
+        )
     }
 }
