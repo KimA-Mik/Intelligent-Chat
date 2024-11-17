@@ -36,6 +36,10 @@ interface ChatDao {
     @Query("SELECT * FROM $CHATS_TABLE_NAME WHERE card_id = :cardId")
     fun subscribeToCardChats(cardId: Long): Flow<List<SimpleChatWithMessagesDto>>
 
+    @Transaction
+    @Query("SELECT * FROM $CHATS_TABLE_NAME WHERE card_id IN (:cardIds)")
+    fun getChatsForCardIds(cardIds: List<Long>): List<ChatWithMessagesDto>
+
     @Insert
     suspend fun insertMessage(messageEntity: MessageEntity): Long
 
@@ -117,6 +121,11 @@ interface ChatDao {
     suspend fun deleteChat(chatWithMessagesDto: ChatWithMessagesDto) {
         deleteChat(chatWithMessagesDto.chat)
         deleteMessagesDto(chatWithMessagesDto.messages)
+    }
+
+    @Transaction
+    suspend fun deleteChatsTransaction(chats: List<ChatWithMessagesDto>) {
+        chats.forEach { deleteChat(it) }
     }
 
     @Transaction

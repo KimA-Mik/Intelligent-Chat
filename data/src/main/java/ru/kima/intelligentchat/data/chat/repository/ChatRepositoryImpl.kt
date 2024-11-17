@@ -7,6 +7,7 @@ import ru.kima.intelligentchat.data.chat.mappers.toChat
 import ru.kima.intelligentchat.data.chat.mappers.toChatWithMessages
 import ru.kima.intelligentchat.data.chat.mappers.toDto
 import ru.kima.intelligentchat.data.chat.mappers.toEntity
+import ru.kima.intelligentchat.data.chat.mappers.toFullChat
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.domain.chat.ChatNotFoundException
 import ru.kima.intelligentchat.domain.chat.model.Chat
@@ -35,8 +36,16 @@ class ChatRepositoryImpl(
             .map { it.map(SimpleChatWithMessagesDto::toChatWithMessages) }
     }
 
+    override suspend fun getChatsForCardIds(cardIds: List<Long>): List<FullChat> {
+        return chatDao.getChatsForCardIds(cardIds).map { it.toFullChat() }
+    }
+
     override suspend fun deleteChat(chat: FullChat) {
         return chatDao.deleteChat(chat.toDto())
+    }
+
+    override suspend fun deleteChats(chats: List<FullChat>) {
+        chatDao.deleteChatsTransaction(chats.map { it.toDto() })
     }
 
     override suspend fun insertChat(chat: Chat): Long {

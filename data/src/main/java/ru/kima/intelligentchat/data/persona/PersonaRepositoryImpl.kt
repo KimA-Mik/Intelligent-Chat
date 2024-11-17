@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
-import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
+import ru.kima.intelligentchat.data.image.dataSource.InternalImageStorage
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
@@ -14,7 +14,7 @@ import java.io.FileNotFoundException
 
 class PersonaRepositoryImpl(
     wrapper: DatabaseWrapper,
-    private val imageStorage: ImageStorage
+    private val imageStorage: InternalImageStorage
 ) : PersonaRepository {
     private val personaDao = wrapper.database.personaDao()
     override suspend fun insertPersona(persona: Persona): Long {
