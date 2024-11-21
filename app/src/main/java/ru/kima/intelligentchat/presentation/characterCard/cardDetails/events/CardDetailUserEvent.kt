@@ -22,9 +22,6 @@ sealed interface CardDetailUserEvent {
     data class FieldUpdate(val field: CardDetailsViewModel.CardField, val updatedString: String) :
         CardDetailUserEvent
 
-    data object DeleteCardClicked : CardDetailUserEvent
-    data object ConfirmDeleteCard : CardDetailUserEvent
-    data object DismissDeleteCard : CardDetailUserEvent
     data object OpenAltGreetingsSheet : CardDetailUserEvent
     data object CloseAltGreetingsSheet : CardDetailUserEvent
     data object CreateAltGreeting : CardDetailUserEvent

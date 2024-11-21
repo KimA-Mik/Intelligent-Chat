@@ -13,7 +13,8 @@ import ru.kima.intelligentchat.data.card.mappers.toEntity
 import ru.kima.intelligentchat.data.card.mappers.toEntry
 import ru.kima.intelligentchat.data.card.util.getCardPhotoName
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
-import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
+import ru.kima.intelligentchat.data.image.dataSource.DummyImageStorage
+import ru.kima.intelligentchat.data.image.dataSource.InternalImageStorage
 import ru.kima.intelligentchat.data.serialization.CardDeserializer
 import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.model.CardEntry
@@ -24,7 +25,7 @@ import java.io.ByteArrayOutputStream
 class CharacterCardRepositoryImpl(
     wrapper: DatabaseWrapper,
     json: Json,
-    private val imageStorage: ImageStorage
+    private val imageStorage: InternalImageStorage
 ) :
     CharacterCardRepository {
     private val jsonDeserializer = CardDeserializer(json)
@@ -74,20 +75,23 @@ class CharacterCardRepositoryImpl(
         cardDao.updateTransaction(entity)
     }
 
-    override suspend fun deleteCard(card: CharacterCard) {
-        card.photoBytes?.let {
-            val name = getCardPhotoName(card.id)
-            imageStorage.deleteImage(name)
+    override suspend fun deleteCards(cards: List<CharacterCard>) {
+        for (card in cards) {
+            card.photoBytes?.let {
+                val name = getCardPhotoName(card.id)
+                imageStorage.deleteImage(name)
+            }
         }
 
-        val deleted = CharacterEntity(
-            id = card.id,
-            name = card.name,
-            deleted = true
-        )
+        val deleted = cards.map {
+            CharacterEntity(
+                id = it.id,
+                name = it.name,
+                deleted = true
+            )
+        }
 
         cardDao.softDeleteTransaction(deleted)
-//        cardDao.deleteTransaction(entity.character.id)
     }
 
     override suspend fun updateCardAvatar(cardId: Long, bytes: ByteArray) {
@@ -103,6 +107,13 @@ class CharacterCardRepositoryImpl(
         val photoBytes = outputStream.toByteArray()
         imageStorage.saveImage(fileName, photoBytes)
         cardDao.updatePhotoFilePath(cardId, fileName)
+    }
+
+    override suspend fun getMarkedCards(): List<CharacterCard> {
+        val dummyImageStorage = DummyImageStorage()
+        return cardDao.markedCards().map {
+            it.toCharacterCard(dummyImageStorage, emptyList())
+        }
     }
 
     override suspend fun createAlternateGreeting(cardId: Long): Long {

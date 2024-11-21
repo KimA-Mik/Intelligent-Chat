@@ -64,22 +64,19 @@ interface CharacterCardDao {
     fun getCharacterListEntries(): Flow<List<CardListItemEntity>>
 
     @Transaction
-    suspend fun deleteTransaction(id: Long) {
-        deleteCharacterCardById(id)
-        deleteGreetings(id)
-    }
+    @Query("SELECT * FROM $CARDS_TABLE_NAME WHERE deleted = 1")
+    suspend fun markedCards(): List<CardEntity>
 
     @Transaction
-    suspend fun softDeleteTransaction(character: CharacterEntity) {
-        updateCharacterCard(character)
-        deleteGreetings(character.id)
+    suspend fun softDeleteTransaction(cards: List<CharacterEntity>) {
+        cards.forEach {
+            updateCharacterCard(it)
+            deleteGreetingsForCard(it.id)
+        }
     }
 
-    @Query("DELETE FROM $CARDS_TABLE_NAME WHERE id = :id")
-    suspend fun deleteCharacterCardById(id: Long)
-
     @Query("DELETE FROM $ALT_GREETING_TABLE_NAME where cardId=:cardId")
-    suspend fun deleteGreetings(cardId: Long)
+    suspend fun deleteGreetingsForCard(cardId: Long)
 
     @Query("DELETE FROM $ALT_GREETING_TABLE_NAME where id=:id")
     suspend fun deleteGreeting(id: Long)

@@ -32,7 +32,6 @@ data class CardDetailsState(
     }
 
     data class AdditionalSurfaces(
-        val deleteCardDialog: Boolean = false,
         val showAltGreeting: Boolean = false,
         val deleteAltGreetingDialog: Boolean = false,
     )
