@@ -3,15 +3,15 @@ package ru.kima.intelligentchat.presentation.characterCard.charactersList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
@@ -57,8 +57,8 @@ class CharactersListViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CharactersListState())
 
-    private val _uiEvents = MutableSharedFlow<CharactersListUiEvent>()
-    val uiEvents = _uiEvents.asSharedFlow()
+    private val _uiEvents = MutableStateFlow(Event<CharactersListUiEvent>(null))
+    val uiEvents = _uiEvents.asStateFlow()
 
     init {
         // TODO: redo first launch check 
@@ -98,22 +98,22 @@ class CharactersListViewModel(
     }
 
     private fun onEditCardClicked(cardId: Long) = viewModelScope.launch {
-        _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(cardId))
+        _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardEdit(cardId)))
     }
 
     private fun onOpenCardChat(cardId: Long) = viewModelScope.launch {
-        _uiEvents.emit(CharactersListUiEvent.NavigateToCardChat(cardId))
+        _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardChat(cardId)))
     }
 
     private fun addCardFromPng(png: ByteArray) {
         putCardFromImage(png).onEach { resource ->
             when (resource) {
                 is Resource.Error -> {
-                    _uiEvents.emit(CharactersListUiEvent.SnackbarMessage(resource.message!!))
+                    _uiEvents.emit(Event(CharactersListUiEvent.SnackbarMessage(resource.message!!)))
                 }
 
                 is Resource.Success -> {
-                    _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(resource.data!!))
+                    _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardEdit(resource.data!!)))
                 }
             }
         }.launchIn(viewModelScope)
@@ -121,14 +121,14 @@ class CharactersListViewModel(
 
     private fun onAddCardFromImageClicked() {
         viewModelScope.launch {
-            _uiEvents.emit(CharactersListUiEvent.SelectPngImage)
+            _uiEvents.emit(Event(CharactersListUiEvent.SelectPngImage))
         }
     }
 
     private fun createEmptyCardClicked() {
         viewModelScope.launch {
             val cardId = putCard(CharacterCard.default())
-            _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(cardId))
+            _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardEdit(cardId)))
         }
     }
 
@@ -145,15 +145,15 @@ class CharactersListViewModel(
     private fun onShowCardAvatar(cardId: Long) = viewModelScope.launch {
         val card = cards.value.find { it.id == cardId }
         if (card == null) {
-            _uiEvents.emit(CharactersListUiEvent.Message.NoSuchCard)
+            _uiEvents.emit(Event(CharactersListUiEvent.Message.NoSuchCard))
             return@launch
         }
         if (card.thumbnail.bitmap == null) {
-            _uiEvents.emit(CharactersListUiEvent.Message.NoCardPhoto)
+            _uiEvents.emit(Event(CharactersListUiEvent.Message.NoCardPhoto))
             return@launch
         }
 
-        _uiEvents.emit(CharactersListUiEvent.ShowCardImage(cardId))
+        _uiEvents.emit(Event(CharactersListUiEvent.ShowCardImage(cardId)))
     }
 
     private fun onInitDialogValueChanged(newValue: String) {
@@ -168,7 +168,7 @@ class CharactersListViewModel(
     }
 
     private fun onDismissInitialPersonaName() = viewModelScope.launch {
-        _uiEvents.emit(CharactersListUiEvent.Message.DefaultPersonaInit)
+        _uiEvents.emit(Event(CharactersListUiEvent.Message.DefaultPersonaInit))
         onInitDialogResult("User")
     }
 
@@ -184,6 +184,6 @@ class CharactersListViewModel(
     }
 
     private fun onMenuButtonClicked() = viewModelScope.launch {
-        _uiEvents.emit(CharactersListUiEvent.OpenNavigationDrawer)
+        _uiEvents.emit(Event(CharactersListUiEvent.OpenNavigationDrawer))
     }
 }
