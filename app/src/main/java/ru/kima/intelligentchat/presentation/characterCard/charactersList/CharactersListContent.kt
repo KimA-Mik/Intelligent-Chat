@@ -16,6 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.components.CardItem
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
@@ -25,7 +27,7 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
 fun CharactersList(
-    cards: List<ImmutableCardEntry>,
+    cards: ImmutableList<ImmutableCardEntry>,
     modifier: Modifier = Modifier,
     onEvent: (CharactersListUserEvent) -> Unit
 ) {
@@ -85,7 +87,7 @@ fun CharactersListPreview() {
                     characterVersion = "Version $index",
                     creatorNotes = "Notes $index"
                 )
-            }
+            }.toImmutableList()
             CharactersList(
                 cards = cards,
                 onEvent = {}
@@ -112,7 +114,7 @@ fun CharactersListPreviewExpanded() {
                     characterVersion = "Version $index",
                     creatorNotes = "Notes $index"
                 )
-            }
+            }.toImmutableList()
             CharactersList(
                 cards = cards,
                 onEvent = {}
