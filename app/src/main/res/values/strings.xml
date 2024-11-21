@@ -129,5 +129,11 @@
     <!--  Common text  -->
     <string name="alert_dialog_accept">Accept</string>
     <string name="alert_dialog_dismiss">Cancel</string>
+    <string name="action_search">Search</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_search_hint">Search…</string>
+    <string name="action_bar_up_description">Navigate up</string>
+
 
 </resources>
