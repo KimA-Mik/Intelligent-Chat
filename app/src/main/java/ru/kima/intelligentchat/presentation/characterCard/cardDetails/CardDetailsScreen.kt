@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,8 +36,6 @@ import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.Car
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
-import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
-import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,16 +80,6 @@ fun CardDetailsScreen(
     }
 
     when {
-        state.additionalSurfaces.deleteCardDialog -> SimpleAlertDialog(
-            onConfirm = { onEvent(CardDetailUserEvent.ConfirmDeleteCard) },
-            onDismiss = { onEvent(CardDetailUserEvent.DismissDeleteCard) },
-            title = stringResource(R.string.delete_card_dialog_title),
-            text = stringResource(R.string.delete_card_dialog_text),
-            icon = Icons.Filled.DeleteForever,
-            confirmText = stringResource(R.string.delete_button_text),
-            dismissText = stringResource(R.string.cancel_button_text)
-        )
-
         state.additionalSurfaces.deleteAltGreetingDialog -> SimpleAlertDialog(
             onConfirm = { onEvent(CardDetailUserEvent.ConfirmDeleteAltGreeting) },
             onDismiss = { onEvent(CardDetailUserEvent.DismissDeleteAltGreeting) },
@@ -131,9 +118,6 @@ fun CardDetailsScreen(
                         )
                     }
                 },
-                actions = {
-                    SimpleDropdownMenu(menuItems = dropdownMenuItems(onEvent))
-                },
             )
         },
     ) { contentPadding ->
@@ -159,17 +143,4 @@ fun CardDetailsScreen(
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
         )
     }
-}
-
-@Composable
-private fun dropdownMenuItems(
-    onEvent: (CardDetailUserEvent) -> Unit
-) = remember {
-    listOf(
-        SimpleDropDownMenuItem(
-            textId = R.string.delete_card,
-            onClick = { onEvent(CardDetailUserEvent.DeleteCardClicked) },
-            iconVector = Icons.Filled.Delete
-        )
-    )
 }

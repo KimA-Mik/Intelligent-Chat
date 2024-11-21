@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -21,7 +20,6 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.useCase.CreateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteAlternateGreetingUseCase
-import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
@@ -39,7 +37,6 @@ class CardDetailsViewModel(
     private val getCard: GetCardUseCase,
     private val updateCardAvatar: UpdateCardAvatarUseCase,
     private val updateCard: UpdateCardUseCase,
-    private val deleteCard: DeleteCardUseCase,
     private val createAlternateGreeting: CreateAlternateGreetingUseCase,
     private val deleteAltGreeting: DeleteAlternateGreetingUseCase,
     private val updateAlternateGreeting: UpdateAlternateGreetingUseCase,
@@ -56,7 +53,6 @@ class CardDetailsViewModel(
     private val tokensCount = MutableStateFlow(CardDetailsState.TokensCount())
 
     private var cardBeforeTokenization = ImmutableCard()
-    private var deleted = false
 
     val state = combine(
         card,
@@ -96,7 +92,6 @@ class CardDetailsViewModel(
 
             card
                 .debounce(500)
-                .filter { !deleted }
                 .onEach { tokenizeCard(it) }
                 .collect { updateCard(it.toCard()) }
         }
@@ -105,7 +100,6 @@ class CardDetailsViewModel(
     override fun onCleared() {
         super.onCleared()
         MainScope().launch(Dispatchers.IO) {
-            if (deleted) return@launch
             if (card.value.id == 0L) return@launch
 
             updateCard(card.value.toCard())
@@ -117,9 +111,6 @@ class CardDetailsViewModel(
             is CardDetailUserEvent.FieldUpdate -> onFieldUpdate(event.field, event.updatedString)
             CardDetailUserEvent.SelectImageClicked -> onSelectImageClicked()
             is CardDetailUserEvent.UpdateCardImage -> onUpdateCardImage(event.bytes)
-            CardDetailUserEvent.DeleteCardClicked -> onDeleteCardClicked()
-            CardDetailUserEvent.ConfirmDeleteCard -> onDeleteCard()
-            CardDetailUserEvent.DismissDeleteCard -> onDismissDeleteCard()
             CardDetailUserEvent.OpenAltGreetingsSheet -> onOpenAlternateMessages()
             CardDetailUserEvent.CloseAltGreetingsSheet -> onCloseAlternateMessages()
             CardDetailUserEvent.CreateAltGreeting -> onCreateAltGreeting()
@@ -198,29 +189,6 @@ class CardDetailsViewModel(
                     it
                 }
             }
-        }
-    }
-
-    private fun onDeleteCardClicked() {
-        additionalSurfaces.update {
-            it.copy(deleteCardDialog = true)
-        }
-    }
-
-    private fun onDeleteCard() {
-        deleted = true
-        additionalSurfaces.update {
-            it.copy(deleteCardDialog = false)
-        }
-        viewModelScope.launch {
-            _uiEvents.emit(UiEvent.PopBack)
-            deleteCard(state.value.card.toCard())
-        }
-    }
-
-    private fun onDismissDeleteCard() {
-        additionalSurfaces.update {
-            it.copy(deleteCardDialog = false)
         }
     }
 
