@@ -152,7 +152,9 @@ private fun CharactersListScreen(
                     runSnackbar(
                         snackbarHostState = snackbarHostState,
                         message = context.getString(R.string.message_deleted_snackbar_message),
-                        onActionPerformed = {},
+                        onActionPerformed = {
+                            onEvent(CharactersListUserEvent.RestoreCardClicked(event.cardId))
+                        },
                         actionLabel = context.getString(R.string.restore_snackbar_action),
                     )
                 }

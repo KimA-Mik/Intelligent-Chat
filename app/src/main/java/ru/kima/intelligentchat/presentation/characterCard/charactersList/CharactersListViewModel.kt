@@ -20,6 +20,7 @@ import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
+import ru.kima.intelligentchat.domain.card.useCase.RestoreCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
@@ -34,6 +35,7 @@ class CharactersListViewModel(
     preferences: GetPreferencesUseCase,
     private val putCard: PutCardUseCase,
     private val deleteCard: DeleteCardUseCase,
+    private val restoreCard: RestoreCardUseCase,
     private val cardsUseCase: GetCardsListUseCase,
     private val createPersona: CreatePersonaUseCase,
     private val putCardFromImage: AddCardFromPngUseCase,
@@ -113,7 +115,7 @@ class CharactersListViewModel(
     }
 
     private fun onRestoreCardClicked(cardId: Long) = viewModelScope.launch {
-
+        restoreCard(cardId)
     }
 
     private fun onOpenCardChat(cardId: Long) = viewModelScope.launch {
