@@ -19,8 +19,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -31,6 +33,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +45,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -51,11 +56,13 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
+import ru.kima.intelligentchat.presentation.common.components.SearchToolbar
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChat
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardEdit
 import ru.kima.intelligentchat.presentation.navigation.navigateToCardImage
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharactersListScreen(
     navController: NavController,
@@ -71,7 +78,7 @@ fun CharactersListScreen(
         }
     }
 
-    val content = LocalContext.current
+    val context = LocalContext.current
     val state by viewModel.state.collectAsState()
     imagePicker.registerPicker { imageBytes ->
         onEvent(CharactersListUserEvent.AddCardFromImage(imageBytes))
@@ -100,7 +107,7 @@ fun CharactersListScreen(
                     navController.navigateToCardImage(event.cardId)
 
                 is CharactersListUiEvent.Message ->
-                    snackbarHostState.showSnackbar(content.getString(event.messageId))
+                    snackbarHostState.showSnackbar(context.getString(event.messageId))
 
                 CharactersListUiEvent.OpenNavigationDrawer -> scope.launch {
                     drawerState.open()
@@ -126,11 +133,18 @@ fun CharactersListScreen(
     }
 
 
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
-
+    var isExpanded by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
+        topBar = {
+            ChatListAppBar(
+                searchQuery = state.searchText,
+                onChangeSearchQuery = { onEvent(CharactersListUserEvent.SearchQueryChanged(it)) },
+                showNavigationIcon = !expanded,
+                onNavigationIconClick = { onEvent(CharactersListUserEvent.OnMenuButtonClicked) },
+                scrollBehavior = scrollBehavior,
+            )
+        },
         floatingActionButton = {
             ActionButtons(
                 isExpanded,
@@ -145,15 +159,34 @@ fun CharactersListScreen(
                 })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
-        CharactersListContent(
+        CharactersList(
+            cards = state.cards,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            state = state,
-            expanded = expanded,
+                .padding(paddingValues)
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
             onEvent = onEvent
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatListAppBar(
+    searchQuery: String?,
+    onChangeSearchQuery: (String?) -> Unit,
+    showNavigationIcon: Boolean,
+    onNavigationIconClick: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior?
+) {
+    SearchToolbar(
+        searchQuery = searchQuery,
+        onChangeSearchQuery = onChangeSearchQuery,
+        titleContent = { Text(text = stringResource(R.string.nav_item_characters)) },
+        navigateUp = if (showNavigationIcon) onNavigationIconClick else null,
+        navigationIcon = Icons.Default.Menu,
+        scrollBehavior = scrollBehavior,
+    )
 }
 
 @Composable

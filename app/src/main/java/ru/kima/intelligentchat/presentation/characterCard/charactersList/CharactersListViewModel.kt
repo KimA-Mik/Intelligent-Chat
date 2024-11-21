@@ -19,15 +19,12 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
-import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
-import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.toImmutable
-import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 
 class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -37,32 +34,26 @@ class CharactersListViewModel(
     private val putCard: PutCardUseCase,
     private val putCardFromImage: AddCardFromPngUseCase,
     private val createPersona: CreatePersonaUseCase,
-    private val loadPersonaImage: LoadPersonaImageUseCase,
-    selectedPersona: SelectedPersonaUseCase
 ) : ViewModel() {
     private val cards = MutableStateFlow(emptyList<ImmutableCardEntry>())
-    private val query = savedStateHandle.getStateFlow("query", String())
-    private val persona = MutableStateFlow(Persona())
-    private val personaImage = MutableStateFlow(PersonaImageContainer())
+    private val query = savedStateHandle.getStateFlow<String?>("query", null)
     private val initialDialog = savedStateHandle.getStateFlow("initialDialog", false)
     private val initialDialogText = savedStateHandle.getStateFlow("initialDialogText", String())
 
     val state = combine(
         cards,
         query,
-        persona,
-        personaImage,
         initialDialog,
         initialDialogText
-    ) { args ->
-        @Suppress("UNCHECKED_CAST")
+    ) { cards,
+        query,
+        initialDialog,
+        initialDialogText ->
         CharactersListState(
-            cards = args[0] as List<ImmutableCardEntry>,
-            searchText = args[1] as String,
-            persona = args[2] as Persona,
-            personaImage = args[3] as PersonaImageContainer,
-            initialDialog = args[4] as Boolean,
-            initialDialogText = args[5] as String
+            cards = cards,
+            searchText = query,
+            initialDialog = initialDialog,
+            initialDialogText = initialDialogText,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CharactersListState())
 
@@ -75,16 +66,14 @@ class CharactersListViewModel(
             onLoadPersona(it.selectedPersonaId)
         }.launchIn(viewModelScope)
 
-        selectedPersona(viewModelScope)
-            .onEach { persona.value = it }
-            .onEach { personaImage.value = PersonaImageContainer(loadPersonaImage(it.id).bitmap) }
-            .launchIn(viewModelScope)
-
         loadCards()
     }
 
     private fun loadCards() = viewModelScope.launch {
-        cardsUseCase.filter(query.value)
+        query.value?.let {
+            cardsUseCase.filter(it)
+        }
+
         cardsUseCase().collect { result ->
             cards.value = result.map {
                 it.toImmutable()
@@ -143,9 +132,14 @@ class CharactersListViewModel(
         }
     }
 
-    private fun onSearchQueryChanger(query: String) {
+    private fun onSearchQueryChanger(query: String?) {
         savedStateHandle["query"] = query
-        cardsUseCase.filter(query)
+        if (query == null) {
+            cardsUseCase.filter("")
+        } else {
+            cardsUseCase.filter(query)
+
+        }
     }
 
     private fun onShowCardAvatar(cardId: Long) = viewModelScope.launch {
@@ -169,10 +163,6 @@ class CharactersListViewModel(
     private fun onLoadPersona(personaId: Long) {
         if (personaId == 0L) {
             savedStateHandle["initialDialog"] = true
-            return
-        }
-
-        if (personaId == persona.value.id) {
             return
         }
     }

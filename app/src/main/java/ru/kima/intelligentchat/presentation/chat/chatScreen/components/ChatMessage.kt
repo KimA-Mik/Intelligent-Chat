@@ -47,11 +47,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.common.conditional
 import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
+import ru.kima.intelligentchat.presentation.common.components.conditional
 import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
 import ru.kima.intelligentchat.presentation.common.markdown.MarkdownText
