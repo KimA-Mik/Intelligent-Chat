@@ -3,11 +3,13 @@ package ru.kima.intelligentchat.presentation.characterCard.charactersList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -41,7 +43,7 @@ class CharactersListViewModel(
     private val initialDialogText = savedStateHandle.getStateFlow("initialDialogText", String())
 
     val state = combine(
-        cards,
+        cards.map { it.toImmutableList() },
         query,
         initialDialog,
         initialDialogText

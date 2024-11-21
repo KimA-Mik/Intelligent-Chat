@@ -59,6 +59,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -353,7 +354,7 @@ fun CharactersScreenPreview() {
                     characterVersion = "Version $index",
                     creatorNotes = "Notes $index"
                 )
-            }
+            }.toImmutableList()
             CharactersListScreen(
                 state = CharactersListState(cards),
                 onEvent = { },
@@ -387,7 +388,7 @@ fun CharactersScreenPreviewExpanded() {
                     characterVersion = "Version $index",
                     creatorNotes = "Notes $index"
                 )
-            }
+            }.toImmutableList()
             CharactersListScreen(
                 state = CharactersListState(cards),
                 onEvent = { },
