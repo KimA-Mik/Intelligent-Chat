@@ -26,6 +26,7 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
+import ru.kima.intelligentchat.domain.card.useCase.RestoreCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardAvatarUseCase
 import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
@@ -126,6 +127,7 @@ fun domain() = module {
     factoryOf(::GetCardsListUseCase)
     singleOf(::GetCardUseCase)
     singleOf(::PutCardUseCase)
+    singleOf(::RestoreCardUseCase)
     singleOf(::UpdateCardAvatarUseCase)
     singleOf(::AddCardFromPngUseCase)
     singleOf(::UpdateCardUseCase)

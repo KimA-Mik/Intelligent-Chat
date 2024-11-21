@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.characterCard.charactersList
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -19,8 +20,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -29,11 +33,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,46 +48,81 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
+import ru.kima.intelligentchat.presentation.common.components.SearchToolbar
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
+import ru.kima.intelligentchat.presentation.common.util.runSnackbar
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChat
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardEdit
 import ru.kima.intelligentchat.presentation.navigation.navigateToCardImage
+import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
-fun CharactersListScreen(
-    navController: NavController,
+fun CharactersListScreenRoot(
+    expanded: Boolean,
+    navController: NavHostController,
     snackbarHostState: SnackbarHostState,
-    drawerState: DrawerState,
-    imagePicker: ImagePicker,
-    viewModel: CharactersListViewModel,
-    expanded: Boolean
+    drawerState: DrawerState
 ) {
+    val viewModel: CharactersListViewModel = koinViewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiEvent by viewModel.uiEvents.collectAsStateWithLifecycle()
     val onEvent = remember<(CharactersListUserEvent) -> Unit> {
         {
             viewModel.onUserEvent(it)
         }
     }
+    CharactersListScreen(
+        state = state,
+        onEvent = onEvent,
+        uiEvent = uiEvent,
+        navController = navController,
+        snackbarHostState = snackbarHostState,
+        drawerState = drawerState,
+        imagePicker = koinInject(),
+        expanded = expanded
+    )
+}
 
-    val content = LocalContext.current
-    val state by viewModel.state.collectAsState()
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CharactersListScreen(
+    state: CharactersListState,
+    onEvent: (CharactersListUserEvent) -> Unit,
+    uiEvent: Event<CharactersListUiEvent>,
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
+    drawerState: DrawerState,
+    imagePicker: ImagePicker,
+    expanded: Boolean
+) {
+    val context = LocalContext.current
     imagePicker.registerPicker { imageBytes ->
         onEvent(CharactersListUserEvent.AddCardFromImage(imageBytes))
     }
 
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(true) {
-        viewModel.uiEvents.collect { event ->
+    LaunchedEffect(uiEvent) {
+        uiEvent.consume { event ->
             when (event) {
                 is CharactersListUiEvent.NavigateToCardEdit ->
                     navController.navigateToCardEdit(event.cardId)
@@ -88,10 +130,9 @@ fun CharactersListScreen(
                 is CharactersListUiEvent.NavigateToCardChat ->
                     navController.navigateToCardChat(event.cardId)
 
-                is CharactersListUiEvent.SnackbarMessage ->
-                    scope.launch {
-                        snackbarHostState.showSnackbar(event.message)
-                    }
+                is CharactersListUiEvent.SnackbarMessage -> scope.launch {
+                    snackbarHostState.showSnackbar(event.message)
+                }
 
                 CharactersListUiEvent.SelectPngImage ->
                     imagePicker.pickImage("image/png")
@@ -99,13 +140,24 @@ fun CharactersListScreen(
                 is CharactersListUiEvent.ShowCardImage ->
                     navController.navigateToCardImage(event.cardId)
 
-                is CharactersListUiEvent.Message ->
-                    snackbarHostState.showSnackbar(content.getString(event.messageId))
+                is CharactersListUiEvent.Message -> scope.launch {
+                    snackbarHostState.showSnackbar(context.getString(event.messageId))
+                }
 
                 CharactersListUiEvent.OpenNavigationDrawer -> scope.launch {
                     drawerState.open()
                 }
 
+                is CharactersListUiEvent.CardDeleted -> scope.launch {
+                    runSnackbar(
+                        snackbarHostState = snackbarHostState,
+                        message = context.getString(R.string.message_deleted_snackbar_message),
+                        onActionPerformed = {
+                            onEvent(CharactersListUserEvent.RestoreCardClicked(event.cardId))
+                        },
+                        actionLabel = context.getString(R.string.restore_snackbar_action),
+                    )
+                }
             }
         }
     }
@@ -125,12 +177,18 @@ fun CharactersListScreen(
         )
     }
 
-
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
-
+    var isExpanded by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
+        topBar = {
+            ChatListAppBar(
+                searchQuery = state.searchText,
+                onChangeSearchQuery = { onEvent(CharactersListUserEvent.SearchQueryChanged(it)) },
+                showNavigationIcon = !expanded,
+                onNavigationIconClick = { onEvent(CharactersListUserEvent.OnMenuButtonClicked) },
+                scrollBehavior = scrollBehavior,
+            )
+        },
         floatingActionButton = {
             ActionButtons(
                 isExpanded,
@@ -145,15 +203,34 @@ fun CharactersListScreen(
                 })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
-        CharactersListContent(
+        CharactersList(
+            cards = state.cards,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            state = state,
-            expanded = expanded,
+                .padding(paddingValues)
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
             onEvent = onEvent
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatListAppBar(
+    searchQuery: String?,
+    onChangeSearchQuery: (String?) -> Unit,
+    showNavigationIcon: Boolean,
+    onNavigationIconClick: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior?
+) {
+    SearchToolbar(
+        searchQuery = searchQuery,
+        onChangeSearchQuery = onChangeSearchQuery,
+        titleContent = { Text(text = stringResource(R.string.nav_item_characters)) },
+        navigateUp = if (showNavigationIcon) onNavigationIconClick else null,
+        navigationIcon = Icons.Default.Menu,
+        scrollBehavior = scrollBehavior,
+    )
 }
 
 @Composable
@@ -265,6 +342,74 @@ fun InitPersonaDialog(
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview(name = "Characters Screen Preview light theme")
+@Preview(
+    name = "Characters Screen Preview dark theme",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun CharactersScreenPreview() {
+    IntelligentChatTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val cards = List(100) { index ->
+                ImmutableCardEntry(
+                    id = index.toLong(),
+                    name = "Name $index",
+                    characterVersion = "Version $index",
+                    creatorNotes = "Notes $index"
+                )
+            }.toImmutableList()
+            CharactersListScreen(
+                state = CharactersListState(cards),
+                onEvent = { },
+                uiEvent = Event(null),
+                navController = rememberNavController(),
+                snackbarHostState = SnackbarHostState(),
+                drawerState = rememberDrawerState(DrawerValue.Closed),
+                imagePicker = ImagePicker(LocalContext.current),
+                expanded = false
+            )
+
+        }
+    }
+}
+
+@Preview(
+    name = "Characters Screen Preview expanded",
+    widthDp = 600
+)
+@Composable
+fun CharactersScreenPreviewExpanded() {
+    IntelligentChatTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val cards = List(100) { index ->
+                ImmutableCardEntry(
+                    id = index.toLong(),
+                    name = "Name $index",
+                    characterVersion = "Version $index",
+                    creatorNotes = "Notes $index"
+                )
+            }.toImmutableList()
+            CharactersListScreen(
+                state = CharactersListState(cards),
+                onEvent = { },
+                uiEvent = Event(null),
+                navController = rememberNavController(),
+                snackbarHostState = SnackbarHostState(),
+                drawerState = rememberDrawerState(DrawerValue.Closed),
+                imagePicker = ImagePicker(LocalContext.current),
+                expanded = true
+            )
         }
     }
 }

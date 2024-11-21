@@ -3,71 +3,68 @@ package ru.kima.intelligentchat.presentation.characterCard.charactersList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
+import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
+import ru.kima.intelligentchat.domain.card.useCase.RestoreCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.CreatePersonaUseCase
-import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
-import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUiEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.toImmutable
-import ru.kima.intelligentchat.presentation.personas.common.PersonaImageContainer
 
 class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle,
     preferences: GetPreferencesUseCase,
-    private val setSelectedPersonaId: SetSelectedPersonaIdUseCase,
-    private val cardsUseCase: GetCardsListUseCase,
     private val putCard: PutCardUseCase,
-    private val putCardFromImage: AddCardFromPngUseCase,
+    private val deleteCard: DeleteCardUseCase,
+    private val restoreCard: RestoreCardUseCase,
+    private val cardsUseCase: GetCardsListUseCase,
     private val createPersona: CreatePersonaUseCase,
-    private val loadPersonaImage: LoadPersonaImageUseCase,
-    selectedPersona: SelectedPersonaUseCase
+    private val putCardFromImage: AddCardFromPngUseCase,
+    private val setSelectedPersonaId: SetSelectedPersonaIdUseCase,
 ) : ViewModel() {
     private val cards = MutableStateFlow(emptyList<ImmutableCardEntry>())
-    private val query = savedStateHandle.getStateFlow("query", String())
-    private val persona = MutableStateFlow(Persona())
-    private val personaImage = MutableStateFlow(PersonaImageContainer())
-    private val initialDialog = savedStateHandle.getStateFlow("initialDialog", false)
-    private val initialDialogText = savedStateHandle.getStateFlow("initialDialogText", String())
+    private val query = savedStateHandle.getStateFlow<String?>(QUERY_KEY, null)
+    private val initialDialog = savedStateHandle.getStateFlow(INITIAL_DIALOG_KEY, false)
+    private val initialDialogText = savedStateHandle.getStateFlow(INITIAL_DIALOG_TEXT_KEY, String())
 
     val state = combine(
-        cards,
+        cards.map { it.toImmutableList() },
         query,
-        persona,
-        personaImage,
         initialDialog,
         initialDialogText
-    ) { args ->
-        @Suppress("UNCHECKED_CAST")
+    ) { cards,
+        query,
+        initialDialog,
+        initialDialogText ->
         CharactersListState(
-            cards = args[0] as List<ImmutableCardEntry>,
-            searchText = args[1] as String,
-            persona = args[2] as Persona,
-            personaImage = args[3] as PersonaImageContainer,
-            initialDialog = args[4] as Boolean,
-            initialDialogText = args[5] as String
+            cards = cards,
+            searchText = query,
+            initialDialog = initialDialog,
+            initialDialogText = initialDialogText,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CharactersListState())
 
-    private val _uiEvents = MutableSharedFlow<CharactersListUiEvent>()
-    val uiEvents = _uiEvents.asSharedFlow()
+    private val _uiEvents = MutableStateFlow(Event<CharactersListUiEvent>(null))
+    val uiEvents = _uiEvents.asStateFlow()
 
     init {
         // TODO: redo first launch check 
@@ -75,16 +72,14 @@ class CharactersListViewModel(
             onLoadPersona(it.selectedPersonaId)
         }.launchIn(viewModelScope)
 
-        selectedPersona(viewModelScope)
-            .onEach { persona.value = it }
-            .onEach { personaImage.value = PersonaImageContainer(loadPersonaImage(it.id).bitmap) }
-            .launchIn(viewModelScope)
-
         loadCards()
     }
 
     private fun loadCards() = viewModelScope.launch {
-        cardsUseCase.filter(query.value)
+        query.value?.let {
+            cardsUseCase.filter(it)
+        }
+
         cardsUseCase().collect { result ->
             cards.value = result.map {
                 it.toImmutable()
@@ -95,6 +90,8 @@ class CharactersListViewModel(
     fun onUserEvent(event: CharactersListUserEvent) {
         when (event) {
             is CharactersListUserEvent.EditCardClicked -> onEditCardClicked(event.cardId)
+            is CharactersListUserEvent.DeleteCardClicked -> onDeleteCardClicked(event.cardId)
+            is CharactersListUserEvent.RestoreCardClicked -> onRestoreCardClicked(event.cardId)
             is CharactersListUserEvent.OpenCardChat -> onOpenCardChat(event.cardId)
             is CharactersListUserEvent.AddCardFromImage -> addCardFromPng(event.imageBytes)
             CharactersListUserEvent.AddCardFromImageClicked -> onAddCardFromImageClicked()
@@ -109,22 +106,31 @@ class CharactersListViewModel(
     }
 
     private fun onEditCardClicked(cardId: Long) = viewModelScope.launch {
-        _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(cardId))
+        _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardEdit(cardId)))
+    }
+
+    private fun onDeleteCardClicked(cardId: Long) = viewModelScope.launch {
+        deleteCard(cardId)
+        _uiEvents.value = Event(CharactersListUiEvent.CardDeleted(cardId))
+    }
+
+    private fun onRestoreCardClicked(cardId: Long) = viewModelScope.launch {
+        restoreCard(cardId)
     }
 
     private fun onOpenCardChat(cardId: Long) = viewModelScope.launch {
-        _uiEvents.emit(CharactersListUiEvent.NavigateToCardChat(cardId))
+        _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardChat(cardId)))
     }
 
     private fun addCardFromPng(png: ByteArray) {
         putCardFromImage(png).onEach { resource ->
             when (resource) {
                 is Resource.Error -> {
-                    _uiEvents.emit(CharactersListUiEvent.SnackbarMessage(resource.message!!))
+                    _uiEvents.emit(Event(CharactersListUiEvent.SnackbarMessage(resource.message!!)))
                 }
 
                 is Resource.Success -> {
-                    _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(resource.data!!))
+                    _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardEdit(resource.data!!)))
                 }
             }
         }.launchIn(viewModelScope)
@@ -132,53 +138,54 @@ class CharactersListViewModel(
 
     private fun onAddCardFromImageClicked() {
         viewModelScope.launch {
-            _uiEvents.emit(CharactersListUiEvent.SelectPngImage)
+            _uiEvents.emit(Event(CharactersListUiEvent.SelectPngImage))
         }
     }
 
     private fun createEmptyCardClicked() {
         viewModelScope.launch {
             val cardId = putCard(CharacterCard.default())
-            _uiEvents.emit(CharactersListUiEvent.NavigateToCardEdit(cardId))
+            _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardEdit(cardId)))
         }
     }
 
-    private fun onSearchQueryChanger(query: String) {
-        savedStateHandle["query"] = query
-        cardsUseCase.filter(query)
+    private fun onSearchQueryChanger(query: String?) {
+        savedStateHandle[QUERY_KEY] = query
+        if (query == null) {
+            cardsUseCase.filter("")
+        } else {
+            cardsUseCase.filter(query)
+
+        }
     }
 
     private fun onShowCardAvatar(cardId: Long) = viewModelScope.launch {
         val card = cards.value.find { it.id == cardId }
         if (card == null) {
-            _uiEvents.emit(CharactersListUiEvent.Message.NoSuchCard)
+            _uiEvents.emit(Event(CharactersListUiEvent.Message.NoSuchCard))
             return@launch
         }
         if (card.thumbnail.bitmap == null) {
-            _uiEvents.emit(CharactersListUiEvent.Message.NoCardPhoto)
+            _uiEvents.emit(Event(CharactersListUiEvent.Message.NoCardPhoto))
             return@launch
         }
 
-        _uiEvents.emit(CharactersListUiEvent.ShowCardImage(cardId))
+        _uiEvents.emit(Event(CharactersListUiEvent.ShowCardImage(cardId)))
     }
 
     private fun onInitDialogValueChanged(newValue: String) {
-        savedStateHandle["initialDialogText"] = newValue
+        savedStateHandle[INITIAL_DIALOG_TEXT_KEY] = newValue
     }
 
     private fun onLoadPersona(personaId: Long) {
         if (personaId == 0L) {
-            savedStateHandle["initialDialog"] = true
-            return
-        }
-
-        if (personaId == persona.value.id) {
+            savedStateHandle[INITIAL_DIALOG_KEY] = true
             return
         }
     }
 
     private fun onDismissInitialPersonaName() = viewModelScope.launch {
-        _uiEvents.emit(CharactersListUiEvent.Message.DefaultPersonaInit)
+        _uiEvents.emit(Event(CharactersListUiEvent.Message.DefaultPersonaInit))
         onInitDialogResult("User")
     }
 
@@ -187,13 +194,19 @@ class CharactersListViewModel(
     }
 
     private suspend fun onInitDialogResult(personaName: String) {
-        savedStateHandle["initialDialog"] = false
+        savedStateHandle[INITIAL_DIALOG_KEY] = false
         val persona = Persona(name = personaName)
         val id = createPersona(persona)
         setSelectedPersonaId(id)
     }
 
     private fun onMenuButtonClicked() = viewModelScope.launch {
-        _uiEvents.emit(CharactersListUiEvent.OpenNavigationDrawer)
+        _uiEvents.emit(Event(CharactersListUiEvent.OpenNavigationDrawer))
+    }
+
+    companion object {
+        private const val QUERY_KEY = "query"
+        private const val INITIAL_DIALOG_KEY = "initialDialog"
+        private const val INITIAL_DIALOG_TEXT_KEY = "initialDialogText"
     }
 }

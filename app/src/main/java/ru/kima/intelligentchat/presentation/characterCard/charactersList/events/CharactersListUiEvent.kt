@@ -16,4 +16,5 @@ sealed interface CharactersListUiEvent {
     }
 
     data object OpenNavigationDrawer : CharactersListUiEvent
+    data class CardDeleted(val cardId: Long) : CharactersListUiEvent
 }

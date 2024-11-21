@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.koin.androidx.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.collections.immutable)
 
     testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)
