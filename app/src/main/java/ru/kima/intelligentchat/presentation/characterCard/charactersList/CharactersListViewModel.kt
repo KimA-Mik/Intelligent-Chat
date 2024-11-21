@@ -17,6 +17,7 @@ import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
+import ru.kima.intelligentchat.domain.card.useCase.DeleteCardUseCase
 import ru.kima.intelligentchat.domain.card.useCase.GetCardsListUseCase
 import ru.kima.intelligentchat.domain.card.useCase.PutCardUseCase
 import ru.kima.intelligentchat.domain.persona.model.Persona
@@ -31,11 +32,12 @@ import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.t
 class CharactersListViewModel(
     private val savedStateHandle: SavedStateHandle,
     preferences: GetPreferencesUseCase,
-    private val setSelectedPersonaId: SetSelectedPersonaIdUseCase,
-    private val cardsUseCase: GetCardsListUseCase,
     private val putCard: PutCardUseCase,
-    private val putCardFromImage: AddCardFromPngUseCase,
+    private val deleteCard: DeleteCardUseCase,
+    private val cardsUseCase: GetCardsListUseCase,
     private val createPersona: CreatePersonaUseCase,
+    private val putCardFromImage: AddCardFromPngUseCase,
+    private val setSelectedPersonaId: SetSelectedPersonaIdUseCase,
 ) : ViewModel() {
     private val cards = MutableStateFlow(emptyList<ImmutableCardEntry>())
     private val query = savedStateHandle.getStateFlow<String?>("query", null)
@@ -86,6 +88,8 @@ class CharactersListViewModel(
     fun onUserEvent(event: CharactersListUserEvent) {
         when (event) {
             is CharactersListUserEvent.EditCardClicked -> onEditCardClicked(event.cardId)
+            is CharactersListUserEvent.DeleteCardClicked -> onDeleteCardClicked(event.cardId)
+            is CharactersListUserEvent.RestoreCardClicked -> onRestoreCardClicked(event.cardId)
             is CharactersListUserEvent.OpenCardChat -> onOpenCardChat(event.cardId)
             is CharactersListUserEvent.AddCardFromImage -> addCardFromPng(event.imageBytes)
             CharactersListUserEvent.AddCardFromImageClicked -> onAddCardFromImageClicked()
@@ -101,6 +105,15 @@ class CharactersListViewModel(
 
     private fun onEditCardClicked(cardId: Long) = viewModelScope.launch {
         _uiEvents.emit(Event(CharactersListUiEvent.NavigateToCardEdit(cardId)))
+    }
+
+    private fun onDeleteCardClicked(cardId: Long) = viewModelScope.launch {
+        deleteCard(cardId)
+        _uiEvents.value = Event(CharactersListUiEvent.CardDeleted(cardId))
+    }
+
+    private fun onRestoreCardClicked(cardId: Long) = viewModelScope.launch {
+
     }
 
     private fun onOpenCardChat(cardId: Long) = viewModelScope.launch {

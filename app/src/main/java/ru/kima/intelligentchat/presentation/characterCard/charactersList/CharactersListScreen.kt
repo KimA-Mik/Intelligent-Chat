@@ -70,6 +70,7 @@ import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
 import ru.kima.intelligentchat.presentation.common.components.SearchToolbar
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
+import ru.kima.intelligentchat.presentation.common.util.runSnackbar
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChat
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardEdit
 import ru.kima.intelligentchat.presentation.navigation.navigateToCardImage
@@ -147,6 +148,14 @@ private fun CharactersListScreen(
                     drawerState.open()
                 }
 
+                is CharactersListUiEvent.CardDeleted -> scope.launch {
+                    runSnackbar(
+                        snackbarHostState = snackbarHostState,
+                        message = context.getString(R.string.message_deleted_snackbar_message),
+                        onActionPerformed = {},
+                        actionLabel = context.getString(R.string.restore_snackbar_action),
+                    )
+                }
             }
         }
     }

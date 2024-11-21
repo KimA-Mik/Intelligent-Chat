@@ -4,11 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.components.CardItem
@@ -38,8 +39,6 @@ fun CharactersList(
     ) {
         items(cards, key = { item -> item.id }) { card ->
             //TODO: decode image from bytes cause lags
-            Modifier
-                .padding(horizontal = 8.dp)
             CardItem(
                 card = card,
                 modifier = Modifier.animateItem(),
@@ -59,11 +58,16 @@ private fun itemDropDownMenuItems(
     id: Long,
     onEvent: (CharactersListUserEvent) -> Unit
 ) = remember {
-    listOf(
+    persistentListOf(
         SimpleDropDownMenuItem(
             textId = R.string.menu_item_edit_card,
             onClick = { onEvent(CharactersListUserEvent.EditCardClicked(id)) },
             iconVector = Icons.Default.Create
+        ),
+        SimpleDropDownMenuItem(
+            textId = R.string.menu_item_delete_card,
+            onClick = { onEvent(CharactersListUserEvent.DeleteCardClicked(id)) },
+            iconVector = Icons.Default.Delete
         )
     )
 }
