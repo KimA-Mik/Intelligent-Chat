@@ -42,9 +42,9 @@ class CharactersListViewModel(
     private val setSelectedPersonaId: SetSelectedPersonaIdUseCase,
 ) : ViewModel() {
     private val cards = MutableStateFlow(emptyList<ImmutableCardEntry>())
-    private val query = savedStateHandle.getStateFlow<String?>("query", null)
-    private val initialDialog = savedStateHandle.getStateFlow("initialDialog", false)
-    private val initialDialogText = savedStateHandle.getStateFlow("initialDialogText", String())
+    private val query = savedStateHandle.getStateFlow<String?>(QUERY_KEY, null)
+    private val initialDialog = savedStateHandle.getStateFlow(INITIAL_DIALOG_KEY, false)
+    private val initialDialogText = savedStateHandle.getStateFlow(INITIAL_DIALOG_TEXT_KEY, String())
 
     val state = combine(
         cards.map { it.toImmutableList() },
@@ -150,7 +150,7 @@ class CharactersListViewModel(
     }
 
     private fun onSearchQueryChanger(query: String?) {
-        savedStateHandle["query"] = query
+        savedStateHandle[QUERY_KEY] = query
         if (query == null) {
             cardsUseCase.filter("")
         } else {
@@ -174,12 +174,12 @@ class CharactersListViewModel(
     }
 
     private fun onInitDialogValueChanged(newValue: String) {
-        savedStateHandle["initialDialogText"] = newValue
+        savedStateHandle[INITIAL_DIALOG_TEXT_KEY] = newValue
     }
 
     private fun onLoadPersona(personaId: Long) {
         if (personaId == 0L) {
-            savedStateHandle["initialDialog"] = true
+            savedStateHandle[INITIAL_DIALOG_KEY] = true
             return
         }
     }
@@ -194,7 +194,7 @@ class CharactersListViewModel(
     }
 
     private suspend fun onInitDialogResult(personaName: String) {
-        savedStateHandle["initialDialog"] = false
+        savedStateHandle[INITIAL_DIALOG_KEY] = false
         val persona = Persona(name = personaName)
         val id = createPersona(persona)
         setSelectedPersonaId(id)
@@ -202,5 +202,11 @@ class CharactersListViewModel(
 
     private fun onMenuButtonClicked() = viewModelScope.launch {
         _uiEvents.emit(Event(CharactersListUiEvent.OpenNavigationDrawer))
+    }
+
+    companion object {
+        private const val QUERY_KEY = "query"
+        private const val INITIAL_DIALOG_KEY = "initialDialog"
+        private const val INITIAL_DIALOG_TEXT_KEY = "initialDialogText"
     }
 }
