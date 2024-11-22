@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -36,19 +35,18 @@ fun Modifier.runOnEnterKeyPressed(action: () -> Unit): Modifier = onPreviewKeyEv
     }
 }
 
+@Composable
 fun Modifier.showSoftKeyboard(show: Boolean): Modifier = if (show) {
-    composed {
-        val focusRequester = remember { FocusRequester() }
-        var openKeyboard by rememberSaveable { mutableStateOf(show) }
-        LaunchedEffect(focusRequester) {
-            if (openKeyboard) {
-                focusRequester.requestFocus()
-                openKeyboard = false
-            }
+    val focusRequester = remember { FocusRequester() }
+    var openKeyboard by rememberSaveable { mutableStateOf(show) }
+    LaunchedEffect(focusRequester) {
+        if (openKeyboard) {
+            focusRequester.requestFocus()
+            openKeyboard = false
         }
-
-        focusRequester(focusRequester)
     }
+
+    focusRequester(focusRequester)
 } else {
     this
 }
@@ -57,7 +55,7 @@ fun Modifier.showSoftKeyboard(show: Boolean): Modifier = if (show) {
 @Composable
 fun Modifier.clearFocusOnSoftKeyboardHide(
     onFocusCleared: (() -> Unit)? = null
-): Modifier = composed {
+): Modifier {
     var isFocused by remember { mutableStateOf(false) }
     var keyboardShowedSinceFocused by remember { mutableStateOf(false) }
     if (isFocused) {
@@ -73,7 +71,7 @@ fun Modifier.clearFocusOnSoftKeyboardHide(
         }
     }
 
-    onFocusChanged {
+    return onFocusChanged {
         if (isFocused != it.isFocused) {
             if (isFocused) {
                 keyboardShowedSinceFocused = false

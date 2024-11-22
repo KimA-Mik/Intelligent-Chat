@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -20,7 +22,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,8 +41,9 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.CardDetailsDefaults
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
-import ru.kima.intelligentchat.presentation.common.components.AppBar
+import ru.kima.intelligentchat.presentation.common.components.UpIcon
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -114,56 +117,92 @@ fun CardDetailsScreen(
             confirmText = stringResource(R.string.delete_button_text),
             dismissText = stringResource(R.string.cancel_button_text)
         )
+
+        state.additionalSurfaces.showAltGreeting -> ModalBottomSheet(
+            onDismissRequest = { onEvent(CardDetailUserEvent.CloseAltGreetingsSheet) },
+            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+        ) {
+            AltGreetingsSheetContent(
+                greetings = state.card.alternateGreetings,
+                editableGreeting = state.additionalSurfaces.editableGreeting,
+                editableGreetingBuffer = state.additionalSurfaces.editableGreetingBuffer,
+                onEvent = onEvent
+            )
+        }
+
     }
 
     val scrollBehavior =
-        TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+        TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val sb = remember { scrollBehavior }
     Scaffold(
         modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .imePadding(),
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
         topBar = {
-            AppBar(
-                titleContent = {
-                    Text(
-                        text = state.card.name,
-                        style = MaterialTheme.typography.headlineSmall,
-                        maxLines = 2
-                    )
-                },
-                scrollBehavior = scrollBehavior,
-                navigateUp = { navController.popBackStack() }
+            CardDetailsAppBar(
+                name = state.card.name,
+                cardTokens = state.tokensCount.totalTokens,
+                nameTokensCount = state.tokensCount.name,
+                photoName = state.card.photoName,
+                sb, onEvent
             )
         },
     ) { contentPadding ->
-        if (state.additionalSurfaces.showAltGreeting) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    onEvent(CardDetailUserEvent.CloseAltGreetingsSheet)
-                },
-                modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
-            ) {
-                AltGreetingsSheetContent(
-                    greetings = state.card.alternateGreetings,
-                    editableGreeting = state.editableGreeting,
-                    editableGreetingBuffer = state.editableGreetingBuffer,
-                    onEvent = onEvent
-                )
-            }
-        }
-
         CardDetailContent(
             state,
             onEvent = onEvent,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(sb.nestedScrollConnection)
         )
     }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun CardDetailsAppBar(
+    name: String,
+    cardTokens: Int,
+    nameTokensCount: Int,
+    photoName: String?,
+    scrollBehavior: TopAppBarScrollBehavior,
+    onEvent: (CardDetailUserEvent) -> Unit
+) {
+    LargeTopAppBar(
+        title = {
+            if (scrollBehavior.state.collapsedFraction < 0.5f) {
+                HeadArea(
+                    name = name,
+                    cardTokens = cardTokens,
+                    nameTokensCount = nameTokensCount,
+                    photoName = photoName,
+                    onEvent = onEvent
+                )
+            } else {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.headlineSmall,
+                    maxLines = 2
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = { onEvent(CardDetailUserEvent.NavigateUp) }
+            ) {
+                UpIcon()
+            }
+        },
+        expandedHeight = TopAppBarDefaults.LargeAppBarCollapsedHeight + CardDetailsDefaults.topBarPadding + CardDetailsDefaults.imageSize,
+        colors = TopAppBarDefaults.largeTopAppBarColors().copy(
+            scrolledContainerColor = TopAppBarDefaults.largeTopAppBarColors().containerColor
+        ),
+        scrollBehavior = scrollBehavior
+    )
 }
 
 @Preview(name = "Card details screen light mode")

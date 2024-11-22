@@ -43,30 +43,39 @@ class CardDetailsViewModel(
     private val tokenizeText: TokenizeTextUseCase
 ) : ViewModel() {
     private val cardId = savedStateHandle.getStateFlow(CardField.Id.string, 0L)
+    private val card = MutableStateFlow(ImmutableCard())
 
     private val editableGreeting = savedStateHandle.getStateFlow(EDITABLE_GREETING, 0L)
     private val editableGreetingBuffer =
         savedStateHandle.getStateFlow(EDITABLE_GREETING_BUFFER, String())
+    private val additionalSurfaces = combine(
+        savedStateHandle.getStateFlow(SHOW_ALT_GREETING, false),
+        savedStateHandle.getStateFlow(DELETE_ALT_GREETING_DIALOG, false),
+        editableGreeting,
+        editableGreetingBuffer
+    ) { showAltGreeting, deleteAltGreetingDialog, editableGreeting, editableGreetingBuffer ->
+        CardDetailsState.AdditionalSurfaces(
+            showAltGreeting = showAltGreeting,
+            deleteAltGreetingDialog = deleteAltGreetingDialog,
+            editableGreeting = editableGreeting,
+            editableGreetingBuffer = editableGreetingBuffer,
+        )
+    }
 
-    private val card = MutableStateFlow(ImmutableCard())
-    private val additionalSurfaces = MutableStateFlow(CardDetailsState.AdditionalSurfaces())
     private val tokensCount = MutableStateFlow(CardDetailsState.TokensCount())
-
     private var cardBeforeTokenization = ImmutableCard()
 
     val state = combine(
         card,
         additionalSurfaces,
-        editableGreeting,
-        editableGreetingBuffer,
-        tokensCount
-    ) { card, dialogs, editableGreeting, editableGreetingBuffer, tokensCount ->
+        tokensCount,
+        savedStateHandle.getStateFlow(SELECTED_TAB_INDEX, 0)
+    ) { card, dialogs, tokensCount, selectedTabIndex ->
         CardDetailsState(
             card = card,
             additionalSurfaces = dialogs,
-            editableGreeting = editableGreeting,
-            editableGreetingBuffer = editableGreetingBuffer,
-            tokensCount = tokensCount
+            tokensCount = tokensCount,
+            selectedTabIndex = selectedTabIndex
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
@@ -123,6 +132,9 @@ class CardDetailsViewModel(
             is CardDetailUserEvent.UpdateAlternateGreetingBuffer -> onUpdateAlternateGreetingBuffer(
                 event.buffer
             )
+
+            is CardDetailUserEvent.SelectTab -> onSelectTab(event.index)
+            CardDetailUserEvent.NavigateUp -> onNavigateUp()
         }
     }
 
@@ -161,19 +173,6 @@ class CardDetailsViewModel(
     }
 
 
-    private fun onSelectImageClicked() {
-        viewModelScope.launch {
-            _uiEvents.emit(Event(UiEvent.SelectImage))
-        }
-    }
-
-    private fun onUpdateCardImage(bytes: ByteArray) = viewModelScope.launch {
-        if (bytes.isNotEmpty()) {
-            updateCardAvatar(state.value.card.id, bytes)
-            card.value = getCard(card.value.id).first().toImmutable()
-        }
-    }
-
     private fun onFieldUpdate(field: CardField, update: String) {
         card.update {
             when (field) {
@@ -192,16 +191,25 @@ class CardDetailsViewModel(
         }
     }
 
-    private fun onOpenAlternateMessages() {
-        additionalSurfaces.update {
-            it.copy(showAltGreeting = true)
+    private fun onSelectImageClicked() {
+        viewModelScope.launch {
+            _uiEvents.emit(Event(UiEvent.SelectImage))
         }
     }
 
-    private fun onCloseAlternateMessages() {
-        additionalSurfaces.update {
-            it.copy(showAltGreeting = false)
+    private fun onUpdateCardImage(bytes: ByteArray) = viewModelScope.launch {
+        if (bytes.isNotEmpty()) {
+            updateCardAvatar(state.value.card.id, bytes)
+            card.value = getCard(card.value.id).first().toImmutable()
         }
+    }
+
+    private fun onOpenAlternateMessages() {
+        savedStateHandle[SHOW_ALT_GREETING] = true
+    }
+
+    private fun onCloseAlternateMessages() {
+        savedStateHandle[SHOW_ALT_GREETING] = false
     }
 
     private fun onCreateAltGreeting() = viewModelScope.launch {
@@ -211,16 +219,12 @@ class CardDetailsViewModel(
 
     private fun onDeleteAltGreeting(id: Long) = viewModelScope.launch {
         greetingToDelete = id
-        additionalSurfaces.update {
-            it.copy(deleteAltGreetingDialog = true)
-        }
+        savedStateHandle[DELETE_ALT_GREETING_DIALOG] = true
     }
 
     private fun onConfirmDeleteAltGreeting() = viewModelScope.launch {
         if (greetingToDelete > 0) {
-            additionalSurfaces.update {
-                it.copy(deleteAltGreetingDialog = false)
-            }
+            savedStateHandle[DELETE_ALT_GREETING_DIALOG] = false
             deleteAltGreeting(greetingToDelete)
             greetingToDelete = 0L
             card.value = getCard(card.value.id).first().toImmutable()
@@ -228,9 +232,7 @@ class CardDetailsViewModel(
     }
 
     private fun onDismissDeleteAltGreeting() {
-        additionalSurfaces.update {
-            it.copy(deleteAltGreetingDialog = false)
-        }
+        savedStateHandle[DELETE_ALT_GREETING_DIALOG] = false
     }
 
     private fun onEditAltGreeting(id: Long) {
@@ -262,6 +264,14 @@ class CardDetailsViewModel(
         savedStateHandle[EDITABLE_GREETING_BUFFER] = buffer
     }
 
+    private fun onSelectTab(index: Int) {
+        savedStateHandle[SELECTED_TAB_INDEX] = index
+    }
+
+    private fun onNavigateUp() {
+        _uiEvents.value = Event(UiEvent.PopBack)
+    }
+
     enum class CardField(val string: String) {
         Id("cardId"),
         Name("cardName"),
@@ -282,5 +292,8 @@ class CardDetailsViewModel(
     companion object {
         private const val EDITABLE_GREETING = "editableGreeting"
         private const val EDITABLE_GREETING_BUFFER = "editableGreetingBuffer"
+        private const val SHOW_ALT_GREETING = "showAltGreeting"
+        private const val DELETE_ALT_GREETING_DIALOG = "deleteAltGreetingDialog"
+        private const val SELECTED_TAB_INDEX = "selectedTabIndex"
     }
 }
