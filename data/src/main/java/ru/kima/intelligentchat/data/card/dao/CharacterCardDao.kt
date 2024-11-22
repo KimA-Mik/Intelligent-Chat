@@ -50,7 +50,7 @@ interface CharacterCardDao {
     }
 
     @Query("UPDATE $CARDS_TABLE_NAME SET photoFilePath=:photoFilePath WHERE id = :id")
-    suspend fun updatePhotoFilePath(id: Long, photoFilePath: String)
+    suspend fun updatePhotoFilePath(id: Long, photoFilePath: String?)
 
     @Transaction
     @Query("SELECT * FROM $CARDS_TABLE_NAME")

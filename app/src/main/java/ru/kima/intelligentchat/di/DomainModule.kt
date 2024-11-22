@@ -58,6 +58,7 @@ import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
+import ru.kima.intelligentchat.domain.images.useCase.GetFreeImageNameUseCase
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.DefaultSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
@@ -153,6 +154,8 @@ fun domain() = module {
     singleOf(::LoadHordeModelsUseCase)
     singleOf(::SaveApiKeyUseCase)
     singleOf(::SelectActiveHordePresetUseCase)
+
+    singleOf(::GetFreeImageNameUseCase)
 
     singleOf(::GetKoboldPresetUseCase)
     singleOf(::SubscribeToKoboldPresetsUseCase)

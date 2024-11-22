@@ -1,7 +1,5 @@
 package ru.kima.intelligentchat.data.card.repository
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
@@ -11,7 +9,6 @@ import ru.kima.intelligentchat.data.card.entities.CharacterEntity
 import ru.kima.intelligentchat.data.card.mappers.toCharacterCard
 import ru.kima.intelligentchat.data.card.mappers.toEntity
 import ru.kima.intelligentchat.data.card.mappers.toEntry
-import ru.kima.intelligentchat.data.card.util.getCardPhotoName
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
 import ru.kima.intelligentchat.data.image.dataSource.InternalImageStorage
 import ru.kima.intelligentchat.data.serialization.CardDeserializer
@@ -19,7 +16,6 @@ import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.model.CardEntry
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
-import java.io.ByteArrayOutputStream
 
 class CharacterCardRepositoryImpl(
     wrapper: DatabaseWrapper,
@@ -92,19 +88,8 @@ class CharacterCardRepositoryImpl(
         cardDao.softDeleteTransaction(deleted)
     }
 
-    override suspend fun updateCardAvatar(cardId: Long, bytes: ByteArray) {
-        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return
-
-        val fileName = getCardPhotoName(cardId)
-
-        val outputStream = ByteArrayOutputStream()
-        if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
-            return
-        }
-
-        val photoBytes = outputStream.toByteArray()
-        imageStorage.saveImage(fileName, photoBytes)
-        cardDao.updatePhotoFilePath(cardId, fileName)
+    override suspend fun updateCardAvatar(cardId: Long, photoName: String?) {
+        cardDao.updatePhotoFilePath(cardId, photoName)
     }
 
     override suspend fun getMarkedCards(): List<CharacterCard> {
