@@ -6,10 +6,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
@@ -17,6 +16,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.card.model.AltGreeting
 import ru.kima.intelligentchat.domain.card.useCase.CreateAlternateGreetingUseCase
 import ru.kima.intelligentchat.domain.card.useCase.DeleteAlternateGreetingUseCase
@@ -71,8 +71,8 @@ class CardDetailsViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
 
-    private val _uiEvents = MutableSharedFlow<UiEvent>()
-    val uiEvents = _uiEvents.asSharedFlow()
+    private val _uiEvents = MutableStateFlow(Event<UiEvent>(null))
+    val uiEvents = _uiEvents.asStateFlow()
 
     private var greetingToDelete = 0L
 
@@ -80,7 +80,7 @@ class CardDetailsViewModel(
         val id = savedStateHandle.get<Long>(CARD_ID_ARGUMENT)
         viewModelScope.launch {
             if (id == null || id == 0L) {
-                _uiEvents.emit(UiEvent.PopBack)
+                _uiEvents.emit(Event(UiEvent.PopBack))
                 return@launch
             }
 
@@ -163,7 +163,7 @@ class CardDetailsViewModel(
 
     private fun onSelectImageClicked() {
         viewModelScope.launch {
-            _uiEvents.emit(UiEvent.SelectImage)
+            _uiEvents.emit(Event(UiEvent.SelectImage))
         }
     }
 

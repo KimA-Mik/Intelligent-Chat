@@ -14,7 +14,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsScreen
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsRoot
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.CharactersListScreenRoot
 import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListScreen
 import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListState
@@ -57,7 +57,12 @@ fun NavGraphBuilder.cardGraph(
                 }
             )
         ) {
-            CardDetailsScreen(navController, snackbarHostState, koinInject(), koinViewModel())
+            CardDetailsRoot(
+                navController = navController,
+                snackbarHostState = snackbarHostState,
+                imagePicker = koinInject(),
+                viewModel = koinViewModel()
+            )
         }
 
         composable(
