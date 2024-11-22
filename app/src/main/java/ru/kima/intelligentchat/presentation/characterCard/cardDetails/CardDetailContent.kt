@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -36,10 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
-import ru.kima.intelligentchat.presentation.common.image.ImmutableBitmap
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -65,7 +63,7 @@ fun CardDetailContent(
             name = state.card.name,
             cardTokens = state.tokensCount.totalTokens,
             nameTokensCount = state.tokensCount.name,
-            photo = state.card.photoBytes,
+            photoName = state.card.photoName,
             onEvent = onEvent
         )
 
@@ -141,7 +139,7 @@ fun HeadArea(
     name: String,
     cardTokens: Int,
     nameTokensCount: Int,
-    photo: ImmutableBitmap,
+    photoName: String?,
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
@@ -150,10 +148,10 @@ fun HeadArea(
             .padding(top = 16.dp, start = 8.dp, end = 8.dp)
             .then(modifier)
     ) {
-        CardImage(
+        AsyncCardImage(
             // FIXME: Fix later
-            photo,
-            modifier = Modifier.size(100.dp)
+            photoName = photoName,
+            imageSize = 100.dp
         ) {
             onEvent(CardDetailUserEvent.SelectImageClicked)
         }

@@ -1,30 +1,15 @@
 package ru.kima.intelligentchat.data.card.mappers
 
-import android.graphics.BitmapFactory
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import ru.kima.intelligentchat.data.card.entities.CardEntity
 import ru.kima.intelligentchat.data.card.entities.CharacterEntity
-import ru.kima.intelligentchat.data.card.util.getCardPhotoName
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
-import ru.kima.intelligentchat.domain.images.ImageStorage
 
-suspend fun CardEntity.toCharacterCard(
-    imageStorage: ImageStorage, tags: List<String> = emptyList()
+fun CardEntity.toCharacterCard(
+    tags: List<String> = emptyList()
 ): CharacterCard {
     return CharacterCard(
         id = character.id,
-        photoBytes = character.photoFilePath?.let {
-            coroutineScope {
-                val job = async(Dispatchers.Unconfined, start = CoroutineStart.LAZY) {
-                    val image = imageStorage.getImage(it)
-                    BitmapFactory.decodeByteArray(image, 0, image.size)
-                }
-                job.await()
-            }
-        },
+        photoName = character.photoFilePath,
         name = character.name,
         description = character.description,
         personality = character.personality,
@@ -47,7 +32,7 @@ suspend fun CardEntity.toCharacterCard(
 fun CharacterCard.toEntity(): CardEntity {
     return CardEntity(character = CharacterEntity(
         id = id,
-        photoFilePath = photoBytes?.let { getCardPhotoName(id) },
+        photoFilePath = photoName,
         name = name,
         description = description,
         personality = personality,

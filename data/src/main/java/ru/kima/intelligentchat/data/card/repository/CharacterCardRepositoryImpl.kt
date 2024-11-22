@@ -13,7 +13,6 @@ import ru.kima.intelligentchat.data.card.mappers.toEntity
 import ru.kima.intelligentchat.data.card.mappers.toEntry
 import ru.kima.intelligentchat.data.card.util.getCardPhotoName
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
-import ru.kima.intelligentchat.data.image.dataSource.DummyImageStorage
 import ru.kima.intelligentchat.data.image.dataSource.InternalImageStorage
 import ru.kima.intelligentchat.data.serialization.CardDeserializer
 import ru.kima.intelligentchat.domain.card.model.AltGreeting
@@ -34,20 +33,20 @@ class CharacterCardRepositoryImpl(
     override fun getCharactersCards() =
         cardDao.selectCharacterCards().map { cards ->
             cards.map { entity ->
-                entity.toCharacterCard(imageStorage)
+                entity.toCharacterCard()
             }
         }
 
     override fun getCardsListEntries(): Flow<List<CardEntry>> =
         cardDao.getCharacterListEntries().map { entries ->
             entries.map { entry ->
-                entry.toEntry(imageStorage)
+                entry.toEntry()
             }
         }
 
     override fun getCharacterCard(id: Long) =
         cardDao.selectCharacterCard(id).map {
-            it.toCharacterCard(imageStorage)
+            it.toCharacterCard()
         }
 
     override suspend fun putCharacterCard(characterCard: CharacterCard): Long {
@@ -77,9 +76,8 @@ class CharacterCardRepositoryImpl(
 
     override suspend fun deleteCards(cards: List<CharacterCard>) {
         for (card in cards) {
-            card.photoBytes?.let {
-                val name = getCardPhotoName(card.id)
-                imageStorage.deleteImage(name)
+            card.photoName?.let {
+                imageStorage.deleteImage(it)
             }
         }
 
@@ -110,9 +108,8 @@ class CharacterCardRepositoryImpl(
     }
 
     override suspend fun getMarkedCards(): List<CharacterCard> {
-        val dummyImageStorage = DummyImageStorage()
         return cardDao.markedCards().map {
-            it.toCharacterCard(dummyImageStorage, emptyList())
+            it.toCharacterCard(emptyList())
         }
     }
 

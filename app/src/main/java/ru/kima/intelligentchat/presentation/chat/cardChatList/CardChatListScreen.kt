@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -41,10 +40,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.cardChatList.model.ChatListItem
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
@@ -111,10 +111,10 @@ fun CardChatListScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        state.displayCard.image.imageBitmap?.let {
-                            CardImage(
-                                bitmap = state.displayCard.image,
-                                modifier = Modifier.size(40.dp),
+                        state.displayCard.photoName?.let {
+                            AsyncCardImage(
+                                photoName = state.displayCard.photoName,
+                                imageSize = ChatDefaults.SENDER_IMAGE_SIZE,
                                 onClick = {}
                             )
                         }

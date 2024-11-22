@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.AltRoute
@@ -48,11 +47,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.formatAndTrim
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.common.components.conditional
-import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
 import ru.kima.intelligentchat.presentation.common.markdown.MarkdownText
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
@@ -79,7 +77,7 @@ fun ChatMessage(
         verticalAlignment = Alignment.Top
     ) {
         ImageAndMetaInfo(
-            imageBitmap = message.senderImage,
+            photoName = message.senderImageName,
             index = message.index,
             imageSize = imageSize,
             tookMs = 0,
@@ -266,7 +264,7 @@ fun AnimatedText(
 
 @Composable
 fun ImageAndMetaInfo(
-    imageBitmap: ImmutableImageBitmap,
+    photoName: String?,
     index: Int,
     imageSize: Dp,
     modifier: Modifier = Modifier,
@@ -283,8 +281,8 @@ fun ImageAndMetaInfo(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             MessageSenderImage(
-                imageBitmap = imageBitmap,
-                modifier = Modifier.size(imageSize),
+                photoName = photoName,
+                imageSize = imageSize,
                 onClick = onImageClick
             )
 
@@ -328,16 +326,16 @@ fun RightArrow(
 
 @Composable
 fun MessageSenderImage(
-    imageBitmap: ImmutableImageBitmap,
-    modifier: Modifier = Modifier,
+    photoName: String?, imageSize: Dp, modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    CardImage(
-        bitmap = imageBitmap,
+    AsyncCardImage(
+        photoName = photoName,
         modifier = modifier, emptyPainter = rememberVectorPainter(
             image = Icons.Default.QuestionMark,
             tint = MaterialTheme.colorScheme.onSecondaryContainer
         ),
+        imageSize = imageSize,
         onClick = onClick
     )
 }

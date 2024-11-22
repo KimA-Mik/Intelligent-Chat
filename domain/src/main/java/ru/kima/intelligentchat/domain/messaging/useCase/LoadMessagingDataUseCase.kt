@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.domain.messaging.useCase
 
+import android.graphics.BitmapFactory
 import kotlinx.coroutines.flow.first
 import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
@@ -7,6 +8,7 @@ import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
+import ru.kima.intelligentchat.domain.images.ImageStorage
 import ru.kima.intelligentchat.domain.messaging.model.Sender
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.model.PersonaImage
@@ -16,6 +18,7 @@ import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 class LoadMessagingDataUseCase(
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
     private val getCard: GetCardUseCase,
+    private val imageStorage: ImageStorage,
     private val getPersona: GetPersonaUseCase,
     private val loadPersonaImage: LoadPersonaImageUseCase
 ) {
@@ -50,8 +53,12 @@ class LoadMessagingDataUseCase(
 
     private suspend fun loadCharacter(id: Long): Sender {
         val card = getCard(id).first()
+        val image = card.photoName?.let {
+            val data = imageStorage.getImage(it)
+            BitmapFactory.decodeByteArray(data, 0, data.size)
+        }
 
-        return Sender.CharacterSender(card)
+        return Sender.CharacterSender(card, image)
     }
 
     private suspend fun loadPersona(id: Long): Sender {

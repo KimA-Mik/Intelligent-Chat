@@ -36,7 +36,7 @@ fun EditableChatMessage(
 ) = Column(modifier = modifier) {
     Row(verticalAlignment = Alignment.Top) {
         ImageAndMetaInfo(
-            imageBitmap = message.senderImage,
+            photoName = message.senderImageName,
             index = message.index,
             imageSize = imageSize,
             tookMs = 0,

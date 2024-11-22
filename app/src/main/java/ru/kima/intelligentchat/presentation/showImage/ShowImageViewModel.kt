@@ -1,6 +1,5 @@
 package ru.kima.intelligentchat.presentation.showImage
 
-import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,8 +16,8 @@ class ShowImageViewModel(
     savedStateHandle: SavedStateHandle,
     private val getCard: GetCardUseCase
 ) : ViewModel() {
-    private val _imageBitmap = MutableStateFlow<Bitmap?>(null)
-    val imageBitmap = _imageBitmap.asStateFlow()
+    private val _photoName = MutableStateFlow<String?>(null)
+    val photoName = _photoName.asStateFlow()
 
     private val _uiEvents = MutableSharedFlow<UiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
@@ -38,11 +37,7 @@ class ShowImageViewModel(
 
     private fun loadImageFromCard(cardId: Long) {
         getCard(cardId).onEach { card ->
-            if (card.photoBytes == null) {
-                onLoadError("No image")
-            } else {
-                _imageBitmap.value = card.photoBytes!!
-            }
+            _photoName.value = card.photoName
         }.launchIn(viewModelScope)
     }
 

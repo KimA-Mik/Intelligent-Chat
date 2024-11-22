@@ -1,6 +1,5 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen
 
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,7 +36,6 @@ import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SubscribeToMessagingStatus
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
-import ru.kima.intelligentchat.domain.persona.useCase.LoadPersonaImageUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
@@ -46,7 +44,6 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayCha
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toImmutable
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
-import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
 class ChatScreenViewModel(
@@ -62,7 +59,6 @@ class ChatScreenViewModel(
     private val cancelMessage: CancelMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
     private val restoreMessage: RestoreMessageUseCase,
-    private val loadPersonaImage: LoadPersonaImageUseCase,
     private val messagingStatus: SubscribeToMessagingStatus,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
     private val deleteCurrentSwipe: DeleteCurrentSwipeUseCase,
@@ -126,7 +122,6 @@ class ChatScreenViewModel(
                 characterCard = displayCard,
                 fullChat = fullChat.toDisplayChat(
                     card = characterCard,
-                    preloadCardImageBitmap = displayCard.image,
                     selectedPersona = preferences.selectedPersonaId,
                     personasNames = names,
                     personasImages = images
@@ -171,14 +166,7 @@ class ChatScreenViewModel(
 
     private fun loadPersonasImages(personas: Flow<List<Persona>>) = personas.map { list ->
         list.associate { persona ->
-            val image = persona.imageName?.let {
-                loadPersonaImage(persona.id)
-            }
-
-            val imageBitmap = image?.bitmap?.asImageBitmap()
-            imageBitmap?.prepareToDraw()
-
-            Pair(persona.id, ImmutableImageBitmap(imageBitmap))
+            Pair(persona.id, persona.imageName)
         }
     }
 

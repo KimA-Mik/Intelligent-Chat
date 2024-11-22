@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -65,11 +64,12 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.chat.model.SenderType
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.ChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.components.EditableChatMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
@@ -128,10 +128,10 @@ fun ChatScreenContent(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        state.info.characterCard.image.imageBitmap?.let {
-                            CardImage(
-                                bitmap = state.info.characterCard.image,
-                                modifier = Modifier.size(40.dp),
+                        state.info.characterCard.photoName?.let {
+                            AsyncCardImage(
+                                photoName = state.info.characterCard.photoName,
+                                imageSize = ChatDefaults.SENDER_IMAGE_SIZE,
                                 onClick = {}
                             )
                         }
