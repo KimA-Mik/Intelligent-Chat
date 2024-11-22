@@ -8,8 +8,8 @@ import kotlinx.coroutines.coroutineScope
 import ru.kima.intelligentchat.data.card.entities.CardEntity
 import ru.kima.intelligentchat.data.card.entities.CharacterEntity
 import ru.kima.intelligentchat.data.card.util.getCardPhotoName
-import ru.kima.intelligentchat.data.image.dataSource.ImageStorage
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
+import ru.kima.intelligentchat.domain.images.ImageStorage
 
 suspend fun CardEntity.toCharacterCard(
     imageStorage: ImageStorage, tags: List<String> = emptyList()

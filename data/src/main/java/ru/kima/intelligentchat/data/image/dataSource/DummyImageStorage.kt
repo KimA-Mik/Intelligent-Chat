@@ -1,6 +1,7 @@
 package ru.kima.intelligentchat.data.image.dataSource
 
 import android.graphics.Bitmap
+import ru.kima.intelligentchat.domain.images.ImageStorage
 import java.io.FileDescriptor
 
 class DummyImageStorage : ImageStorage {

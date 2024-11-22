@@ -8,7 +8,10 @@ import android.os.Build
 import android.util.Size
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ru.kima.intelligentchat.domain.images.ImageStorage
 import java.io.FileDescriptor
+import java.io.FileNotFoundException
+import java.io.IOException
 import kotlin.io.path.Path
 
 
@@ -35,8 +38,14 @@ class InternalImageStorage(
         }
     }
 
-    override fun getImageFileDescriptor(fileName: String): FileDescriptor {
-        return context.openFileInput(fileName).fd
+    override fun getImageFileDescriptor(fileName: String): FileDescriptor? {
+        return try {
+            context.openFileInput(fileName).fd
+        } catch (_: FileNotFoundException) {
+            null
+        } catch (_: IOException) {
+            null
+        }
     }
 
     override suspend fun getThumbnail(fileName: String): Bitmap {
