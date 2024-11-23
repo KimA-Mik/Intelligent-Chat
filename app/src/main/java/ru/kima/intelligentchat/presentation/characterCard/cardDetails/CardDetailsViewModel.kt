@@ -27,6 +27,7 @@ import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.CardField
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.toImmutable
 import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
@@ -44,6 +45,7 @@ class CardDetailsViewModel(
 ) : ViewModel() {
     private val cardId = savedStateHandle.getStateFlow(CardField.Id.string, 0L)
     private val card = MutableStateFlow(ImmutableCard())
+    private val switchesState = MutableStateFlow(CardDetailsState.SwitchesState())
 
     private val editableGreeting = savedStateHandle.getStateFlow(EDITABLE_GREETING, 0L)
     private val editableGreetingBuffer =
@@ -69,13 +71,15 @@ class CardDetailsViewModel(
         card,
         additionalSurfaces,
         tokensCount,
-        savedStateHandle.getStateFlow(SELECTED_TAB_INDEX, 0)
-    ) { card, dialogs, tokensCount, selectedTabIndex ->
+        savedStateHandle.getStateFlow(SELECTED_TAB_INDEX, 0),
+        switchesState
+    ) { card, dialogs, tokensCount, selectedTabIndex, switchesState ->
         CardDetailsState(
             card = card,
             additionalSurfaces = dialogs,
             tokensCount = tokensCount,
-            selectedTabIndex = selectedTabIndex
+            selectedTabIndex = selectedTabIndex,
+            switchesState = switchesState
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardDetailsState())
 
@@ -118,6 +122,7 @@ class CardDetailsViewModel(
     fun onEvent(event: CardDetailUserEvent) {
         when (event) {
             is CardDetailUserEvent.FieldUpdate -> onFieldUpdate(event.field, event.updatedString)
+            is CardDetailUserEvent.FieldSwitch -> onFieldSwitch(event.field)
             CardDetailUserEvent.SelectImageClicked -> onSelectImageClicked()
             is CardDetailUserEvent.UpdateCardImage -> onUpdateCardImage(event.bytes)
             CardDetailUserEvent.OpenAltGreetingsSheet -> onOpenAlternateMessages()
@@ -135,6 +140,7 @@ class CardDetailsViewModel(
 
             is CardDetailUserEvent.SelectTab -> onSelectTab(event.index)
             CardDetailUserEvent.NavigateUp -> onNavigateUp()
+
         }
     }
 
@@ -190,6 +196,21 @@ class CardDetailsViewModel(
             }
         }
     }
+
+    private fun onFieldSwitch(field: CardField) = switchesState.update {
+        when (field) {
+            CardField.Description -> it.copy(description = !it.description)
+            CardField.Personality -> it.copy(personality = !it.personality)
+            CardField.Scenario -> it.copy(scenario = !it.scenario)
+            CardField.FirstMes -> it.copy(firstMes = !it.firstMes)
+            CardField.MesExample -> it.copy(mesExample = !it.mesExample)
+            CardField.CreatorNotes -> it.copy(creatorNotes = !it.creatorNotes)
+            else -> {
+                it
+            }
+        }
+    }
+
 
     private fun onSelectImageClicked() {
         viewModelScope.launch {
@@ -270,23 +291,6 @@ class CardDetailsViewModel(
 
     private fun onNavigateUp() {
         _uiEvents.value = Event(UiEvent.PopBack)
-    }
-
-    enum class CardField(val string: String) {
-        Id("cardId"),
-        Name("cardName"),
-        Description("cardDescription"),
-        Personality("cardPersonality"),
-        Scenario("cardScenario"),
-        FirstMes("cardFirstMes"),
-        MesExample("cardMesExample"),
-        CreatorNotes("cardCreatorNotes"),
-        SystemPrompt("cardSystemPrompt"),
-        PostHistoryInstructions("cardPostHistoryInstructions"),
-        AlternateGreetings("cardAlternateGreetings"),
-        Tags("cardTags"),
-        Creator("cardCreator"),
-        CharacterVersion("cardCharacterVersion")
     }
 
     companion object {

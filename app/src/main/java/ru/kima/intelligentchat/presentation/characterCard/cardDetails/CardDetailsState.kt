@@ -9,6 +9,7 @@ data class CardDetailsState(
     val additionalSurfaces: AdditionalSurfaces = AdditionalSurfaces(),
     val tokensCount: TokensCount = TokensCount(),
     val selectedTabIndex: Int = 0,
+    val switchesState: SwitchesState = SwitchesState()
 ) {
     data class TokensCount(
         val name: Int = 0,
@@ -36,5 +37,15 @@ data class CardDetailsState(
         val editableGreeting: Long = 0,
         val editableGreetingBuffer: String = String(),
     )
-}
 
+    data class SwitchesState(
+        //History
+        val description: Boolean = true,
+        val firstMes: Boolean = true,
+        val personality: Boolean = false,
+        val scenario: Boolean = false,
+        val mesExample: Boolean = false,
+
+        val creatorNotes: Boolean = false,
+    )
+}

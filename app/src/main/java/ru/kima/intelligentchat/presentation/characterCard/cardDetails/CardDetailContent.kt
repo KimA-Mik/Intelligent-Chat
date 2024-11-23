@@ -30,10 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -50,6 +47,7 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.CardDetailsDefaults
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.CardField
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
 import ru.kima.intelligentchat.presentation.common.components.clearFocusOnSoftKeyboardHide
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -98,18 +96,19 @@ fun CardDetailContent(
         val innerModifier = Modifier.fillMaxSize()
         when (it) {
             0 -> HistoryTab(
+                tokensCount = state.tokensCount,
+                description = state.card.description,
+                descriptionExpanded = state.switchesState.description,
+                firstMes = state.card.firstMes,
+                firstMesExpanded = state.switchesState.firstMes,
+                personality = state.card.personality,
+                personalityExpanded = state.switchesState.personality,
+                scenario = state.card.scenario,
+                scenarioExpanded = state.switchesState.scenario,
+                exampleDialog = state.card.mesExample,
+                exampleDialogExpanded = state.switchesState.mesExample,
                 modifier = innerModifier,
                 onEvent = onEvent,
-                description = state.card.description,
-                descriptionTokenCount = state.tokensCount.description,
-                firstMes = state.card.firstMes,
-                firstMesTokenCount = state.tokensCount.firstMes,
-                personality = state.card.personality,
-                personalityTokenCount = state.tokensCount.personality,
-                scenario = state.card.scenario,
-                scenarioTokenCount = state.tokensCount.scenario,
-                exampleDialog = state.card.mesExample,
-                exampleDialogTokenCount = state.tokensCount.mesExample,
             )
 
             1 -> SystemTab(
@@ -130,25 +129,20 @@ fun CardDetailContent(
 
 @Composable
 fun HistoryTab(
+    tokensCount: CardDetailsState.TokensCount,
     description: String,
-    descriptionTokenCount: Int,
+    descriptionExpanded: Boolean,
     firstMes: String,
-    firstMesTokenCount: Int,
+    firstMesExpanded: Boolean,
     personality: String,
-    personalityTokenCount: Int,
+    personalityExpanded: Boolean,
     scenario: String,
-    scenarioTokenCount: Int,
+    scenarioExpanded: Boolean,
     exampleDialog: String,
-    exampleDialogTokenCount: Int,
+    exampleDialogExpanded: Boolean,
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
-    var isDescriptionExpanded by remember { mutableStateOf(true) }
-    var isFirstMesExpanded by remember { mutableStateOf(true) }
-    var isPersonalityExpanded by remember { mutableStateOf(false) }
-    var isScenarioExpanded by remember { mutableStateOf(false) }
-    var isCreatorsNotesExpanded by remember { mutableStateOf(false) }
-
     val scrollState = rememberScrollState()
     Column(
         modifier = modifier.verticalScroll(scrollState),
@@ -157,11 +151,10 @@ fun HistoryTab(
         GeneralInfo(
             text = description,
             title = stringResource(R.string.card_description_title),
-            field = CardDetailsViewModel.CardField.Description,
-            isExpanded = isDescriptionExpanded,
-            onExpand = { isDescriptionExpanded = !isDescriptionExpanded },
+            field = CardField.Description,
+            isExpanded = descriptionExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = descriptionTokenCount,
+            textTokensCount = tokensCount.description,
             showTokensCount = true,
             onEvent = onEvent
         )
@@ -169,11 +162,10 @@ fun HistoryTab(
         GeneralInfo(
             text = firstMes,
             title = stringResource(R.string.card_first_message_title),
-            field = CardDetailsViewModel.CardField.FirstMes,
-            isExpanded = isFirstMesExpanded,
-            onExpand = { isFirstMesExpanded = !isFirstMesExpanded },
+            field = CardField.FirstMes,
+            isExpanded = firstMesExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = firstMesTokenCount,
+            textTokensCount = tokensCount.firstMes,
             showTokensCount = true,
             supportRow = {
                 TextButton(onClick = {
@@ -188,11 +180,10 @@ fun HistoryTab(
         GeneralInfo(
             text = personality,
             title = stringResource(R.string.card_personality_title),
-            field = CardDetailsViewModel.CardField.Personality,
-            isExpanded = isPersonalityExpanded,
-            onExpand = { isPersonalityExpanded = !isPersonalityExpanded },
+            field = CardField.Personality,
+            isExpanded = personalityExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = personalityTokenCount,
+            textTokensCount = tokensCount.personality,
             showTokensCount = true,
             onEvent = onEvent
         )
@@ -200,11 +191,10 @@ fun HistoryTab(
         GeneralInfo(
             text = scenario,
             title = stringResource(R.string.card_scenario_title),
-            field = CardDetailsViewModel.CardField.Scenario,
-            isExpanded = isScenarioExpanded,
-            onExpand = { isScenarioExpanded = !isScenarioExpanded },
+            field = CardField.Scenario,
+            isExpanded = scenarioExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = scenarioTokenCount,
+            textTokensCount = tokensCount.scenario,
             showTokensCount = true,
             onEvent = onEvent
         )
@@ -212,11 +202,10 @@ fun HistoryTab(
         GeneralInfo(
             text = exampleDialog,
             title = stringResource(R.string.card_example_dialogs_title),
-            field = CardDetailsViewModel.CardField.CreatorNotes,
-            isExpanded = isCreatorsNotesExpanded,
-            onExpand = { isCreatorsNotesExpanded = !isCreatorsNotesExpanded },
+            field = CardField.CreatorNotes,
+            isExpanded = exampleDialogExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = exampleDialogTokenCount,
+            textTokensCount = tokensCount.mesExample,
             showTokensCount = true,
             onEvent = onEvent
         )
@@ -300,7 +289,7 @@ fun HeadArea(
             value = name, onValueChange = { newValue ->
                 onEvent(
                     CardDetailUserEvent.FieldUpdate(
-                        CardDetailsViewModel.CardField.Name,
+                        CardField.Name,
                         newValue
                     )
                 )
@@ -335,9 +324,8 @@ fun HeadArea(
 fun GeneralInfo(
     text: String,
     title: String,
-    field: CardDetailsViewModel.CardField,
+    field: CardField,
     isExpanded: Boolean,
-    onExpand: () -> Unit,
     modifier: Modifier = Modifier,
     textTokensCount: Int = 0,
     showTokensCount: Boolean = false,
@@ -360,7 +348,9 @@ fun GeneralInfo(
             )
 
             IconButton(
-                onClick = onExpand
+                onClick = {
+                    onEvent(CardDetailUserEvent.FieldSwitch(field))
+                }
             ) {
                 Icon(
                     modifier = Modifier.graphicsLayer(
