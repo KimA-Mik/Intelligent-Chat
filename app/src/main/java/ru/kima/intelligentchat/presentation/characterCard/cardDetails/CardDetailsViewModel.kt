@@ -220,8 +220,11 @@ class CardDetailsViewModel(
 
     private fun onUpdateCardImage(bytes: ByteArray) = viewModelScope.launch {
         if (bytes.isNotEmpty()) {
-            updateCardAvatar(state.value.card.id, bytes)
-            card.value = getCard(card.value.id).first().toImmutable()
+            updateCardAvatar(state.value.card.id, bytes)?.let { cardName ->
+                card.update {
+                    it.copy(photoName = cardName)
+                }
+            }
         }
     }
 

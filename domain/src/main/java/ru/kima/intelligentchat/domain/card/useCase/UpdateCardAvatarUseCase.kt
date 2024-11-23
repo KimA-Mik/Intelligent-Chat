@@ -10,21 +10,24 @@ class UpdateCardAvatarUseCase(
     private val getFreeImageName: GetFreeImageNameUseCase,
     private val characterRepository: CharacterCardRepository
 ) {
-    suspend operator fun invoke(cardId: Long, bytes: ByteArray) {
+    suspend operator fun invoke(cardId: Long, bytes: ByteArray): String? {
         try {
             val card = characterRepository.getCharacterCard(cardId).first()
 
             val fileName = getFreeImageName()
-            if (!imageStorage.saveImage(fileName, bytes)) return
+            if (!imageStorage.saveImage(fileName, bytes)) return null
             characterRepository.updateCardAvatar(cardId, fileName)
 
             card.photoName?.let {
                 imageStorage.deleteImage(it)
             }
+
+            return fileName
         } catch (e: Exception) {
             e.message?.let {
 
             }
+            return null
         }
     }
 }
