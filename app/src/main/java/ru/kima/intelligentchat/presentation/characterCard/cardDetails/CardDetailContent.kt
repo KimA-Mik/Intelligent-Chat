@@ -154,6 +154,7 @@ fun HistoryTab(
             field = CardField.Description,
             isExpanded = descriptionExpanded,
             modifier = Modifier.padding(8.dp),
+            placeholder = stringResource(R.string.card_description_hint),
             textTokensCount = tokensCount.description,
             showTokensCount = true,
             onEvent = onEvent
@@ -165,6 +166,7 @@ fun HistoryTab(
             field = CardField.FirstMes,
             isExpanded = firstMesExpanded,
             modifier = Modifier.padding(8.dp),
+            placeholder = stringResource(R.string.card_first_message_hint),
             textTokensCount = tokensCount.firstMes,
             showTokensCount = true,
             supportRow = {
@@ -183,6 +185,7 @@ fun HistoryTab(
             field = CardField.Personality,
             isExpanded = personalityExpanded,
             modifier = Modifier.padding(8.dp),
+            placeholder = stringResource(R.string.card_personality_hint),
             textTokensCount = tokensCount.personality,
             showTokensCount = true,
             onEvent = onEvent
@@ -194,6 +197,7 @@ fun HistoryTab(
             field = CardField.Scenario,
             isExpanded = scenarioExpanded,
             modifier = Modifier.padding(8.dp),
+            placeholder = stringResource(R.string.card_scenario_hint),
             textTokensCount = tokensCount.scenario,
             showTokensCount = true,
             onEvent = onEvent
@@ -205,6 +209,7 @@ fun HistoryTab(
             field = CardField.MesExample,
             isExpanded = mesExampleExpanded,
             modifier = Modifier.padding(8.dp),
+            placeholder = stringResource(R.string.card_message_example_hint),
             textTokensCount = tokensCount.mesExample,
             showTokensCount = true,
             onEvent = onEvent
@@ -327,6 +332,7 @@ fun GeneralInfo(
     field: CardField,
     isExpanded: Boolean,
     modifier: Modifier = Modifier,
+    placeholder: String? = null,
     textTokensCount: Int = 0,
     showTokensCount: Boolean = false,
     supportRow: @Composable RowScope.() -> Unit = { Spacer(Modifier.weight(1f)) },
@@ -372,6 +378,11 @@ fun GeneralInfo(
                     .clearFocusOnSoftKeyboardHide(),
                 onValueChange = { updated ->
                     onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
+                },
+                placeholder = {
+                    placeholder?.let {
+                        Text(it)
+                    }
                 },
                 supportingText = {
                     Row(

@@ -29,6 +29,12 @@
     <string name="card_creators_note_title">Creator\'s Note</string>
     <string name="card_message_example_title">Examples of dialogue</string>
 
+    <string name="card_description_hint">Character\'s physical and mental traits</string>
+    <string name="card_first_message_hint">The first message from the character that starts every chat</string>
+    <string name="card_personality_hint">A brief description of personality</string>
+    <string name="card_scenario_hint">Circumstances and context of the interaction</string>
+    <string name="card_message_example_hint">Examples of chat dialog. Begin each example with <![CDATA[<]]>START<![CDATA[>]]> on a new line</string>
+
     <string name="tokens_count">Tokens: %1$d</string>
 
     <string name="tab_item_history">History</string>
