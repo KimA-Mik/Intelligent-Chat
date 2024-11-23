@@ -2,6 +2,10 @@ package ru.kima.intelligentchat.presentation.characterCard.cardDetails
 
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -11,8 +15,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -33,6 +35,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -41,9 +44,8 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.UiEvent
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.CardDetailsDefaults
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
-import ru.kima.intelligentchat.presentation.common.components.UpIcon
+import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -133,7 +135,7 @@ fun CardDetailsScreen(
     }
 
     val scrollBehavior =
-        TopAppBarDefaults.enterAlwaysScrollBehavior()
+        TopAppBarDefaults.pinnedScrollBehavior()
     val sb = remember { scrollBehavior }
     Scaffold(
         modifier = Modifier
@@ -162,6 +164,8 @@ fun CardDetailsScreen(
     }
 }
 
+const val OVERLAPPED_FRACTION = 0.1f
+
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun CardDetailsAppBar(
@@ -171,38 +175,38 @@ private fun CardDetailsAppBar(
     photoName: String?,
     scrollBehavior: TopAppBarScrollBehavior,
     onEvent: (CardDetailUserEvent) -> Unit
-) {
-    LargeTopAppBar(
-        title = {
-            if (scrollBehavior.state.collapsedFraction < 0.5f) {
-                HeadArea(
-                    name = name,
-                    cardTokens = cardTokens,
-                    nameTokensCount = nameTokensCount,
-                    photoName = photoName,
-                    onEvent = onEvent
-                )
-            } else {
+) = Column {
+    val headVisible = scrollBehavior.state.overlappedFraction < OVERLAPPED_FRACTION
+    AppBar(
+        titleContent = {
+            AnimatedVisibility(
+                visible = !headVisible,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
                 Text(
                     text = name,
-                    style = MaterialTheme.typography.headlineSmall,
                     maxLines = 2
                 )
             }
         },
-        navigationIcon = {
-            IconButton(
-                onClick = { onEvent(CardDetailUserEvent.NavigateUp) }
-            ) {
-                UpIcon()
-            }
-        },
-        expandedHeight = TopAppBarDefaults.LargeAppBarCollapsedHeight + CardDetailsDefaults.topBarPadding + CardDetailsDefaults.imageSize,
-        colors = TopAppBarDefaults.largeTopAppBarColors().copy(
-            scrolledContainerColor = TopAppBarDefaults.largeTopAppBarColors().containerColor
-        ),
+        navigateUp = { onEvent(CardDetailUserEvent.NavigateUp) },
+        colors = TopAppBarDefaults.largeTopAppBarColors(scrolledContainerColor = TopAppBarDefaults.largeTopAppBarColors().containerColor),
         scrollBehavior = scrollBehavior
     )
+
+    AnimatedVisibility(
+        visible = headVisible,
+    ) {
+        HeadArea(
+            name = name,
+            cardTokens = cardTokens,
+            nameTokensCount = nameTokensCount,
+            photoName = photoName,
+            modifier = Modifier.padding(horizontal = 8.dp),
+            onEvent = onEvent,
+        )
+    }
 }
 
 @Preview(name = "Card details screen light mode")

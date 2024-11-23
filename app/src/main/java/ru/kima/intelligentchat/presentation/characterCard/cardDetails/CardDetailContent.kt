@@ -263,7 +263,8 @@ fun HeadArea(
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
     Row(
-        modifier = modifier
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AsyncCardImage(
             // FIXME: Fix later
@@ -288,7 +289,6 @@ fun HeadArea(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp)
                 .weight(1f)
                 .clearFocusOnSoftKeyboardHide(),
             maxLines = 2,
@@ -310,7 +310,6 @@ fun HeadArea(
                 }
             }
         )
-
     }
 }
 
