@@ -105,8 +105,8 @@ fun CardDetailContent(
                 personalityExpanded = state.switchesState.personality,
                 scenario = state.card.scenario,
                 scenarioExpanded = state.switchesState.scenario,
-                exampleDialog = state.card.mesExample,
-                exampleDialogExpanded = state.switchesState.mesExample,
+                mesExample = state.card.mesExample,
+                mesExampleExpanded = state.switchesState.mesExample,
                 modifier = innerModifier,
                 onEvent = onEvent,
             )
@@ -138,8 +138,8 @@ fun HistoryTab(
     personalityExpanded: Boolean,
     scenario: String,
     scenarioExpanded: Boolean,
-    exampleDialog: String,
-    exampleDialogExpanded: Boolean,
+    mesExample: String,
+    mesExampleExpanded: Boolean,
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
@@ -200,10 +200,10 @@ fun HistoryTab(
         )
 
         GeneralInfo(
-            text = exampleDialog,
-            title = stringResource(R.string.card_example_dialogs_title),
-            field = CardField.CreatorNotes,
-            isExpanded = exampleDialogExpanded,
+            text = mesExample,
+            title = stringResource(R.string.card_message_example_title),
+            field = CardField.MesExample,
+            isExpanded = mesExampleExpanded,
             modifier = Modifier.padding(8.dp),
             textTokensCount = tokensCount.mesExample,
             showTokensCount = true,

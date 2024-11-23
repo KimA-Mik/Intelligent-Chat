@@ -27,7 +27,7 @@
     <string name="card_scenario_title">Scenario</string>
     <string name="card_name_title">Name</string>
     <string name="card_creators_note_title">Creator\'s Note</string>
-    <string name="card_example_dialogs_title">Examples of dialogue</string>
+    <string name="card_message_example_title">Examples of dialogue</string>
 
     <string name="tokens_count">Tokens: %1$d</string>
 
