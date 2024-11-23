@@ -112,6 +112,13 @@ fun CardDetailContent(
             )
 
             1 -> SystemTab(
+                creator = state.card.creator,
+                creatorExpanded = state.switchesState.creator,
+                characterVersion = state.card.characterVersion,
+                characterVersionExpanded = state.switchesState.characterVersion,
+                creatorsNote = state.card.creatorNotes,
+                creatorsNoteExpanded = state.switchesState.creatorsNote,
+                onEvent = onEvent,
                 modifier = innerModifier,
             )
 
@@ -218,20 +225,49 @@ fun HistoryTab(
 }
 
 @Composable
-fun SystemTab(modifier: Modifier = Modifier) {
-    val scrollState = rememberScrollState()
-    Column(
-        modifier = modifier.verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "(⌒_⌒;)\nHere will be system fields soon",
-            style = MaterialTheme.typography.headlineLarge,
-            textAlign = TextAlign.Center
-        )
-    }
+fun SystemTab(
+    creator: String,
+    creatorExpanded: Boolean,
+    characterVersion: String,
+    characterVersionExpanded: Boolean,
+    creatorsNote: String,
+    creatorsNoteExpanded: Boolean,
+    onEvent: (CardDetailUserEvent) -> Unit,
+    modifier: Modifier = Modifier
+) = Column(
+    modifier = modifier.verticalScroll(rememberScrollState()),
+) {
+    GeneralInfo(
+        text = creator,
+        title = stringResource(R.string.card_creator_title),
+        field = CardField.Creator,
+        isExpanded = creatorExpanded,
+        modifier = Modifier.padding(8.dp),
+        placeholder = stringResource(R.string.card_creator_hint),
+        onEvent = onEvent
+    )
+
+    GeneralInfo(
+        text = characterVersion,
+        title = stringResource(R.string.card_character_version_title),
+        field = CardField.CharacterVersion,
+        isExpanded = characterVersionExpanded,
+        modifier = Modifier.padding(8.dp),
+        placeholder = stringResource(R.string.card_character_version_hint),
+        onEvent = onEvent
+    )
+
+    GeneralInfo(
+        text = creatorsNote,
+        title = stringResource(R.string.card_creators_note_title),
+        field = CardField.CreatorNotes,
+        isExpanded = creatorsNoteExpanded,
+        modifier = Modifier.padding(8.dp),
+        placeholder = stringResource(R.string.card_creators_note_hint),
+        onEvent = onEvent
+    )
 }
+
 
 @Composable
 fun StatsTab(modifier: Modifier = Modifier) {

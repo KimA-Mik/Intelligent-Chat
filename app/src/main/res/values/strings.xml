@@ -26,14 +26,19 @@
     <string name="card_personality_title">Personality</string>
     <string name="card_scenario_title">Scenario</string>
     <string name="card_name_title">Name</string>
-    <string name="card_creators_note_title">Creator\'s Note</string>
     <string name="card_message_example_title">Examples of dialogue</string>
+    <string name="card_creator_title">Creator</string>
+    <string name="card_character_version_title">Character version</string>
+    <string name="card_creators_note_title">Creator\'s Note</string>
 
     <string name="card_description_hint">Character\'s physical and mental traits</string>
     <string name="card_first_message_hint">The first message from the character that starts every chat</string>
     <string name="card_personality_hint">A brief description of personality</string>
     <string name="card_scenario_hint">Circumstances and context of the interaction</string>
     <string name="card_message_example_hint">Examples of chat dialog. Begin each example with <![CDATA[<]]>START<![CDATA[>]]> on a new line</string>
+    <string name="card_creator_hint">Creator\'s name / Contact info</string>
+    <string name="card_character_version_hint">To track character version</string>
+    <string name="card_creators_note_hint">Describe the bot, give use tips or give the models it has been tested on. This is displayed int the characters list</string>
 
     <string name="tokens_count">Tokens: %1$d</string>
 

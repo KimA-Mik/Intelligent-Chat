@@ -46,6 +46,9 @@ data class CardDetailsState(
         val scenario: Boolean = false,
         val mesExample: Boolean = false,
 
-        val creatorNotes: Boolean = false,
+        //System
+        val creator: Boolean = true,
+        val characterVersion: Boolean = false,
+        val creatorsNote: Boolean = false,
     )
 }

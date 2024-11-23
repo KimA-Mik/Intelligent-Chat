@@ -188,11 +188,10 @@ class CardDetailsViewModel(
                 CardField.Scenario -> it.copy(scenario = update)
                 CardField.FirstMes -> it.copy(firstMes = update)
                 CardField.MesExample -> it.copy(mesExample = update)
+                CardField.Creator -> it.copy(creator = update)
+                CardField.CharacterVersion -> it.copy(characterVersion = update)
                 CardField.CreatorNotes -> it.copy(creatorNotes = update)
-                else -> {
-                    println("Field $field")
-                    it
-                }
+                else -> it
             }
         }
     }
@@ -204,10 +203,10 @@ class CardDetailsViewModel(
             CardField.Scenario -> it.copy(scenario = !it.scenario)
             CardField.FirstMes -> it.copy(firstMes = !it.firstMes)
             CardField.MesExample -> it.copy(mesExample = !it.mesExample)
-            CardField.CreatorNotes -> it.copy(creatorNotes = !it.creatorNotes)
-            else -> {
-                it
-            }
+            CardField.Creator -> it.copy(creator = !it.creator)
+            CardField.CharacterVersion -> it.copy(characterVersion = !it.characterVersion)
+            CardField.CreatorNotes -> it.copy(creatorsNote = !it.creatorsNote)
+            else -> it
         }
     }
 
