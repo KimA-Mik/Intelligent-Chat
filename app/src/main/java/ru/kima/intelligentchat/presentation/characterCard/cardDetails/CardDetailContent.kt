@@ -4,15 +4,16 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,73 +23,158 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.CardDetailsDefaults
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.CardField
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableCard
-import ru.kima.intelligentchat.presentation.common.image.ImmutableBitmap
+import ru.kima.intelligentchat.presentation.common.components.clearFocusOnSoftKeyboardHide
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
+
+private val tabs: ImmutableList<Int> = persistentListOf(
+    R.string.tab_item_history,
+    R.string.tab_item_system,
+    R.string.tab_item_stats,
+)
+
 
 @Composable
 fun CardDetailContent(
     state: CardDetailsState,
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
+) = Column(
+    modifier = modifier,
 ) {
-    var isDescriptionExpanded by remember { mutableStateOf(true) }
-    var isFirstMesExpanded by remember { mutableStateOf(true) }
-    var isPersonalityExpanded by remember { mutableStateOf(false) }
-    var isScenarioExpanded by remember { mutableStateOf(false) }
-    var isCreatorsNotesExpanded by remember { mutableStateOf(false) }
+    val pagerState = rememberPagerState { tabs.size }
 
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(state.selectedTabIndex) {
+        scope.launch { pagerState.animateScrollToPage(state.selectedTabIndex) }
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        onEvent(CardDetailUserEvent.SelectTab(pagerState.currentPage))
+    }
+    TabRow(selectedTabIndex = state.selectedTabIndex) {
+        tabs.forEachIndexed { index, title ->
+            Tab(
+                selected = state.selectedTabIndex == index,
+                onClick = { onEvent(CardDetailUserEvent.SelectTab(index)) },
+                text = {
+                    Text(
+                        text = stringResource(title),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                })
+        }
+    }
+
+    HorizontalPager(pagerState) {
+        val innerModifier = Modifier.fillMaxSize()
+        when (it) {
+            0 -> HistoryTab(
+                tokensCount = state.tokensCount,
+                description = state.card.description,
+                descriptionExpanded = state.switchesState.description,
+                firstMes = state.card.firstMes,
+                firstMesExpanded = state.switchesState.firstMes,
+                personality = state.card.personality,
+                personalityExpanded = state.switchesState.personality,
+                scenario = state.card.scenario,
+                scenarioExpanded = state.switchesState.scenario,
+                mesExample = state.card.mesExample,
+                mesExampleExpanded = state.switchesState.mesExample,
+                modifier = innerModifier,
+                onEvent = onEvent,
+            )
+
+            1 -> SystemTab(
+                creator = state.card.creator,
+                creatorExpanded = state.switchesState.creator,
+                characterVersion = state.card.characterVersion,
+                characterVersionExpanded = state.switchesState.characterVersion,
+                creatorsNote = state.card.creatorNotes,
+                creatorsNoteExpanded = state.switchesState.creatorsNote,
+                onEvent = onEvent,
+                modifier = innerModifier,
+            )
+
+            2 -> StatsTab(
+                modifier = innerModifier,
+            )
+
+            else -> UnreachableTab(
+                modifier = innerModifier,
+            )
+        }
+    }
+}
+
+
+@Composable
+fun HistoryTab(
+    tokensCount: CardDetailsState.TokensCount,
+    description: String,
+    descriptionExpanded: Boolean,
+    firstMes: String,
+    firstMesExpanded: Boolean,
+    personality: String,
+    personalityExpanded: Boolean,
+    scenario: String,
+    scenarioExpanded: Boolean,
+    mesExample: String,
+    mesExampleExpanded: Boolean,
+    modifier: Modifier = Modifier,
+    onEvent: (CardDetailUserEvent) -> Unit
+) {
     val scrollState = rememberScrollState()
     Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .verticalScroll(scrollState),
+        modifier = modifier.verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        HeadArea(
-            name = state.card.name,
-            cardTokens = state.tokensCount.totalTokens,
-            nameTokensCount = state.tokensCount.name,
-            photo = state.card.photoBytes,
-            onEvent = onEvent
-        )
-
         GeneralInfo(
-            text = state.card.description,
+            text = description,
             title = stringResource(R.string.card_description_title),
-            field = CardDetailsViewModel.CardField.Description,
-            isExpanded = isDescriptionExpanded,
-            onExpand = { isDescriptionExpanded = !isDescriptionExpanded },
+            field = CardField.Description,
+            isExpanded = descriptionExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = state.tokensCount.description,
+            placeholder = stringResource(R.string.card_description_hint),
+            textTokensCount = tokensCount.description,
             showTokensCount = true,
             onEvent = onEvent
         )
 
         GeneralInfo(
-            text = state.card.firstMes,
+            text = firstMes,
             title = stringResource(R.string.card_first_message_title),
-            field = CardDetailsViewModel.CardField.FirstMes,
-            isExpanded = isFirstMesExpanded,
-            onExpand = { isFirstMesExpanded = !isFirstMesExpanded },
+            field = CardField.FirstMes,
+            isExpanded = firstMesExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = state.tokensCount.firstMes,
+            placeholder = stringResource(R.string.card_first_message_hint),
+            textTokensCount = tokensCount.firstMes,
             showTokensCount = true,
             supportRow = {
                 TextButton(onClick = {
@@ -101,59 +187,137 @@ fun CardDetailContent(
         )
 
         GeneralInfo(
-            text = state.card.personality,
+            text = personality,
             title = stringResource(R.string.card_personality_title),
-            field = CardDetailsViewModel.CardField.Personality,
-            isExpanded = isPersonalityExpanded,
-            onExpand = { isPersonalityExpanded = !isPersonalityExpanded },
+            field = CardField.Personality,
+            isExpanded = personalityExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = state.tokensCount.personality,
+            placeholder = stringResource(R.string.card_personality_hint),
+            textTokensCount = tokensCount.personality,
             showTokensCount = true,
             onEvent = onEvent
         )
 
         GeneralInfo(
-            text = state.card.scenario,
+            text = scenario,
             title = stringResource(R.string.card_scenario_title),
-            field = CardDetailsViewModel.CardField.Scenario,
-            isExpanded = isScenarioExpanded,
-            onExpand = { isScenarioExpanded = !isScenarioExpanded },
+            field = CardField.Scenario,
+            isExpanded = scenarioExpanded,
             modifier = Modifier.padding(8.dp),
-            textTokensCount = state.tokensCount.scenario,
+            placeholder = stringResource(R.string.card_scenario_hint),
+            textTokensCount = tokensCount.scenario,
             showTokensCount = true,
             onEvent = onEvent
         )
 
         GeneralInfo(
-            text = state.card.creatorNotes,
-            title = stringResource(R.string.card_creators_note_title),
-            field = CardDetailsViewModel.CardField.CreatorNotes,
-            isExpanded = isCreatorsNotesExpanded,
-            onExpand = { isCreatorsNotesExpanded = !isCreatorsNotesExpanded },
+            text = mesExample,
+            title = stringResource(R.string.card_message_example_title),
+            field = CardField.MesExample,
+            isExpanded = mesExampleExpanded,
             modifier = Modifier.padding(8.dp),
+            placeholder = stringResource(R.string.card_message_example_hint),
+            textTokensCount = tokensCount.mesExample,
+            showTokensCount = true,
             onEvent = onEvent
         )
     }
 }
 
 @Composable
+fun SystemTab(
+    creator: String,
+    creatorExpanded: Boolean,
+    characterVersion: String,
+    characterVersionExpanded: Boolean,
+    creatorsNote: String,
+    creatorsNoteExpanded: Boolean,
+    onEvent: (CardDetailUserEvent) -> Unit,
+    modifier: Modifier = Modifier
+) = Column(
+    modifier = modifier.verticalScroll(rememberScrollState()),
+) {
+    GeneralInfo(
+        text = creator,
+        title = stringResource(R.string.card_creator_title),
+        field = CardField.Creator,
+        isExpanded = creatorExpanded,
+        modifier = Modifier.padding(8.dp),
+        placeholder = stringResource(R.string.card_creator_hint),
+        onEvent = onEvent
+    )
+
+    GeneralInfo(
+        text = characterVersion,
+        title = stringResource(R.string.card_character_version_title),
+        field = CardField.CharacterVersion,
+        isExpanded = characterVersionExpanded,
+        modifier = Modifier.padding(8.dp),
+        placeholder = stringResource(R.string.card_character_version_hint),
+        onEvent = onEvent
+    )
+
+    GeneralInfo(
+        text = creatorsNote,
+        title = stringResource(R.string.card_creators_note_title),
+        field = CardField.CreatorNotes,
+        isExpanded = creatorsNoteExpanded,
+        modifier = Modifier.padding(8.dp),
+        placeholder = stringResource(R.string.card_creators_note_hint),
+        onEvent = onEvent
+    )
+}
+
+
+@Composable
+fun StatsTab(modifier: Modifier = Modifier) {
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = modifier.verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "(„ಡωಡ„)\nHere will be stats soon",
+            style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun UnreachableTab(modifier: Modifier = Modifier) {
+    val scrollState = rememberScrollState()
+    Box(
+        modifier = modifier.verticalScroll(scrollState),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "୧((#Φ益Φ#))୨", style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+
+@Composable
 fun HeadArea(
     name: String,
     cardTokens: Int,
     nameTokensCount: Int,
-    photo: ImmutableBitmap,
+    photoName: String?,
     modifier: Modifier = Modifier,
+    imageSize: Dp = CardDetailsDefaults.imageSize,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .padding(top = 16.dp, start = 8.dp, end = 8.dp)
-            .then(modifier)
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        CardImage(
+        AsyncCardImage(
             // FIXME: Fix later
-            photo,
-            modifier = Modifier.size(100.dp)
+            photoName = photoName,
+            imageSize = imageSize
         ) {
             onEvent(CardDetailUserEvent.SelectImageClicked)
         }
@@ -166,16 +330,17 @@ fun HeadArea(
             value = name, onValueChange = { newValue ->
                 onEvent(
                     CardDetailUserEvent.FieldUpdate(
-                        CardDetailsViewModel.CardField.Name,
+                        CardField.Name,
                         newValue
                     )
                 )
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .weight(1f),
-            maxLines = 3,
+                .weight(1f)
+                .clearFocusOnSoftKeyboardHide(),
+            maxLines = 2,
+            textStyle = MaterialTheme.typography.bodyLarge,
             supportingText = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -193,7 +358,6 @@ fun HeadArea(
                 }
             }
         )
-
     }
 }
 
@@ -201,10 +365,10 @@ fun HeadArea(
 fun GeneralInfo(
     text: String,
     title: String,
-    field: CardDetailsViewModel.CardField,
+    field: CardField,
     isExpanded: Boolean,
-    onExpand: () -> Unit,
     modifier: Modifier = Modifier,
+    placeholder: String? = null,
     textTokensCount: Int = 0,
     showTokensCount: Boolean = false,
     supportRow: @Composable RowScope.() -> Unit = { Spacer(Modifier.weight(1f)) },
@@ -226,7 +390,9 @@ fun GeneralInfo(
             )
 
             IconButton(
-                onClick = onExpand
+                onClick = {
+                    onEvent(CardDetailUserEvent.FieldSwitch(field))
+                }
             ) {
                 Icon(
                     modifier = Modifier.graphicsLayer(
@@ -244,9 +410,15 @@ fun GeneralInfo(
                 value = text,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .clearFocusOnSoftKeyboardHide(),
                 onValueChange = { updated ->
                     onEvent(CardDetailUserEvent.FieldUpdate(field, updated))
+                },
+                placeholder = {
+                    placeholder?.let {
+                        Text(it)
+                    }
                 },
                 supportingText = {
                     Row(

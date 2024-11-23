@@ -7,7 +7,7 @@ import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.model.PersonaImage
 
 sealed interface Sender {
-    data class CharacterSender(val card: CharacterCard) : Sender
+    data class CharacterSender(val card: CharacterCard, val image: Bitmap?) : Sender
     data class PersonaSender(val persona: Persona, val image: PersonaImage) : Sender
 
     val name: String
@@ -18,7 +18,7 @@ sealed interface Sender {
 
     val photo: Bitmap?
         get() = when (this) {
-            is CharacterSender -> card.photoBytes
+            is CharacterSender -> image
             is PersonaSender -> image.bitmap
         }
 

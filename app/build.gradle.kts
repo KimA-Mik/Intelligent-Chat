@@ -12,8 +12,8 @@ android {
         applicationId = "ru.kima.intelligentchat"
         minSdk = 24
         targetSdk = 35
-        versionCode = 12
-        versionName = "0.85.2"
+        versionCode = 13
+        versionName = "0.86"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)

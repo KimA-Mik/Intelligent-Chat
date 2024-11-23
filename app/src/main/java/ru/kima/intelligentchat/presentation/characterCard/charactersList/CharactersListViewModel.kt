@@ -165,7 +165,7 @@ class CharactersListViewModel(
             _uiEvents.emit(Event(CharactersListUiEvent.Message.NoSuchCard))
             return@launch
         }
-        if (card.thumbnail.bitmap == null) {
+        if (card.photoName == null) {
             _uiEvents.emit(Event(CharactersListUiEvent.Message.NoCardPhoto))
             return@launch
         }

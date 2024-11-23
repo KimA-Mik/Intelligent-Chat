@@ -6,14 +6,12 @@ import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
-import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 
 fun FullChat.toDisplayChat(
     card: CharacterCard,
-    preloadCardImageBitmap: ImmutableImageBitmap,
     selectedPersona: Long,
     personasNames: Map<Long, String> = emptyMap(),
-    personasImages: Map<Long, ImmutableImageBitmap> = emptyMap()
+    personasImages: Map<Long, String?> = emptyMap()
 ): DisplayChat {
     val chatMessages = if (messages.isEmpty()) {
         val firstMessage = MessageWithSwipes(
@@ -42,7 +40,7 @@ fun FullChat.toDisplayChat(
         mutableListOf(
             firstMessage.toDisplayMessage(
                 card.name,
-                preloadCardImageBitmap,
+                card.photoName,
                 personasNames,
                 personasImages,
                 showSwipeInfo = firstMessage.swipes.size > 1
@@ -51,7 +49,10 @@ fun FullChat.toDisplayChat(
     } else {
         messages.mapIndexed { index, message ->
             message.toDisplayMessage(
-                card.name, preloadCardImageBitmap, personasNames, personasImages,
+                card.name,
+                card.photoName,
+                personasNames,
+                personasImages,
                 showSwipeInfo = index == messages.lastIndex && message.sender == SenderType.Character
             )
         }

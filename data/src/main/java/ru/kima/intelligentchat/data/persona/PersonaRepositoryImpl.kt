@@ -64,6 +64,7 @@ class PersonaRepositoryImpl(
         return try {
             val avatarName = getPersonaAvatarFileName(id)
             val fd = imageStorage.getImageFileDescriptor(avatarName)
+                ?: return PersonaImage(bitmap = null)
             val bitmap = BitmapFactory.decodeFileDescriptor(fd)
             PersonaImage(bitmap = bitmap)
         } catch (ex: FileNotFoundException) {

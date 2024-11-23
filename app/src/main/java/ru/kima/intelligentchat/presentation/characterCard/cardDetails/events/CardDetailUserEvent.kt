@@ -1,6 +1,6 @@
 package ru.kima.intelligentchat.presentation.characterCard.cardDetails.events
 
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.CardDetailsViewModel
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.CardField
 
 sealed interface CardDetailUserEvent {
     data class UpdateCardImage(val bytes: ByteArray) : CardDetailUserEvent {
@@ -19,7 +19,10 @@ sealed interface CardDetailUserEvent {
     }
 
     data object SelectImageClicked : CardDetailUserEvent
-    data class FieldUpdate(val field: CardDetailsViewModel.CardField, val updatedString: String) :
+    data class FieldUpdate(val field: CardField, val updatedString: String) :
+        CardDetailUserEvent
+
+    data class FieldSwitch(val field: CardField) :
         CardDetailUserEvent
 
     data object OpenAltGreetingsSheet : CardDetailUserEvent
@@ -32,4 +35,6 @@ sealed interface CardDetailUserEvent {
     data object AcceptAltGreetingEdit : CardDetailUserEvent
     data object RejectAltGreetingEdit : CardDetailUserEvent
     data class UpdateAlternateGreetingBuffer(val buffer: String) : CardDetailUserEvent
+    data object NavigateUp : CardDetailUserEvent
+    data class SelectTab(val index: Int) : CardDetailUserEvent
 }

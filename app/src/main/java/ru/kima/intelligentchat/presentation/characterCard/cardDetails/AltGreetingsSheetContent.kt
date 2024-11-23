@@ -24,10 +24,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.events.CardDetailUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.model.ImmutableAltGreeting
+import ru.kima.intelligentchat.presentation.common.components.clearFocusOnSoftKeyboardHide
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -152,8 +155,10 @@ fun EditableAlternateGreeting(
             onValueChange = { onEvent(CardDetailUserEvent.UpdateAlternateGreetingBuffer(it)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            textStyle = MaterialTheme.typography.bodyMedium
+                .padding(horizontal = 8.dp)
+                .clearFocusOnSoftKeyboardHide(),
+            textStyle = MaterialTheme.typography.bodyMedium,
+            placeholder = { Text(text = stringResource(R.string.card_first_message_hint)) }
         )
     }
 }

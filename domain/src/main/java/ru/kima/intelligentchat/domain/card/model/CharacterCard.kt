@@ -1,11 +1,9 @@
 package ru.kima.intelligentchat.domain.card.model
 
-import android.graphics.Bitmap
-
 data class CharacterCard(
     val id: Long,
 
-    val photoBytes: Bitmap?,
+    val photoName: String? = null,
 
     val name: String,
     val description: String,
@@ -34,7 +32,7 @@ data class CharacterCard(
     companion object {
         fun default(
             id: Long = 0,
-            photoBytes: Bitmap? = null,
+            photoName: String? = null,
             name: String = String(),
             description: String = String(),
             personality: String = String(),
@@ -54,7 +52,7 @@ data class CharacterCard(
         ): CharacterCard {
             return CharacterCard(
                 id = id,
-                photoBytes = photoBytes,
+                photoName = photoName,
                 name = name,
                 description = description,
                 personality = personality,

@@ -1,10 +1,8 @@
 package ru.kima.intelligentchat.presentation.showImage
 
-import android.graphics.Bitmap
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
@@ -26,12 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
+import ru.kima.intelligentchat.common.photoNameToFile
 
 
 @Composable
@@ -40,7 +40,7 @@ fun ShowImageScreen(
     snackbarHostState: SnackbarHostState,
     viewModel: ShowImageViewModel
 ) {
-    val imageBitmap by viewModel.imageBitmap.collectAsState()
+    val photoName by viewModel.photoName.collectAsState()
     LaunchedEffect(true) {
         viewModel.uiEvents.collect { event ->
             when (event) {
@@ -51,20 +51,18 @@ fun ShowImageScreen(
     }
 
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { contentPadding ->
-        if (imageBitmap != null) {
-            ShowImageContent(
-                Modifier.padding(contentPadding),
-                bitmap = imageBitmap!!,
-                onEvent = viewModel::onEvent
-            )
-        }
+        ShowImageContent(
+            photoName = photoName,
+            Modifier.padding(contentPadding),
+            onEvent = viewModel::onEvent
+        )
     }
 }
 
 @Composable
 fun ShowImageContent(
+    photoName: String?,
     modifier: Modifier,
-    bitmap: Bitmap,
     onEvent: (ShowImageViewModel.UserEvent) -> Unit
 ) {
     val config = LocalConfiguration.current
@@ -72,8 +70,7 @@ fun ShowImageContent(
     val screenHeight = config.screenHeightDp.toFloat()
     val screenWidth = config.screenWidthDp.toFloat()
 
-    val imageHeight = remember(bitmap) { bitmap.height.toFloat() }
-    val imageBitmap = remember(bitmap) { bitmap.asImageBitmap() }
+    var imageHeight by remember { mutableFloatStateOf(1f) }
 
     Box(modifier = modifier) {
         var scale by remember { mutableFloatStateOf(1f) }
@@ -133,8 +130,13 @@ fun ShowImageContent(
             }
         }
 
-        Image(
-            bitmap = imageBitmap, contentDescription = "This is an image",
+        val context = LocalContext.current
+        val file = remember(photoName) {
+            context.photoNameToFile(photoName)
+        }
+
+        AsyncImage(
+            model = file, contentDescription = "This is an image",
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
                 .fillMaxSize()
@@ -145,8 +147,11 @@ fun ShowImageContent(
                     translationX = animateX,
                     translationY = animateY
                 )
-                .transformable(state)
+                .transformable(state),
 //                .offset(animateX, animateY)
+            onSuccess = {
+                imageHeight = it.result.image.height.toFloat()
+            }
         )
 
         IconButton(

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.CardImage
+import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
@@ -41,11 +40,10 @@ fun CardItem(
         modifier = modifier.clickable { onCardClick() },
     ) {
         Row {
-            CardImage(
-                image = card.thumbnail,
-                modifier = Modifier
-                    .size(72.dp)
-                    .padding(8.dp),
+            AsyncCardImage(
+                photoName = card.photoName,
+                imageSize = 72.dp,
+                modifier = Modifier.padding(8.dp),
                 onClick = onAvatarClick
             )
 

@@ -13,7 +13,7 @@ interface CharacterCardRepository {
     suspend fun putCharacterCardFromJson(serialized: String): Long
     suspend fun updateCharacterCard(characterCard: CharacterCard)
     suspend fun deleteCards(cards: List<CharacterCard>)
-    suspend fun updateCardAvatar(cardId: Long, bytes: ByteArray)
+    suspend fun updateCardAvatar(cardId: Long, photoName: String?)
     suspend fun getMarkedCards(): List<CharacterCard>
     suspend fun createAlternateGreeting(cardId: Long): Long
     suspend fun updateAlternateGreeting(altGreeting: AltGreeting, cardId: Long)

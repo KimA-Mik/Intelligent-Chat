@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person4
@@ -22,12 +23,19 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import ru.kima.intelligentchat.common.photoNameToFile
 import ru.kima.intelligentchat.presentation.common.image.ImmutableBitmap
 import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
+import ru.kima.intelligentchat.presentation.common.util.dpToPx
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
+import kotlin.math.roundToInt
 
 @Composable
 fun CardImage(
@@ -90,6 +98,53 @@ fun CardImage(
 
     Image(
         painter = bitmap.imageBitmap?.let { BitmapPainter(it) } ?: emptyPainter,
+        contentDescription = contentDescription,
+        modifier = imageModifier,
+        contentScale = ContentScale.Crop
+    )
+}
+
+@Composable
+fun AsyncCardImage(
+    photoName: String?,
+    modifier: Modifier = Modifier,
+    imageSize: Dp = 40.dp,
+    borderColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
+    emptyPainter: Painter = rememberVectorPainter(
+        image = Icons.Default.Person4,
+        tint = MaterialTheme.colorScheme.onSecondaryContainer
+    ),
+    emptyBackgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
+    contentDescription: String? = null,
+    onClick: () -> Unit
+) {
+    val imageModifier = modifier
+        .size(imageSize)
+        .clip(CircleShape)
+        .border(
+            width = 1.5.dp,
+            color = borderColor,
+            shape = CircleShape
+        )
+        .clickable { onClick() }
+        .drawBehind {
+            if (photoName == null && emptyBackgroundColor != Color.Unspecified) {
+                drawCircle(color = emptyBackgroundColor)
+            }
+        }
+
+    val pixelSize = imageSize.dpToPx()
+    val context = LocalContext.current
+    val request = remember(photoName, pixelSize) {
+        ImageRequest.Builder(context)
+            .data(context.photoNameToFile(photoName))
+            .size(pixelSize.roundToInt())
+            .build()
+    }
+
+    val painter = rememberAsyncImagePainter(model = request)
+    Image(
+        painter = if (photoName != null) painter else emptyPainter,
         contentDescription = contentDescription,
         modifier = imageModifier,
         contentScale = ContentScale.Crop

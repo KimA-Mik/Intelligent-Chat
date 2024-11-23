@@ -4,13 +4,12 @@ import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.model.Swipe
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
-import ru.kima.intelligentchat.presentation.common.image.ImmutableImageBitmap
 
 fun MessageWithSwipes.toDisplayMessage(
     cardName: String,
-    cardBitmap: ImmutableImageBitmap = ImmutableImageBitmap(),
+    cardImageName: String?,
     personasNames: Map<Long, String> = emptyMap(),
-    personasImages: Map<Long, ImmutableImageBitmap> = emptyMap(),
+    personasImages: Map<Long, String?> = emptyMap(),
     showSwipeInfo: Boolean = false,
 ): DisplayMessage {
     val selectedSwipe = swipes.getOrElse(selectedSwipeIndex) {
@@ -24,10 +23,10 @@ fun MessageWithSwipes.toDisplayMessage(
         senderName = if (sender == SenderType.Character) cardName else personasNames.getOrElse(
             senderId
         ) { "Unknown persona" },
-        senderImage = if (sender == SenderType.Character)
-            cardBitmap
+        senderImageName = if (sender == SenderType.Character)
+            cardImageName
         else
-            personasImages.getOrElse(senderId) { ImmutableImageBitmap() },
+            personasImages[senderId],
         text = selectedSwipe.text,
         sentTimeMillis = selectedSwipe.sendTime,
         currentSwipe = selectedSwipeIndex + 1,

@@ -22,6 +22,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTooltipState
@@ -64,6 +65,7 @@ fun AppBar(
     isActionMode: Boolean = false,
     onCancelActionMode: () -> Unit = {},
 
+    colors: TopAppBarColors? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     Column(
@@ -88,7 +90,7 @@ fun AppBar(
             },
             title = titleContent,
             actions = actions,
-            colors = TopAppBarDefaults.topAppBarColors(
+            colors = colors ?: TopAppBarDefaults.topAppBarColors(
                 containerColor = backgroundColor
                     ?: MaterialTheme.colorScheme.surfaceColorAtElevation(
                         elevation = if (isActionMode) 3.dp else 0.dp,
@@ -98,7 +100,6 @@ fun AppBar(
         )
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
