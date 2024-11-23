@@ -98,9 +98,18 @@ fun CardDetailContent(
         val innerModifier = Modifier.fillMaxSize()
         when (it) {
             0 -> HistoryTab(
-                state = state,
                 modifier = innerModifier,
-                onEvent = onEvent
+                onEvent = onEvent,
+                description = state.card.description,
+                descriptionTokenCount = state.tokensCount.description,
+                firstMes = state.card.firstMes,
+                firstMesTokenCount = state.tokensCount.firstMes,
+                personality = state.card.personality,
+                personalityTokenCount = state.tokensCount.personality,
+                scenario = state.card.scenario,
+                scenarioTokenCount = state.tokensCount.scenario,
+                exampleDialog = state.card.mesExample,
+                exampleDialogTokenCount = state.tokensCount.mesExample,
             )
 
             1 -> SystemTab(
@@ -121,7 +130,16 @@ fun CardDetailContent(
 
 @Composable
 fun HistoryTab(
-    state: CardDetailsState,
+    description: String,
+    descriptionTokenCount: Int,
+    firstMes: String,
+    firstMesTokenCount: Int,
+    personality: String,
+    personalityTokenCount: Int,
+    scenario: String,
+    scenarioTokenCount: Int,
+    exampleDialog: String,
+    exampleDialogTokenCount: Int,
     modifier: Modifier = Modifier,
     onEvent: (CardDetailUserEvent) -> Unit
 ) {
@@ -136,28 +154,26 @@ fun HistoryTab(
         modifier = modifier.verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-
         GeneralInfo(
-            text = state.card.description,
+            text = description,
             title = stringResource(R.string.card_description_title),
             field = CardDetailsViewModel.CardField.Description,
             isExpanded = isDescriptionExpanded,
             onExpand = { isDescriptionExpanded = !isDescriptionExpanded },
             modifier = Modifier.padding(8.dp),
-            textTokensCount = state.tokensCount.description,
+            textTokensCount = descriptionTokenCount,
             showTokensCount = true,
             onEvent = onEvent
         )
 
         GeneralInfo(
-            text = state.card.firstMes,
+            text = firstMes,
             title = stringResource(R.string.card_first_message_title),
             field = CardDetailsViewModel.CardField.FirstMes,
             isExpanded = isFirstMesExpanded,
             onExpand = { isFirstMesExpanded = !isFirstMesExpanded },
             modifier = Modifier.padding(8.dp),
-            textTokensCount = state.tokensCount.firstMes,
+            textTokensCount = firstMesTokenCount,
             showTokensCount = true,
             supportRow = {
                 TextButton(onClick = {
@@ -170,36 +186,38 @@ fun HistoryTab(
         )
 
         GeneralInfo(
-            text = state.card.personality,
+            text = personality,
             title = stringResource(R.string.card_personality_title),
             field = CardDetailsViewModel.CardField.Personality,
             isExpanded = isPersonalityExpanded,
             onExpand = { isPersonalityExpanded = !isPersonalityExpanded },
             modifier = Modifier.padding(8.dp),
-            textTokensCount = state.tokensCount.personality,
+            textTokensCount = personalityTokenCount,
             showTokensCount = true,
             onEvent = onEvent
         )
 
         GeneralInfo(
-            text = state.card.scenario,
+            text = scenario,
             title = stringResource(R.string.card_scenario_title),
             field = CardDetailsViewModel.CardField.Scenario,
             isExpanded = isScenarioExpanded,
             onExpand = { isScenarioExpanded = !isScenarioExpanded },
             modifier = Modifier.padding(8.dp),
-            textTokensCount = state.tokensCount.scenario,
+            textTokensCount = scenarioTokenCount,
             showTokensCount = true,
             onEvent = onEvent
         )
 
         GeneralInfo(
-            text = state.card.creatorNotes,
-            title = stringResource(R.string.card_creators_note_title),
+            text = exampleDialog,
+            title = stringResource(R.string.card_example_dialogs_title),
             field = CardDetailsViewModel.CardField.CreatorNotes,
             isExpanded = isCreatorsNotesExpanded,
             onExpand = { isCreatorsNotesExpanded = !isCreatorsNotesExpanded },
             modifier = Modifier.padding(8.dp),
+            textTokensCount = exampleDialogTokenCount,
+            showTokensCount = true,
             onEvent = onEvent
         )
     }
