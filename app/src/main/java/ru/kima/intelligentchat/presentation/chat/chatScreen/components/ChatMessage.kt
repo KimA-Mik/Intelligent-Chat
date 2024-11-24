@@ -39,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -58,6 +57,7 @@ import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownAnnotator
 import dev.snipme.highlights.Highlights
 import org.intellij.markdown.MarkdownTokenTypes
+import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.formatAndTrim
@@ -284,7 +284,7 @@ fun AnimatedText(
 
     var italicIndex by remember(text) { mutableIntStateOf(-1) }
     var quoteIndex by remember(text) { mutableIntStateOf(-1) }
-    var annotatedStringBuilder by remember { mutableStateOf<AnnotatedString.Builder?>(null) }
+    var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
     AnimatedContent(
         targetState = text, label = "",
         modifier = modifier,
@@ -295,19 +295,23 @@ fun AnimatedText(
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
             annotator = markdownAnnotator { _, child ->
-                if (annotatedStringBuilder != this) {
-                    annotatedStringBuilder = this
+                if (child.parent != parent) {
+                    parent = child.parent
                     italicIndex = -1
                     quoteIndex = -1
                 }
 
                 when {
+                    child.type == MarkdownTokenTypes.WHITE_SPACE -> {
+                        italicIndex = -1
+                        quoteIndex = -1
+                    }
+
                     child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset == 1 -> {
                         if (italicIndex < 0) {
                             italicIndex = pushStyle(italicStyle)
                         } else {
-                            pop(italicIndex)
-                            quoteIndex = shiftIfNeeded(italicIndex, quoteIndex)
+                            pop()
                             italicIndex = -1
                         }
                     }
@@ -317,8 +321,7 @@ fun AnimatedText(
                             quoteIndex = pushStyle(quoteStyle)
                         } else {
                             append(MarkdownTokenTypes.DOUBLE_QUOTE.name)
-                            pop(quoteIndex)
-                            italicIndex = shiftIfNeeded(quoteIndex, italicIndex)
+                            pop()
                             quoteIndex = -1
                             return@markdownAnnotator true
                         }
@@ -328,7 +331,7 @@ fun AnimatedText(
                 return@markdownAnnotator false
             },
             components = markdownComponents(
-                //TODO: Add customization support
+                //TODO: Add support
                 codeBlock = { markdownComponentModel ->
                     MarkdownCodeBlock(
                         markdownComponentModel.content,
@@ -350,10 +353,6 @@ fun AnimatedText(
     }
 }
 
-fun shiftIfNeeded(l: Int, r: Int): Int {
-    return if (l <= r) -1
-    else r
-}
 
 @Composable
 fun ImageAndMetaInfo(
