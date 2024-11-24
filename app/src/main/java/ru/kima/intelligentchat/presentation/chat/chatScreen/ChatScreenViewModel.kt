@@ -136,11 +136,11 @@ class ChatScreenViewModel(
             chatInfo,
             messagingStatus()
                 .onEach { if (it is MessagingIndicator.Done) _uiEvent.emit(Event(UiEvent.ScrollDown)) },
-            savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, String()),
-            savedStateHandle.getStateFlow(MESSAGE_EDIT_BUFFER, String()),
+            savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, ""),
+            savedStateHandle.getStateFlow(MESSAGE_EDIT_BUFFER, ""),
             savedStateHandle.getStateFlow(EDITED_MESSAGE_ID, EMPTY_EDITED_MESSAGE_ID),
             savedStateHandle.getStateFlow(OPEN_URI_REQUEST, false),
-            savedStateHandle.getStateFlow(URI_TO_OPEN, String())
+            savedStateHandle.getStateFlow(URI_TO_OPEN, "")
         ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId, openUriRequest, uriToOpen ->
             ChatState(
                 info = info,
@@ -205,7 +205,7 @@ class ChatScreenViewModel(
 
     private fun onDismissOpenUriRequest() {
         savedStateHandle[OPEN_URI_REQUEST] = false
-        savedStateHandle[URI_TO_OPEN] = String()
+        savedStateHandle[URI_TO_OPEN] = ""
     }
 
     private fun onAcceptOpenUriRequest() {
@@ -327,7 +327,7 @@ class ChatScreenViewModel(
 
     private fun onSendMessage(state: ChatState) = viewModelScope.launch {
         val text = state.inputMessageBuffer
-        savedStateHandle[MESSAGE_INPUT_BUFFER] = String()
+        savedStateHandle[MESSAGE_INPUT_BUFFER] = ""
         sendMessage(
             chatId = characterCard.value.selectedChat,
             personaId = state.info.fullChat.selectedPersonaId,

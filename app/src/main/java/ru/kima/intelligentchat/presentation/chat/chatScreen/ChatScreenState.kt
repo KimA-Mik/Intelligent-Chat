@@ -6,8 +6,8 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessa
 
 data class ChatState(
     val info: ChatInfo = ChatInfo(),
-    val inputMessageBuffer: String = String(),
-    val editMessageBuffer: String = String(),
+    val inputMessageBuffer: String = "",
+    val editMessageBuffer: String = "",
     val editMessageId: Long = 0L,
     val status: ImmutableMessagingIndicator = ImmutableMessagingIndicator.None,
     val openUriRequestDialog: Boolean = false,
