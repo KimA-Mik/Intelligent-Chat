@@ -241,7 +241,7 @@ class MessagingService : Service(), KoinComponent {
         currentGenerationId = null
         currentGenerationStrategy = null
         resultedMessage?.let { msg ->
-            savingStrategy.save(msg, data.sender)
+            savingStrategy.save(msg.trim().trimIndent(), data.sender)
             _status.value = MessagingIndicator.Done
             //Dirty hack
             delay(10)

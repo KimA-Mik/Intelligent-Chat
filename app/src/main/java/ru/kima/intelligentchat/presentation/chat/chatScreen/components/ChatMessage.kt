@@ -39,6 +39,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +58,10 @@ import com.mikepenz.markdown.compose.extendedspans.SquigglyUnderlineSpanPainter
 import com.mikepenz.markdown.compose.extendedspans.rememberSquigglyUnderlineAnimator
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
+import com.mikepenz.markdown.model.markdownAnnotator
 import com.mikepenz.markdown.model.markdownExtendedSpans
+import org.intellij.markdown.MarkdownTokenTypes
+import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.formatAndTrim
@@ -262,21 +268,26 @@ fun AnimatedText(
     }
     prevSwipe = currentSwipe
 
-//    val colorScheme = MaterialTheme.colorScheme
-//    val actionStyle = remember {
-//        SpanStyle(
-//            fontWeight = FontWeight.Bold,
-//            fontStyle = FontStyle.Italic,
-//            color = colorScheme.onPrimaryContainer
-//        )
-//    }
-//    val dialogueStyle = remember {
-//        SpanStyle(
-//            fontStyle = FontStyle.Italic,
-//            color = colorScheme.primary
-//        )
-//    }
+    val colorScheme = MaterialTheme.colorScheme
+    //TODO: Factor out colors
+    val italicStyle = remember {
+        SpanStyle(
+            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.onPrimaryContainer
+        )
+    }
+    val quoteStyle = remember {
+        SpanStyle(
+            fontWeight = FontWeight.Normal,
+            fontStyle = FontStyle.Normal,
+            color = colorScheme.primary
+        )
+    }
 
+    var italicIndex by remember(text) { mutableIntStateOf(-1) }
+    var quoteIndex by remember(text) { mutableIntStateOf(-1) }
+    var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
     AnimatedContent(
         targetState = text, label = "",
         modifier = modifier,
@@ -291,42 +302,43 @@ fun AnimatedText(
                 remember {
                     ExtendedSpans(
                         RoundedCornerSpanPainter(),
-                        SquigglyUnderlineSpanPainter(animator = animator)
+                        SquigglyUnderlineSpanPainter(animator = animator),
                     )
                 }
             },
-//            annotator = markdownAnnotator { content, child ->
-//                if (child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset > 1) {
-//                    if (child.endOffset < length) append(child.getTextInNode(content))
-//                    addStyle(actionStyle, child.startOffset, child.endOffset)
-//                    return@markdownAnnotator true
-//                }
-//
-////                if (child.type == MarkdownTokenTypes.TEXT &&
-////                    child.startOffset - 1 in content.indices && content[child.endOffset] == '"' &&
-////                    child.endOffset in content.indices && content[child.endOffset] == '"'
-////                ) {
-////                    if (child.endOffset < length) append(child.getTextInNode(content))
-////                    addStyle(dialogueStyle, child.startOffset - 1, child.endOffset + 1)
-////                    return@markdownAnnotator false
-////                }
-//
-//
-//
-//                if (child.startOffset - 1 in content.indices) {
-//                    Log.d(TAG, "prev: ${content[child.startOffset - 1]}")
-//                }
-//                val children = child.children.map { grandchild-> grandchild.type }
-//                Log.d(
-//                    TAG,
-//                    "type: ${child.type}\n children:$children  content: ${child.getTextInNode(content)}"
-//                )
-//                if (child.endOffset in content.indices) {
-//                    Log.d(TAG, "next: ${content[child.endOffset]}\n")
-//                }
-//
-//                false
-//            },
+            annotator = markdownAnnotator { _, child ->
+                if (child.parent != parent) {
+                    parent = child.parent
+                    italicIndex = -1
+                    quoteIndex = -1
+                }
+
+                when {
+                    child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset == 1 -> {
+                        if (italicIndex < 0) {
+                            italicIndex = pushStyle(italicStyle)
+                        } else {
+                            pop(italicIndex)
+                            quoteIndex = shiftIfNeeded(italicIndex, quoteIndex)
+                            italicIndex = -1
+                        }
+                    }
+
+                    child.type == MarkdownTokenTypes.DOUBLE_QUOTE -> {
+                        if (quoteIndex < 0) {
+                            quoteIndex = pushStyle(quoteStyle)
+                        } else {
+                            append(MarkdownTokenTypes.DOUBLE_QUOTE.name)
+                            pop(quoteIndex)
+                            italicIndex = shiftIfNeeded(quoteIndex, italicIndex)
+                            quoteIndex = -1
+                            return@markdownAnnotator true
+                        }
+                    }
+                }
+
+                return@markdownAnnotator false
+            },
             components = markdownComponents(
                 codeBlock = highlightedCodeBlock,
                 codeFence = highlightedCodeFence,
@@ -335,7 +347,10 @@ fun AnimatedText(
     }
 }
 
-//private const val TAG = "ChatMessage"
+fun shiftIfNeeded(l: Int, r: Int): Int {
+    return if (l <= r) -1
+    else r
+}
 
 @Composable
 fun ImageAndMetaInfo(
