@@ -10,6 +10,8 @@ data class ChatState(
     val editMessageBuffer: String = String(),
     val editMessageId: Long = 0L,
     val status: ImmutableMessagingIndicator = ImmutableMessagingIndicator.None,
+    val openUriRequestDialog: Boolean = false,
+    val uriToOpen: String = "",
 ) {
     data class ChatInfo(
         val characterCard: DisplayCard = DisplayCard(),

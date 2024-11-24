@@ -18,4 +18,7 @@ sealed interface UserEvent {
     data object ScrollDown : UserEvent
     data class DeleteCurrentSwipe(val messageId: Long) : UserEvent
     data class RestoreSwipe(val messageId: Long, val swipeId: Long) : UserEvent
+    data class OpenUriRequest(val uri: String) : UserEvent
+    data object AcceptOpenUriRequest : UserEvent
+    data object DismissOpenUriRequest : UserEvent
 }

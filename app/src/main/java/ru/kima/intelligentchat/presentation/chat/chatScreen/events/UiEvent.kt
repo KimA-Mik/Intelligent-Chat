@@ -5,4 +5,5 @@ sealed interface UiEvent {
     data class RestoreMessage(val messageId: Long) : UiEvent
     data object ScrollDown : UiEvent
     data class RestoreSwipe(val messageId: Long, val swipeId: Long) : UiEvent
+    data class OpenUri(val uri: String) : UiEvent
 }

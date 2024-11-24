@@ -142,6 +142,9 @@
     <string name="message_deleted_snackbar_message">Message has been deleted</string>
     <string name="swipe_deleted_snackbar_message">Swipe has been deleted</string>
 
+    <string name="open_uri_request_dialog_title">Open link</string>
+    <string name="open_uri_request_dialog_text">Do you want to open %1$s?</string>
+
 
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
@@ -154,6 +157,7 @@
     <string name="action_search">Search</string>
     <string name="action_reset">Reset</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_open">Open</string>
     <string name="action_search_hint">Search…</string>
     <string name="action_bar_up_description">Navigate up</string>
 

@@ -8,7 +8,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -135,13 +134,17 @@ class ChatScreenViewModel(
             savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, String()),
             savedStateHandle.getStateFlow(MESSAGE_EDIT_BUFFER, String()),
             savedStateHandle.getStateFlow(EDITED_MESSAGE_ID, EMPTY_EDITED_MESSAGE_ID),
-        ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId ->
+            savedStateHandle.getStateFlow(OPEN_URI_REQUEST, false),
+            savedStateHandle.getStateFlow(URI_TO_OPEN, String())
+        ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId, openUriRequest, uriToOpen ->
             ChatState(
                 info = info,
                 inputMessageBuffer = inputMessageBuffer,
                 editMessageBuffer = editMessageBuffer,
                 editMessageId = editMessageId,
-                status = messagingStatus.toImmutable()
+                status = messagingStatus.toImmutable(),
+                openUriRequestDialog = openUriRequest,
+                uriToOpen = uriToOpen
             )
         }
 
@@ -189,7 +192,27 @@ class ChatScreenViewModel(
             UserEvent.ScrollDown -> onScrollDown()
             is UserEvent.DeleteCurrentSwipe -> onDeleteCurrentSwipe(event.messageId)
             is UserEvent.RestoreSwipe -> onRestoreSwipe(event.messageId, event.swipeId)
+            is UserEvent.OpenUriRequest -> onOpenUriRequest(event.uri)
+            UserEvent.AcceptOpenUriRequest -> onAcceptOpenUriRequest()
+            UserEvent.DismissOpenUriRequest -> onDismissOpenUriRequest()
         }
+    }
+
+    private fun onDismissOpenUriRequest() {
+        savedStateHandle[OPEN_URI_REQUEST] = false
+        savedStateHandle[URI_TO_OPEN] = String()
+    }
+
+    private fun onAcceptOpenUriRequest() {
+        savedStateHandle[OPEN_URI_REQUEST] = false
+        savedStateHandle.get<String>(URI_TO_OPEN)?.let {
+            _uiEvent.value = Event(UiEvent.OpenUri(it))
+        }
+    }
+
+    private fun onOpenUriRequest(uri: String) {
+        savedStateHandle[OPEN_URI_REQUEST] = true
+        savedStateHandle[URI_TO_OPEN] = uri
     }
 
     private fun onRestoreSwipe(messageId: Long, swipeId: Long) = viewModelScope.launch {
@@ -339,6 +362,8 @@ class ChatScreenViewModel(
         private const val MESSAGE_INPUT_BUFFER = "MESSAGE_INPUT_BUFFER"
         private const val MESSAGE_EDIT_BUFFER = "MESSAGE_EDIT_BUFFER"
         private const val EDITED_MESSAGE_ID = "EDITED_MESSAGE"
+        private const val OPEN_URI_REQUEST = "OPEN_URI_REQUEST"
+        private const val URI_TO_OPEN = "URI_TO_OPEN"
         private const val EMPTY_EDITED_MESSAGE_ID = -1L
     }
 }
