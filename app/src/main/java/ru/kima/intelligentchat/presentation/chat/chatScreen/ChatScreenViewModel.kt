@@ -95,6 +95,7 @@ class ChatScreenViewModel(
                 chatJob?.cancel()
                 chatJob = viewModelScope.launch {
                     subscribeToFullChat(card.selectedChat).collect {
+                        val prevChatId = _fullChat.value.chatId
                         _fullChat.value = it.valueOr { error ->
                             when (error) {
                                 SubscribeToFullChatUseCase.Error.UnknownError -> FullChat()
@@ -103,6 +104,10 @@ class ChatScreenViewModel(
                                     FullChat()
                                 }
                             }
+                        }
+
+                        if (prevChatId == 0L) {
+                            _uiEvent.value = Event(UiEvent.ScrollDown)
                         }
                     }
                 }
@@ -328,6 +333,8 @@ class ChatScreenViewModel(
             personaId = state.info.fullChat.selectedPersonaId,
             text = text,
         )
+
+        _uiEvent.value = Event(UiEvent.ScrollDown)
     }
 
     private fun onUpdateInputMessage(message: String) {
