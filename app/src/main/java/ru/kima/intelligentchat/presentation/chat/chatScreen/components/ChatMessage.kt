@@ -45,6 +45,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.compose.Markdown
+import com.mikepenz.markdown.compose.components.markdownComponents
+import com.mikepenz.markdown.compose.elements.highlightedCodeBlock
+import com.mikepenz.markdown.compose.elements.highlightedCodeFence
+import com.mikepenz.markdown.compose.extendedspans.ExtendedSpans
+import com.mikepenz.markdown.compose.extendedspans.RoundedCornerSpanPainter
+import com.mikepenz.markdown.compose.extendedspans.SquigglyUnderlineSpanPainter
+import com.mikepenz.markdown.compose.extendedspans.rememberSquigglyUnderlineAnimator
+import com.mikepenz.markdown.m3.markdownColor
+import com.mikepenz.markdown.m3.markdownTypography
+import com.mikepenz.markdown.model.markdownExtendedSpans
+import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
@@ -52,7 +64,6 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.common.components.conditional
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
-import ru.kima.intelligentchat.presentation.common.markdown.MarkdownText
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -251,16 +262,80 @@ fun AnimatedText(
     }
     prevSwipe = currentSwipe
 
+//    val colorScheme = MaterialTheme.colorScheme
+//    val actionStyle = remember {
+//        SpanStyle(
+//            fontWeight = FontWeight.Bold,
+//            fontStyle = FontStyle.Italic,
+//            color = colorScheme.onPrimaryContainer
+//        )
+//    }
+//    val dialogueStyle = remember {
+//        SpanStyle(
+//            fontStyle = FontStyle.Italic,
+//            color = colorScheme.primary
+//        )
+//    }
+
     AnimatedContent(
         targetState = text, label = "",
         modifier = modifier,
         transitionSpec = { animationSpec }) {
-        MarkdownText(
-            text = it,
-//                style = MaterialTheme.typography.bodyLarge
+        Markdown(
+            it,
+            colors = markdownColor(),
+            typography = markdownTypography(),
+            flavour = CommonMarkFlavourDescriptor(),
+            extendedSpans = markdownExtendedSpans {
+                val animator = rememberSquigglyUnderlineAnimator()
+                remember {
+                    ExtendedSpans(
+                        RoundedCornerSpanPainter(),
+                        SquigglyUnderlineSpanPainter(animator = animator)
+                    )
+                }
+            },
+//            annotator = markdownAnnotator { content, child ->
+//                if (child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset > 1) {
+//                    if (child.endOffset < length) append(child.getTextInNode(content))
+//                    addStyle(actionStyle, child.startOffset, child.endOffset)
+//                    return@markdownAnnotator true
+//                }
+//
+////                if (child.type == MarkdownTokenTypes.TEXT &&
+////                    child.startOffset - 1 in content.indices && content[child.endOffset] == '"' &&
+////                    child.endOffset in content.indices && content[child.endOffset] == '"'
+////                ) {
+////                    if (child.endOffset < length) append(child.getTextInNode(content))
+////                    addStyle(dialogueStyle, child.startOffset - 1, child.endOffset + 1)
+////                    return@markdownAnnotator false
+////                }
+//
+//
+//
+//                if (child.startOffset - 1 in content.indices) {
+//                    Log.d(TAG, "prev: ${content[child.startOffset - 1]}")
+//                }
+//                val children = child.children.map { grandchild-> grandchild.type }
+//                Log.d(
+//                    TAG,
+//                    "type: ${child.type}\n children:$children  content: ${child.getTextInNode(content)}"
+//                )
+//                if (child.endOffset in content.indices) {
+//                    Log.d(TAG, "next: ${content[child.endOffset]}\n")
+//                }
+//
+//                false
+//            },
+            components = markdownComponents(
+                codeBlock = highlightedCodeBlock,
+                codeFence = highlightedCodeFence,
+            )
         )
     }
 }
+
+//private const val TAG = "ChatMessage"
 
 @Composable
 fun ImageAndMetaInfo(
