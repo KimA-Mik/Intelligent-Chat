@@ -19,10 +19,7 @@ import ru.kima.intelligentchat.presentation.characterCard.charactersList.Charact
 import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListScreen
 import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListState
 import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListViewModel
-import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreen
-import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenState
-import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenViewModel
-import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
+import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenRoot
 import ru.kima.intelligentchat.presentation.navigation.NavItem
 import ru.kima.intelligentchat.presentation.navigation.NavigationLayout
 
@@ -73,21 +70,9 @@ fun NavGraphBuilder.cardGraph(
                     defaultValue = -1L
                 })
         ) {
-            val viewModel: ChatScreenViewModel = koinViewModel()
-            val state by viewModel.state.collectAsStateWithLifecycle(ChatScreenState.ChatState())
-            val uiEvent by viewModel.uiEvent.collectAsStateWithLifecycle()
-            val onEvent = remember<(UserEvent) -> Unit> {
-                {
-                    viewModel.onEvent(it)
-                }
-            }
-
-            ChatScreen(
-                state = state,
-                uiEvent = uiEvent,
+            ChatScreenRoot(
                 navController = navController,
                 snackbarHostState = snackbarHostState,
-                onEvent = onEvent
             )
         }
 
