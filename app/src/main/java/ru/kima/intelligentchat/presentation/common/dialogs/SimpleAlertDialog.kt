@@ -22,24 +22,27 @@ fun SimpleAlertDialog(
     title: String,
     text: String,
     icon: ImageVector,
+    modifier: Modifier = Modifier,
     confirmText: String = "Confirm",
     dismissText: String = "Dismiss"
 ) {
     AlertDialog(
-        icon = { Icon(imageVector = icon, contentDescription = null) },
-        title = { Text(text = title) },
-        text = { Text(text = text) },
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text(text = confirmText)
             }
         },
+        modifier = modifier,
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(text = dismissText)
             }
-        })
+        },
+        icon = { Icon(imageVector = icon, contentDescription = null) },
+        title = { Text(text = title) },
+        text = { Text(text = text) }
+    )
 }
 
 
@@ -53,8 +56,8 @@ fun DialogPreview() {
     IntelligentChatTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             SimpleAlertDialog(
-                onConfirm = {  },
-                onDismiss = {  },
+                onConfirm = { },
+                onDismiss = { },
                 title = "Dialog",
                 text = "Text",
                 icon = Icons.Outlined.Dialpad
