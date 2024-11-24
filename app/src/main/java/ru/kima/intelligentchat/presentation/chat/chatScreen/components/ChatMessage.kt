@@ -52,14 +52,9 @@ import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.highlightedCodeBlock
 import com.mikepenz.markdown.compose.elements.highlightedCodeFence
-import com.mikepenz.markdown.compose.extendedspans.ExtendedSpans
-import com.mikepenz.markdown.compose.extendedspans.RoundedCornerSpanPainter
-import com.mikepenz.markdown.compose.extendedspans.SquigglyUnderlineSpanPainter
-import com.mikepenz.markdown.compose.extendedspans.rememberSquigglyUnderlineAnimator
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownAnnotator
-import com.mikepenz.markdown.model.markdownExtendedSpans
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
@@ -297,15 +292,6 @@ fun AnimatedText(
             colors = markdownColor(),
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
-            extendedSpans = markdownExtendedSpans {
-                val animator = rememberSquigglyUnderlineAnimator()
-                remember {
-                    ExtendedSpans(
-                        RoundedCornerSpanPainter(),
-                        SquigglyUnderlineSpanPainter(animator = animator),
-                    )
-                }
-            },
             annotator = markdownAnnotator { _, child ->
                 if (child.parent != parent) {
                     parent = child.parent
