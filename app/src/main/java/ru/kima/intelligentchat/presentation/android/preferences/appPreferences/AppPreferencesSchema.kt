@@ -16,7 +16,7 @@ data class AppPreferencesSchema(
 
 val Context.preferencesDataStore: DataStore<AppPreferencesSchema> by dataStore(
     fileName = "preferences.pb",
-    serializer = AppPreferencesSerialize
+    serializer = AppPreferencesSerializer
 )
 
 fun AppPreferencesSchema.toPreferences(): AppPreferences {

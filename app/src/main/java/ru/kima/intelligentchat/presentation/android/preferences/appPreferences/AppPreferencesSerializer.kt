@@ -14,7 +14,7 @@ import java.io.OutputStream
 
 
 @OptIn(ExperimentalSerializationApi::class)
-object AppPreferencesSerialize : Serializer<AppPreferencesSchema> {
+object AppPreferencesSerializer : Serializer<AppPreferencesSchema> {
     override val defaultValue: AppPreferencesSchema
         get() = AppPreferencesSchema()
 

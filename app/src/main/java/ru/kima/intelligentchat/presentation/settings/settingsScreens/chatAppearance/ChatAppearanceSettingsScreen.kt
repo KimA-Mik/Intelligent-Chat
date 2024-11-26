@@ -23,7 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatAppearance
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.settings.components.SwitchSettingsItem
 import ru.kima.intelligentchat.presentation.settings.settingsScreens.chatAppearance.events.ChatAppearanceSettingsAction
@@ -35,7 +35,7 @@ fun ChatAppearanceSettingsRoot(
     snackbarHostState: SnackbarHostState,
     viewModel: ChatAppearanceSettingsViewModel = koinViewModel()
 ) {
-    val appearance by viewModel.chatAppearance.collectAsStateWithLifecycle()
+    val appearance by viewModel.chatAppearance.collectAsStateWithLifecycle(ImmutableChatAppearance())
     val onEvent = remember<(ChatAppearanceSettingsAction) -> Unit> {
         {
             viewModel.onEvent(it)
@@ -53,7 +53,7 @@ fun ChatAppearanceSettingsRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatAppearanceSettingsScreen(
-    appearance: ChatAppearance,
+    appearance: ImmutableChatAppearance,
     onEvent: (ChatAppearanceSettingsAction) -> Unit,
     navController: NavHostController,
     snackbarHostState: SnackbarHostState
@@ -83,7 +83,7 @@ fun ChatAppearanceSettingsScreen(
 
 @Composable
 fun ChatAppearanceSettingsContent(
-    appearance: ChatAppearance,
+    appearance: ImmutableChatAppearance,
     onEvent: (ChatAppearanceSettingsAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -112,7 +112,7 @@ private fun ChatAppearanceSettingsPreview() {
     IntelligentChatTheme {
         Surface {
             ChatAppearanceSettingsScreen(
-                appearance = ChatAppearance(),
+                appearance = ImmutableChatAppearance(),
                 onEvent = {},
                 navController = rememberNavController(),
                 snackbarHostState = SnackbarHostState()

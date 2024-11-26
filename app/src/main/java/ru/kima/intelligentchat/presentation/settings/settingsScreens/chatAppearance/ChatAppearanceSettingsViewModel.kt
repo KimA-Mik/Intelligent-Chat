@@ -1,15 +1,19 @@
 package ru.kima.intelligentchat.presentation.settings.settingsScreens.chatAppearance
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatAppearance
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.domain.preferences.chatAppearance.ChatAppearanceRepository
+import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toImmutable
 import ru.kima.intelligentchat.presentation.settings.settingsScreens.chatAppearance.events.ChatAppearanceSettingsAction
 
-class ChatAppearanceSettingsViewModel : ViewModel() {
-    private val _chatAppearance = MutableStateFlow(ChatAppearance())
-    val chatAppearance = _chatAppearance.asStateFlow()
+class ChatAppearanceSettingsViewModel(
+    private val chatAppearanceRepository: ChatAppearanceRepository
+) : ViewModel() {
+    val chatAppearance = chatAppearanceRepository.chatAppearance().map {
+        it.toImmutable()
+    }
 
     fun onEvent(action: ChatAppearanceSettingsAction) {
         when (action) {
@@ -18,15 +22,11 @@ class ChatAppearanceSettingsViewModel : ViewModel() {
         }
     }
 
-    private fun onSetShowDate(value: Boolean) {
-        _chatAppearance.update {
-            it.copy(showDate = value)
-        }
+    private fun onSetShowDate(value: Boolean) = viewModelScope.launch {
+        chatAppearanceRepository.updateShowDate(value)
     }
 
-    private fun onSetShowNumber(value: Boolean) {
-        _chatAppearance.update {
-            it.copy(showNumber = value)
-        }
+    private fun onSetShowNumber(value: Boolean) = viewModelScope.launch {
+        chatAppearanceRepository.updateShowNumber(value)
     }
 }

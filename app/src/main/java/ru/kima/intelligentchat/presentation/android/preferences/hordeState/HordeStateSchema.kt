@@ -26,5 +26,5 @@ data class HordeStateSchema(
 
 val Context.hordeStateDataStore: DataStore<HordeStateSchema> by dataStore(
     fileName = "horde_preferences.pb",
-    serializer = HordeStateSerialize
+    serializer = HordeStateSerializer
 )

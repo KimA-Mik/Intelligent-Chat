@@ -1,5 +1,4 @@
-package ru.kima.intelligentchat.presentation.android.preferences.hordeState
-
+package ru.kima.intelligentchat.presentation.android.preferences.chatAppearance
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
@@ -14,19 +13,18 @@ import java.io.InputStream
 import java.io.OutputStream
 
 @OptIn(ExperimentalSerializationApi::class)
-object HordeStateSerialize : Serializer<HordeStateSchema> {
-    override val defaultValue: HordeStateSchema
-        get() = HordeStateSchema()
+object ChatAppearanceSerializer : Serializer<ChatAppearanceSchema> {
+    override val defaultValue = ChatAppearanceSchema()
 
-    override suspend fun readFrom(input: InputStream): HordeStateSchema {
+    override suspend fun readFrom(input: InputStream): ChatAppearanceSchema {
         try {
-            return ProtoBuf.decodeFromByteArray<HordeStateSchema>(input.readBytes())
+            return ProtoBuf.decodeFromByteArray<ChatAppearanceSchema>(input.readBytes())
         } catch (exception: SerializationException) {
             throw CorruptionException("Cannot read proto.", exception)
         }
     }
 
-    override suspend fun writeTo(t: HordeStateSchema, output: OutputStream) {
+    override suspend fun writeTo(t: ChatAppearanceSchema, output: OutputStream) {
         withContext(Dispatchers.IO) {
             output.write(ProtoBuf.encodeToByteArray(t))
         }
