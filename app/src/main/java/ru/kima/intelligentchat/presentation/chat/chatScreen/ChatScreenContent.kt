@@ -21,13 +21,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.RememberMe
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,12 +40,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,6 +54,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -75,6 +77,9 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
 import ru.kima.intelligentchat.presentation.common.components.AnimatedFab
+import ru.kima.intelligentchat.presentation.common.components.AppBar
+import ru.kima.intelligentchat.presentation.common.components.SimpleUriHandler
+import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.util.runSnackbar
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChatList
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
@@ -84,7 +89,7 @@ import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreenContent(
-    state: ChatScreenState.ChatState,
+    state: ChatState,
     uiEvent: Event<UiEvent>,
     navController: NavController,
     snackbarHostState: SnackbarHostState,
@@ -99,8 +104,21 @@ fun ChatScreenContent(
         }
     }
 
+    when {
+        state.openUriRequestDialog -> SimpleAlertDialog(
+            onConfirm = { onEvent(UserEvent.AcceptOpenUriRequest) },
+            onDismiss = { onEvent(UserEvent.DismissOpenUriRequest) },
+            title = stringResource(R.string.open_uri_request_dialog_title),
+            text = stringResource(R.string.open_uri_request_dialog_text, state.uriToOpen),
+            icon = Icons.Default.OpenInBrowser,
+            confirmText = stringResource(R.string.action_open),
+            dismissText = stringResource(R.string.action_cancel)
+        )
+    }
+
     val listState = rememberLazyListState()
     val context = LocalContext.current
+    val localUriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(uiEvent) {
         uiEvent.consume {
@@ -108,6 +126,7 @@ fun ChatScreenContent(
                 cardId = state.info.characterCard.id,
                 event = it,
                 context = context,
+                uriHandler = localUriHandler,
                 listState = listState,
                 navController = navController,
                 coroutineScope = coroutineScope,
@@ -117,13 +136,19 @@ fun ChatScreenContent(
         }
     }
 
+    val uriHandler = remember {
+        SimpleUriHandler {
+            onEvent(UserEvent.OpenUriRequest(it))
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .imePadding(),
         topBar = {
-            TopAppBar(
-                title = {
+            AppBar(
+                titleContent = {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -143,14 +168,7 @@ fun ChatScreenContent(
                         )
                     }
                 },
-                navigationIcon = {
-                    IconButton(onClick = popBackStack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
-                },
+                navigateUp = popBackStack,
                 actions = {
                     SimpleDropdownMenu(
                         menuItems = dropdownMenuItems(onEvent),
@@ -180,7 +198,9 @@ fun ChatScreenContent(
             }
         }
     ) { padding ->
-        if (state.info.fullChat.messages.isNotEmpty()) {
+        CompositionLocalProvider(
+            LocalUriHandler provides uriHandler
+        ) {
             Messages(
                 state = state.info,
                 listState = listState,
@@ -200,6 +220,7 @@ private fun consumeEvent(
     cardId: Long,
     event: UiEvent,
     context: Context,
+    uriHandler: UriHandler,
     listState: LazyListState,
     navController: NavController,
     coroutineScope: CoroutineScope,
@@ -236,6 +257,8 @@ private fun consumeEvent(
                 actionLabel = context.getString(R.string.restore_snackbar_action)
             )
         }
+
+        is UiEvent.OpenUri -> uriHandler.openUri(event.uri)
     }
 }
 
@@ -287,7 +310,7 @@ fun MessageIndicator(
 
 @Composable
 fun Messages(
-    state: ChatScreenState.ChatState.ChatInfo,
+    state: ChatState.ChatInfo,
     listState: LazyListState,
     editMessageBuffer: String,
     editMessageId: Long,
@@ -428,8 +451,8 @@ fun ChatTextField(
 private fun ChatScreenPreview() {
     IntelligentChatTheme {
         ChatScreenContent(
-            state = ChatScreenState.ChatState(
-                info = ChatScreenState.ChatState.ChatInfo(
+            state = ChatState(
+                info = ChatState.ChatInfo(
                     characterCard = DisplayCard(name = "Sender"),
                     fullChat = DisplayChat(
                         messages = listOf(

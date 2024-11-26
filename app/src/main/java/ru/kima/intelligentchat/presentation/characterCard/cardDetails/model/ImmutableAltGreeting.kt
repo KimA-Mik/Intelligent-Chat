@@ -10,7 +10,7 @@ data class ImmutableAltGreeting(
 ) {
     fun toDto(): AltGreeting {
         return AltGreeting(
-            id, body
+            id, body.trimIndent()
         )
     }
 }

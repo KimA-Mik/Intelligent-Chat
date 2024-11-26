@@ -8,7 +8,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -69,7 +68,7 @@ class ChatScreenViewModel(
     private val characterCard = MutableStateFlow(CharacterCard.default())
     private val displayCard = MutableStateFlow(DisplayCard())
 
-    private val _state = MutableStateFlow<ChatScreenState>(ChatScreenState.ChatState())
+    private val _state = MutableStateFlow(ChatState())
     val state = _state.asStateFlow()
 
     private val _uiEvent = MutableStateFlow(Event<UiEvent>(null))
@@ -85,7 +84,6 @@ class ChatScreenViewModel(
     private fun initialize() {
         val id = savedStateHandle.get<Long>(CARD_ID_ARGUMENT)
         if (id == null || id == 0L) {
-            _state.value = ChatScreenState.ErrorState
             return
         }
 
@@ -118,7 +116,7 @@ class ChatScreenViewModel(
         val chatInfo = combine(
             characterCard, displayCard, _fullChat, personasNames, personasImages, preferences(),
         ) { characterCard, displayCard, fullChat, names, images, preferences ->
-            ChatScreenState.ChatState.ChatInfo(
+            ChatState.ChatInfo(
                 characterCard = displayCard,
                 fullChat = fullChat.toDisplayChat(
                     card = characterCard,
@@ -133,16 +131,20 @@ class ChatScreenViewModel(
             chatInfo,
             messagingStatus()
                 .onEach { if (it is MessagingIndicator.Done) _uiEvent.emit(Event(UiEvent.ScrollDown)) },
-            savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, String()),
-            savedStateHandle.getStateFlow(MESSAGE_EDIT_BUFFER, String()),
+            savedStateHandle.getStateFlow(MESSAGE_INPUT_BUFFER, ""),
+            savedStateHandle.getStateFlow(MESSAGE_EDIT_BUFFER, ""),
             savedStateHandle.getStateFlow(EDITED_MESSAGE_ID, EMPTY_EDITED_MESSAGE_ID),
-        ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId ->
-            ChatScreenState.ChatState(
+            savedStateHandle.getStateFlow(OPEN_URI_REQUEST, false),
+            savedStateHandle.getStateFlow(URI_TO_OPEN, "")
+        ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId, openUriRequest, uriToOpen ->
+            ChatState(
                 info = info,
                 inputMessageBuffer = inputMessageBuffer,
                 editMessageBuffer = editMessageBuffer,
                 editMessageId = editMessageId,
-                status = messagingStatus.toImmutable()
+                status = messagingStatus.toImmutable(),
+                openUriRequestDialog = openUriRequest,
+                uriToOpen = uriToOpen
             )
         }
 
@@ -190,7 +192,27 @@ class ChatScreenViewModel(
             UserEvent.ScrollDown -> onScrollDown()
             is UserEvent.DeleteCurrentSwipe -> onDeleteCurrentSwipe(event.messageId)
             is UserEvent.RestoreSwipe -> onRestoreSwipe(event.messageId, event.swipeId)
+            is UserEvent.OpenUriRequest -> onOpenUriRequest(event.uri)
+            UserEvent.AcceptOpenUriRequest -> onAcceptOpenUriRequest()
+            UserEvent.DismissOpenUriRequest -> onDismissOpenUriRequest()
         }
+    }
+
+    private fun onDismissOpenUriRequest() {
+        savedStateHandle[OPEN_URI_REQUEST] = false
+        savedStateHandle[URI_TO_OPEN] = ""
+    }
+
+    private fun onAcceptOpenUriRequest() {
+        savedStateHandle[OPEN_URI_REQUEST] = false
+        savedStateHandle.get<String>(URI_TO_OPEN)?.let {
+            _uiEvent.value = Event(UiEvent.OpenUri(it))
+        }
+    }
+
+    private fun onOpenUriRequest(uri: String) {
+        savedStateHandle[OPEN_URI_REQUEST] = true
+        savedStateHandle[URI_TO_OPEN] = uri
     }
 
     private fun onRestoreSwipe(messageId: Long, swipeId: Long) = viewModelScope.launch {
@@ -218,7 +240,7 @@ class ChatScreenViewModel(
     }
 
     private fun onBranchFromMessage(messageId: Long) = viewModelScope.launch {
-        val s = currentState() ?: return@launch
+        val s = _state.value
 
         branchChatFromMessage(
             chatId = s.info.fullChat.chatId,
@@ -231,7 +253,7 @@ class ChatScreenViewModel(
     }
 
     private fun onMoveMessageUp(messageId: Long) = viewModelScope.launch {
-        val s = currentState() ?: return@launch
+        val s = _state.value
 
         moveMessage(
             chatId = s.info.fullChat.chatId,
@@ -241,7 +263,7 @@ class ChatScreenViewModel(
     }
 
     private fun onMoveMessageDown(messageId: Long) = viewModelScope.launch {
-        val s = currentState() ?: return@launch
+        val s = _state.value
 
         moveMessage(
             chatId = s.info.fullChat.chatId,
@@ -269,7 +291,6 @@ class ChatScreenViewModel(
         if (messageId < 1L) return
 
         val s = state.value
-        if (s !is ChatScreenState.ChatState) return
 
         s.info.fullChat.messages.find { it.messageId == messageId }?.let {
             savedStateHandle[MESSAGE_EDIT_BUFFER] = it.text
@@ -279,7 +300,7 @@ class ChatScreenViewModel(
     }
 
     private fun onMessageButtonClicked() {
-        val s = currentState() ?: return
+        val s = _state.value
 
         when (s.status) {
             ImmutableMessagingIndicator.None -> onSendMessage(s)
@@ -289,7 +310,7 @@ class ChatScreenViewModel(
 
     private fun onDeleteMessage(messageId: Long) = viewModelScope.launch {
         val s = _state.value
-        if (messageId > 0 && s is ChatScreenState.ChatState) {
+        if (messageId > 0) {
             deleteMessage(chatId = s.info.fullChat.chatId, messageId = messageId)
         }
         _uiEvent.value = Event(UiEvent.RestoreMessage(messageId))
@@ -299,14 +320,16 @@ class ChatScreenViewModel(
         cancelMessage()
     }
 
-    private fun onSendMessage(state: ChatScreenState.ChatState) = viewModelScope.launch {
+    private fun onSendMessage(state: ChatState) = viewModelScope.launch {
         val text = state.inputMessageBuffer
-        savedStateHandle[MESSAGE_INPUT_BUFFER] = String()
+        savedStateHandle[MESSAGE_INPUT_BUFFER] = ""
         sendMessage(
             chatId = characterCard.value.selectedChat,
             personaId = state.info.fullChat.selectedPersonaId,
             text = text,
         )
+
+        _uiEvent.value = Event(UiEvent.ScrollDown)
     }
 
     private fun onUpdateInputMessage(message: String) {
@@ -322,7 +345,7 @@ class ChatScreenViewModel(
     }
 
     private suspend fun onMessageSwipe(messageId: Long, direction: SwipeDirection) {
-        val s = currentState() ?: return
+        val s = _state.value
         if (messageId == 0L) {
             swipeFirstMessage(
                 cardId = characterCard.value.id,
@@ -337,19 +360,12 @@ class ChatScreenViewModel(
         }
     }
 
-    private fun currentState(): ChatScreenState.ChatState? {
-        val s = _state.value
-
-        return when {
-            s is ChatScreenState.ChatState -> s
-            else -> null
-        }
-    }
-
     companion object {
         private const val MESSAGE_INPUT_BUFFER = "MESSAGE_INPUT_BUFFER"
         private const val MESSAGE_EDIT_BUFFER = "MESSAGE_EDIT_BUFFER"
         private const val EDITED_MESSAGE_ID = "EDITED_MESSAGE"
+        private const val OPEN_URI_REQUEST = "OPEN_URI_REQUEST"
+        private const val URI_TO_OPEN = "URI_TO_OPEN"
         private const val EMPTY_EDITED_MESSAGE_ID = -1L
     }
 }

@@ -39,12 +39,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.compose.Markdown
+import com.mikepenz.markdown.compose.components.markdownComponents
+import com.mikepenz.markdown.compose.elements.MarkdownCodeBlock
+import com.mikepenz.markdown.compose.elements.MarkdownCodeFence
+import com.mikepenz.markdown.compose.elements.MarkdownParagraph
+import com.mikepenz.markdown.m3.markdownColor
+import com.mikepenz.markdown.m3.markdownTypography
+import com.mikepenz.markdown.model.markdownAnnotator
+import dev.snipme.highlights.Highlights
+import org.intellij.markdown.MarkdownTokenTypes
+import org.intellij.markdown.ast.ASTNode
+import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
@@ -52,7 +67,7 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.common.components.conditional
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
-import ru.kima.intelligentchat.presentation.common.markdown.MarkdownText
+import ru.kima.intelligentchat.presentation.common.markdown.CustomMarkdownHighlightedCode
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
@@ -251,16 +266,103 @@ fun AnimatedText(
     }
     prevSwipe = currentSwipe
 
+    val colorScheme = MaterialTheme.colorScheme
+    //TODO: Factor out colors
+    val italicStyle = remember {
+        SpanStyle(
+            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.onPrimaryContainer
+        )
+    }
+    val quoteStyle = remember {
+        SpanStyle(
+            fontWeight = FontWeight.Normal,
+            fontStyle = FontStyle.Normal,
+            color = colorScheme.primary
+        )
+    }
+
+    var italicIndex by remember(text) { mutableIntStateOf(-1) }
+    var quoteIndex by remember(text) { mutableIntStateOf(-1) }
+    var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
     AnimatedContent(
         targetState = text, label = "",
         modifier = modifier,
         transitionSpec = { animationSpec }) {
-        MarkdownText(
-            text = it,
-//                style = MaterialTheme.typography.bodyLarge
+        Markdown(
+            it,
+            colors = markdownColor(),
+            typography = markdownTypography(),
+            flavour = CommonMarkFlavourDescriptor(),
+            annotator = markdownAnnotator { _, child ->
+                if (parent != child.parent) {
+                    parent = child.parent
+                    italicIndex = -1
+                    quoteIndex = -1
+                }
+
+                when {
+                    child.type == MarkdownTokenTypes.WHITE_SPACE -> {
+                        italicIndex = -1
+                        quoteIndex = -1
+                    }
+
+                    child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset == 1 -> {
+                        if (italicIndex < 0) {
+                            italicIndex = pushStyle(italicStyle)
+                        } else {
+                            pop()
+                            italicIndex = -1
+                        }
+                    }
+
+                    child.type == MarkdownTokenTypes.DOUBLE_QUOTE -> {
+                        if (quoteIndex < 0) {
+                            quoteIndex = pushStyle(quoteStyle)
+                        } else {
+                            append(MarkdownTokenTypes.DOUBLE_QUOTE.name)
+                            pop()
+                            quoteIndex = -1
+                            return@markdownAnnotator true
+                        }
+                    }
+                }
+
+                return@markdownAnnotator false
+            },
+            components = markdownComponents(
+                paragraph = { markdownComponentModel ->
+                    MarkdownParagraph(
+                        markdownComponentModel.content,
+                        markdownComponentModel.node,
+                        modifier = Modifier
+                            .conditional(markdownComponentModel.node.endOffset != markdownComponentModel.content.length)
+                            { padding(bottom = 8.dp) },
+                        style = markdownComponentModel.typography.paragraph
+                    )
+                },
+                codeBlock = { markdownComponentModel ->
+                    MarkdownCodeBlock(
+                        markdownComponentModel.content,
+                        markdownComponentModel.node
+                    ) { code, language ->
+                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
+                    }
+                },
+                codeFence = { markdownComponentModel ->
+                    MarkdownCodeFence(
+                        markdownComponentModel.content,
+                        markdownComponentModel.node
+                    ) { code, language ->
+                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
+                    }
+                },
+            )
         )
     }
 }
+
 
 @Composable
 fun ImageAndMetaInfo(

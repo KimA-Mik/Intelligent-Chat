@@ -1,34 +1,37 @@
 package ru.kima.intelligentchat.presentation.chat.chatScreen
 
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import ru.kima.intelligentchat.common.Event
-import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UiEvent
+import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(
-    state: ChatScreenState,
-    uiEvent: Event<UiEvent>,
+fun ChatScreenRoot(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
-    onEvent: (UserEvent) -> Unit
 ) {
-    when (state) {
-        is ChatScreenState.ChatState -> ChatScreenContent(
-            state = state,
-            uiEvent = uiEvent,
-            navController = navController,
-            snackbarHostState = snackbarHostState,
-            onEvent = onEvent
-        )
-
-        ChatScreenState.ErrorState -> TODO()
+    val viewModel: ChatScreenViewModel = koinViewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle(ChatState())
+    val uiEvent by viewModel.uiEvent.collectAsStateWithLifecycle()
+    val onEvent = remember<(UserEvent) -> Unit> {
+        {
+            viewModel.onEvent(it)
+        }
     }
+
+    ChatScreenContent(
+        state = state,
+        uiEvent = uiEvent,
+        navController = navController,
+        snackbarHostState = snackbarHostState,
+        onEvent = onEvent
+    )
 }
+
 
 
 
