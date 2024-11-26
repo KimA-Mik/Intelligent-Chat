@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kima.intelligentchat.common.Event
-import ru.kima.intelligentchat.presentation.settings.events.SettingsRootAction
-import ru.kima.intelligentchat.presentation.settings.events.SettingsRootUiEvent
+import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootAction
+import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootUiEvent
 
 class SettingsRootViewModel : ViewModel() {
     private val _uiEvent = MutableStateFlow<Event<SettingsRootUiEvent>>(Event(null))
@@ -23,6 +23,6 @@ class SettingsRootViewModel : ViewModel() {
     }
 
     private fun onOpenChatAppearance() {
-        _uiEvent.value = Event(SettingsRootUiEvent.NotImplemented)
+        _uiEvent.value = Event(SettingsRootUiEvent.NavigateToChatAppearance)
     }
 }

@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.settings.events
+package ru.kima.intelligentchat.presentation.settings.root.events
 
 sealed interface SettingsRootAction {
     data object OpenChatAppearance : SettingsRootAction

@@ -152,6 +152,10 @@
     <string name="settings_nav_item_chat_appearance_description">Chat appearance, message appearance</string>
     <string name="settings_nav_item_advanced_formatting_description">Context template, context formatting, instruct mode</string>
 
+    <!--  Chat Appearance Settings Screen  -->
+    <string name="setting_show_message_number_title">Show message number</string>
+    <string name="setting_show_swipe_date_title">Show swipe date</string>
+
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>

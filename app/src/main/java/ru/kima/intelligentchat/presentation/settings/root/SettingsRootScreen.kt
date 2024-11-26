@@ -40,9 +40,10 @@ import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.common.components.AppBar
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToChatAppearance
 import ru.kima.intelligentchat.presentation.settings.components.SettingsNavItem
-import ru.kima.intelligentchat.presentation.settings.events.SettingsRootAction
-import ru.kima.intelligentchat.presentation.settings.events.SettingsRootUiEvent
+import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootAction
+import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootUiEvent
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -93,6 +94,8 @@ fun SettingsRootScreen(
                         duration = SnackbarDuration.Short
                     )
                 }
+
+                SettingsRootUiEvent.NavigateToChatAppearance -> navController.navigateToChatAppearance()
             }
         }
     }
