@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import ru.kima.intelligentchat.core.common.API_TYPE
-import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
 import ru.kima.intelligentchat.domain.chat.model.SenderType
+import ru.kima.intelligentchat.domain.common.ApiType
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
+import ru.kima.intelligentchat.presentation.android.preferences.appPreferences.AppPreferencesRepositoryImpl
+import ru.kima.intelligentchat.presentation.android.preferences.hordeState.HordeStateRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.service.common.isServiceRunning
 import ru.kima.intelligentchat.presentation.android.service.messaging.MessagingService
 
@@ -27,10 +27,10 @@ private const val TAG = "MessagingRepositoryImpl"
 
 class MessagingRepositoryImpl(
     private val context: Context,
-    private val hordeStateHandler: HordeStateHandler,
-    private val preferencesHandler: PreferencesHandler,
+    private val hordeStateRepositoryImpl: HordeStateRepositoryImpl,
+    private val appPreferencesRepositoryImpl: AppPreferencesRepositoryImpl,
 ) : MessagingRepository {
-    private val preferences = preferencesHandler.data
+    private val preferences = appPreferencesRepositoryImpl.preferences()
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
     private val _generationStatus = MutableStateFlow<MessagingIndicator>(MessagingIndicator.None)
@@ -117,16 +117,16 @@ class MessagingRepositoryImpl(
             return
         }
 
-        preferencesHandler.updateGenerationPending(false)
+        appPreferencesRepositoryImpl.updateGenerationPending(false)
         val currentApi = preferences.first().selectedApiType
         when (currentApi) {
-            API_TYPE.HORDE -> initHorde()
-            API_TYPE.KOBOLD_AI -> {}
+            ApiType.HORDE -> initHorde()
+            ApiType.KOBOLD_AI -> {}
         }
     }
 
     private suspend fun initHorde() {
-        val hordeGenerationId = hordeStateHandler.data.first().generationId
+        val hordeGenerationId = hordeStateRepositoryImpl.data.first().generationId
             ?: return
 
         Log.d(TAG, "Uncompleted Horde generation id: $hordeGenerationId")

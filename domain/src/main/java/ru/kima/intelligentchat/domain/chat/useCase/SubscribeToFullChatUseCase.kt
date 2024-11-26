@@ -4,12 +4,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.domain.chat.ChatNotFoundException
 import ru.kima.intelligentchat.domain.chat.model.Chat
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.MessageWithSwipes
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
+import ru.kima.intelligentchat.domain.common.ICResult
 
 //TODO: clear up unused use cases
 class SubscribeToFullChatUseCase(

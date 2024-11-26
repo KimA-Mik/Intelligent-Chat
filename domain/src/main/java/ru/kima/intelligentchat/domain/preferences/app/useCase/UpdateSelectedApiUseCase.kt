@@ -1,10 +1,12 @@
 package ru.kima.intelligentchat.domain.preferences.app.useCase
 
-import ru.kima.intelligentchat.core.common.API_TYPE
-import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
+import ru.kima.intelligentchat.domain.common.ApiType
+import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 
-class UpdateSelectedApiUseCase(private val preferencesHandler: PreferencesHandler) {
-    suspend operator fun invoke(apiType: API_TYPE) {
-        preferencesHandler.updateSelectedAip(apiType)
+class UpdateSelectedApiUseCase(
+    private val repository: AppPreferencesRepository
+) {
+    suspend operator fun invoke(apiType: ApiType) {
+        repository.updateSelectedAip(apiType)
     }
 }

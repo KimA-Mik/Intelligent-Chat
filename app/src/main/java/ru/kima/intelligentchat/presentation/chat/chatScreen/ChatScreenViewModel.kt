@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
-import ru.kima.intelligentchat.core.common.valueOr
-import ru.kima.intelligentchat.core.utils.combine
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
@@ -29,6 +27,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
+import ru.kima.intelligentchat.domain.common.valueOr
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
@@ -36,6 +35,7 @@ import ru.kima.intelligentchat.domain.messaging.useCase.SubscribeToMessagingStat
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.useCase.GetPersonasUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
+import ru.kima.intelligentchat.domain.utils.combine
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UiEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.events.UserEvent
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayCard

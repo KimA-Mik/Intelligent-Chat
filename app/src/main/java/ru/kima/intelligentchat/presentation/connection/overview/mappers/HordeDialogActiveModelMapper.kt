@@ -1,6 +1,6 @@
 package ru.kima.intelligentchat.presentation.connection.overview.mappers
 
-import ru.kima.intelligentchat.core.preferences.hordeState.model.HordeModelInfo
+import ru.kima.intelligentchat.domain.preferences.horde.model.HordeModelInfo
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
 
 fun HordeModelInfo.toDialogActiveModel(selected: Boolean): HordeDialogActiveModel {

@@ -2,12 +2,12 @@ package ru.kima.intelligentchat.domain.messaging.useCase
 
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
+import ru.kima.intelligentchat.domain.common.valueOr
 import ru.kima.intelligentchat.domain.images.ImageStorage
 import ru.kima.intelligentchat.domain.messaging.model.Sender
 import ru.kima.intelligentchat.domain.persona.model.Persona

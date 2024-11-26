@@ -1,9 +1,12 @@
 package ru.kima.intelligentchat.domain.preferences.horde.useCase
 
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
+import ru.kima.intelligentchat.domain.preferences.horde.HordeStateRepository
 
-class SelectHordeModelsUseCase(private val preferences: HordeStateHandler) {
+class SelectHordeModelsUseCase(
+    private val repository: HordeStateRepository
+
+) {
     suspend operator fun invoke(models: List<String>) {
-        preferences.selectModels(models)
+        repository.selectModels(models)
     }
 }

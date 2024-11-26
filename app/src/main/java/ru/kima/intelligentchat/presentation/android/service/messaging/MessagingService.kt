@@ -24,8 +24,8 @@ import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 import ru.kima.intelligentchat.ChatApplication
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.core.common.API_TYPE
 import ru.kima.intelligentchat.domain.chat.model.SenderType
+import ru.kima.intelligentchat.domain.common.ApiType
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.DefaultSavingStrategy
@@ -39,14 +39,14 @@ import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 
 class MessagingService : Service(), KoinComponent {
-    private val strategies: Map<API_TYPE, GenerationStrategy>
+    private val strategies: Map<ApiType, GenerationStrategy>
 
     init {
         val hordeStrategy: HordeGenerationStrategy by inject()
         val koboldStrategy: KoboldAiGenerationStrategy by inject()
         strategies = mapOf(
-            API_TYPE.HORDE to hordeStrategy,
-            API_TYPE.KOBOLD_AI to koboldStrategy
+            ApiType.HORDE to hordeStrategy,
+            ApiType.KOBOLD_AI to koboldStrategy
         )
     }
 
@@ -94,7 +94,7 @@ class MessagingService : Service(), KoinComponent {
         val chatId = intent.getLongExtra(CHAT_ID_EXTRA, 0L)
         val personaId = intent.getLongExtra(PERSONA_ID_EXTRA, 0L)
         val apiType = intent.getStringExtra(API_TYPE_EXTRA)?.let {
-            API_TYPE.fromString(it)
+            ApiType.fromString(it)
         }
         val senderType = intent.getStringExtra(SENDER_TYPE_EXTRA)?.let {
             SenderType.fromString(it)
@@ -117,7 +117,7 @@ class MessagingService : Service(), KoinComponent {
     private fun runForeground(
         chatId: Long,
         personaId: Long,
-        apiType: API_TYPE,
+        apiType: ApiType,
         senderType: SenderType,
         savingStrategy: SavingStrategy
     ) {
@@ -142,7 +142,7 @@ class MessagingService : Service(), KoinComponent {
     private suspend fun runForegroundAsync(
         chatId: Long,
         personaId: Long,
-        apiType: API_TYPE,
+        apiType: ApiType,
         senderType: SenderType,
         savingStrategy: SavingStrategy
     ) {
@@ -302,7 +302,7 @@ class MessagingService : Service(), KoinComponent {
             context: Context,
             chatId: Long,
             personaId: Long,
-            apiType: API_TYPE,
+            apiType: ApiType,
             senderType: SenderType
         ): Intent {
             val intent = Intent(context, MessagingService::class.java)
@@ -319,7 +319,7 @@ class MessagingService : Service(), KoinComponent {
             chatId: Long,
             messageId: Long,
             personaId: Long,
-            apiType: API_TYPE,
+            apiType: ApiType,
             senderType: SenderType
         ): Intent {
             val intent = Intent(context, MessagingService::class.java)

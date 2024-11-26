@@ -6,11 +6,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import ru.kima.intelligentchat.core.utils.clipIntToRange
-import ru.kima.intelligentchat.core.utils.swap
 import ru.kima.intelligentchat.domain.presets.kobold.model.KoboldPreset
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetUseCase
+import ru.kima.intelligentchat.domain.utils.clipIntToRange
+import ru.kima.intelligentchat.domain.utils.swap
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
 import kotlin.math.abs
 import kotlin.math.sign

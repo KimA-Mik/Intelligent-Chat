@@ -1,8 +1,8 @@
 package ru.kima.intelligentchat.domain.horde.repositoty
 
 import kotlinx.coroutines.flow.Flow
-import ru.kima.intelligentchat.core.common.ICResult
-import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.common.ICResult
+import ru.kima.intelligentchat.domain.common.Resource
 import ru.kima.intelligentchat.domain.common.errors.HordeError
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput

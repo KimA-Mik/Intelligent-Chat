@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -69,8 +70,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(project(mapOf("path" to ":domain")))
     implementation(project(mapOf("path" to ":data")))
-    implementation(project(mapOf("path" to ":core")))
 
+    implementation(libs.androidx.datastore)
+    implementation(libs.kotlinx.serialization.protobuf)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.koin.androidx.compose)
     implementation(libs.kotlinx.serialization.json)

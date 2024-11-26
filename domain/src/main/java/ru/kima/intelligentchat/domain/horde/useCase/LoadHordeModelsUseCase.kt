@@ -2,14 +2,15 @@ package ru.kima.intelligentchat.domain.horde.useCase
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
+import ru.kima.intelligentchat.domain.horde.mapper.toHordeModelInfo
 import ru.kima.intelligentchat.domain.horde.model.HordeWorker
 import ru.kima.intelligentchat.domain.horde.model.ModelInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
+import ru.kima.intelligentchat.domain.preferences.horde.HordeStateRepository
 
 class LoadHordeModelsUseCase(
     private val horde: HordeRepository,
-    private val hordeState: HordeStateHandler
+    private val stateRepository: HordeStateRepository,
 ) {
     suspend operator fun invoke(): LoadHordeModelsResult = coroutineScope {
         val modelsDeferred = async { horde.activeModels() }
@@ -31,11 +32,10 @@ class LoadHordeModelsUseCase(
             handleWorker(worker, modelsMap)
         }
 
-        hordeState.updateHordeModelInfo(
-            modelsMap
-                .mapValues {
-                    it.value.toHordeModelInfo()
-                }
+        stateRepository.updateHordeModelInfo(
+            modelsMap.mapValues {
+                it.value.toHordeModelInfo()
+            }
         )
 
         return@coroutineScope LoadHordeModelsResult.Success(modelsMap.size)

@@ -1,6 +1,5 @@
 package ru.kima.intelligentchat.domain.horde.model
 
-import ru.kima.intelligentchat.core.preferences.hordeState.model.HordeModelInfo
 
 data class ModelInfo(
     val name: String = String(),
@@ -11,18 +10,6 @@ data class ModelInfo(
     val maxContextSize: Int = 0,
     val maxResponseLength: Int = 0
 ) {
-    fun toHordeModelInfo(): HordeModelInfo {
-        return HordeModelInfo(
-            name = name,
-            count = count,
-            performance = performance,
-            queued = queued,
-            eta = eta,
-            maxContextSize = maxContextSize,
-            maxResponseLength = maxResponseLength,
-        )
-    }
-
     companion object {
         fun fromActiveModel(activeModel: ActiveModel): ModelInfo {
             return ModelInfo(

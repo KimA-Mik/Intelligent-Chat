@@ -1,6 +1,6 @@
 package ru.kima.intelligentchat.domain.horde.useCase
 
-import ru.kima.intelligentchat.core.common.Resource
+import ru.kima.intelligentchat.domain.common.Resource
 import ru.kima.intelligentchat.domain.horde.model.UserInfo
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateHordeUserDataUseCase

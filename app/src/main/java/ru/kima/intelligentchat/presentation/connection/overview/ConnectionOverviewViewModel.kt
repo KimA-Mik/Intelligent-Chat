@@ -15,16 +15,16 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.ComposeEvent
-import ru.kima.intelligentchat.core.common.API_TYPE
-import ru.kima.intelligentchat.core.preferences.appPreferences.AppPreferences
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeState
-import ru.kima.intelligentchat.core.preferences.hordeState.model.HordeModelInfo
+import ru.kima.intelligentchat.domain.common.ApiType
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
+import ru.kima.intelligentchat.domain.preferences.app.AppPreferences
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
+import ru.kima.intelligentchat.domain.preferences.horde.model.HordeModelInfo
+import ru.kima.intelligentchat.domain.preferences.horde.model.HordeState
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.SelectHordeModelsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToWorkerUseCase
@@ -155,7 +155,7 @@ class ConnectionOverviewViewModel(
         }
     }
 
-    private fun onUpdateSelectedApi(apiType: API_TYPE) = viewModelScope.launch {
+    private fun onUpdateSelectedApi(apiType: ApiType) = viewModelScope.launch {
         updateSelectedApi(apiType)
     }
 

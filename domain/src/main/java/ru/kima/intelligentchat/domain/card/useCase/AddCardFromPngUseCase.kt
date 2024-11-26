@@ -1,9 +1,9 @@
 package ru.kima.intelligentchat.domain.card.useCase
 
 import kotlinx.coroutines.flow.flow
-import ru.kima.intelligentchat.core.common.Resource
-import ru.kima.intelligentchat.core.utils.PngBlockParser
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
+import ru.kima.intelligentchat.domain.common.Resource
+import ru.kima.intelligentchat.domain.utils.PngBlockParser
 
 class AddCardFromPngUseCase(
     private val characterRepository: CharacterCardRepository,

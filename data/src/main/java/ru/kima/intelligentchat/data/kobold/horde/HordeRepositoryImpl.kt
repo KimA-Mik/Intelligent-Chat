@@ -7,8 +7,6 @@ import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.create
-import ru.kima.intelligentchat.core.common.ICResult
-import ru.kima.intelligentchat.core.common.Resource
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toActiveModel
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toDto
 import ru.kima.intelligentchat.data.kobold.horde.mappers.toHordeAsyncRequest
@@ -20,6 +18,8 @@ import ru.kima.intelligentchat.data.kobold.horde.model.RequestError
 import ru.kima.intelligentchat.data.kobold.horde.model.RequestValidationError
 import ru.kima.intelligentchat.data.kobold.horde.model.WorkerDto
 import ru.kima.intelligentchat.data.util.jsonConverterFactory.toConverterFactory
+import ru.kima.intelligentchat.domain.common.ICResult
+import ru.kima.intelligentchat.domain.common.Resource
 import ru.kima.intelligentchat.domain.common.errors.HordeError
 import ru.kima.intelligentchat.domain.horde.model.ActiveModel
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput

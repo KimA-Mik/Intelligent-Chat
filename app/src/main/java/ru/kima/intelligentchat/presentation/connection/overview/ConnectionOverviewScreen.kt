@@ -51,7 +51,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeEvent
-import ru.kima.intelligentchat.core.common.API_TYPE
+import ru.kima.intelligentchat.domain.common.ApiType
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.fragments.HordeFragment
@@ -221,13 +221,13 @@ fun ConnectionOverviewContent(
                 DropdownMenuItem(
                     text = { Text(text = stringResource(id = R.string.api_type_kobold_horde)) },
                     onClick = {
-                        onEvent(COUserEvent.UpdateSelectedApi(API_TYPE.HORDE))
+                        onEvent(COUserEvent.UpdateSelectedApi(ApiType.HORDE))
                         isApiMenuExpanded = false
                     })
                 DropdownMenuItem(
                     text = { Text(text = stringResource(id = R.string.api_type_kobold)) },
                     onClick = {
-                        onEvent(COUserEvent.UpdateSelectedApi(API_TYPE.KOBOLD_AI))
+                        onEvent(COUserEvent.UpdateSelectedApi(ApiType.KOBOLD_AI))
                         isApiMenuExpanded = false
                     })
             }
@@ -238,8 +238,8 @@ fun ConnectionOverviewContent(
             modifier = Modifier.fillMaxSize()
         ) { apiType ->
             when (apiType) {
-                API_TYPE.KOBOLD_AI -> KoboldAiFragment(modifier = Modifier, onEvent = onEvent)
-                API_TYPE.HORDE -> HordeFragment(
+                ApiType.KOBOLD_AI -> KoboldAiFragment(modifier = Modifier, onEvent = onEvent)
+                ApiType.HORDE -> HordeFragment(
                     state = state.hordeFragmentState,
                     modifier = Modifier, onEvent = onEvent
                 )
@@ -249,10 +249,10 @@ fun ConnectionOverviewContent(
 }
 
 @Composable
-fun apiTypeStringResource(apiType: API_TYPE): String {
+fun apiTypeStringResource(apiType: ApiType): String {
     return when (apiType) {
-        API_TYPE.KOBOLD_AI -> stringResource(id = R.string.api_type_kobold)
-        API_TYPE.HORDE -> stringResource(id = R.string.api_type_kobold_horde)
+        ApiType.KOBOLD_AI -> stringResource(id = R.string.api_type_kobold)
+        ApiType.HORDE -> stringResource(id = R.string.api_type_kobold_horde)
     }
 }
 

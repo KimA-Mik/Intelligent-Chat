@@ -1,14 +1,14 @@
 package ru.kima.intelligentchat.presentation.connection.overview
 
 import androidx.compose.runtime.Immutable
-import ru.kima.intelligentchat.core.common.API_TYPE
+import ru.kima.intelligentchat.domain.common.ApiType
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeDialogActiveModel
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordeModelsWrapper
 import ru.kima.intelligentchat.presentation.connection.overview.model.HordePresetsWrapper
 
 @Immutable
 data class ConnectionOverviewState(
-    val selectedApiType: API_TYPE = API_TYPE.HORDE,
+    val selectedApiType: ApiType = ApiType.HORDE,
     val hordeFragmentState: HordeFragmentState = HordeFragmentState()
 ) {
     @Immutable

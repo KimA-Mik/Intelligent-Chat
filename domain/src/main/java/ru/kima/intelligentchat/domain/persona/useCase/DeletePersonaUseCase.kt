@@ -1,13 +1,13 @@
 package ru.kima.intelligentchat.domain.persona.useCase
 
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
 import ru.kima.intelligentchat.domain.persona.model.Persona
 import ru.kima.intelligentchat.domain.persona.repository.PersonaRepository
+import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 
 class DeletePersonaUseCase(
     private val repository: PersonaRepository,
-    private val preferences: PreferencesHandler
+    private val preferencesRepository: AppPreferencesRepository
 ) {
     suspend operator fun invoke(persona: Persona): Boolean {
         val count = repository.getPersonasCount()
@@ -15,14 +15,14 @@ class DeletePersonaUseCase(
             return false
         }
 
-        val selectedPersonaId = preferences.data.first().selectedPersonaId
+        val selectedPersonaId = preferencesRepository.preferences().first().selectedPersonaId
         if (selectedPersonaId == persona.id) {
             val newId = repository
                 .selectPersonas()
                 .first()
                 .first { it.id != selectedPersonaId }
                 .id
-            preferences.updateSelectedPersona(newId)
+            preferencesRepository.updateSelectedPersona(newId)
         }
 
         repository.deletePersona(persona)

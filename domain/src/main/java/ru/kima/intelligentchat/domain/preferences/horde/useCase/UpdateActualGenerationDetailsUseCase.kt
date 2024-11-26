@@ -1,12 +1,15 @@
 package ru.kima.intelligentchat.domain.preferences.horde.useCase
 
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
+import ru.kima.intelligentchat.domain.preferences.horde.HordeStateRepository
 
-class UpdateActualGenerationDetailsUseCase(private val preferencesHandler: HordeStateHandler) {
+class UpdateActualGenerationDetailsUseCase(
+    private val repository: HordeStateRepository
+
+) {
     suspend operator fun invoke(
         contextSize: Int = -1,
         responseLength: Int = -1
     ) {
-        preferencesHandler.updateActualGenerationDetails(contextSize, responseLength)
+        repository.updateActualGenerationDetails(contextSize, responseLength)
     }
 }

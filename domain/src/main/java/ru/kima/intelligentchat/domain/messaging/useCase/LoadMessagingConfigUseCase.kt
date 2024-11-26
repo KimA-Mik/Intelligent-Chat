@@ -1,22 +1,22 @@
 package ru.kima.intelligentchat.domain.messaging.useCase
 
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.core.common.API_TYPE
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
 import ru.kima.intelligentchat.domain.chat.model.SenderType
+import ru.kima.intelligentchat.domain.common.ApiType
 import ru.kima.intelligentchat.domain.messaging.model.MessagingConfig
+import ru.kima.intelligentchat.domain.preferences.horde.HordeStateRepository
 
 class LoadMessagingConfigUseCase(
-    private val handler: HordeStateHandler
+    private val hordeStateRepository: HordeStateRepository,
 ) {
     suspend operator fun invoke(
-        apiType: API_TYPE,
+        apiType: ApiType,
         senderType: SenderType,
         personaName: String,
         cardName: String
     ) = when (apiType) {
-        API_TYPE.KOBOLD_AI -> loadHordeConfig(senderType, personaName, cardName)
-        API_TYPE.HORDE -> loadHordeConfig(senderType, personaName, cardName)
+        ApiType.KOBOLD_AI -> loadHordeConfig(senderType, personaName, cardName)
+        ApiType.HORDE -> loadHordeConfig(senderType, personaName, cardName)
     }
 
 
@@ -26,7 +26,7 @@ class LoadMessagingConfigUseCase(
         personaName: String,
         cardName: String
     ): MessagingConfig {
-        val state = handler.data.first()
+        val state = hordeStateRepository.hordeState().first()
         return MessagingConfig(
             maxResponseLength = state.actualResponseLength,
             maxContextLength = state.actualContextSize,

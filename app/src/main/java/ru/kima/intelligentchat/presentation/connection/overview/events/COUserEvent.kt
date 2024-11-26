@@ -1,9 +1,9 @@
 package ru.kima.intelligentchat.presentation.connection.overview.events
 
-import ru.kima.intelligentchat.core.common.API_TYPE
+import ru.kima.intelligentchat.domain.common.ApiType
 
 sealed interface COUserEvent {
-    data class UpdateSelectedApi(val apiType: API_TYPE) : COUserEvent
+    data class UpdateSelectedApi(val apiType: ApiType) : COUserEvent
     data class UpdateApiToken(val token: String) : COUserEvent
     data object ToggleHordeTokenVisibility : COUserEvent
     data object ToggleContextToWorker : COUserEvent
