@@ -5,8 +5,10 @@ import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.filled.Contactless
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Contactless
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import ru.kima.intelligentchat.R
 
@@ -39,5 +41,11 @@ enum class NavItem(
         selectedIcon = Icons.Filled.Contactless,
         unselectedIcon = Icons.Outlined.Contactless,
         root = "connection"
+    ),
+    Settings(
+        titleId = R.string.nav_item_settings,
+        selectedIcon = Icons.Filled.Settings,
+        unselectedIcon = Icons.Outlined.Settings,
+        root = "settings"
     )
 }
