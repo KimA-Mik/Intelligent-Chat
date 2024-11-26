@@ -58,6 +58,7 @@ import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownAnnotator
 import dev.snipme.highlights.Highlights
 import org.intellij.markdown.MarkdownTokenTypes
+import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.formatAndTrim
@@ -284,7 +285,7 @@ fun AnimatedText(
 
     var italicIndex by remember(text) { mutableIntStateOf(-1) }
     var quoteIndex by remember(text) { mutableIntStateOf(-1) }
-    var pastContent by remember(text) { mutableStateOf("") }
+    var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
     AnimatedContent(
         targetState = text, label = "",
         modifier = modifier,
@@ -294,9 +295,9 @@ fun AnimatedText(
             colors = markdownColor(),
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
-            annotator = markdownAnnotator { content, child ->
-                if (pastContent != content) {
-                    pastContent = content
+            annotator = markdownAnnotator { _, child ->
+                if (parent != child.parent) {
+                    parent = child.parent
                     italicIndex = -1
                     quoteIndex = -1
                 }
