@@ -52,12 +52,12 @@ import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.MarkdownCodeBlock
 import com.mikepenz.markdown.compose.elements.MarkdownCodeFence
+import com.mikepenz.markdown.compose.elements.MarkdownParagraph
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownAnnotator
 import dev.snipme.highlights.Highlights
 import org.intellij.markdown.MarkdownTokenTypes
-import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.formatAndTrim
@@ -284,7 +284,7 @@ fun AnimatedText(
 
     var italicIndex by remember(text) { mutableIntStateOf(-1) }
     var quoteIndex by remember(text) { mutableIntStateOf(-1) }
-    var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
+    var pastContent by remember(text) { mutableStateOf("") }
     AnimatedContent(
         targetState = text, label = "",
         modifier = modifier,
@@ -294,9 +294,9 @@ fun AnimatedText(
             colors = markdownColor(),
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
-            annotator = markdownAnnotator { _, child ->
-                if (child.parent != parent) {
-                    parent = child.parent
+            annotator = markdownAnnotator { content, child ->
+                if (pastContent != content) {
+                    pastContent = content
                     italicIndex = -1
                     quoteIndex = -1
                 }
@@ -331,7 +331,16 @@ fun AnimatedText(
                 return@markdownAnnotator false
             },
             components = markdownComponents(
-                //TODO: Add support
+                paragraph = { markdownComponentModel ->
+                    MarkdownParagraph(
+                        markdownComponentModel.content,
+                        markdownComponentModel.node,
+                        modifier = Modifier
+                            .conditional(markdownComponentModel.node.endOffset != markdownComponentModel.content.length)
+                            { padding(bottom = 8.dp) },
+                        style = markdownComponentModel.typography.paragraph
+                    )
+                },
                 codeBlock = { markdownComponentModel ->
                     MarkdownCodeBlock(
                         markdownComponentModel.content,
