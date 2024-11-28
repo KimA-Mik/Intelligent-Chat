@@ -35,7 +35,7 @@ fun ChatAppearanceSettingsRoot(
     snackbarHostState: SnackbarHostState,
     viewModel: ChatAppearanceSettingsViewModel = koinViewModel()
 ) {
-    val appearance by viewModel.chatAppearance.collectAsStateWithLifecycle(ImmutableChatAppearance())
+    val appearance by viewModel.chatAppearance.collectAsStateWithLifecycle(ImmutableChatAppearance.default)
     val onEvent = remember<(ChatAppearanceSettingsAction) -> Unit> {
         {
             viewModel.onEvent(it)
@@ -112,7 +112,7 @@ private fun ChatAppearanceSettingsPreview() {
     IntelligentChatTheme {
         Surface {
             ChatAppearanceSettingsScreen(
-                appearance = ImmutableChatAppearance(),
+                appearance = ImmutableChatAppearance.default,
                 onEvent = {},
                 navController = rememberNavController(),
                 snackbarHostState = SnackbarHostState()

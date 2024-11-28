@@ -4,6 +4,10 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class ImmutableChatAppearance(
-    val showDate: Boolean = true,
-    val showNumber: Boolean = true,
-)
+    val showDate: Boolean,
+    val showNumber: Boolean,
+) {
+    companion object {
+        val default = ImmutableChatAppearance(showDate = true, showNumber = true)
+    }
+}

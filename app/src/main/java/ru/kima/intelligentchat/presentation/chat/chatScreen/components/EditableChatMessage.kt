@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -32,6 +33,7 @@ fun EditableChatMessage(
     onDismissClick: () -> Unit,
     onImageClick: () -> Unit,
     modifier: Modifier = Modifier,
+    chatAppearance: ImmutableChatAppearance = ImmutableChatAppearance.default,
     imageSize: Dp = ChatDefaults.SENDER_IMAGE_SIZE,
 ) = Column(modifier = modifier) {
     Row(verticalAlignment = Alignment.Top) {
@@ -39,6 +41,7 @@ fun EditableChatMessage(
             photoName = message.senderImageName,
             index = message.index,
             imageSize = imageSize,
+            showNumber = chatAppearance.showNumber,
             tookMs = 0,
             onImageClick = onImageClick,
         )

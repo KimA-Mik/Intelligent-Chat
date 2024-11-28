@@ -2,6 +2,7 @@ package ru.kima.intelligentchat.presentation.chat.chatScreen
 
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
 
 data class ChatState(
@@ -12,6 +13,7 @@ data class ChatState(
     val status: ImmutableMessagingIndicator = ImmutableMessagingIndicator.None,
     val openUriRequestDialog: Boolean = false,
     val uriToOpen: String = "",
+    val chatAppearance: ImmutableChatAppearance = ImmutableChatAppearance.default
 ) {
     data class ChatInfo(
         val characterCard: DisplayCard = DisplayCard(),

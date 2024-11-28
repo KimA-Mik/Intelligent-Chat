@@ -65,6 +65,7 @@ import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.common.components.conditional
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
 import ru.kima.intelligentchat.presentation.common.markdown.CustomMarkdownHighlightedCode
@@ -77,6 +78,7 @@ fun ChatMessage(
     message: DisplayMessage,
     modifier: Modifier = Modifier,
     imageSize: Dp = ChatDefaults.SENDER_IMAGE_SIZE,
+    chatAppearance: ImmutableChatAppearance = ImmutableChatAppearance.default,
     onEditClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
     onDeleteSwipeClicked: () -> Unit,
@@ -95,6 +97,7 @@ fun ChatMessage(
             photoName = message.senderImageName,
             index = message.index,
             imageSize = imageSize,
+            showNumber = chatAppearance.showNumber,
             tookMs = 0,
             onImageClick = onImageClicked,
         )
@@ -110,20 +113,22 @@ fun ChatMessage(
         )
 
         if (message.index > 0) {
-            val date = remember(message.sentTimeMillis) {
-                val calendar = Calendar.getInstance()
-                calendar.timeInMillis = message.sentTimeMillis
-                val format = DateFormat.getInstance()
-                format.format(calendar.time)
+            if (chatAppearance.showDate) {
+                val date = remember(message.sentTimeMillis) {
+                    val calendar = Calendar.getInstance()
+                    calendar.timeInMillis = message.sentTimeMillis
+                    val format = DateFormat.getInstance()
+                    format.format(calendar.time)
+                }
+                Text(
+                    text = date,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier
+                        .alignByBaseline()
+                        .width(IntrinsicSize.Min)
+                )
             }
-            Text(
-                text = date,
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .alignByBaseline()
-                    .width(IntrinsicSize.Min)
-            )
 
             SimpleDropdownMenu(
                 dropdownMenuItems(
@@ -369,6 +374,7 @@ fun ImageAndMetaInfo(
     photoName: String?,
     index: Int,
     imageSize: Dp,
+    showNumber: Boolean,
     modifier: Modifier = Modifier,
     tookMs: Long = 0,
     onImageClick: () -> Unit,
@@ -388,10 +394,12 @@ fun ImageAndMetaInfo(
                 onClick = onImageClick
             )
 
-            Text(
-                text = "#$index",
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (showNumber) {
+                Text(
+                    text = "#$index",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
             if (tookMs > 0L) {
                 val seconds = (tookMs / 1000f).formatAndTrim(2)
