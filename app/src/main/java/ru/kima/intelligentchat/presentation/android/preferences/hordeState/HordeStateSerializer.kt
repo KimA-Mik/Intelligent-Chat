@@ -18,12 +18,14 @@ object HordeStateSerializer : Serializer<HordeStateSchema> {
     override val defaultValue: HordeStateSchema
         get() = HordeStateSchema()
 
-    override suspend fun readFrom(input: InputStream): HordeStateSchema {
-        try {
-            return ProtoBuf.decodeFromByteArray<HordeStateSchema>(input.readBytes())
-        } catch (exception: SerializationException) {
-            throw CorruptionException("Cannot read proto.", exception)
+    override suspend fun readFrom(input: InputStream): HordeStateSchema = try {
+        withContext(Dispatchers.IO) {
+            return@withContext ProtoBuf.decodeFromByteArray<HordeStateSchema>(
+                input.readBytes()
+            )
         }
+    } catch (exception: SerializationException) {
+        throw CorruptionException("Cannot read proto.", exception)
     }
 
     override suspend fun writeTo(t: HordeStateSchema, output: OutputStream) {

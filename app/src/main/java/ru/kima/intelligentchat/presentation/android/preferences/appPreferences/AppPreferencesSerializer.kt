@@ -18,12 +18,14 @@ object AppPreferencesSerializer : Serializer<AppPreferencesSchema> {
     override val defaultValue: AppPreferencesSchema
         get() = AppPreferencesSchema()
 
-    override suspend fun readFrom(input: InputStream): AppPreferencesSchema {
-        try {
-            return ProtoBuf.decodeFromByteArray<AppPreferencesSchema>(input.readBytes())
-        } catch (exception: SerializationException) {
-            throw CorruptionException("Cannot read proto.", exception)
+    override suspend fun readFrom(input: InputStream): AppPreferencesSchema = try {
+        withContext(Dispatchers.IO) {
+            return@withContext ProtoBuf.decodeFromByteArray<AppPreferencesSchema>(
+                input.readBytes()
+            )
         }
+    } catch (exception: SerializationException) {
+        throw CorruptionException("Cannot read proto.", exception)
     }
 
     override suspend fun writeTo(t: AppPreferencesSchema, output: OutputStream) {

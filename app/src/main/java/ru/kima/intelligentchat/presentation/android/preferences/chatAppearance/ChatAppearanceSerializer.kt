@@ -16,12 +16,14 @@ import java.io.OutputStream
 object ChatAppearanceSerializer : Serializer<ChatAppearanceSchema> {
     override val defaultValue = ChatAppearanceSchema()
 
-    override suspend fun readFrom(input: InputStream): ChatAppearanceSchema {
-        try {
-            return ProtoBuf.decodeFromByteArray<ChatAppearanceSchema>(input.readBytes())
-        } catch (exception: SerializationException) {
-            throw CorruptionException("Cannot read proto.", exception)
+    override suspend fun readFrom(input: InputStream): ChatAppearanceSchema = try {
+        withContext(Dispatchers.IO) {
+            return@withContext ProtoBuf.decodeFromByteArray<ChatAppearanceSchema>(
+                input.readBytes()
+            )
         }
+    } catch (exception: SerializationException) {
+        throw CorruptionException("Cannot read proto.", exception)
     }
 
     override suspend fun writeTo(t: ChatAppearanceSchema, output: OutputStream) {
