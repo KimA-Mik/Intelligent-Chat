@@ -1,10 +1,10 @@
 package ru.kima.intelligentchat.domain.chat.useCase
 
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.CreateMessageUseCase
+import ru.kima.intelligentchat.domain.common.valueOr
 import ru.kima.intelligentchat.domain.messaging.util.inlineCardName
 import ru.kima.intelligentchat.domain.messaging.util.inlinePersonaName
 import ru.kima.intelligentchat.domain.persona.model.Persona

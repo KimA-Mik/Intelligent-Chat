@@ -75,6 +75,7 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
 import ru.kima.intelligentchat.presentation.common.components.AnimatedFab
 import ru.kima.intelligentchat.presentation.common.components.AppBar
@@ -206,6 +207,7 @@ fun ChatScreenContent(
                 listState = listState,
                 editMessageBuffer = state.editMessageBuffer,
                 editMessageId = state.editMessageId,
+                chatAppearance = state.chatAppearance,
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
@@ -311,6 +313,7 @@ fun MessageIndicator(
 @Composable
 fun Messages(
     state: ChatState.ChatInfo,
+    chatAppearance: ImmutableChatAppearance,
     listState: LazyListState,
     editMessageBuffer: String,
     editMessageId: Long,
@@ -338,6 +341,7 @@ fun Messages(
                     modifier = Modifier
                         .fillMaxWidth()
                         .animateItem(),
+                    chatAppearance = chatAppearance
                 )
 
                 false -> ChatMessage(
@@ -346,6 +350,7 @@ fun Messages(
                         .fillMaxWidth()
                         .animateContentSize()
                         .animateItem(),
+                    chatAppearance = chatAppearance,
                     onImageClicked = {},
                     onLeftClicked = { onEvent(UserEvent.MessageSwipeLeft(it.messageId)) },
                     onRightClicked = { onEvent(UserEvent.MessageSwipeRight(it.messageId)) },

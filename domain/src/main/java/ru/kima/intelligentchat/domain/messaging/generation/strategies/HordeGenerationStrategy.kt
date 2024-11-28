@@ -4,8 +4,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import ru.kima.intelligentchat.core.common.ICResult
-import ru.kima.intelligentchat.core.common.valueOr
+import ru.kima.intelligentchat.domain.common.ICResult
+import ru.kima.intelligentchat.domain.common.valueOr
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
 import ru.kima.intelligentchat.domain.horde.model.HordeDefaults
 import ru.kima.intelligentchat.domain.horde.model.HordeGenerationParams

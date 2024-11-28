@@ -1,16 +1,16 @@
 package ru.kima.intelligentchat.domain.horde.useCase
 
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.core.common.Resource
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
+import ru.kima.intelligentchat.domain.common.Resource
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
+import ru.kima.intelligentchat.domain.preferences.horde.HordeStateRepository
 
 class GetKudosUseCase(
     private val repository: HordeRepository,
-    private val preferences: HordeStateHandler
+    private val hordeStateRepository: HordeStateRepository,
 ) {
     suspend operator fun invoke(): GetKudosResult {
-        val pref = preferences.data.first()
+        val pref = hordeStateRepository.hordeState().first()
         if (pref.userId == 0) {
             return GetKudosResult.NoUser
         }

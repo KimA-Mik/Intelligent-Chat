@@ -1,0 +1,3 @@
+package ru.kima.intelligentchat.presentation.settings.settingsScreens.chatAppearance.events
+
+sealed interface ChatAppearanceSettingsUiEvent

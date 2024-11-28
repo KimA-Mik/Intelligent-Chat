@@ -51,6 +51,7 @@
     <string name="nav_item_characters">Characters</string>
     <string name="nav_item_personas">Personas</string>
     <string name="nav_item_connection">Connection</string>
+    <string name="nav_item_settings">Settings</string>
 
     <string name="persona_name">Persona name</string>
     <string name="persona_description">Persona description</string>
@@ -145,6 +146,15 @@
     <string name="open_uri_request_dialog_title">Open link</string>
     <string name="open_uri_request_dialog_text">Do you want to open %1$s?</string>
 
+    <!--  Settings Root Screen  -->
+    <string name="settings_nav_item_chat_appearance_title">Chat appearance</string>
+    <string name="settings_nav_item_advanced_formatting_title">Advanced Formatting</string>
+    <string name="settings_nav_item_chat_appearance_description">Chat appearance, message appearance</string>
+    <string name="settings_nav_item_advanced_formatting_description">Context template, context formatting, instruct mode</string>
+
+    <!--  Chat Appearance Settings Screen  -->
+    <string name="setting_show_message_number_title">Show message number</string>
+    <string name="setting_show_swipe_date_title">Show swipe date</string>
 
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
@@ -163,5 +173,5 @@
 
     <string name="restore_snackbar_action">Restore</string>
 
-
+    <string name="not_implemented_placeholder">Not implemented yet…</string>
 </resources>

@@ -1,7 +1,7 @@
 package ru.kima.intelligentchat.domain.chat.useCase.inChat
 
-import ru.kima.intelligentchat.core.common.ICResult
 import ru.kima.intelligentchat.domain.chat.repository.MessageRepository
+import ru.kima.intelligentchat.domain.common.ICResult
 
 class DeleteCurrentSwipeUseCase(
     private val messageRepository: MessageRepository,

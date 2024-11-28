@@ -1,9 +1,9 @@
 package ru.kima.intelligentchat.domain.chat.useCase
 
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
+import ru.kima.intelligentchat.domain.common.valueOr
 
 class DeleteChatUseCase(
     private val chatRepository: ChatRepository,

@@ -14,6 +14,8 @@ import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.HordeP
 import ru.kima.intelligentchat.presentation.personas.details.PersonaDetailsViewModel
 import ru.kima.intelligentchat.presentation.personas.list.PersonasListViewModel
 import ru.kima.intelligentchat.presentation.service.horde.HordeConfigService
+import ru.kima.intelligentchat.presentation.settings.root.SettingsRootViewModel
+import ru.kima.intelligentchat.presentation.settings.settingsScreens.chatAppearance.ChatAppearanceSettingsViewModel
 import ru.kima.intelligentchat.presentation.showImage.ShowImageViewModel
 
 fun presentation() = module {
@@ -36,4 +38,7 @@ fun presentation() = module {
     viewModelOf(::CardChatListViewModel)
 
     singleOf(::HordeConfigService)
+
+    viewModelOf(::SettingsRootViewModel)
+    viewModelOf(::ChatAppearanceSettingsViewModel)
 }

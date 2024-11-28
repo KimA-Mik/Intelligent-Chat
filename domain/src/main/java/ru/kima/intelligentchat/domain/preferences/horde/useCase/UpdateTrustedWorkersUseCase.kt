@@ -1,9 +1,12 @@
 package ru.kima.intelligentchat.domain.preferences.horde.useCase
 
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
+import ru.kima.intelligentchat.domain.preferences.horde.HordeStateRepository
 
-class UpdateTrustedWorkersUseCase(private val handler: HordeStateHandler) {
+class UpdateTrustedWorkersUseCase(
+    private val repository: HordeStateRepository
+
+) {
     suspend operator fun invoke(trustedWorkers: Boolean) {
-        handler.updateTrustedWorkers(trustedWorkers)
+        repository.updateTrustedWorkers(trustedWorkers)
     }
 }

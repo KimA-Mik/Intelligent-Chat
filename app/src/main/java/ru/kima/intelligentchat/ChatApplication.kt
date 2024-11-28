@@ -11,7 +11,6 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import ru.kima.intelligentchat.di.core
 import ru.kima.intelligentchat.di.data
 import ru.kima.intelligentchat.di.domain
 import ru.kima.intelligentchat.di.presentation
@@ -29,7 +28,6 @@ class ChatApplication : Application() {
             androidLogger()
             androidContext(this@ChatApplication)
             modules(
-                core(),
                 data(),
                 domain(),
                 presentation()

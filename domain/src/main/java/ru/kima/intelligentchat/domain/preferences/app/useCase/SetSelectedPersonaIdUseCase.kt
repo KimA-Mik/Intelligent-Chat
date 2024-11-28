@@ -1,9 +1,11 @@
 package ru.kima.intelligentchat.domain.preferences.app.useCase
 
-import ru.kima.intelligentchat.core.preferences.appPreferences.PreferencesHandler
+import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 
-class SetSelectedPersonaIdUseCase(private val preferencesHandler: PreferencesHandler) {
+class SetSelectedPersonaIdUseCase(
+    private val repository: AppPreferencesRepository
+) {
     suspend operator fun invoke(id: Long) {
-        preferencesHandler.updateSelectedPersona(id)
+        repository.updateSelectedPersona(id)
     }
 }

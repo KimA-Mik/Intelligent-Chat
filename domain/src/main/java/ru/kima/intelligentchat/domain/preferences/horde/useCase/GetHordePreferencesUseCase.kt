@@ -1,7 +1,9 @@
 package ru.kima.intelligentchat.domain.preferences.horde.useCase
 
-import ru.kima.intelligentchat.core.preferences.hordeState.HordeStateHandler
+import ru.kima.intelligentchat.domain.preferences.horde.HordeStateRepository
 
-class GetHordePreferencesUseCase(private val handler: HordeStateHandler) {
-    operator fun invoke() = handler.data
+class GetHordePreferencesUseCase(
+    private val repository: HordeStateRepository
+) {
+    operator fun invoke() = repository.hordeState()
 }

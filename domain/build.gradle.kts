@@ -42,7 +42,6 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(project(mapOf("path" to ":core")))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
 }

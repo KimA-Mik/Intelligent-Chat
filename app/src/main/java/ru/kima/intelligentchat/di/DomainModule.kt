@@ -79,9 +79,12 @@ import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
+import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.UpdateSelectedApiUseCase
+import ru.kima.intelligentchat.domain.preferences.chatAppearance.ChatAppearanceRepository
+import ru.kima.intelligentchat.domain.preferences.horde.HordeStateRepository
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.SelectHordeModelsUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateActualGenerationDetailsUseCase
@@ -97,6 +100,9 @@ import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetU
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 import ru.kima.intelligentchat.presentation.android.implementation.messaging.repositoty.MessagingRepositoryImpl
+import ru.kima.intelligentchat.presentation.android.preferences.appPreferences.AppPreferencesRepositoryImpl
+import ru.kima.intelligentchat.presentation.android.preferences.chatAppearance.ChatAppearanceRepositoryImpl
+import ru.kima.intelligentchat.presentation.android.preferences.hordeState.HordeStateRepositoryImpl
 
 @OptIn(ExperimentalSerializationApi::class)
 fun domain() = module {
@@ -108,6 +114,10 @@ fun domain() = module {
     singleOf(::MessageRepositoryImpl) bind MessageRepository::class
     singleOf(::SwipeRepositoryImpl) bind SwipeRepository::class
     singleOf(::MessagingRepositoryImpl) bind MessagingRepository::class
+
+    singleOf(::AppPreferencesRepositoryImpl) bind AppPreferencesRepository::class
+    singleOf(::ChatAppearanceRepositoryImpl) bind ChatAppearanceRepository::class
+    singleOf(::HordeStateRepositoryImpl) bind HordeStateRepository::class
 
     factoryOf(::CleanUpUseCase)
 

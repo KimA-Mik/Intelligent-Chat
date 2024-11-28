@@ -1,11 +1,11 @@
 package ru.kima.intelligentchat.domain.chat.useCase.inChat
 
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.core.common.valueOr
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.chat.repository.ChatRepository
 import ru.kima.intelligentchat.domain.chat.useCase.SubscribeToFullChatUseCase
 import ru.kima.intelligentchat.domain.common.errors.Formatter
+import ru.kima.intelligentchat.domain.common.valueOr
 
 class BranchChatFromMessageUseCase(
     private val subscribeToFullChatUseCase: SubscribeToFullChatUseCase,
