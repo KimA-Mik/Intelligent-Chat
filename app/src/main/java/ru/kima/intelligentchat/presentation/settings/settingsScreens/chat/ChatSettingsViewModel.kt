@@ -2,17 +2,23 @@ package ru.kima.intelligentchat.presentation.settings.settingsScreens.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.preferences.chatSettings.ChatSettingsRepository
-import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toImmutable
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.settings.settingsScreens.chat.events.ChatSettingsAction
 
 class ChatSettingsViewModel(
     private val chatSettingsRepository: ChatSettingsRepository
 ) : ViewModel() {
-    val chatAppearance = chatSettingsRepository.chatSettings().map {
-        it.toImmutable()
+    val chatAppearance = combine(
+        chatSettingsRepository.showDate.subscribe(),
+        chatSettingsRepository.showNumber.subscribe()
+    ) { showDate, showNumber ->
+        ImmutableChatAppearance(
+            showDate = showDate,
+            showNumber = showNumber
+        )
     }
 
     fun onEvent(action: ChatSettingsAction) {
@@ -23,10 +29,10 @@ class ChatSettingsViewModel(
     }
 
     private fun onSetShowDate(value: Boolean) = viewModelScope.launch {
-        chatSettingsRepository.updateShowDate(value)
+        chatSettingsRepository.showDate.set(value)
     }
 
     private fun onSetShowNumber(value: Boolean) = viewModelScope.launch {
-        chatSettingsRepository.updateShowNumber(value)
+        chatSettingsRepository.showNumber.set(value)
     }
 }
