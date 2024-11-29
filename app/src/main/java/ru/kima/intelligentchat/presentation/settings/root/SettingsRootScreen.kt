@@ -40,7 +40,7 @@ import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.common.components.AppBar
-import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToChatAppearance
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToChatSettings
 import ru.kima.intelligentchat.presentation.settings.components.SettingsNavItem
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootAction
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootUiEvent
@@ -95,7 +95,7 @@ fun SettingsRootScreen(
                     )
                 }
 
-                SettingsRootUiEvent.NavigateToChatAppearance -> navController.navigateToChatAppearance()
+                SettingsRootUiEvent.NavigateToChatSettings -> navController.navigateToChatSettings()
             }
         }
     }
@@ -140,8 +140,8 @@ fun SettingsRootContent(
             .padding(vertical = 4.dp)
 
         SettingsNavItem(
-            title = stringResource(R.string.settings_nav_item_chat_appearance_title),
-            onNavigate = { onEvent(SettingsRootAction.OpenChatAppearance) },
+            title = stringResource(R.string.settings_nav_item_chat_settings_title),
+            onNavigate = { onEvent(SettingsRootAction.OpenChatSettings) },
             modifier = navItemModifier,
             description = stringResource(R.string.settings_nav_item_chat_appearance_description),
             icon = Icons.AutoMirrored.Filled.Chat

@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.settings.settingsScreens.chatAppearance
+package ru.kima.intelligentchat.presentation.settings.settingsScreens.chat
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -26,23 +26,23 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.settings.components.SwitchSettingsItem
-import ru.kima.intelligentchat.presentation.settings.settingsScreens.chatAppearance.events.ChatAppearanceSettingsAction
+import ru.kima.intelligentchat.presentation.settings.settingsScreens.chat.events.ChatSettingsAction
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
-fun ChatAppearanceSettingsRoot(
+fun ChatSettingsRoot(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
-    viewModel: ChatAppearanceSettingsViewModel = koinViewModel()
+    viewModel: ChatSettingsViewModel = koinViewModel()
 ) {
     val appearance by viewModel.chatAppearance.collectAsStateWithLifecycle(ImmutableChatAppearance.default)
-    val onEvent = remember<(ChatAppearanceSettingsAction) -> Unit> {
+    val onEvent = remember<(ChatSettingsAction) -> Unit> {
         {
             viewModel.onEvent(it)
         }
     }
 
-    ChatAppearanceSettingsScreen(
+    ChatSettingsScreen(
         appearance = appearance,
         onEvent = onEvent,
         navController = navController,
@@ -52,9 +52,9 @@ fun ChatAppearanceSettingsRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatAppearanceSettingsScreen(
+fun ChatSettingsScreen(
     appearance: ImmutableChatAppearance,
-    onEvent: (ChatAppearanceSettingsAction) -> Unit,
+    onEvent: (ChatSettingsAction) -> Unit,
     navController: NavHostController,
     snackbarHostState: SnackbarHostState
 ) {
@@ -63,7 +63,7 @@ fun ChatAppearanceSettingsScreen(
         topBar = {
             AppBar(
                 titleContent = {
-                    Text(text = stringResource(R.string.settings_nav_item_chat_appearance_title))
+                    Text(text = stringResource(R.string.settings_nav_item_chat_settings_title))
                 },
                 navigateUp = { navController.navigateUp() },
                 scrollBehavior = scrollBehavior
@@ -71,7 +71,7 @@ fun ChatAppearanceSettingsScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        ChatAppearanceSettingsContent(
+        ChatSettingsContent(
             appearance = appearance,
             onEvent = onEvent,
             modifier = Modifier
@@ -82,9 +82,9 @@ fun ChatAppearanceSettingsScreen(
 }
 
 @Composable
-fun ChatAppearanceSettingsContent(
+fun ChatSettingsContent(
     appearance: ImmutableChatAppearance,
-    onEvent: (ChatAppearanceSettingsAction) -> Unit,
+    onEvent: (ChatSettingsAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -94,24 +94,24 @@ fun ChatAppearanceSettingsContent(
         SwitchSettingsItem(
             title = stringResource(R.string.setting_show_message_number_title),
             checked = appearance.showNumber,
-            onCheckedChange = { onEvent(ChatAppearanceSettingsAction.SetShowNumber(it)) },
+            onCheckedChange = { onEvent(ChatSettingsAction.SetShowNumber(it)) },
             modifier = Modifier,
         )
 
         SwitchSettingsItem(
             title = stringResource(R.string.setting_show_swipe_date_title),
             checked = appearance.showDate,
-            onCheckedChange = { onEvent(ChatAppearanceSettingsAction.SetShowDate(it)) }
+            onCheckedChange = { onEvent(ChatSettingsAction.SetShowDate(it)) }
         )
     }
 }
 
 @Preview
 @Composable
-private fun ChatAppearanceSettingsPreview() {
+private fun ChatSettingsPreview() {
     IntelligentChatTheme {
         Surface {
-            ChatAppearanceSettingsScreen(
+            ChatSettingsScreen(
                 appearance = ImmutableChatAppearance.default,
                 onEvent = {},
                 navController = rememberNavController(),

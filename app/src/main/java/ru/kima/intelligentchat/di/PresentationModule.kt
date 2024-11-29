@@ -15,7 +15,7 @@ import ru.kima.intelligentchat.presentation.personas.details.PersonaDetailsViewM
 import ru.kima.intelligentchat.presentation.personas.list.PersonasListViewModel
 import ru.kima.intelligentchat.presentation.service.horde.HordeConfigService
 import ru.kima.intelligentchat.presentation.settings.root.SettingsRootViewModel
-import ru.kima.intelligentchat.presentation.settings.settingsScreens.chatAppearance.ChatAppearanceSettingsViewModel
+import ru.kima.intelligentchat.presentation.settings.settingsScreens.chat.ChatSettingsViewModel
 import ru.kima.intelligentchat.presentation.showImage.ShowImageViewModel
 
 fun presentation() = module {
@@ -40,5 +40,5 @@ fun presentation() = module {
     singleOf(::HordeConfigService)
 
     viewModelOf(::SettingsRootViewModel)
-    viewModelOf(::ChatAppearanceSettingsViewModel)
+    viewModelOf(::ChatSettingsViewModel)
 }
