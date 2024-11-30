@@ -14,7 +14,7 @@ class SettingsRootViewModel : ViewModel() {
     fun onEvent(action: SettingsRootAction) {
         when (action) {
             SettingsRootAction.OpenAdvancedFormatting -> onOpenAdvancedFormatting()
-            SettingsRootAction.OpenChatAppearance -> onOpenChatAppearance()
+            SettingsRootAction.OpenChatSettings -> onOpenChatSettings()
         }
     }
 
@@ -22,7 +22,7 @@ class SettingsRootViewModel : ViewModel() {
         _uiEvent.value = Event(SettingsRootUiEvent.NotImplemented)
     }
 
-    private fun onOpenChatAppearance() {
-        _uiEvent.value = Event(SettingsRootUiEvent.NavigateToChatAppearance)
+    private fun onOpenChatSettings() {
+        _uiEvent.value = Event(SettingsRootUiEvent.NavigateToChatSettings)
     }
 }

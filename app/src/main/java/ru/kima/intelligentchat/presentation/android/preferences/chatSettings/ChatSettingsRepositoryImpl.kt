@@ -1,14 +1,14 @@
-package ru.kima.intelligentchat.presentation.android.preferences.chatAppearance
+package ru.kima.intelligentchat.presentation.android.preferences.chatSettings
 
 import android.content.Context
 import kotlinx.coroutines.flow.map
-import ru.kima.intelligentchat.domain.preferences.chatAppearance.ChatAppearanceRepository
+import ru.kima.intelligentchat.domain.preferences.chatSettings.ChatSettingsRepository
 
-class ChatAppearanceRepositoryImpl(
+class ChatSettingsRepositoryImpl(
     context: Context
-) : ChatAppearanceRepository {
+) : ChatSettingsRepository {
     private val store = context.chatAppearanceDataStore
-    override fun chatAppearance() = store.data.map {
+    override fun chatSettings() = store.data.map {
         it.toChatAppearance()
     }
 
@@ -29,8 +29,8 @@ class ChatAppearanceRepositoryImpl(
     }
 
     private suspend fun updateData(
-        transform: suspend (ChatAppearanceSchema) -> ChatAppearanceSchema
-    ): ChatAppearanceSchema {
+        transform: suspend (ChatSettingsSchema) -> ChatSettingsSchema
+    ): ChatSettingsSchema {
         return store.updateData(transform)
     }
 }

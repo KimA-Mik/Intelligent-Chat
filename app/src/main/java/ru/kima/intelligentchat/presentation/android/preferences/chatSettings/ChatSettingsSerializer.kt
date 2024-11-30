@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.android.preferences.chatAppearance
+package ru.kima.intelligentchat.presentation.android.preferences.chatSettings
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
@@ -13,12 +13,12 @@ import java.io.InputStream
 import java.io.OutputStream
 
 @OptIn(ExperimentalSerializationApi::class)
-object ChatAppearanceSerializer : Serializer<ChatAppearanceSchema> {
-    override val defaultValue = ChatAppearanceSchema()
+object ChatSettingsSerializer : Serializer<ChatSettingsSchema> {
+    override val defaultValue = ChatSettingsSchema()
 
-    override suspend fun readFrom(input: InputStream): ChatAppearanceSchema = try {
+    override suspend fun readFrom(input: InputStream): ChatSettingsSchema = try {
         withContext(Dispatchers.IO) {
-            return@withContext ProtoBuf.decodeFromByteArray<ChatAppearanceSchema>(
+            return@withContext ProtoBuf.decodeFromByteArray<ChatSettingsSchema>(
                 input.readBytes()
             )
         }
@@ -26,7 +26,7 @@ object ChatAppearanceSerializer : Serializer<ChatAppearanceSchema> {
         throw CorruptionException("Cannot read proto.", exception)
     }
 
-    override suspend fun writeTo(t: ChatAppearanceSchema, output: OutputStream) {
+    override suspend fun writeTo(t: ChatSettingsSchema, output: OutputStream) {
         withContext(Dispatchers.IO) {
             output.write(ProtoBuf.encodeToByteArray(t))
         }
