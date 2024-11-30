@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.settings.screen.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Surface
@@ -16,33 +17,58 @@ import ru.kima.intelligentchat.presentation.settings.util.collectAsState
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
-fun SettingItem(
-    item: Setting.SettingItem<*>,
+fun <T> SettingItem(
+    item: Setting.SettingItem<T>,
     modifier: Modifier = Modifier
 ) {
+    val scope = rememberCoroutineScope()
     when (item) {
-        is Setting.SettingItem.SwitchSetting -> SwitchSetting(item, modifier)
+        is Setting.SettingItem.SwitchSetting -> SwitchSetting(
+            item = item,
+            onCheckedChange = {
+                scope.launch { item.onValueChanged(it) }
+            },
+            modifier = modifier
+        )
+
+        is Setting.SettingItem.CustomSetting -> CustomSetting(
+            item = item,
+            onChange = {
+                scope.launch { item.onValueChanged(it) }
+            },
+            modifier = modifier
+        )
     }
 }
 
 @Composable
 fun SwitchSetting(
     item: Setting.SettingItem.SwitchSetting,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scope = rememberCoroutineScope()
     val checked by item.pref.collectAsState()
     SwitchSettingsItem(
         title = item.title,
         checked = checked,
-        onCheckedChange = {
-            scope.launch { item.onValueChanged(it) }
-        },
+        onCheckedChange = onCheckedChange,
         modifier = modifier,
         description = item.subtitle,
         enabled = item.enabled,
         icon = item.icon
     )
+}
+
+@Composable
+fun <T> CustomSetting(
+    item: Setting.SettingItem.CustomSetting<T>,
+    onChange: (T) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val pref by item.pref.collectAsState()
+    Box(modifier = modifier) {
+        item.content(pref, onChange)
+    }
 }
 
 @Preview
