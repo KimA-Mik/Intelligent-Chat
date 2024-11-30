@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import ru.kima.intelligentchat.presentation.android.preferences.appAppearance.AppAppearance
 import ru.kima.intelligentchat.presentation.ui.theme.colorScheme.TidalWaveColorScheme
 
 private val DarkColorScheme = darkColorScheme(
@@ -35,20 +36,28 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun IntelligentChatTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: AppAppearance.DarkMode = AppAppearance.DarkMode.SYSTEM,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val actualDarkTheme = when (darkTheme) {
+        AppAppearance.DarkMode.SYSTEM -> isSystemInDarkTheme()
+        AppAppearance.DarkMode.ON -> true
+        AppAppearance.DarkMode.OFF -> false
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (actualDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+                context
+            )
         }
 
 //        darkTheme -> DarkColorScheme
 //        else -> LightColorScheme
-        darkTheme -> TidalWaveColorScheme.darkScheme
+        actualDarkTheme -> TidalWaveColorScheme.darkScheme
         else -> TidalWaveColorScheme.lightScheme
     }
 
