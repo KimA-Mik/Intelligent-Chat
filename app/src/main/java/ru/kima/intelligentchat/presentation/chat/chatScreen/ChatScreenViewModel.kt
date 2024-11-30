@@ -132,8 +132,8 @@ class ChatScreenViewModel(
         }
 
         val chat = combine(
-            chatSettingsRepository.showDate.subscribe(),
-            chatSettingsRepository.showNumber.subscribe()
+            chatSettingsRepository.showDate().subscribe(),
+            chatSettingsRepository.showNumber().subscribe()
         ) { showDate, showNumber ->
             ImmutableChatAppearance(
                 showDate = showDate,

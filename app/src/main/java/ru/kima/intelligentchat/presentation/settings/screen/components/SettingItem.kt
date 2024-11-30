@@ -8,11 +8,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
-import ru.kima.intelligentchat.domain.preferences.Preference
+import ru.kima.intelligentchat.presentation.android.preferences.ICPreference
 import ru.kima.intelligentchat.presentation.settings.Setting
+import ru.kima.intelligentchat.presentation.settings.util.collectAsState
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -31,7 +31,7 @@ fun SwitchSetting(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    val checked by item.pref.subscribe().collectAsStateWithLifecycle(false)
+    val checked by item.pref.collectAsState()
     SwitchSettingsItem(
         title = item.title,
         checked = checked,
@@ -52,10 +52,11 @@ private fun SwitchSettingItemPreview() {
         Surface {
             SettingItem(
                 item = Setting.SettingItem.SwitchSetting(
-                    pref = object : Preference<Boolean> {
-                        override fun subscribe() = flowOf(true)
-                        override suspend fun set(value: Boolean) {}
-                    },
+                    pref = ICPreference(
+                        initialValue = true,
+                        flow = flowOf(true),
+                        setter = {}
+                    ),
                     title = "Title",
                     enabled = true,
                     subtitle = "Subtitle",

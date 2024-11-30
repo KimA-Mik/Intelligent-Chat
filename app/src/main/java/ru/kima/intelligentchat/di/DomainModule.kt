@@ -4,6 +4,7 @@ import android.content.Context
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import org.koin.core.module.dsl.createdAtStart
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -116,7 +117,10 @@ fun domain() = module {
     singleOf(::MessagingRepositoryImpl) bind MessagingRepository::class
 
     singleOf(::AppPreferencesRepositoryImpl) bind AppPreferencesRepository::class
-    singleOf(::ChatSettingsRepositoryImpl) bind ChatSettingsRepository::class
+    singleOf(::ChatSettingsRepositoryImpl) {
+        //Avoid switches flickering in settings screen
+        createdAtStart()
+    } bind ChatSettingsRepository::class
     singleOf(::HordeStateRepositoryImpl) bind HordeStateRepository::class
 
     factoryOf(::CleanUpUseCase)

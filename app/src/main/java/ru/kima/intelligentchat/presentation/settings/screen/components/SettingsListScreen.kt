@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.flowOf
-import ru.kima.intelligentchat.domain.preferences.Preference
+import ru.kima.intelligentchat.presentation.android.preferences.ICPreference
 import ru.kima.intelligentchat.presentation.settings.Setting
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
@@ -45,17 +45,19 @@ private fun SettingsListScreenPreview() {
         enabled = true,
         settingsItems = persistentListOf(
             Setting.SettingItem.SwitchSetting(
-                pref = object : Preference<Boolean> {
-                    override fun subscribe() = flowOf(true)
-                    override suspend fun set(value: Boolean) {}
-                },
+                pref = ICPreference(
+                    initialValue = true,
+                    flow = flowOf(true),
+                    setter = {}
+                ),
                 title = "One"
             ),
             Setting.SettingItem.SwitchSetting(
-                pref = object : Preference<Boolean> {
-                    override fun subscribe() = flowOf(false)
-                    override suspend fun set(value: Boolean) {}
-                },
+                pref = ICPreference(
+                    initialValue = false,
+                    flow = flowOf(false),
+                    setter = {}
+                ),
                 title = "Two"
             ),
         )

@@ -24,23 +24,25 @@ object ChatSettingsScreen : SettingsScreen, KoinComponent {
     override fun settings(): ImmutableList<Setting> {
         val settings = remember { get<ChatSettingsRepository>() }
 
+        val showNumber = settings.showNumber()
+        val showDate = settings.showDate()
         val appearanceGroup = Setting.SettingGroup(
             title = stringResource(R.string.appearance_setting_group_title),
             enabled = true,
             settingsItems = persistentListOf(
                 Setting.SettingItem.SwitchSetting(
-                    pref = settings.showNumber,
+                    pref = showNumber,
                     title = stringResource(R.string.setting_show_message_number_title),
                     onValueChanged = {
-                        settings.showNumber.set(it)
+                        showNumber.set(it)
                         true
                     }
                 ),
                 Setting.SettingItem.SwitchSetting(
-                    pref = settings.showDate,
+                    pref = showDate,
                     title = stringResource(R.string.setting_show_swipe_date_title),
                     onValueChanged = {
-                        settings.showDate.set(it)
+                        showDate.set(it)
                         true
                     }
                 )
