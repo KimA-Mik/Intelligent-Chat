@@ -1,6 +1,10 @@
 package ru.kima.intelligentchat.presentation.settings.root.events
 
+import ru.kima.intelligentchat.presentation.settings.screen.SettingsScreen
+
 sealed interface SettingsRootAction {
-    data object OpenChatSettings : SettingsRootAction
-    data object OpenAdvancedFormatting : SettingsRootAction
+
+
+    data class SelectScreen(val screen: SettingsScreen) : SettingsRootAction
+    data object ClearScreen : SettingsRootAction
 }

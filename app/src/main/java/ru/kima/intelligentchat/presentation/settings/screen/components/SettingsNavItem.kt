@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.presentation.settings.components
+package ru.kima.intelligentchat.presentation.settings.screen.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding

@@ -25,7 +25,7 @@ import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.common.components.AppBar
-import ru.kima.intelligentchat.presentation.settings.components.SwitchSettingsItem
+import ru.kima.intelligentchat.presentation.settings.screen.components.SwitchSettingsItem
 import ru.kima.intelligentchat.presentation.settings.settingsScreens.chat.events.ChatSettingsAction
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
