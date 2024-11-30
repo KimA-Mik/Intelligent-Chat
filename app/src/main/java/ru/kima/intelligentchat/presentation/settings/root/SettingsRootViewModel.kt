@@ -1,11 +1,14 @@
 package ru.kima.intelligentchat.presentation.settings.root
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootAction
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootUiEvent
@@ -29,7 +32,7 @@ class SettingsRootViewModel : ViewModel() {
             screens = settings,
             selectedScreen = selectedSetting
         )
-    }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), SettingsRootState())
 
     private val _uiEvent = MutableStateFlow<Event<SettingsRootUiEvent>>(Event(null))
     val uiEvent = _uiEvent.asStateFlow()

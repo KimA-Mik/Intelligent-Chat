@@ -40,7 +40,6 @@ import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.common.components.AppBar
-import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToChatSettings
 import ru.kima.intelligentchat.presentation.settings.PreferenceScaffold
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootAction
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootUiEvent
@@ -58,13 +57,13 @@ fun SettingsRoot(
     snackbarHostState: SnackbarHostState
 ) {
     val viewModel: SettingsRootViewModel = koinViewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val uiEvent by viewModel.uiEvent.collectAsStateWithLifecycle()
     val onEvent = remember<(SettingsRootAction) -> Unit> {
         {
             viewModel.onEvent(it)
         }
     }
-    val state by viewModel.state.collectAsStateWithLifecycle(SettingsRootState())
 
     SettingsRootScreen(
         state = state,
@@ -100,8 +99,6 @@ fun SettingsRootScreen(
                         duration = SnackbarDuration.Short
                     )
                 }
-
-                SettingsRootUiEvent.NavigateToChatSettings -> navController.navigateToChatSettings()
             }
         }
     }

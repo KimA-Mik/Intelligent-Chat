@@ -1,3 +1,0 @@
-package ru.kima.intelligentchat.presentation.settings.settingsScreens.chat.events
-
-sealed interface ChatSettingsUiEvent
