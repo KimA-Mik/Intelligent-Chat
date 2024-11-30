@@ -148,8 +148,7 @@
 
     <!--  Settings Root Screen  -->
     <string name="settings_nav_item_chat_settings_title">Chat</string>
-    <string name="settings_nav_item_advanced_formatting_title">Advanced Formatting</string>
-    <string name="settings_nav_item_chat_appearance_description">Chat appearance, message appearance</string>
+    <string name="settings_nav_item_chat_settings_description">Chat appearance, message appearance</string>
     <string name="settings_nav_item_advanced_formatting_description">Context template, context formatting, instruct mode</string>
     <string name="appearance_setting_group_title">Appearance</string>
 
