@@ -1,15 +1,12 @@
 package ru.kima.intelligentchat.presentation.settings.root
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,15 +32,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.common.components.AppBar
-import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToChatSettings
-import ru.kima.intelligentchat.presentation.settings.components.SettingsNavItem
+import ru.kima.intelligentchat.presentation.settings.PreferenceScaffold
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootAction
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootUiEvent
+import ru.kima.intelligentchat.presentation.settings.screen.AdvancedFormattingScreen
+import ru.kima.intelligentchat.presentation.settings.screen.ChatSettingsScreen
+import ru.kima.intelligentchat.presentation.settings.screen.SettingsScreen
+import ru.kima.intelligentchat.presentation.settings.screen.components.SettingsNavItem
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
@@ -54,6 +57,7 @@ fun SettingsRoot(
     snackbarHostState: SnackbarHostState
 ) {
     val viewModel: SettingsRootViewModel = koinViewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val uiEvent by viewModel.uiEvent.collectAsStateWithLifecycle()
     val onEvent = remember<(SettingsRootAction) -> Unit> {
         {
@@ -62,6 +66,7 @@ fun SettingsRoot(
     }
 
     SettingsRootScreen(
+        state = state,
         uiEvent = uiEvent,
         expanded = expanded,
         drawerState = drawerState,
@@ -74,6 +79,7 @@ fun SettingsRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsRootScreen(
+    state: SettingsRootState,
     uiEvent: Event<SettingsRootUiEvent>,
     expanded: Boolean,
     drawerState: DrawerState,
@@ -81,9 +87,8 @@ fun SettingsRootScreen(
     snackbarHostState: SnackbarHostState,
     onEvent: (SettingsRootAction) -> Unit
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     LaunchedEffect(uiEvent) {
         uiEvent.consume {
             when (it) {
@@ -94,11 +99,36 @@ fun SettingsRootScreen(
                         duration = SnackbarDuration.Short
                     )
                 }
-
-                SettingsRootUiEvent.NavigateToChatSettings -> navController.navigateToChatSettings()
             }
         }
     }
+
+    if (state.selectedScreen == null) {
+        ListScaffold(
+            screens = state.screens,
+            scope = scope,
+            expanded, drawerState, snackbarHostState, onEvent
+        )
+    } else {
+        PreferenceScaffold(
+            titleRes = state.selectedScreen.titleRes(),
+            itemsProvider = { state.selectedScreen.settings() },
+            onBackPressed = { onEvent(SettingsRootAction.ClearScreen) }
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun ListScaffold(
+    screens: ImmutableList<SettingsScreen>,
+    scope: CoroutineScope,
+    expanded: Boolean,
+    drawerState: DrawerState,
+    snackbarHostState: SnackbarHostState,
+    onEvent: (SettingsRootAction) -> Unit
+) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             AppBar(
@@ -117,6 +147,7 @@ fun SettingsRootScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         SettingsRootContent(
+            screens = screens,
             onEvent = onEvent,
             modifier = Modifier
                 .fillMaxSize()
@@ -128,32 +159,28 @@ fun SettingsRootScreen(
 
 @Composable
 fun SettingsRootContent(
+    screens: ImmutableList<SettingsScreen>,
     onEvent: (SettingsRootAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    LazyColumn(
         modifier = modifier
-            .verticalScroll(rememberScrollState())
     ) {
         val navItemModifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
 
-        SettingsNavItem(
-            title = stringResource(R.string.settings_nav_item_chat_settings_title),
-            onNavigate = { onEvent(SettingsRootAction.OpenChatSettings) },
-            modifier = navItemModifier,
-            description = stringResource(R.string.settings_nav_item_chat_appearance_description),
-            icon = Icons.AutoMirrored.Filled.Chat
-        )
-
-        SettingsNavItem(
-            title = stringResource(R.string.settings_nav_item_advanced_formatting_title),
-            onNavigate = { onEvent(SettingsRootAction.OpenAdvancedFormatting) },
-            modifier = navItemModifier,
-            description = stringResource(R.string.settings_nav_item_advanced_formatting_description),
-            icon = Icons.Default.TextFormat
-        )
+        items(screens) { screen ->
+            SettingsNavItem(
+                title = stringResource(screen.titleRes()),
+                onNavigate = { onEvent(SettingsRootAction.SelectScreen(screen)) },
+                modifier = navItemModifier,
+                description = screen.subtitleRes()?.let {
+                    stringResource(it)
+                },
+                icon = screen.icon()
+            )
+        }
     }
 }
 
@@ -163,6 +190,12 @@ private fun SettingsRootScreenPreview() {
     IntelligentChatTheme {
         Surface {
             SettingsRootScreen(
+                state = SettingsRootState(
+                    persistentListOf(
+                        ChatSettingsScreen,
+                        AdvancedFormattingScreen
+                    )
+                ),
                 uiEvent = Event(null),
                 expanded = false,
                 drawerState = rememberDrawerState(DrawerValue.Closed),

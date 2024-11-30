@@ -8,6 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -43,6 +44,7 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayCar
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toDisplayChat
 import ru.kima.intelligentchat.presentation.chat.chatScreen.mappers.toImmutable
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayCard
+import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableMessagingIndicator
 import ru.kima.intelligentchat.presentation.navigation.graphs.CARD_ID_ARGUMENT
 
@@ -129,6 +131,16 @@ class ChatScreenViewModel(
             )
         }
 
+        val chat = combine(
+            chatSettingsRepository.showDate().subscribe(),
+            chatSettingsRepository.showNumber().subscribe()
+        ) { showDate, showNumber ->
+            ImmutableChatAppearance(
+                showDate = showDate,
+                showNumber = showNumber
+            )
+        }
+
         val stateFlow = combine(
             chatInfo,
             messagingStatus()
@@ -138,7 +150,7 @@ class ChatScreenViewModel(
             savedStateHandle.getStateFlow(EDITED_MESSAGE_ID, EMPTY_EDITED_MESSAGE_ID),
             savedStateHandle.getStateFlow(OPEN_URI_REQUEST, false),
             savedStateHandle.getStateFlow(URI_TO_OPEN, ""),
-            chatSettingsRepository.chatSettings().map { it.toImmutable() }
+            chat,
         ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId, openUriRequest, uriToOpen, chatAppearance ->
             ChatState(
                 info = info,

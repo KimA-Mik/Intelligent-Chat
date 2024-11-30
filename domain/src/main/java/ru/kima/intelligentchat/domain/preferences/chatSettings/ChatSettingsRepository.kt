@@ -1,9 +1,8 @@
 package ru.kima.intelligentchat.domain.preferences.chatSettings
 
-import kotlinx.coroutines.flow.Flow
+import ru.kima.intelligentchat.domain.preferences.Preference
 
 interface ChatSettingsRepository {
-    fun chatSettings(): Flow<ChatSettings>
-    suspend fun updateShowDate(value: Boolean)
-    suspend fun updateShowNumber(value: Boolean)
+    fun showDate(): Preference<Boolean>
+    fun showNumber(): Preference<Boolean>
 }

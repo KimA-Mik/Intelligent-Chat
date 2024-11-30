@@ -2,7 +2,6 @@ package ru.kima.intelligentchat.presentation.navigation.graphs
 
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.SnackbarHostState
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -10,10 +9,8 @@ import androidx.navigation.navigation
 import ru.kima.intelligentchat.presentation.navigation.NavItem
 import ru.kima.intelligentchat.presentation.navigation.NavigationLayout
 import ru.kima.intelligentchat.presentation.settings.root.SettingsRoot
-import ru.kima.intelligentchat.presentation.settings.settingsScreens.chat.ChatSettingsRoot
 
 private const val ROOT_DESTINATION = "root"
-private const val CHAT_SETTINGS_DESTINATION = "chatSettings"
 
 fun NavGraphBuilder.settingsGraph(
     expanded: Boolean,
@@ -36,15 +33,5 @@ fun NavGraphBuilder.settingsGraph(
                 )
             }
         }
-
-        composable(CHAT_SETTINGS_DESTINATION) {
-            ChatSettingsRoot(
-                navController = navController,
-                snackbarHostState = snackbarHostState
-            )
-        }
     }
 }
-
-fun NavController.navigateToChatSettings() =
-    navigate(CHAT_SETTINGS_DESTINATION)
