@@ -60,7 +60,7 @@ object AppearanceSettingsScreen : SettingsScreen, KoinComponent {
 
         val darkModePureBlackSetting = Setting.SettingItem.SwitchSetting(
             pref = appearance.darkModePureBlack(),
-            title = "darkModePureBlack",
+            title = stringResource(R.string.appearance_setting_dark_mode_pure_black_title),
             enabled = darkMode.currentValue() != AppAppearance.DarkMode.OFF,
         )
 
