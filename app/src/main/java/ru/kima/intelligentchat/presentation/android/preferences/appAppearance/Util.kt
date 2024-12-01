@@ -41,3 +41,10 @@ fun UiModeManager.isNightMode(): Boolean {
         else -> isSystemInDarkTheme()
     }
 }
+
+fun AppAppearanceSchema.toAppAppearance(): AppAppearance {
+    return AppAppearance(
+        darkMode = darkMode,
+        darkModePureBlack = darkModePureBlack,
+    )
+}
