@@ -53,23 +53,15 @@ object AppearanceSettingsScreen : SettingsScreen, KoinComponent {
             title = "",
             enabled = true,
             onValueChanged = { newValue ->
-                darkMode.set(newValue)
                 uiManager.setDarkMode(newValue)
-//                (context as? Activity)?.let { ActivityCompat.recreate(it) }
-
                 true
             }
         )
 
-        val darkModePureBlack = appearance.darkModePureBlack()
         val darkModePureBlackSetting = Setting.SettingItem.SwitchSetting(
             pref = appearance.darkModePureBlack(),
             title = "darkModePureBlack",
             enabled = darkMode.currentValue() != AppAppearance.DarkMode.OFF,
-            onValueChanged = { newValue ->
-                darkModePureBlack.set(newValue)
-                true
-            }
         )
 
         return Setting.SettingGroup(

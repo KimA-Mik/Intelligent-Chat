@@ -12,7 +12,7 @@ sealed interface Setting {
     sealed interface SettingItem<T> : Setting {
         val subtitle: String?
         val icon: ImageVector?
-        val onValueChanged: suspend (T) -> Boolean
+        val onValueChanged: suspend (newValue: T) -> Boolean
 
         data class SwitchSetting(
             val pref: Preference<Boolean>,
@@ -30,7 +30,7 @@ sealed interface Setting {
             override val enabled: Boolean = true,
             override val subtitle: String? = null,
             override val icon: ImageVector? = null,
-            override val onValueChanged: suspend (T) -> Boolean = { true }
+            override val onValueChanged: suspend (newValue: T) -> Boolean = { true }
         ) : SettingItem<T>
     }
 
