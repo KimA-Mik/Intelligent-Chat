@@ -9,7 +9,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.android.ext.android.get
+import ru.kima.intelligentchat.presentation.android.preferences.appAppearance.AppAppearanceStore
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,8 +23,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
+            val appearanceStore = remember { get<AppAppearanceStore>() }
+            val appearance by appearanceStore.appAppearance().collectAsStateWithLifecycle()
+
             IntelligentChatTheme(
-                dynamicColor = true
+                isAmoled = appearance.darkModePureBlack,
+                dynamicColor = true,
             ) {
                 Surface(
                     color = MaterialTheme.colorScheme.background,

@@ -16,24 +16,16 @@ class AppAppearanceStore(
 ) {
     private val dataStore = context.appearanceDataStore
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private var _current = MutableStateFlow(AppAppearanceSchema())
+    private var _current = MutableStateFlow(AppAppearanceSchema().toAppAppearance())
 
     init {
         dataStore.data
             .onEach {
-                _current.value = it
+                _current.value = it.toAppAppearance()
             }.launchIn(coroutineScope)
     }
 
     fun appAppearance() = _current.asStateFlow()
-
-    suspend fun setDarkMode(darkMode: AppAppearance.DarkMode) {
-        dataStore.updateData {
-            it.copy(
-                darkMode = darkMode
-            )
-        }
-    }
 
     fun darkMode(): Preference<AppAppearance.DarkMode> {
         return ICPreference(
@@ -49,4 +41,17 @@ class AppAppearanceStore(
         )
     }
 
+    fun darkModePureBlack(): Preference<Boolean> {
+        return ICPreference(
+            initialValue = _current.value.darkModePureBlack,
+            flow = dataStore.data.map { it.darkModePureBlack },
+            setter = { darkModePureBlack ->
+                dataStore.updateData {
+                    it.copy(
+                        darkModePureBlack = darkModePureBlack
+                    )
+                }
+            }
+        )
+    }
 }

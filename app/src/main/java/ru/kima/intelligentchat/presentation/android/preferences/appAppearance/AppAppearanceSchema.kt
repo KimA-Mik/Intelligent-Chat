@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppAppearanceSchema(
-    val darkMode: AppAppearance.DarkMode = AppAppearance.DarkMode.SYSTEM
+    val darkMode: AppAppearance.DarkMode = AppAppearance.DarkMode.SYSTEM,
+    val darkModePureBlack: Boolean = false,
 )
 
 val Context.appearanceDataStore: DataStore<AppAppearanceSchema> by dataStore(
