@@ -4,9 +4,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-internal object TidalWaveColorScheme {
+internal object TidalWaveColorScheme : ICColorScheme() {
 
-    val darkScheme = darkColorScheme(
+    override val darkScheme = darkColorScheme(
         primary = Color(0xFF5ed4fc),
         onPrimary = Color(0xFF003544),
         primaryContainer = Color(0xFF004d61),
@@ -32,7 +32,7 @@ internal object TidalWaveColorScheme {
         outline = Color(0xFF8a9296),
     )
 
-    val lightScheme = lightColorScheme(
+    override val lightScheme = lightColorScheme(
         primary = Color(0xFF006780),
         onPrimary = Color(0xFFffffff),
         primaryContainer = Color(0xFFB4D4DF),
