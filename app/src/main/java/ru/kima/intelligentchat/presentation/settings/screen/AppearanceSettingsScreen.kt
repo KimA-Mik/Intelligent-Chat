@@ -6,11 +6,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import ru.kima.intelligentchat.R
@@ -38,24 +40,26 @@ object AppearanceSettingsScreen : SettingsScreen, KoinComponent {
 
     @Composable
     private fun getThemeSettingGroup(): Setting.SettingGroup {
+        val scope = rememberCoroutineScope()
         val appearance = remember { get<AppAppearanceStore>() }
         val uiManager = remember { get<UiModeManager>() }
         val darkMode = appearance.darkMode()
         val darkThemeSelector = Setting.SettingItem.CustomSetting(
             pref = darkMode,
-            content = { item, onChange ->
+            content = { item, _ ->
                 DarkModeSelector(
                     item = item,
-                    onSelectItem = onChange,
+                    onSelectItem = {
+                        scope.launch {
+                            darkMode.set(it)
+                            uiManager.setDarkMode(it)
+                        }
+                    },
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
             },
             title = "",
             enabled = true,
-            onValueChanged = { newValue ->
-                uiManager.setDarkMode(newValue)
-                true
-            }
         )
 
         val darkModePureBlackSetting = Setting.SettingItem.SwitchSetting(
@@ -73,5 +77,4 @@ object AppearanceSettingsScreen : SettingsScreen, KoinComponent {
             )
         )
     }
-
 }

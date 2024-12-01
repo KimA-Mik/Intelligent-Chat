@@ -25,7 +25,7 @@ sealed interface Setting {
 
         data class CustomSetting<T>(
             val pref: Preference<T>,
-            val content: @Composable (T, (T) -> Unit) -> Unit,
+            val content: @Composable (value: T, settingUpdate: (T) -> Unit) -> Unit,
             override val title: String,
             override val enabled: Boolean = true,
             override val subtitle: String? = null,
