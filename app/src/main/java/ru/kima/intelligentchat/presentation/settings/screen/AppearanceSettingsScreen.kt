@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.settings.screen
 
+import android.app.UiModeManager
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Palette
@@ -14,6 +15,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.presentation.android.preferences.appAppearance.AppAppearanceStore
+import ru.kima.intelligentchat.presentation.android.preferences.appAppearance.setDarkMode
 import ru.kima.intelligentchat.presentation.settings.Setting
 import ru.kima.intelligentchat.presentation.settings.screen.components.DarkModeSelector
 
@@ -27,6 +29,7 @@ object AppearanceSettingsScreen : SettingsScreen, KoinComponent {
     @Composable
     override fun settings(): ImmutableList<Setting> {
         val appearance = remember { get<AppAppearanceStore>() }
+        val uiManager = remember { get<UiModeManager>() }
         val darkThemeSelector = Setting.SettingItem.CustomSetting(
             pref = appearance.darkMode(),
             content = { item, onChange ->
@@ -40,6 +43,9 @@ object AppearanceSettingsScreen : SettingsScreen, KoinComponent {
             enabled = true,
             onValueChanged = { newValue ->
                 appearance.setDarkMode(newValue)
+                uiManager.setDarkMode(newValue)
+//                (context as? Activity)?.let { ActivityCompat.recreate(it) }
+
                 true
             }
         )

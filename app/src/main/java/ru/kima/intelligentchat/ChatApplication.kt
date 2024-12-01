@@ -3,6 +3,7 @@ package ru.kima.intelligentchat
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.UiModeManager
 import android.os.Build
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,12 +18,16 @@ import ru.kima.intelligentchat.di.presentation
 import ru.kima.intelligentchat.domain.common.useCase.CleanUpUseCase
 import ru.kima.intelligentchat.presentation.service.horde.HordeConfigService
 
+
 class ChatApplication : Application() {
     private val applicationScope = CoroutineScope(Dispatchers.Default)
     private lateinit var hordeConfigService: HordeConfigService
+    lateinit var uiManager: UiModeManager
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels()
+        uiManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
 
         startKoin {
             androidLogger()
