@@ -1,49 +1,30 @@
 package ru.kima.intelligentchat.presentation.settings.screen.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.presentation.android.preferences.ICPreference
 import ru.kima.intelligentchat.presentation.settings.Setting
-import ru.kima.intelligentchat.presentation.settings.util.collectAsState
+import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.RootWidget
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 @Composable
-fun SettingItem(
-    item: Setting.SettingItem<*>,
+fun <T> SettingItem(
+    item: Setting.SettingItem<T>,
     modifier: Modifier = Modifier
 ) {
-    when (item) {
-        is Setting.SettingItem.SwitchSetting -> SwitchSetting(item, modifier)
+    AnimatedVisibility(
+        item.enabled
+    ) {
+        RootWidget(item, modifier)
     }
 }
 
-@Composable
-fun SwitchSetting(
-    item: Setting.SettingItem.SwitchSetting,
-    modifier: Modifier = Modifier
-) {
-    val scope = rememberCoroutineScope()
-    val checked by item.pref.collectAsState()
-    SwitchSettingsItem(
-        title = item.title,
-        checked = checked,
-        onCheckedChange = {
-            scope.launch { item.onValueChanged(it) }
-        },
-        modifier = modifier,
-        description = item.subtitle,
-        enabled = item.enabled,
-        icon = item.icon
-    )
-}
 
 @Preview
 @Composable

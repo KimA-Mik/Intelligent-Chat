@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.settings
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.collections.immutable.ImmutableList
 import ru.kima.intelligentchat.domain.preferences.Preference
@@ -21,6 +22,16 @@ sealed interface Setting {
             override val icon: ImageVector? = null,
             override val onValueChanged: suspend (newValue: Boolean) -> Boolean = { true },
         ) : SettingItem<Boolean>
+
+        data class CustomSetting<T>(
+            val pref: Preference<T>,
+            val content: @Composable (value: T, settingUpdate: (T) -> Unit) -> Unit,
+            override val title: String,
+            override val enabled: Boolean = true,
+            override val subtitle: String? = null,
+            override val icon: ImageVector? = null,
+            override val onValueChanged: suspend (newValue: T) -> Boolean = { true }
+        ) : SettingItem<T>
     }
 
     data class SettingGroup(

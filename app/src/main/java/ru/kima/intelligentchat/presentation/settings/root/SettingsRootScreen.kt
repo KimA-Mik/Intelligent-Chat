@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.settings.root
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -76,7 +77,6 @@ fun SettingsRoot(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsRootScreen(
     state: SettingsRootState,
@@ -87,6 +87,10 @@ fun SettingsRootScreen(
     snackbarHostState: SnackbarHostState,
     onEvent: (SettingsRootAction) -> Unit
 ) {
+    BackHandler {
+        onEvent(SettingsRootAction.BackPressed)
+    }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     LaunchedEffect(uiEvent) {
@@ -99,6 +103,8 @@ fun SettingsRootScreen(
                         duration = SnackbarDuration.Short
                     )
                 }
+
+                SettingsRootUiEvent.PopBack -> navController.popBackStack()
             }
         }
     }

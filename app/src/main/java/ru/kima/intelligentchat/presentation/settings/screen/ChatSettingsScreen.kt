@@ -18,7 +18,7 @@ object ChatSettingsScreen : SettingsScreen, KoinComponent {
     override fun titleRes() = R.string.settings_nav_item_chat_settings_title
 
     @Composable
-    override fun subtitleRes() = R.string.settings_nav_item_chat_appearance_description
+    override fun subtitleRes() = R.string.settings_nav_item_chat_settings_description
 
     @Composable
     override fun settings(): ImmutableList<Setting> {

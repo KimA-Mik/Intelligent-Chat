@@ -13,6 +13,7 @@ import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootAction
 import ru.kima.intelligentchat.presentation.settings.root.events.SettingsRootUiEvent
 import ru.kima.intelligentchat.presentation.settings.screen.AdvancedFormattingScreen
+import ru.kima.intelligentchat.presentation.settings.screen.AppearanceSettingsScreen
 import ru.kima.intelligentchat.presentation.settings.screen.ChatSettingsScreen
 import ru.kima.intelligentchat.presentation.settings.screen.SettingsScreen
 
@@ -20,6 +21,7 @@ class SettingsRootViewModel : ViewModel() {
 
     private val settings = MutableStateFlow<ImmutableList<SettingsScreen>>(
         persistentListOf(
+            AppearanceSettingsScreen,
             ChatSettingsScreen,
             AdvancedFormattingScreen
         )
@@ -41,6 +43,7 @@ class SettingsRootViewModel : ViewModel() {
         when (action) {
             SettingsRootAction.ClearScreen -> onClearScreen()
             is SettingsRootAction.SelectScreen -> onSelectScreen(action.screen)
+            SettingsRootAction.BackPressed -> onBackPressed()
         }
     }
 
@@ -50,5 +53,13 @@ class SettingsRootViewModel : ViewModel() {
 
     private fun onSelectScreen(screen: SettingsScreen) {
         selectedSetting.value = screen
+    }
+
+    private fun onBackPressed() {
+        if (selectedSetting.value != null) {
+            selectedSetting.value = null
+        } else {
+            _uiEvent.value = Event(SettingsRootUiEvent.PopBack)
+        }
     }
 }
