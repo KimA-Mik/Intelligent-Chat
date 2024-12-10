@@ -170,6 +170,9 @@
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>
     <string name="awaiting_for_message_notification">%1$s is typing</string>
 
+    <string name="generation_error_notification_channel_name">Generation error</string>
+    <string name="generation_error_notification_channel_description">Notifies when an error occurs during the generation.</string>
+
     <!--  Common text  -->
     <string name="alert_dialog_accept">Accept</string>
     <string name="alert_dialog_dismiss">Cancel</string>
