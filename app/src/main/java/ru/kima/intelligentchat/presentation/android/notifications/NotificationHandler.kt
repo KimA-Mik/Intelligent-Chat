@@ -32,10 +32,8 @@ class NotificationHandler(
         characterImage: Bitmap? = null
     ): Notification {
         val title = context.getString(R.string.awaiting_for_message_notification, characterName)
-        val builder = NotificationCompat
-            .Builder(context, AWAITING_FOR_MESSAGE_NOTIFICATION_CHANNEL_ID)
+        val builder = defaultBuilder(AWAITING_FOR_MESSAGE_NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
 
         characterImage?.let { builder.setLargeIcon(it) }
         return builder.build()
@@ -47,17 +45,21 @@ class NotificationHandler(
         characterImage: Bitmap? = null,
         error: GenerationError
     ) {
+
         val title =
             context.getString(R.string.generation_error_notification_channel_title, characterName)
-        val builder = NotificationCompat
-            .Builder(context, GENERATION_ERROR_NOTIFICATIONS_CHANNEL_ID)
+        val builder = defaultBuilder(GENERATION_ERROR_NOTIFICATIONS_CHANNEL_ID)
             .setContentTitle(title)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentText(error.getDescription(context))
 
         characterImage?.let { builder.setLargeIcon(it) }
         notificationManager.notify(senderId, builder.build())
     }
+
+    private fun defaultBuilder(channelId: String) =
+        NotificationCompat
+            .Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun awaitingForMessageNotificationChannel(): NotificationChannel {
