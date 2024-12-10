@@ -192,6 +192,14 @@ class MessagingService : Service(), KoinComponent {
         strategy.generation(generationRequest).collect { generationStatus ->
             when (generationStatus) {
                 is GenerationStatus.Done -> {
+                    notificationHandler.notifyNewMessage(
+                        senderId = when (data.sender.type) {
+                            SenderType.Character -> data.sender.id.toInt()
+                            SenderType.Persona -> -data.sender.id.toInt()
+                        },
+                        characterName = data.sender.name,
+                        characterImage = data.sender.photo,
+                    )
                     resultedMessage = generationStatus.result
                 }
 

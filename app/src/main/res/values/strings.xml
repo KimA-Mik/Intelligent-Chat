@@ -170,6 +170,10 @@
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>
     <string name="awaiting_for_message_notification">%1$s is typing</string>
 
+    <string name="new_chat_message_notification_channel_name">New chat message</string>
+    <string name="new_chat_message_notification_channel_description">Notifies about new message.</string>
+    <string name="new_chat_message_notification">%1$s has sent you a message</string>
+
     <string name="generation_error_notification_channel_name">Generation error</string>
     <string name="generation_error_notification_channel_description">Notifies when an error occurs during the generation.</string>
     <string name="generation_error_notification_channel_title">Error generating answer for %1$s</string>

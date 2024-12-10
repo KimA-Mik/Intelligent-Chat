@@ -21,7 +21,8 @@ class NotificationHandler(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channels = listOf(
                 awaitingForMessageNotificationChannel(),
-                generationErrorNotificationChannel()
+                generationErrorNotificationChannel(),
+                chatMessageNotificationChannel()
             )
             notificationManager.createNotificationChannels(channels)
         }
@@ -56,6 +57,20 @@ class NotificationHandler(
         notificationManager.notify(senderId, builder.build())
     }
 
+    fun notifyNewMessage(
+        senderId: Int,
+        characterName: String,
+        characterImage: Bitmap? = null,
+    ) {
+        val title =
+            context.getString(R.string.new_chat_message_notification, characterName)
+        val builder = defaultBuilder(NEW_CHAT_MESSAGE_NOTIFICATIONS_CHANNEL_ID)
+            .setContentTitle(title)
+
+        characterImage?.let { builder.setLargeIcon(it) }
+        notificationManager.notify(senderId, builder.build())
+    }
+
     private fun defaultBuilder(channelId: String) =
         NotificationCompat
             .Builder(context, channelId)
@@ -83,10 +98,22 @@ class NotificationHandler(
         return channel
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun chatMessageNotificationChannel(): NotificationChannel {
+        val name = context.getString(R.string.new_chat_message_notification_channel_name)
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel =
+            NotificationChannel(NEW_CHAT_MESSAGE_NOTIFICATIONS_CHANNEL_ID, name, importance)
+        channel.description =
+            context.getString(R.string.new_chat_message_notification_channel_description)
+        return channel
+    }
+
     companion object {
         private const val AWAITING_FOR_MESSAGE_NOTIFICATION_CHANNEL_ID =
-            "awaiting_for_message_notification_channel"
-        private const val CHAT_MESSAGE_NOTIFICATIONS_CHANNEL_ID = "chat_message_notifications"
+            "awaiting_for_message_notification"
+        private const val NEW_CHAT_MESSAGE_NOTIFICATIONS_CHANNEL_ID =
+            "new_chat_message_notifications"
         private const val GENERATION_ERROR_NOTIFICATIONS_CHANNEL_ID =
             "generation_error_notifications"
     }
