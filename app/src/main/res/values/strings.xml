@@ -172,6 +172,16 @@
 
     <string name="generation_error_notification_channel_name">Generation error</string>
     <string name="generation_error_notification_channel_description">Notifies when an error occurs during the generation.</string>
+    <string name="generation_error_notification_channel_title">Error generating answer for %1$s</string>
+    <string name="generation_error_description_no_internet_connection">No internet connection</string>
+    <string name="generation_error_description_not_implemented">The thing you tried to use in not implemented yet</string>
+
+    <string name="horde_error_description_invalid_api_key">Invalid AI Horde API key provided</string>
+    <string name="horde_error_description_maintenance_mode">Request aborted because horde is in maintenance mode</string>
+    <string name="horde_error_description_request_not_found">Request not found. This probably means it was deleted for inactivity\n</string>
+    <string name="horde_error_description_too_many_prompts">User has requested too many generations concurrently</string>
+    <string name="horde_error_description_unknown_error">Unknown error: %1$s</string>
+    <string name="horde_error_description_validation_error">Validation error: %1$s\nAdditional prompts:\n%2$s</string>
 
     <!--  Common text  -->
     <string name="alert_dialog_accept">Accept</string>
@@ -186,4 +196,5 @@
     <string name="restore_snackbar_action">Restore</string>
 
     <string name="not_implemented_placeholder">Not implemented yet…</string>
+
 </resources>

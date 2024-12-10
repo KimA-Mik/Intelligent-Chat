@@ -195,9 +195,16 @@ class MessagingService : Service(), KoinComponent {
                     resultedMessage = generationStatus.result
                 }
 
-                //TODO: handle errors
                 is GenerationStatus.Error -> {
-                    Log.e(TAG, "ERROR: ${generationStatus.error}")
+                    notificationHandler.notifyGenerationError(
+                        senderId = when (data.sender.type) {
+                            SenderType.Character -> data.sender.id.toInt()
+                            SenderType.Persona -> -data.sender.id.toInt()
+                        },
+                        characterName = data.sender.name,
+                        characterImage = data.sender.photo,
+                        error = generationStatus.error
+                    )
                     _status.value = MessagingIndicator.None
                 }
 

@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.domain.common.errors.GenerationError
 
 class NotificationHandler(
     private val context: Context
@@ -18,8 +19,11 @@ class NotificationHandler(
 
     init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(awaitingForMessageNotificationChannel())
-            notificationManager.createNotificationChannel(generationErrorNotificationChannel())
+            val channels = listOf(
+                awaitingForMessageNotificationChannel(),
+                generationErrorNotificationChannel()
+            )
+            notificationManager.createNotificationChannels(channels)
         }
     }
 
@@ -35,6 +39,24 @@ class NotificationHandler(
 
         characterImage?.let { builder.setLargeIcon(it) }
         return builder.build()
+    }
+
+    fun notifyGenerationError(
+        senderId: Int,
+        characterName: String,
+        characterImage: Bitmap? = null,
+        error: GenerationError
+    ) {
+        val title =
+            context.getString(R.string.generation_error_notification_channel_title, characterName)
+        val builder = NotificationCompat
+            .Builder(context, GENERATION_ERROR_NOTIFICATIONS_CHANNEL_ID)
+            .setContentTitle(title)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentText(error.getDescription(context))
+
+        characterImage?.let { builder.setLargeIcon(it) }
+        notificationManager.notify(senderId, builder.build())
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
