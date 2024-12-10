@@ -9,7 +9,6 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +22,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 import ru.kima.intelligentchat.ChatApplication
-import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.domain.common.ApiType
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
@@ -37,6 +35,7 @@ import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
+import ru.kima.intelligentchat.presentation.android.notifications.NotificationHandler
 
 class MessagingService : Service(), KoinComponent {
     private val strategies: Map<ApiType, GenerationStrategy>
@@ -52,6 +51,7 @@ class MessagingService : Service(), KoinComponent {
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Default + job)
+    private val notificationHandler: NotificationHandler by inject()
 
     private var currentGenerationId: String? = null
     private var currentGenerationStrategy: GenerationStrategy? = null
@@ -152,23 +152,8 @@ class MessagingService : Service(), KoinComponent {
             return
         }
 
-        val notificationBuilder = NotificationCompat.Builder(
-            this@MessagingService,
-            ChatApplication.CHAT_MESSAGE_NOTIFICATIONS_CHANNEL_ID
-        )
-            .setContentTitle(
-                getString(
-                    R.string.awaiting_for_message_notification,
-                    data.sender.name
-                )
-            )
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-
-        data.sender.photo?.let {
-            notificationBuilder.setLargeIcon(it)
-        }
-
-        val notification = notificationBuilder.build()
+        val notification =
+            notificationHandler.getCharacterTypingNotification(data.sender.name, data.sender.photo)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ServiceCompat.startForeground(
                 this@MessagingService,
@@ -210,9 +195,16 @@ class MessagingService : Service(), KoinComponent {
                     resultedMessage = generationStatus.result
                 }
 
-                //TODO: handle errors
                 is GenerationStatus.Error -> {
-                    Log.e(TAG, "ERROR: ${generationStatus.error}")
+                    notificationHandler.notifyGenerationError(
+                        senderId = when (data.sender.type) {
+                            SenderType.Character -> data.sender.id.toInt()
+                            SenderType.Persona -> -data.sender.id.toInt()
+                        },
+                        characterName = data.sender.name,
+                        characterImage = data.sender.photo,
+                        error = generationStatus.error
+                    )
                     _status.value = MessagingIndicator.None
                 }
 
