@@ -13,6 +13,8 @@ import ru.kima.intelligentchat.di.data
 import ru.kima.intelligentchat.di.domain
 import ru.kima.intelligentchat.di.presentation
 import ru.kima.intelligentchat.domain.common.useCase.CleanUpUseCase
+import ru.kima.intelligentchat.presentation.navigation.model.APP_BASE_URL
+import ru.kima.intelligentchat.presentation.navigation.model.APP_SCHEMA
 import ru.kima.intelligentchat.presentation.service.horde.HordeConfigService
 
 
@@ -24,6 +26,9 @@ class ChatApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         uiManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+
+        APP_SCHEMA = getString(R.string.app_schema)
+        APP_BASE_URL = getString(R.string.app_base_url)
 
         startKoin {
             androidLogger()

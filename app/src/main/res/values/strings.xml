@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Intelligent Chat</string>
+    <string name="app_schema" translatable="false">ic</string>
+    <string name="app_base_url" translatable="false">intelligentchat.kima.ru</string>
 
     <!--  Cards list screen  -->
     <string name="menu_item_edit_card">Edit card</string>
@@ -169,6 +171,10 @@
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>
     <string name="awaiting_for_message_notification">%1$s is typing</string>
+
+    <string name="new_chat_message_notification_channel_name">New chat message</string>
+    <string name="new_chat_message_notification_channel_description">Notifies about new message.</string>
+    <string name="new_chat_message_notification">%1$s has sent you a message</string>
 
     <string name="generation_error_notification_channel_name">Generation error</string>
     <string name="generation_error_notification_channel_description">Notifies when an error occurs during the generation.</string>
