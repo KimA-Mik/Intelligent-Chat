@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -22,6 +23,8 @@ import ru.kima.intelligentchat.presentation.chat.cardChatList.CardChatListViewMo
 import ru.kima.intelligentchat.presentation.chat.chatScreen.ChatScreenRoot
 import ru.kima.intelligentchat.presentation.navigation.NavItem
 import ru.kima.intelligentchat.presentation.navigation.NavigationLayout
+import ru.kima.intelligentchat.presentation.navigation.model.APP_BASE_URL
+import ru.kima.intelligentchat.presentation.navigation.model.APP_SCHEMA
 
 const val CARD_ID_ARGUMENT = "cardId"
 fun NavGraphBuilder.cardGraph(
@@ -68,7 +71,10 @@ fun NavGraphBuilder.cardGraph(
                 navArgument(name = CARD_ID_ARGUMENT) {
                     type = NavType.LongType
                     defaultValue = -1L
-                })
+                }),
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "$APP_SCHEMA:$APP_BASE_URL/chat/{$CARD_ID_ARGUMENT}" }
+            )
         ) {
             ChatScreenRoot(
                 navController = navController,

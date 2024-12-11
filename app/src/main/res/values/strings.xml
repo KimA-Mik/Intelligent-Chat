@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Intelligent Chat</string>
+    <string name="app_schema" translatable="false">ic</string>
+    <string name="app_base_url" translatable="false">intelligentchat.kima.ru</string>
 
     <!--  Cards list screen  -->
     <string name="menu_item_edit_card">Edit card</string>

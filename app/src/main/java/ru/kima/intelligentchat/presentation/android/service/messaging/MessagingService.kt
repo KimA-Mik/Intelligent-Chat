@@ -153,7 +153,14 @@ class MessagingService : Service(), KoinComponent {
         }
 
         val notification =
-            notificationHandler.getCharacterTypingNotification(data.sender.name, data.sender.photo)
+            notificationHandler.getCharacterTypingNotification(
+                cardId = when (data.sender.type) {
+                    SenderType.Character -> data.sender.id
+                    SenderType.Persona -> 0
+                },
+                characterName = data.sender.name,
+                characterImage = data.sender.photo
+            )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ServiceCompat.startForeground(
                 this@MessagingService,
@@ -193,6 +200,10 @@ class MessagingService : Service(), KoinComponent {
             when (generationStatus) {
                 is GenerationStatus.Done -> {
                     notificationHandler.notifyNewMessage(
+                        cardId = when (data.sender.type) {
+                            SenderType.Character -> data.sender.id
+                            SenderType.Persona -> 0
+                        },
                         senderId = when (data.sender.type) {
                             SenderType.Character -> data.sender.id.toInt()
                             SenderType.Persona -> -data.sender.id.toInt()
@@ -205,6 +216,10 @@ class MessagingService : Service(), KoinComponent {
 
                 is GenerationStatus.Error -> {
                     notificationHandler.notifyGenerationError(
+                        cardId = when (data.sender.type) {
+                            SenderType.Character -> data.sender.id
+                            SenderType.Persona -> 0
+                        },
                         senderId = when (data.sender.type) {
                             SenderType.Character -> data.sender.id.toInt()
                             SenderType.Persona -> -data.sender.id.toInt()
