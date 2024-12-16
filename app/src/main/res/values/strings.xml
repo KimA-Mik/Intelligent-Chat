@@ -167,6 +167,10 @@
     <string name="setting_show_message_number_title">Show message number</string>
     <string name="setting_show_swipe_date_title">Show swipe date</string>
 
+    <!--  Advanced Formating Screen  -->
+    <string name="instruct_mode_setting_title">Instruct mode</string>
+    <string name="instruct_mode_setting_description">Extended control over prompt-building strategy</string>
+
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>

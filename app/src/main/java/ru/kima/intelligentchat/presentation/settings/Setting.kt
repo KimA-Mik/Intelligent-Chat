@@ -14,6 +14,14 @@ sealed interface Setting {
         val icon: ImageVector?
         val onValueChanged: suspend (newValue: T) -> Boolean
 
+        data class LabelSetting(
+            override val title: String,
+            override val enabled: Boolean = true,
+            override val subtitle: String? = null,
+            override val icon: ImageVector? = null,
+            override val onValueChanged: suspend (Unit) -> Boolean = { true },
+        ) : SettingItem<Unit>
+
         data class SwitchSetting(
             val pref: Preference<Boolean>,
             override val title: String,
