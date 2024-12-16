@@ -82,6 +82,7 @@ import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
+import ru.kima.intelligentchat.domain.preferences.advancedFormatting.AdvancedFormattingRepository
 import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
@@ -103,6 +104,7 @@ import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetU
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 import ru.kima.intelligentchat.presentation.android.implementation.messaging.repositoty.MessagingRepositoryImpl
+import ru.kima.intelligentchat.presentation.android.preferences.advancedFormatting.AdvancedFormattingRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.preferences.appPreferences.AppPreferencesRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.preferences.chatSettings.ChatSettingsRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.preferences.hordeState.HordeStateRepositoryImpl
@@ -125,6 +127,7 @@ fun domain() = module {
         createdAtStart()
     } bind ChatSettingsRepository::class
     singleOf(::HordeStateRepositoryImpl) bind HordeStateRepository::class
+    singleOf(::AdvancedFormattingRepositoryImpl) bind AdvancedFormattingRepository::class
 
     factoryOf(::CleanUpUseCase)
 
