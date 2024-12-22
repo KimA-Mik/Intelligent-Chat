@@ -10,8 +10,8 @@ class InstructModeTemplateRepositoryImpl(
     wrapper: DatabaseWrapper
 ) : InstructModeTemplateRepository {
     private val dao = wrapper.database.instructModeTemplateDao()
-    override suspend fun insert(template: InstructModeTemplate) {
-        dao.insert(template.toEntity())
+    override suspend fun insert(template: InstructModeTemplate): Long {
+        return dao.insert(template.toEntity())
     }
 
     override suspend fun update(template: InstructModeTemplate) {

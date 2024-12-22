@@ -66,6 +66,10 @@ import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSav
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.instructMode.InstructModeTemplateRepository
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.GetSelectedInstructTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SelectInstructTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.UpdateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
@@ -207,6 +211,11 @@ fun domain() = module {
     singleOf(::LoadMessagingDataUseCase)
     singleOf(::SendMessageUseCase)
     singleOf(::SubscribeToMessagingStatus)
+
+    singleOf(::GetSelectedInstructTemplateUseCase)
+    singleOf(::SelectInstructTemplateUseCase)
+    singleOf(::SubscribeToInstructModeTemplatesUseCase)
+    singleOf(::UpdateInstructModeTemplateUseCase)
 
     singleOf(::HordeGenerationStrategy)
     singleOf(::KoboldAiGenerationStrategy)
