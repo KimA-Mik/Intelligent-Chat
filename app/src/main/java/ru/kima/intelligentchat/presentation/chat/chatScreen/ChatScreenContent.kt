@@ -64,6 +64,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.chat.model.SenderType
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
@@ -268,7 +269,7 @@ private fun consumeEvent(
 private fun dropdownMenuItems(onEvent: (UserEvent) -> Unit) = remember {
     listOf(
         SimpleDropDownMenuItem(
-            R.string.menu_item_chat_instances,
+            ComposeString.Resource(R.string.menu_item_chat_instances),
             onClick = { onEvent(UserEvent.OpenChatList) },
             iconVector = Icons.Default.Feedback
         ),
@@ -279,12 +280,12 @@ private fun dropdownMenuItems(onEvent: (UserEvent) -> Unit) = remember {
 private fun moreMenuItems() = remember {
     listOf(
         SimpleDropDownMenuItem(
-            R.string.menu_item_impersonate,
+            ComposeString.Resource(R.string.menu_item_impersonate),
             onClick = {},
             iconVector = Icons.Default.RememberMe
         ),
         SimpleDropDownMenuItem(
-            R.string.menu_item_count_tokens,
+            ComposeString.Resource(R.string.menu_item_count_tokens),
             onClick = {},
             iconVector = Icons.Default.Numbers
         )

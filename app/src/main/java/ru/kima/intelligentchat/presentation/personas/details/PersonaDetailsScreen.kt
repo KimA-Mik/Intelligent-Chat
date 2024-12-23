@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.common.image.ImagePicker
@@ -151,7 +152,7 @@ private fun dropdownMenuItems(
 ) = remember {
     listOf(
         SimpleDropDownMenuItem(
-            textId = R.string.delete_persona,
+            string = ComposeString.Resource(R.string.delete_persona),
             onClick = { onEvent(UserEvent.DeletePersona) },
             iconVector = Icons.Filled.Delete,
         )
