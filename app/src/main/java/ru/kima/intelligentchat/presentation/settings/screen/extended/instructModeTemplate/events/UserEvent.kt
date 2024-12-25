@@ -2,4 +2,5 @@ package ru.kima.intelligentchat.presentation.settings.screen.extended.instructMo
 
 sealed interface UserEvent {
     data class SelectTemplate(val id: Long) : UserEvent
+    data object OpenSelectIncludeNamePolicy : UserEvent
 }

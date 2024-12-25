@@ -171,6 +171,10 @@
     <string name="instruct_mode_setting_title">Instruct mode</string>
     <string name="instruct_mode_setting_description">Extended control over prompt-building strategy</string>
 
+    <string name="include_string_policy_setting_title">Include names</string>
+    <string name="include_string_policy_never">Never</string>
+    <string name="include_string_policy_always">Always</string>
+
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>

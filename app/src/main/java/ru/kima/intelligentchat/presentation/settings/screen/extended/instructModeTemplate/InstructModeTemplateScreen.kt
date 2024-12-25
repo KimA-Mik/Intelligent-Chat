@@ -1,9 +1,11 @@
 package ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -40,6 +42,7 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.presentation.common.components.AppBar
+import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.TextSettingWidget
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplateListItem
@@ -103,16 +106,41 @@ fun InstructModeTemplateContent(
 ) {
     Column(
         modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp),
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         SelectTemplateCard(
             currentTemplateTitle = state.currentTemplate.name,
             templates = state.templates,
-            onEvent = onEvent
+            onEvent = onEvent,
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
+        SelectedIncludeNamePolicy(
+            includeNamePolicy = state.currentTemplate.includeNamePolicy,
+            onClick = { onEvent(UserEvent.OpenSelectIncludeNamePolicy) },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun SelectedIncludeNamePolicy(
+    includeNamePolicy: IncludeNamePolicy,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextSettingWidget(
+        title = ComposeString.Resource(R.string.include_string_policy_setting_title),
+        modifier = modifier.clickable(onClick = onClick),
+        subtitle = includeNamePolicy.composeSting()
+    )
+}
+
+private fun IncludeNamePolicy.composeSting(): ComposeString {
+    return when (this) {
+        IncludeNamePolicy.NEVER -> ComposeString.Resource(R.string.include_string_policy_never)
+        IncludeNamePolicy.ALWAYS -> ComposeString.Resource(R.string.include_string_policy_always)
     }
 }
 
@@ -121,9 +149,11 @@ fun InstructModeTemplateContent(
 fun SelectTemplateCard(
     currentTemplateTitle: String,
     templates: ImmutableList<DisplayInstructModeTemplateListItem>,
-    onEvent: (UserEvent) -> Unit
+    onEvent: (UserEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
+        modifier = modifier,
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 8.dp
     ) {
