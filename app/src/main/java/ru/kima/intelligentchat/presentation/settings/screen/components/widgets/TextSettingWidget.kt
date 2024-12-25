@@ -6,32 +6,32 @@ import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
+import ru.kima.intelligentchat.common.ComposeString
+import ru.kima.intelligentchat.util.preview.ICPreview
 
 @Composable
 fun TextSettingWidget(
-    title: String,
+    title: ComposeString,
     modifier: Modifier = Modifier,
-    subtitle: String? = null,
+    subtitle: ComposeString? = null,
     icon: ImageVector? = null,
     iconTint: Color = MaterialTheme.colorScheme.primary,
     widget: @Composable (() -> Unit)? = null,
 ) {
     ListItem(
         headlineContent = {
-            Text(text = title)
+            Text(text = title.unwrap())
         },
         modifier = modifier,
         supportingContent = {
             subtitle?.let {
-                Text(text = it)
+                Text(text = it.unwrap())
             }
         },
         leadingContent = {
@@ -39,7 +39,7 @@ fun TextSettingWidget(
                 Icon(
                     imageVector = it,
                     tint = iconTint,
-                    contentDescription = title
+                    contentDescription = title.unwrap()
                 )
             }
         },
@@ -50,19 +50,17 @@ fun TextSettingWidget(
 @PreviewLightDark
 @Composable
 private fun TextSettingWidgetPreview() {
-    IntelligentChatTheme {
-        Surface {
-            Column {
-                TextSettingWidget(
-                    title = "Text setting",
-                    subtitle = "Text setting summary",
-                )
-                TextSettingWidget(
-                    title = "Text setting with icon",
-                    subtitle = "Text setting summary",
-                    icon = Icons.Default.Preview
-                )
-            }
+    ICPreview {
+        Column {
+            TextSettingWidget(
+                title = ComposeString.Raw("Text setting"),
+                subtitle = ComposeString.Raw("Text setting summary"),
+            )
+            TextSettingWidget(
+                title = ComposeString.Raw("Text setting with icon"),
+                subtitle = ComposeString.Raw("Text setting summary"),
+                icon = Icons.Default.Preview
+            )
         }
     }
 }

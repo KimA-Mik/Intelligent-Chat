@@ -3,11 +3,11 @@ package ru.kima.intelligentchat.presentation.settings.screen
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.koin.core.component.KoinComponent
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToInstructMode
 import ru.kima.intelligentchat.presentation.settings.Setting
 import ru.kima.intelligentchat.presentation.ui.LocalNavController
@@ -23,8 +23,8 @@ object AdvancedFormattingScreen : SettingsScreen, KoinComponent {
     override fun settings(): ImmutableList<Setting> {
         val navController = LocalNavController.current
         val instructMode = Setting.SettingItem.LabelSetting(
-            title = stringResource(R.string.instruct_mode_setting_title),
-            subtitle = stringResource(R.string.instruct_mode_setting_description),
+            title = ComposeString.Resource(R.string.instruct_mode_setting_title),
+            subtitle = ComposeString.Resource(R.string.instruct_mode_setting_description),
             onValueChanged = {
                 navController.navigateToInstructMode()
                 true

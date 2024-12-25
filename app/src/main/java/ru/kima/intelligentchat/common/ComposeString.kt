@@ -15,4 +15,8 @@ sealed interface ComposeString {
             is Resource -> stringResource(value)
         }
     }
+
+    companion object {
+        val Empty = Raw("")
+    }
 }
