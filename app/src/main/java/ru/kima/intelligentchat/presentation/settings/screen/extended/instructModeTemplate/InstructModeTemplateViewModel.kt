@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeTemplate
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.GetSelectedInstructTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
@@ -22,16 +24,18 @@ class InstructModeTemplateViewModel(
 ) : ViewModel() {
     private val currentTemplatesUseCase =
         MutableStateFlow(InstructModeTemplate.default().toDisplay())
-
+    private val includeNamePolicyDialog = MutableStateFlow(false)
     val state = combine(
         currentTemplatesUseCase,
         subscribeToInstructModeTemplates().map { list ->
             list.map { it.toListItem() }.toImmutableList()
-        }
-    ) { currentTemplate, templates ->
+        },
+        includeNamePolicyDialog
+    ) { currentTemplate, templates, includeNamePolicyDialog ->
         InstructModeTemplateScreenState(
             currentTemplate = currentTemplate,
-            templates = templates
+            templates = templates,
+            includeNamePolicyDialog = includeNamePolicyDialog
         )
     }.stateIn(
         viewModelScope,
@@ -44,7 +48,33 @@ class InstructModeTemplateViewModel(
     }
 
     fun onEvent(event: UserEvent) {
+        when (event) {
+            is UserEvent.SelectTemplate -> onSelectTemplate(event.id)
+            UserEvent.OpenSelectIncludeNamePolicy -> onOpenSelectIncludeNamePolicy()
+            UserEvent.DismissSelectIncludeNamePolicyDialog -> onDismissSelectIncludeNamePolicyDialog()
+            is UserEvent.SelectIncludeNamePolicy -> onSelectIncludeNamePolicy(event.policy)
+        }
+    }
 
+    private fun onSelectTemplate(id: Long) {
+
+    }
+
+    private fun onOpenSelectIncludeNamePolicy() {
+        includeNamePolicyDialog.value = true
+    }
+
+    private fun onDismissSelectIncludeNamePolicyDialog() {
+        includeNamePolicyDialog.value = false
+    }
+
+    private fun onSelectIncludeNamePolicy(policy: IncludeNamePolicy) {
+        includeNamePolicyDialog.value = false
+        if (policy == currentTemplatesUseCase.value.includeNamePolicy) return
+
+        currentTemplatesUseCase.update {
+            it.copy(includeNamePolicy = policy)
+        }
     }
 
     private fun getCurrentTemplate() {

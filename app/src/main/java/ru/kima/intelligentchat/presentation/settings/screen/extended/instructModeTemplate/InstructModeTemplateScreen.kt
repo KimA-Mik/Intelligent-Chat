@@ -43,9 +43,11 @@ import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.TextSettingWidget
+import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.IncludeNamePolicySelectDialog
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplateListItem
+import ru.kima.intelligentchat.presentation.settings.util.composeSting
 import ru.kima.intelligentchat.presentation.ui.LocalNavController
 import ru.kima.intelligentchat.presentation.ui.components.DropdownTextField
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
@@ -75,6 +77,14 @@ fun InstructModeTemplateScreen(
     onEvent: (UserEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    when {
+        state.includeNamePolicyDialog ->
+            IncludeNamePolicySelectDialog(
+                selectedPolicy = state.currentTemplate.includeNamePolicy,
+                onEvent = onEvent
+            )
+    }
+
     val nacController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -110,11 +120,12 @@ fun InstructModeTemplateContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        val horizontalPadding = 8.dp
         SelectTemplateCard(
             currentTemplateTitle = state.currentTemplate.name,
             templates = state.templates,
             onEvent = onEvent,
-            modifier = Modifier.padding(horizontal = 8.dp)
+            modifier = Modifier.padding(horizontal = horizontalPadding)
         )
         SelectedIncludeNamePolicy(
             includeNamePolicy = state.currentTemplate.includeNamePolicy,
@@ -135,13 +146,6 @@ fun SelectedIncludeNamePolicy(
         modifier = modifier.clickable(onClick = onClick),
         subtitle = includeNamePolicy.composeSting()
     )
-}
-
-private fun IncludeNamePolicy.composeSting(): ComposeString {
-    return when (this) {
-        IncludeNamePolicy.NEVER -> ComposeString.Resource(R.string.include_string_policy_never)
-        IncludeNamePolicy.ALWAYS -> ComposeString.Resource(R.string.include_string_policy_always)
-    }
 }
 
 @Composable
@@ -224,6 +228,7 @@ fun SelectTextBox(
         modifier = modifier
     )
 }
+
 
 @Preview
 @Composable
