@@ -69,7 +69,10 @@ fun DropdownTextField(
                 val variantText = variant.string.unwrap()
                 DropdownMenuItem(
                     text = { Text(variantText) },
-                    onClick = variant.onClick,
+                    onClick = {
+                        isMenuExpanded = false
+                        variant.onClick()
+                    },
                     leadingIcon = {
                         variant.iconVector?.let {
                             Icon(

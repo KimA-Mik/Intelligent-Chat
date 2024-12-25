@@ -182,7 +182,7 @@ fun SelectTextBox(
     modifier: Modifier = Modifier
 ) {
     DropdownTextField(
-        value = remember { ComposeString.Raw(currentTemplateTitle) },
+        value = remember(currentTemplateTitle) { ComposeString.Raw(currentTemplateTitle) },
         variants = remember(templates) {
             templates.fastMap {
                 SimpleDropDownMenuItem(
