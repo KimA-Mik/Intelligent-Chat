@@ -33,7 +33,8 @@ fun DropdownTextField(
     value: ComposeString,
     variants: ImmutableList<SimpleDropDownMenuItem>,
     modifier: Modifier = Modifier,
-    label: ComposeString? = null
+    label: ComposeString? = null,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     Box(modifier.width(IntrinsicSize.Min)) {
         var isMenuExpanded by remember { mutableStateOf(false) }
@@ -60,7 +61,8 @@ fun DropdownTextField(
                     Text(it.unwrap())
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = maxLines
         )
         DropdownMenu(
             expanded = isMenuExpanded,

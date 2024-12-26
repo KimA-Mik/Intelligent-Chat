@@ -44,6 +44,7 @@ import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePo
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.TextSettingWidget
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.IncludeNamePolicySelectDialog
+import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.RenameTemplateDialog
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplateListItem
@@ -52,6 +53,8 @@ import ru.kima.intelligentchat.presentation.ui.LocalNavController
 import ru.kima.intelligentchat.presentation.ui.components.DropdownTextField
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.util.preview.ICPreview
+
+const val MAX_TEMPLATE_TITLE_LINES = 2
 
 @Composable
 fun InstructModeTemplateRoot() {
@@ -81,7 +84,16 @@ fun InstructModeTemplateScreen(
         state.includeNamePolicyDialog ->
             IncludeNamePolicySelectDialog(
                 selectedPolicy = state.currentTemplate.includeNamePolicy,
-                onEvent = onEvent
+                onAccept = { onEvent(UserEvent.SelectIncludeNamePolicy(it)) },
+                onDismiss = { onEvent(UserEvent.DismissSelectIncludeNamePolicyDialog) },
+            )
+
+        state.renameTemplateDialog ->
+            RenameTemplateDialog(
+                value = state.renameTemplateDialogValue,
+                onAccept = { onEvent(UserEvent.AcceptRenameTemplateDialog) },
+                onDismiss = { onEvent(UserEvent.DismissRenameTemplateDialog) },
+                onValueChange = { onEvent(UserEvent.UpdateRenameTemplateDialog(it)) },
             )
     }
 
@@ -169,18 +181,18 @@ fun SelectTemplateCard(
                 currentTemplateTitle = currentTemplateTitle,
                 templates = templates,
                 selectTemplate = { onEvent(UserEvent.SelectTemplate(it)) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             TooltipBox(
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                 tooltip = {
                     PlainTooltip {
-                        Text("Tooltip")
+                        Text(text = stringResource(R.string.tooltip_instruct_mode_template_rename))
                     }
                 },
                 state = rememberTooltipState()
             ) {
-                IconButton(onClick = {}) {
+                IconButton(onClick = { onEvent(UserEvent.OpenRenameTemplateDialog) }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = null
@@ -225,7 +237,8 @@ fun SelectTextBox(
                 )
             }.toImmutableList()
         },
-        modifier = modifier
+        modifier = modifier,
+        maxLines = MAX_TEMPLATE_TITLE_LINES
     )
 }
 

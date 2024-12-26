@@ -21,24 +21,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
-import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.util.composeSting
 import ru.kima.intelligentchat.util.preview.ICPreview
 
 @Composable
 fun IncludeNamePolicySelectDialog(
     selectedPolicy: IncludeNamePolicy,
-    onEvent: (UserEvent) -> Unit,
+    onAccept: (IncludeNamePolicy) -> Unit,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AlertDialog(
-        onDismissRequest = { onEvent(UserEvent.DismissSelectIncludeNamePolicyDialog) },
+        onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(
-                onClick = {
-                    onEvent(UserEvent.DismissSelectIncludeNamePolicyDialog)
-                }
-            ) {
+            TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.action_cancel))
             }
         },
@@ -49,9 +45,7 @@ fun IncludeNamePolicySelectDialog(
         text = {
             IncludeNamePolicySelector(
                 selectedPolicy = selectedPolicy,
-                selectPolicy = {
-                    onEvent(UserEvent.SelectIncludeNamePolicy(it))
-                }
+                selectPolicy = onAccept
             )
         }
     )
@@ -89,7 +83,8 @@ fun IncludeNamePolicySelector(
 private fun IncludeNamePolicySelectDialogPreview() = ICPreview {
     IncludeNamePolicySelectDialog(
         selectedPolicy = IncludeNamePolicy.ALWAYS,
-        onEvent = {},
+        onAccept = { },
+        onDismiss = { },
         modifier = Modifier.padding(16.dp)
     )
 }

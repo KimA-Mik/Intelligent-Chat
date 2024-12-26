@@ -22,20 +22,26 @@ class InstructModeTemplateViewModel(
     private val subscribeToInstructModeTemplates: SubscribeToInstructModeTemplatesUseCase,
     private val getSelectedInstructTemplate: GetSelectedInstructTemplateUseCase,
 ) : ViewModel() {
-    private val currentTemplatesUseCase =
+    private val currentTemplate =
         MutableStateFlow(InstructModeTemplate.default().toDisplay())
     private val includeNamePolicyDialog = MutableStateFlow(false)
+    private val renameTemplateDialog = MutableStateFlow(false)
+    private val renameTemplateDialogValue = MutableStateFlow("")
     val state = combine(
-        currentTemplatesUseCase,
+        currentTemplate,
         subscribeToInstructModeTemplates().map { list ->
             list.map { it.toListItem() }.toImmutableList()
         },
-        includeNamePolicyDialog
-    ) { currentTemplate, templates, includeNamePolicyDialog ->
+        includeNamePolicyDialog,
+        renameTemplateDialog,
+        renameTemplateDialogValue
+    ) { currentTemplate, templates, includeNamePolicyDialog, renameTemplateDialog, renameTemplateDialogValue ->
         InstructModeTemplateScreenState(
             currentTemplate = currentTemplate,
             templates = templates,
-            includeNamePolicyDialog = includeNamePolicyDialog
+            includeNamePolicyDialog = includeNamePolicyDialog,
+            renameTemplateDialog = renameTemplateDialog,
+            renameTemplateDialogValue = renameTemplateDialogValue
         )
     }.stateIn(
         viewModelScope,
@@ -53,6 +59,10 @@ class InstructModeTemplateViewModel(
             UserEvent.OpenSelectIncludeNamePolicy -> onOpenSelectIncludeNamePolicy()
             UserEvent.DismissSelectIncludeNamePolicyDialog -> onDismissSelectIncludeNamePolicyDialog()
             is UserEvent.SelectIncludeNamePolicy -> onSelectIncludeNamePolicy(event.policy)
+            UserEvent.OpenRenameTemplateDialog -> onOpenRenameTemplateDialog()
+            UserEvent.AcceptRenameTemplateDialog -> onAcceptRenameTemplateDialog()
+            UserEvent.DismissRenameTemplateDialog -> onDismissRenameTemplateDialog()
+            is UserEvent.UpdateRenameTemplateDialog -> onUpdateRenameTemplateDialog(event.value)
         }
     }
 
@@ -70,16 +80,38 @@ class InstructModeTemplateViewModel(
 
     private fun onSelectIncludeNamePolicy(policy: IncludeNamePolicy) {
         includeNamePolicyDialog.value = false
-        if (policy == currentTemplatesUseCase.value.includeNamePolicy) return
+        if (policy == currentTemplate.value.includeNamePolicy) return
 
-        currentTemplatesUseCase.update {
+        currentTemplate.update {
             it.copy(includeNamePolicy = policy)
         }
     }
 
+    private fun onOpenRenameTemplateDialog() {
+        renameTemplateDialog.value = true
+        renameTemplateDialogValue.value = currentTemplate.value.name
+    }
+
+    private fun onAcceptRenameTemplateDialog() {
+        renameTemplateDialog.value = false
+        if (renameTemplateDialogValue.value == currentTemplate.value.name) return
+
+        currentTemplate.update {
+            it.copy(name = renameTemplateDialogValue.value)
+        }
+    }
+
+    private fun onDismissRenameTemplateDialog() {
+        renameTemplateDialog.value = false
+    }
+
+    private fun onUpdateRenameTemplateDialog(value: String) {
+        renameTemplateDialogValue.value = value
+    }
+
     private fun getCurrentTemplate() {
         viewModelScope.launch {
-            currentTemplatesUseCase.value = getSelectedInstructTemplate().toDisplay()
+            currentTemplate.value = getSelectedInstructTemplate().toDisplay()
         }
     }
 }
