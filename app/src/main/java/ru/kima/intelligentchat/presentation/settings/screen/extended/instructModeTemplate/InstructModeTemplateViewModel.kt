@@ -63,8 +63,10 @@ class InstructModeTemplateViewModel(
             UserEvent.AcceptRenameTemplateDialog -> onAcceptRenameTemplateDialog()
             UserEvent.DismissRenameTemplateDialog -> onDismissRenameTemplateDialog()
             is UserEvent.UpdateRenameTemplateDialog -> onUpdateRenameTemplateDialog(event.value)
+            is UserEvent.UpdateWrapSequencesWithNewLine -> onUpdateWrapSequencesWithNewLine(event.value)
         }
     }
+
 
     private fun onSelectTemplate(id: Long) {
 
@@ -107,6 +109,14 @@ class InstructModeTemplateViewModel(
 
     private fun onUpdateRenameTemplateDialog(value: String) {
         renameTemplateDialogValue.value = value
+    }
+
+    private fun onUpdateWrapSequencesWithNewLine(value: Boolean) {
+        currentTemplate.update {
+            it.copy(
+                wrapSequencesWithNewLine = value
+            )
+        }
     }
 
     private fun getCurrentTemplate() {

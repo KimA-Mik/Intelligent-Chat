@@ -42,6 +42,7 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.presentation.common.components.AppBar
+import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.SwitchSettingWidget
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.TextSettingWidget
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.IncludeNamePolicySelectDialog
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.RenameTemplateDialog
@@ -142,6 +143,12 @@ fun InstructModeTemplateContent(
         SelectedIncludeNamePolicy(
             includeNamePolicy = state.currentTemplate.includeNamePolicy,
             onClick = { onEvent(UserEvent.OpenSelectIncludeNamePolicy) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        SwitchSettingWidget(
+            title = remember { ComposeString.Resource(R.string.wrap_sequences_with_new_line_setting_title) },
+            checked = state.currentTemplate.wrapSequencesWithNewLine,
+            onCheckedChange = { onEvent(UserEvent.UpdateWrapSequencesWithNewLine(it)) },
             modifier = Modifier.fillMaxWidth()
         )
     }

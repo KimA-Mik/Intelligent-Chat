@@ -11,4 +11,5 @@ sealed interface UserEvent {
     data object AcceptRenameTemplateDialog : UserEvent
     data object DismissRenameTemplateDialog : UserEvent
     data class UpdateRenameTemplateDialog(val value: String) : UserEvent
+    data class UpdateWrapSequencesWithNewLine(val value: Boolean) : UserEvent
 }
