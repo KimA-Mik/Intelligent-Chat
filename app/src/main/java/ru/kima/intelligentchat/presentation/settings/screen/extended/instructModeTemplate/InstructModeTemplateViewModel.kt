@@ -27,21 +27,32 @@ class InstructModeTemplateViewModel(
     private val includeNamePolicyDialog = MutableStateFlow(false)
     private val renameTemplateDialog = MutableStateFlow(false)
     private val renameTemplateDialogValue = MutableStateFlow("")
+
+    private val dialogs = combine(
+        includeNamePolicyDialog,
+        renameTemplateDialog,
+        renameTemplateDialogValue
+    ) { includeNamePolicyDialog,
+        renameTemplateDialog,
+        renameTemplateDialogValue ->
+        InstructModeTemplateScreenState.Dialogs(
+            includeNamePolicyDialog = includeNamePolicyDialog,
+            renameTemplateDialog = renameTemplateDialog,
+            renameTemplateDialogValue = renameTemplateDialogValue
+        )
+    }
+
     val state = combine(
         currentTemplate,
         subscribeToInstructModeTemplates().map { list ->
             list.map { it.toListItem() }.toImmutableList()
         },
-        includeNamePolicyDialog,
-        renameTemplateDialog,
-        renameTemplateDialogValue
-    ) { currentTemplate, templates, includeNamePolicyDialog, renameTemplateDialog, renameTemplateDialogValue ->
+        dialogs,
+    ) { currentTemplate, templates, dialogs ->
         InstructModeTemplateScreenState(
             currentTemplate = currentTemplate,
             templates = templates,
-            includeNamePolicyDialog = includeNamePolicyDialog,
-            renameTemplateDialog = renameTemplateDialog,
-            renameTemplateDialogValue = renameTemplateDialogValue
+            dialogs = dialogs
         )
     }.stateIn(
         viewModelScope,

@@ -82,16 +82,16 @@ fun InstructModeTemplateScreen(
     modifier: Modifier = Modifier
 ) {
     when {
-        state.includeNamePolicyDialog ->
+        state.dialogs.includeNamePolicyDialog ->
             IncludeNamePolicySelectDialog(
                 selectedPolicy = state.currentTemplate.includeNamePolicy,
                 onAccept = { onEvent(UserEvent.SelectIncludeNamePolicy(it)) },
                 onDismiss = { onEvent(UserEvent.DismissSelectIncludeNamePolicyDialog) },
             )
 
-        state.renameTemplateDialog ->
+        state.dialogs.renameTemplateDialog ->
             RenameTemplateDialog(
-                value = state.renameTemplateDialogValue,
+                value = state.dialogs.renameTemplateDialogValue,
                 onAccept = { onEvent(UserEvent.AcceptRenameTemplateDialog) },
                 onDismiss = { onEvent(UserEvent.DismissRenameTemplateDialog) },
                 onValueChange = { onEvent(UserEvent.UpdateRenameTemplateDialog(it)) },
