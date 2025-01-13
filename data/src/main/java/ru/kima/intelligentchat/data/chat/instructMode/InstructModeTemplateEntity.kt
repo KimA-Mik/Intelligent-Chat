@@ -17,12 +17,12 @@ data class InstructModeTemplateEntity(
     val wrapSequencesWithNewLine: Boolean,
     @ColumnInfo(name = "user_message_prefix", defaultValue = "")
     val userMessagePrefix: String,
-    @ColumnInfo(name = "user_message_suffix", defaultValue = "")
-    val userMessageSuffix: String,
+    @ColumnInfo(name = "user_message_postfix", defaultValue = "")
+    val userMessagePostfix: String,
     @ColumnInfo(name = "assistant_message_prefix", defaultValue = "")
     val assistantMessagePrefix: String,
-    @ColumnInfo(name = "assistant_message_suffix", defaultValue = "")
-    val assistantMessageSuffix: String,
+    @ColumnInfo(name = "assistant_message_postfix", defaultValue = "")
+    val assistantMessagePostfix: String,
     @ColumnInfo(name = "system_same_as_user", defaultValue = "0")
     val systemSameAsUser: Boolean,
     @ColumnInfo(name = "first_assistant_prefix", defaultValue = "")
