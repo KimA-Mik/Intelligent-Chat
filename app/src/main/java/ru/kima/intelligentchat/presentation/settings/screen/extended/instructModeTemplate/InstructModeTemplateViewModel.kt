@@ -42,17 +42,26 @@ class InstructModeTemplateViewModel(
         )
     }
 
+    private val userStringsSection = MutableStateFlow(true)
+    private val assistantStringSection = MutableStateFlow(false)
+
+    private val sections =
+        combine(userStringsSection, assistantStringSection) { userStrings, _ ->
+            InstructModeTemplateScreenState.Sections(userStrings = userStrings)
+        }
+
     val state = combine(
         currentTemplate,
         subscribeToInstructModeTemplates().map { list ->
             list.map { it.toListItem() }.toImmutableList()
         },
-        dialogs,
-    ) { currentTemplate, templates, dialogs ->
+        dialogs, sections
+    ) { currentTemplate, templates, dialogs, sections ->
         InstructModeTemplateScreenState(
             currentTemplate = currentTemplate,
             templates = templates,
-            dialogs = dialogs
+            dialogs = dialogs,
+            sections = sections
         )
     }.stateIn(
         viewModelScope,
@@ -75,9 +84,11 @@ class InstructModeTemplateViewModel(
             UserEvent.DismissRenameTemplateDialog -> onDismissRenameTemplateDialog()
             is UserEvent.UpdateRenameTemplateDialog -> onUpdateRenameTemplateDialog(event.value)
             is UserEvent.UpdateWrapSequencesWithNewLine -> onUpdateWrapSequencesWithNewLine(event.value)
+            is UserEvent.SwitchUserStringsSection -> onSwitchUserStringsSection(event.value)
+            is UserEvent.UpdateUserPrefix -> onUpdateUserPrefix(event.value)
+            is UserEvent.UpdateUserPostfix -> onUpdateUserPostfix(event.value)
         }
     }
-
 
     private fun onSelectTemplate(id: Long) {
 
@@ -127,6 +138,22 @@ class InstructModeTemplateViewModel(
             it.copy(
                 wrapSequencesWithNewLine = value
             )
+        }
+    }
+
+    private fun onSwitchUserStringsSection(value: Boolean) {
+        userStringsSection.value = value
+    }
+
+    private fun onUpdateUserPrefix(value: String) {
+        currentTemplate.update {
+            it.copy(userMessagePrefix = value)
+        }
+    }
+
+    private fun onUpdateUserPostfix(value: String) {
+        currentTemplate.update {
+            it.copy(userMessagePostfix = value)
         }
     }
 

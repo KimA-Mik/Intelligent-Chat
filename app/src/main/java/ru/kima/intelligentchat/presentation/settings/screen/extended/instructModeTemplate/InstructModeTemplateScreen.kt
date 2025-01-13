@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -42,6 +43,7 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.presentation.common.components.AppBar
+import ru.kima.intelligentchat.presentation.settings.screen.components.SettingsGroupTitle
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.SwitchSettingWidget
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.TextSettingWidget
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.IncludeNamePolicySelectDialog
@@ -52,6 +54,7 @@ import ru.kima.intelligentchat.presentation.settings.screen.extended.instructMod
 import ru.kima.intelligentchat.presentation.settings.util.composeSting
 import ru.kima.intelligentchat.presentation.ui.LocalNavController
 import ru.kima.intelligentchat.presentation.ui.components.DropdownTextField
+import ru.kima.intelligentchat.presentation.ui.components.FoldableSection
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.util.preview.ICPreview
 
@@ -151,6 +154,34 @@ fun InstructModeTemplateContent(
             onCheckedChange = { onEvent(UserEvent.UpdateWrapSequencesWithNewLine(it)) },
             modifier = Modifier.fillMaxWidth()
         )
+
+        FoldableSection(
+            title = {
+                SettingsGroupTitle(
+                    ComposeString.Resource(R.string.user_strings_settings_group_title),
+                    modifier = Modifier.weight(1f)
+                )
+            },
+            expanded = state.sections.userStrings,
+            onExpandedChange = {
+                onEvent(UserEvent.SwitchUserStringsSection(it))
+            }
+        ) {
+            UserFormating(
+                userPrefix = state.currentTemplate.userMessagePrefix,
+                onUserPrefixChange = {
+                    onEvent(UserEvent.UpdateUserPrefix(it))
+                },
+                userSuffix = state.currentTemplate.userMessagePostfix,
+                onUserSuffixChange = {
+                    onEvent(UserEvent.UpdateUserPostfix(it))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            )
+        }
+
     }
 }
 
@@ -249,6 +280,36 @@ fun SelectTextBox(
     )
 }
 
+@Composable
+fun UserFormating(
+    userPrefix: String,
+    onUserPrefixChange: (String) -> Unit,
+    userSuffix: String,
+    onUserSuffixChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) = Column(
+    modifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(16.dp)
+) {
+    OutlinedTextField(
+        value = userPrefix,
+        onValueChange = onUserPrefixChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = {
+            Text(text = stringResource(R.string.user_prefix_setting_label))
+        }
+    )
+
+    OutlinedTextField(
+        value = userSuffix,
+        onValueChange = onUserSuffixChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = {
+            Text(text = stringResource(R.string.user_postfix_setting_label))
+        }
+    )
+}
 
 @Preview
 @Composable
@@ -259,10 +320,10 @@ private fun InstructModeTemplateScreenPreview() = ICPreview {
             name = "Template",
             includeNamePolicy = IncludeNamePolicy.ALWAYS,
             wrapSequencesWithNewLine = true,
-            userMessagePrefix = "",
-            userMessageSuffix = "",
+            userMessagePrefix = "Prefix",
+            userMessagePostfix = "Suffix",
             assistantMessagePrefix = "",
-            assistantMessageSuffix = "",
+            assistantMessagePostfix = "",
             systemSameAsUser = false,
             firstAssistantPrefix = "",
             lastAssistantPrefix = "",

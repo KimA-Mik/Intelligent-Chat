@@ -10,11 +10,16 @@ import ru.kima.intelligentchat.presentation.settings.screen.extended.instructMod
 data class InstructModeTemplateScreenState(
     val currentTemplate: DisplayInstructModeTemplate = InstructModeTemplate.default().toDisplay(),
     val templates: ImmutableList<DisplayInstructModeTemplateListItem> = persistentListOf(),
-    val dialogs: Dialogs = Dialogs()
+    val dialogs: Dialogs = Dialogs(),
+    val sections: Sections = Sections()
 ) {
     data class Dialogs(
         val includeNamePolicyDialog: Boolean = false,
         val renameTemplateDialog: Boolean = false,
         val renameTemplateDialogValue: String = ""
+    )
+
+    data class Sections(
+        val userStrings: Boolean = true
     )
 }
