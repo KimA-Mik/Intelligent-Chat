@@ -182,6 +182,31 @@ fun InstructModeTemplateContent(
             )
         }
 
+        FoldableSection(
+            title = {
+                SettingsGroupTitle(
+                    title = ComposeString.Resource(R.string.assistant_strings_settings_group_title),
+                )
+            },
+            expanded = state.sections.assistantStrings,
+            onExpandedChange = {
+                onEvent(UserEvent.SwitchAssistantStringsSection(it))
+            }
+        ) {
+            AssistantFormating(
+                assistantPrefix = state.currentTemplate.assistantMessagePrefix,
+                onAssistantPrefixChange = {
+                    onEvent(UserEvent.UpdateAssistantPrefix(it))
+                },
+                assistantSuffix = state.currentTemplate.assistantMessagePostfix,
+                onAssistantSuffixChange = {
+                    onEvent(UserEvent.UpdateAssistantPostfix(it))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            )
+        }
     }
 }
 
@@ -307,6 +332,37 @@ fun UserFormating(
         modifier = Modifier.fillMaxWidth(),
         label = {
             Text(text = stringResource(R.string.user_postfix_setting_label))
+        }
+    )
+}
+
+@Composable
+fun AssistantFormating(
+    assistantPrefix: String,
+    onAssistantPrefixChange: (String) -> Unit,
+    assistantSuffix: String,
+    onAssistantSuffixChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) = Column(
+    modifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(16.dp)
+) {
+    OutlinedTextField(
+        value = assistantPrefix,
+        onValueChange = onAssistantPrefixChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = {
+            Text(text = stringResource(R.string.assistant_prefix_setting_label))
+        }
+    )
+
+    OutlinedTextField(
+        value = assistantSuffix,
+        onValueChange = onAssistantSuffixChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = {
+            Text(text = stringResource(R.string.assistant_postfix_setting_label))
         }
     )
 }

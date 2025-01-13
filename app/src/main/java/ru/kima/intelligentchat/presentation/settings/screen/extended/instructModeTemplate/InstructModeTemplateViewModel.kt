@@ -46,8 +46,11 @@ class InstructModeTemplateViewModel(
     private val assistantStringSection = MutableStateFlow(false)
 
     private val sections =
-        combine(userStringsSection, assistantStringSection) { userStrings, _ ->
-            InstructModeTemplateScreenState.Sections(userStrings = userStrings)
+        combine(userStringsSection, assistantStringSection) { userStrings, assistantStrings ->
+            InstructModeTemplateScreenState.Sections(
+                userStrings = userStrings,
+                assistantStrings = assistantStrings
+            )
         }
 
     val state = combine(
@@ -87,6 +90,9 @@ class InstructModeTemplateViewModel(
             is UserEvent.SwitchUserStringsSection -> onSwitchUserStringsSection(event.value)
             is UserEvent.UpdateUserPrefix -> onUpdateUserPrefix(event.value)
             is UserEvent.UpdateUserPostfix -> onUpdateUserPostfix(event.value)
+            is UserEvent.SwitchAssistantStringsSection -> onSwitchAssistantStringsSection(event.value)
+            is UserEvent.UpdateAssistantPrefix -> onUpdateAssistantPrefix(event.value)
+            is UserEvent.UpdateAssistantPostfix -> onUpdateAssistantPostfix(event.value)
         }
     }
 
@@ -154,6 +160,26 @@ class InstructModeTemplateViewModel(
     private fun onUpdateUserPostfix(value: String) {
         currentTemplate.update {
             it.copy(userMessagePostfix = value)
+        }
+    }
+
+    private fun onSwitchAssistantStringsSection(value: Boolean) {
+        assistantStringSection.value = value
+    }
+
+    private fun onUpdateAssistantPrefix(value: String) {
+        currentTemplate.update {
+            it.copy(
+                assistantMessagePrefix = value
+            )
+        }
+    }
+
+    private fun onUpdateAssistantPostfix(value: String) {
+        currentTemplate.update {
+            it.copy(
+                assistantMessagePostfix = value
+            )
         }
     }
 
