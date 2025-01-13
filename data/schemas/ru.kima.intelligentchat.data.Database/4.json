@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "71dbd9efb3edd6ffc045bda3a1cf2fe7",
+    "identityHash": "16a17ed10abdd0df49279956be785e36",
     "entities": [
       {
         "tableName": "cards",
@@ -536,7 +536,7 @@
       },
       {
         "tableName": "instruct_mode_templates_table_name",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL DEFAULT 'Default', `include_name_policy` TEXT NOT NULL DEFAULT 'ALWAYS', `wrap_sequences_with_new_line` INTEGER NOT NULL DEFAULT 1, `user_message_prefix` TEXT NOT NULL DEFAULT '', `user_message_suffix` TEXT NOT NULL DEFAULT '', `assistant_message_prefix` TEXT NOT NULL DEFAULT '', `assistant_message_suffix` TEXT NOT NULL DEFAULT '', `system_same_as_user` INTEGER NOT NULL DEFAULT 0, `first_assistant_prefix` TEXT NOT NULL DEFAULT '', `last_assistant_prefix` TEXT NOT NULL DEFAULT '', `first_user_prefix` TEXT NOT NULL DEFAULT '', `last_user_prefix` TEXT NOT NULL DEFAULT '')",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL DEFAULT 'Default', `include_name_policy` TEXT NOT NULL DEFAULT 'ALWAYS', `wrap_sequences_with_new_line` INTEGER NOT NULL DEFAULT 1, `user_message_prefix` TEXT NOT NULL DEFAULT '', `user_message_postfix` TEXT NOT NULL DEFAULT '', `assistant_message_prefix` TEXT NOT NULL DEFAULT '', `assistant_message_postfix` TEXT NOT NULL DEFAULT '', `system_same_as_user` INTEGER NOT NULL DEFAULT 0, `first_assistant_prefix` TEXT NOT NULL DEFAULT '', `last_assistant_prefix` TEXT NOT NULL DEFAULT '', `first_user_prefix` TEXT NOT NULL DEFAULT '', `last_user_prefix` TEXT NOT NULL DEFAULT '')",
         "fields": [
           {
             "fieldPath": "id",
@@ -573,8 +573,8 @@
             "defaultValue": "''"
           },
           {
-            "fieldPath": "userMessageSuffix",
-            "columnName": "user_message_suffix",
+            "fieldPath": "userMessagePostfix",
+            "columnName": "user_message_postfix",
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
@@ -587,8 +587,8 @@
             "defaultValue": "''"
           },
           {
-            "fieldPath": "assistantMessageSuffix",
-            "columnName": "assistant_message_suffix",
+            "fieldPath": "assistantMessagePostfix",
+            "columnName": "assistant_message_postfix",
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
@@ -642,7 +642,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '71dbd9efb3edd6ffc045bda3a1cf2fe7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '16a17ed10abdd0df49279956be785e36')"
     ]
   }
 }
