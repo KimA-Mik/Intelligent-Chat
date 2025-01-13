@@ -157,10 +157,7 @@ fun InstructModeTemplateContent(
 
         FoldableSection(
             title = {
-                SettingsGroupTitle(
-                    ComposeString.Resource(R.string.user_strings_settings_group_title),
-                    modifier = Modifier.weight(1f)
-                )
+                SettingsGroupTitle(title = ComposeString.Resource(R.string.user_strings_settings_group_title))
             },
             expanded = state.sections.userStrings,
             onExpandedChange = {
@@ -184,9 +181,7 @@ fun InstructModeTemplateContent(
 
         FoldableSection(
             title = {
-                SettingsGroupTitle(
-                    title = ComposeString.Resource(R.string.assistant_strings_settings_group_title),
-                )
+                SettingsGroupTitle(title = ComposeString.Resource(R.string.assistant_strings_settings_group_title))
             },
             expanded = state.sections.assistantStrings,
             onExpandedChange = {

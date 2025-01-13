@@ -3,9 +3,9 @@ package ru.kima.intelligentchat.presentation.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,7 +26,7 @@ import ru.kima.intelligentchat.util.preview.ICPreview
 
 @Composable
 fun FoldableSection(
-    title: @Composable RowScope.() -> Unit,
+    title: @Composable () -> Unit,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -45,7 +45,9 @@ fun FoldableSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             ProvideTextStyle(MaterialTheme.typography.bodyLarge) {
-                title()
+                Box(modifier = Modifier.weight(1f)) {
+                    title()
+                }
             }
 
             IconButton(
