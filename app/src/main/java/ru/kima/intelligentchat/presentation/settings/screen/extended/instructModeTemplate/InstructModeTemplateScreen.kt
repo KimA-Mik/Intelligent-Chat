@@ -105,13 +105,14 @@ fun InstructModeTemplateScreen(
 
     val nacController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val sb = remember { scrollBehavior }
     Scaffold(
         modifier = modifier,
         topBar = {
             AppBar(
                 titleContent = { Text(stringResource(R.string.instruct_mode_setting_title)) },
                 navigateUp = { nacController.popBackStack() },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = sb
             )
         }
     ) { paddingValues ->
@@ -121,7 +122,7 @@ fun InstructModeTemplateScreen(
             Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(sb.nestedScrollConnection)
         )
     }
 }
@@ -329,15 +330,11 @@ fun UserFormating(
     userSuffix: String,
     onUserSuffixChange: StringCallback,
     modifier: Modifier = Modifier
-) = Column(
-    modifier,
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(16.dp)
-) {
+) = StringsColumn(modifier) { innerModifier ->
     OutlinedTextField(
         value = userPrefix,
         onValueChange = onUserPrefixChange,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = innerModifier,
         label = {
             Text(text = stringResource(R.string.user_prefix_setting_label))
         }
@@ -346,7 +343,7 @@ fun UserFormating(
     OutlinedTextField(
         value = userSuffix,
         onValueChange = onUserSuffixChange,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = innerModifier,
         label = {
             Text(text = stringResource(R.string.user_postfix_setting_label))
         }
@@ -360,15 +357,11 @@ fun AssistantFormating(
     assistantSuffix: String,
     onAssistantSuffixChange: StringCallback,
     modifier: Modifier = Modifier
-) = Column(
-    modifier,
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(16.dp)
-) {
+) = StringsColumn(modifier) { innerModifier ->
     OutlinedTextField(
         value = assistantPrefix,
         onValueChange = onAssistantPrefixChange,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = innerModifier,
         label = {
             Text(text = stringResource(R.string.assistant_prefix_setting_label))
         }
@@ -377,7 +370,7 @@ fun AssistantFormating(
     OutlinedTextField(
         value = assistantSuffix,
         onValueChange = onAssistantSuffixChange,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = innerModifier,
         label = {
             Text(text = stringResource(R.string.assistant_postfix_setting_label))
         }
@@ -441,7 +434,7 @@ fun StringsColumn(
 ) = Column(
     modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(16.dp)
+    verticalArrangement = Arrangement.spacedBy(8.dp)
 ) {
     content(Modifier.fillMaxWidth())
 }
@@ -464,6 +457,9 @@ private fun InstructModeTemplateScreenPreview() = ICPreview {
             lastAssistantPrefix = "",
             firstUserPrefix = "",
             lastUserPrefix = ""
+        ),
+        sections = InstructModeTemplateScreenState.Sections(
+            assistantStrings = true
         )
     ), onEvent = {})
 }
