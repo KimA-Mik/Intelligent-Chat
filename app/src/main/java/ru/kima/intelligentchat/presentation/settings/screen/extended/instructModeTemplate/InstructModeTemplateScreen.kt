@@ -3,6 +3,7 @@ package ru.kima.intelligentchat.presentation.settings.screen.extended.instructMo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +42,7 @@ import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
+import ru.kima.intelligentchat.common.StringCallback
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.settings.screen.components.SettingsGroupTitle
@@ -155,6 +157,9 @@ fun InstructModeTemplateContent(
             modifier = Modifier.fillMaxWidth()
         )
 
+        val innerModifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
         FoldableSection(
             title = {
                 SettingsGroupTitle(title = ComposeString.Resource(R.string.user_strings_settings_group_title))
@@ -173,9 +178,7 @@ fun InstructModeTemplateContent(
                 onUserSuffixChange = {
                     onEvent(UserEvent.UpdateUserPostfix(it))
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+                modifier = innerModifier
             )
         }
 
@@ -197,9 +200,28 @@ fun InstructModeTemplateContent(
                 onAssistantSuffixChange = {
                     onEvent(UserEvent.UpdateAssistantPostfix(it))
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+                modifier = innerModifier
+            )
+        }
+        FoldableSection(
+            title = {
+                SettingsGroupTitle(title = ComposeString.Resource(R.string.another_strings_setting_group_title))
+            },
+            expanded = state.sections.anotherStringsSection,
+            onExpandedChange = {
+                onEvent(UserEvent.SwitchAnotherStringsSection(it))
+            }
+        ) {
+            AnotherFormating(
+                firstUserPrefix = state.currentTemplate.firstUserPrefix,
+                onFirstUserPrefixChange = { onEvent(UserEvent.UpdateFirstUserPrefix(it)) },
+                lastUserPrefix = state.currentTemplate.lastUserPrefix,
+                onLastUserPrefix = { onEvent(UserEvent.UpdateLastUserPrefix(it)) },
+                firstAssistantPrefix = state.currentTemplate.firstAssistantPrefix,
+                onFirstAssistantPrefixChange = { onEvent(UserEvent.UpdateFirstAssistantPrefix(it)) },
+                lastAssistantPrefix = state.currentTemplate.lastAssistantPrefix,
+                onLastAssistantPrefix = { onEvent(UserEvent.UpdateLastAssistantPrefix(it)) },
+                modifier = innerModifier
             )
         }
     }
@@ -303,9 +325,9 @@ fun SelectTextBox(
 @Composable
 fun UserFormating(
     userPrefix: String,
-    onUserPrefixChange: (String) -> Unit,
+    onUserPrefixChange: StringCallback,
     userSuffix: String,
-    onUserSuffixChange: (String) -> Unit,
+    onUserSuffixChange: StringCallback,
     modifier: Modifier = Modifier
 ) = Column(
     modifier,
@@ -334,9 +356,9 @@ fun UserFormating(
 @Composable
 fun AssistantFormating(
     assistantPrefix: String,
-    onAssistantPrefixChange: (String) -> Unit,
+    onAssistantPrefixChange: StringCallback,
     assistantSuffix: String,
-    onAssistantSuffixChange: (String) -> Unit,
+    onAssistantSuffixChange: StringCallback,
     modifier: Modifier = Modifier
 ) = Column(
     modifier,
@@ -360,6 +382,68 @@ fun AssistantFormating(
             Text(text = stringResource(R.string.assistant_postfix_setting_label))
         }
     )
+}
+
+
+@Composable
+fun AnotherFormating(
+    firstUserPrefix: String,
+    onFirstUserPrefixChange: StringCallback,
+    lastUserPrefix: String,
+    onLastUserPrefix: StringCallback,
+    firstAssistantPrefix: String,
+    onFirstAssistantPrefixChange: StringCallback,
+    lastAssistantPrefix: String,
+    onLastAssistantPrefix: StringCallback,
+    modifier: Modifier = Modifier
+) = StringsColumn(modifier) { innerModifier ->
+    OutlinedTextField(
+        value = firstUserPrefix,
+        onValueChange = onFirstUserPrefixChange,
+        modifier = innerModifier,
+        label = {
+            Text(text = stringResource(R.string.first_user_prefix_setting_label))
+        }
+    )
+
+    OutlinedTextField(
+        value = lastUserPrefix,
+        onValueChange = onLastUserPrefix,
+        modifier = innerModifier,
+        label = {
+            Text(text = stringResource(R.string.last_user_prefix_setting_label))
+        }
+    )
+
+    OutlinedTextField(
+        value = firstAssistantPrefix,
+        onValueChange = onFirstAssistantPrefixChange,
+        modifier = innerModifier,
+        label = {
+            Text(text = stringResource(R.string.first_assistant_prefix_setting_label))
+        }
+    )
+
+    OutlinedTextField(
+        value = lastAssistantPrefix,
+        onValueChange = onLastAssistantPrefix,
+        modifier = innerModifier,
+        label = {
+            Text(text = stringResource(R.string.last_assistant_prefix_setting_label))
+        }
+    )
+}
+
+@Composable
+fun StringsColumn(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.(Modifier) -> Unit
+) = Column(
+    modifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(16.dp)
+) {
+    content(Modifier.fillMaxWidth())
 }
 
 @Preview

@@ -44,14 +44,19 @@ class InstructModeTemplateViewModel(
 
     private val userStringsSection = MutableStateFlow(true)
     private val assistantStringSection = MutableStateFlow(false)
+    private val anotherStringsSection = MutableStateFlow(false)
 
-    private val sections =
-        combine(userStringsSection, assistantStringSection) { userStrings, assistantStrings ->
-            InstructModeTemplateScreenState.Sections(
-                userStrings = userStrings,
-                assistantStrings = assistantStrings
-            )
-        }
+    private val sections = combine(
+        userStringsSection,
+        assistantStringSection,
+        anotherStringsSection
+    ) { userStrings, assistantStrings, anotherStringsSection ->
+        InstructModeTemplateScreenState.Sections(
+            userStrings = userStrings,
+            assistantStrings = assistantStrings,
+            anotherStringsSection = anotherStringsSection
+        )
+    }
 
     val state = combine(
         currentTemplate,
@@ -93,6 +98,11 @@ class InstructModeTemplateViewModel(
             is UserEvent.SwitchAssistantStringsSection -> onSwitchAssistantStringsSection(event.value)
             is UserEvent.UpdateAssistantPrefix -> onUpdateAssistantPrefix(event.value)
             is UserEvent.UpdateAssistantPostfix -> onUpdateAssistantPostfix(event.value)
+            is UserEvent.SwitchAnotherStringsSection -> onSwitchAnotherStringsSection(event.value)
+            is UserEvent.UpdateFirstUserPrefix -> onUpdateFirstUserPrefix(event.value)
+            is UserEvent.UpdateLastUserPrefix -> onUpdateLastUserPrefix(event.value)
+            is UserEvent.UpdateFirstAssistantPrefix -> onUpdateFirstAssistantPrefix(event.value)
+            is UserEvent.UpdateLastAssistantPrefix -> onUpdateLastAssistantPrefix(event.value)
         }
     }
 
@@ -179,6 +189,42 @@ class InstructModeTemplateViewModel(
         currentTemplate.update {
             it.copy(
                 assistantMessagePostfix = value
+            )
+        }
+    }
+
+    private fun onSwitchAnotherStringsSection(value: Boolean) {
+        anotherStringsSection.value = value
+    }
+
+    private fun onUpdateFirstUserPrefix(value: String) {
+        currentTemplate.update {
+            it.copy(
+                firstUserPrefix = value
+            )
+        }
+    }
+
+    private fun onUpdateLastUserPrefix(value: String) {
+        currentTemplate.update {
+            it.copy(
+                lastUserPrefix = value
+            )
+        }
+    }
+
+    private fun onUpdateFirstAssistantPrefix(value: String) {
+        currentTemplate.update {
+            it.copy(
+                firstAssistantPrefix = value
+            )
+        }
+    }
+
+    private fun onUpdateLastAssistantPrefix(value: String) {
+        currentTemplate.update {
+            it.copy(
+                lastAssistantPrefix = value
             )
         }
     }

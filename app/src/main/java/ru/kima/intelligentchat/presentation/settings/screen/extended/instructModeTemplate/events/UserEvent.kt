@@ -18,4 +18,9 @@ sealed interface UserEvent {
     data class SwitchAssistantStringsSection(val value: Boolean) : UserEvent
     data class UpdateAssistantPrefix(val value: String) : UserEvent
     data class UpdateAssistantPostfix(val value: String) : UserEvent
+    data class SwitchAnotherStringsSection(val value: Boolean) : UserEvent
+    data class UpdateFirstUserPrefix(val value: String) : UserEvent
+    data class UpdateLastUserPrefix(val value: String) : UserEvent
+    data class UpdateFirstAssistantPrefix(val value: String) : UserEvent
+    data class UpdateLastAssistantPrefix(val value: String) : UserEvent
 }

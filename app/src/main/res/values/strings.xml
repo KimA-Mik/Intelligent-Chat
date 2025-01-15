@@ -182,12 +182,16 @@
     <string name="user_strings_settings_group_title">User strings</string>
     <string name="user_prefix_setting_label">User prefix</string>
     <string name="user_postfix_setting_label">User postfix</string>
-    <string name="first_user_prefix_setting_label">First user prefix</string>
-    <string name="last_user_prefix_setting_label">Last user prefix</string>
 
     <string name="assistant_strings_settings_group_title">Assistant strings</string>
     <string name="assistant_prefix_setting_label">Assistant prefix</string>
     <string name="assistant_postfix_setting_label">Assistant postfix</string>
+
+    <string name="another_strings_setting_group_title">Another strings</string>
+    <string name="first_user_prefix_setting_label">First user prefix</string>
+    <string name="last_user_prefix_setting_label">Last user prefix</string>
+    <string name="first_assistant_prefix_setting_label">First assistant prefix</string>
+    <string name="last_assistant_prefix_setting_label">Last assistant prefix</string>
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>

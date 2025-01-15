@@ -21,6 +21,7 @@ data class InstructModeTemplateScreenState(
 
     data class Sections(
         val userStrings: Boolean = true,
-        val assistantStrings: Boolean = false
+        val assistantStrings: Boolean = false,
+        val anotherStringsSection: Boolean = false
     )
 }
