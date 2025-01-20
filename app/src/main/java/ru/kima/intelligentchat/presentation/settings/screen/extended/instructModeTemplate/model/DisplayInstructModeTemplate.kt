@@ -35,3 +35,20 @@ fun InstructModeTemplate.toDisplay() =
         firstUserPrefix = firstUserPrefix,
         lastUserPrefix = lastAssistantPrefix
     )
+
+fun DisplayInstructModeTemplate.toModel() =
+    InstructModeTemplate(
+        id = id,
+        name = name,
+        includeNamePolicy = includeNamePolicy,
+        wrapSequencesWithNewLine = wrapSequencesWithNewLine,
+        userMessagePrefix = userMessagePrefix,
+        userMessagePostfix = userMessagePostfix,
+        assistantMessagePrefix = assistantMessagePrefix,
+        assistantMessagePostfix = assistantMessagePostfix,
+        systemSameAsUser = systemSameAsUser,
+        firstAssistantPrefix = firstAssistantPrefix,
+        lastAssistantPrefix = lastAssistantPrefix,
+        firstUserPrefix = firstUserPrefix,
+        lastUserPrefix = lastAssistantPrefix
+    )

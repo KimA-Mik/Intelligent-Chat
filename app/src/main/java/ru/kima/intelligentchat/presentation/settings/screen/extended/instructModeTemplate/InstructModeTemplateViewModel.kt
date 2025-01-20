@@ -3,9 +3,12 @@ package ru.kima.intelligentchat.presentation.settings.screen.extended.instructMo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -14,13 +17,16 @@ import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePo
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeTemplate
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.GetSelectedInstructTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.UpdateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.toDisplay
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.toListItem
+import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.toModel
 
 class InstructModeTemplateViewModel(
     private val subscribeToInstructModeTemplates: SubscribeToInstructModeTemplatesUseCase,
     private val getSelectedInstructTemplate: GetSelectedInstructTemplateUseCase,
+    private val updateInstructModeTemplate: UpdateInstructModeTemplateUseCase
 ) : ViewModel() {
     private val currentTemplate =
         MutableStateFlow(InstructModeTemplate.default().toDisplay())
@@ -77,8 +83,16 @@ class InstructModeTemplateViewModel(
         InstructModeTemplateScreenState()
     )
 
+    private var updateJob: Job? = null
+
     init {
         getCurrentTemplate()
+    }
+
+    override fun onCleared() {
+        viewModelScope.launch {
+            updateInstructModeTemplate(currentTemplate.value.toModel())
+        }
     }
 
     fun onEvent(event: UserEvent) {
@@ -229,9 +243,20 @@ class InstructModeTemplateViewModel(
         }
     }
 
+    @OptIn(FlowPreview::class)
     private fun getCurrentTemplate() {
+        updateJob?.cancel()
         viewModelScope.launch {
             currentTemplate.value = getSelectedInstructTemplate().toDisplay()
+            updateJob = viewModelScope.launch {
+                currentTemplate.debounce(SAVE_TIMEOUT).collect {
+                    updateInstructModeTemplate(it.toModel())
+                }
+            }
         }
+    }
+
+    companion object {
+        private const val SAVE_TIMEOUT = 500L
     }
 }
