@@ -148,10 +148,11 @@ class InstructModeTemplateViewModel(
 
     private fun onAcceptRenameTemplateDialog() {
         renameTemplateDialog.value = false
-        if (renameTemplateDialogValue.value == currentTemplate.value.name) return
+        val title = renameTemplateDialogValue.value.trim()
+        if (title == currentTemplate.value.name) return
 
         currentTemplate.update {
-            it.copy(name = renameTemplateDialogValue.value)
+            it.copy(name = title)
         }
     }
 

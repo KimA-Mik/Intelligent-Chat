@@ -100,6 +100,7 @@ fun InstructModeTemplateScreen(
                 onAccept = { onEvent(UserEvent.AcceptRenameTemplateDialog) },
                 onDismiss = { onEvent(UserEvent.DismissRenameTemplateDialog) },
                 onValueChange = { onEvent(UserEvent.UpdateRenameTemplateDialog(it)) },
+                allowDismiss = false
             )
     }
 

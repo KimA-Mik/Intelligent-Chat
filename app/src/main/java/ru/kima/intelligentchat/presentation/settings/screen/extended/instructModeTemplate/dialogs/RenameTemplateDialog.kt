@@ -20,10 +20,15 @@ fun RenameTemplateDialog(
     onAccept: () -> Unit,
     onDismiss: () -> Unit,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    allowDismiss: Boolean = true
 ) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            if (allowDismiss) {
+                onDismiss()
+            }
+        },
         confirmButton = {
             TextButton(onClick = onAccept) {
                 Text(text = stringResource(R.string.alert_dialog_accept))
@@ -40,7 +45,7 @@ fun RenameTemplateDialog(
                 value = value,
                 onValueChange = onValueChange,
                 label = {
-                    Text("Name")
+                    Text(stringResource(R.string.rename_template_dialog_input_label))
                 },
                 maxLines = MAX_TEMPLATE_TITLE_LINES
             )
