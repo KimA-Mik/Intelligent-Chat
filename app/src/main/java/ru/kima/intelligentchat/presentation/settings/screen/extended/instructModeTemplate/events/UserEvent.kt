@@ -7,6 +7,7 @@ sealed interface UserEvent {
     data object OpenSelectIncludeNamePolicy : UserEvent
     data object DismissSelectIncludeNamePolicyDialog : UserEvent
     data class SelectIncludeNamePolicy(val policy: IncludeNamePolicy) : UserEvent
+    data class CreateTemplate(val name: String) : UserEvent
     data object OpenRenameTemplateDialog : UserEvent
     data object AcceptRenameTemplateDialog : UserEvent
     data object DismissRenameTemplateDialog : UserEvent

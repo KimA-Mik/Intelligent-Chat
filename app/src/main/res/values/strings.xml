@@ -170,6 +170,7 @@
     <!--  Advanced Formating Screen  -->
     <string name="instruct_mode_setting_title">Instruct mode</string>
     <string name="instruct_mode_setting_description">Extended control over prompt-building strategy</string>
+    <string name="default_instruct_mode_template_name">New template</string>
 
     <string name="include_string_policy_setting_title">Include names</string>
     <string name="include_string_policy_never">Never</string>

@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeTemplate
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.CreateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.GetSelectedInstructTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SelectInstructTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.UpdateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events.UserEvent
@@ -25,6 +27,8 @@ import ru.kima.intelligentchat.presentation.settings.screen.extended.instructMod
 
 class InstructModeTemplateViewModel(
     private val subscribeToInstructModeTemplates: SubscribeToInstructModeTemplatesUseCase,
+    private val createInstructModeTemplate: CreateInstructModeTemplateUseCase,
+    private val selectInstructModeTemplate: SelectInstructTemplateUseCase,
     private val getSelectedInstructTemplate: GetSelectedInstructTemplateUseCase,
     private val updateInstructModeTemplate: UpdateInstructModeTemplateUseCase
 ) : ViewModel() {
@@ -90,9 +94,7 @@ class InstructModeTemplateViewModel(
     }
 
     override fun onCleared() {
-        viewModelScope.launch {
-            updateInstructModeTemplate(currentTemplate.value.toModel())
-        }
+        saveTemplate()
     }
 
     fun onEvent(event: UserEvent) {
@@ -101,6 +103,7 @@ class InstructModeTemplateViewModel(
             UserEvent.OpenSelectIncludeNamePolicy -> onOpenSelectIncludeNamePolicy()
             UserEvent.DismissSelectIncludeNamePolicyDialog -> onDismissSelectIncludeNamePolicyDialog()
             is UserEvent.SelectIncludeNamePolicy -> onSelectIncludeNamePolicy(event.policy)
+            is UserEvent.CreateTemplate -> onCreateTemplate(event.name)
             UserEvent.OpenRenameTemplateDialog -> onOpenRenameTemplateDialog()
             UserEvent.AcceptRenameTemplateDialog -> onAcceptRenameTemplateDialog()
             UserEvent.DismissRenameTemplateDialog -> onDismissRenameTemplateDialog()
@@ -120,8 +123,19 @@ class InstructModeTemplateViewModel(
         }
     }
 
-    private fun onSelectTemplate(id: Long) {
+    private fun saveTemplate() {
+        if (currentTemplate.value.id == 0L) return
+        val model = currentTemplate.value.toModel()
+        viewModelScope.launch {
+            updateInstructModeTemplate(model)
+        }
+    }
 
+    private fun onSelectTemplate(id: Long) {
+        saveTemplate()
+        viewModelScope.launch {
+            selectInstructModeTemplate(id)
+        }
     }
 
     private fun onOpenSelectIncludeNamePolicy() {
@@ -138,6 +152,14 @@ class InstructModeTemplateViewModel(
 
         currentTemplate.update {
             it.copy(includeNamePolicy = policy)
+        }
+    }
+
+    private fun onCreateTemplate(name: String) {
+        saveTemplate()
+        viewModelScope.launch {
+            val id = createInstructModeTemplate(name)
+            selectInstructModeTemplate(id)
         }
     }
 
