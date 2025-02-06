@@ -46,6 +46,7 @@ import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.common.StringCallback
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.presentation.common.components.AppBar
+import ru.kima.intelligentchat.presentation.common.components.clearFocusOnSoftKeyboardHide
 import ru.kima.intelligentchat.presentation.settings.screen.components.SettingsGroupTitle
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.SwitchSettingWidget
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.TextSettingWidget
@@ -445,7 +446,11 @@ fun StringsColumn(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(8.dp)
 ) {
-    content(Modifier.fillMaxWidth())
+    content(
+        Modifier
+            .fillMaxWidth()
+            .clearFocusOnSoftKeyboardHide()
+    )
 }
 
 @Preview
