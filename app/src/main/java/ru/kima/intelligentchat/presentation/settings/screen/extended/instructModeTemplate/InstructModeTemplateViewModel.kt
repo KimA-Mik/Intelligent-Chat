@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeTemplate
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.CreateInstructModeTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.DeleteInstructModeTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.GetSelectedInstructTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SelectInstructTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
@@ -26,8 +27,9 @@ import ru.kima.intelligentchat.presentation.settings.screen.extended.instructMod
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.toModel
 
 class InstructModeTemplateViewModel(
-    private val subscribeToInstructModeTemplates: SubscribeToInstructModeTemplatesUseCase,
+    subscribeToInstructModeTemplates: SubscribeToInstructModeTemplatesUseCase,
     private val createInstructModeTemplate: CreateInstructModeTemplateUseCase,
+    private val deleteInstructModeTemplate: DeleteInstructModeTemplateUseCase,
     private val selectInstructModeTemplate: SelectInstructTemplateUseCase,
     private val getSelectedInstructTemplate: GetSelectedInstructTemplateUseCase,
     private val updateInstructModeTemplate: UpdateInstructModeTemplateUseCase
@@ -176,8 +178,11 @@ class InstructModeTemplateViewModel(
         deleteTemplateDialog.value = true
     }
 
-    private fun onAcceptDeleteTemplate() {
+    private fun onAcceptDeleteTemplate() = viewModelScope.launch {
         deleteTemplateDialog.value = false
+        updateJob?.cancel()
+        deleteInstructModeTemplate(currentTemplate.value.id)
+        getCurrentTemplate()
     }
 
     private fun onDismissDeleteTemplate() {

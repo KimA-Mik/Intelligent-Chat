@@ -18,6 +18,10 @@ class InstructModeTemplateRepositoryImpl(
         dao.update(template.toEntity())
     }
 
+    override suspend fun delete(template: InstructModeTemplate) {
+        dao.delete(template.toEntity())
+    }
+
     override fun subscribeToAll(): Flow<List<InstructModeTemplate>> {
         return dao.subscribeToAll().map {
             it.map(InstructModeTemplateEntity::toDomain)

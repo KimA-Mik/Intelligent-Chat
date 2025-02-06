@@ -67,6 +67,7 @@ import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGener
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.instructMode.InstructModeTemplateRepository
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.CreateInstructModeTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.DeleteInstructModeTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.GetSelectedInstructTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SelectInstructTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
@@ -214,6 +215,7 @@ fun domain() = module {
     singleOf(::SubscribeToMessagingStatus)
 
     singleOf(::CreateInstructModeTemplateUseCase)
+    singleOf(::DeleteInstructModeTemplateUseCase)
     singleOf(::GetSelectedInstructTemplateUseCase)
     singleOf(::SelectInstructTemplateUseCase)
     singleOf(::SubscribeToInstructModeTemplatesUseCase)

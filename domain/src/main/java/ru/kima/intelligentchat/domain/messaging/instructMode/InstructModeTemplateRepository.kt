@@ -6,6 +6,7 @@ import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeT
 interface InstructModeTemplateRepository {
     suspend fun insert(template: InstructModeTemplate): Long
     suspend fun update(template: InstructModeTemplate)
+    suspend fun delete(template: InstructModeTemplate)
 
     fun subscribeToAll(): Flow<List<InstructModeTemplate>>
     suspend fun getById(id: Long): InstructModeTemplate?
