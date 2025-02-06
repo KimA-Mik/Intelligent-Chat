@@ -161,6 +161,7 @@ class InstructModeTemplateViewModel(
         viewModelScope.launch {
             val id = createInstructModeTemplate(name)
             selectInstructModeTemplate(id)
+            getCurrentTemplate()
         }
     }
 
