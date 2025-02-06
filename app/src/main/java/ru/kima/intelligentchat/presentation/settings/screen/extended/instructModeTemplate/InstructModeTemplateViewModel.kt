@@ -135,6 +135,7 @@ class InstructModeTemplateViewModel(
         saveTemplate()
         viewModelScope.launch {
             selectInstructModeTemplate(id)
+            getCurrentTemplate()
         }
     }
 
@@ -269,12 +270,10 @@ class InstructModeTemplateViewModel(
     @OptIn(FlowPreview::class)
     private fun getCurrentTemplate() {
         updateJob?.cancel()
-        viewModelScope.launch {
+        updateJob = viewModelScope.launch {
             currentTemplate.value = getSelectedInstructTemplate().toDisplay()
-            updateJob = viewModelScope.launch {
-                currentTemplate.debounce(SAVE_TIMEOUT).collect {
-                    updateInstructModeTemplate(it.toModel())
-                }
+            currentTemplate.debounce(SAVE_TIMEOUT).collect {
+                updateInstructModeTemplate(it.toModel())
             }
         }
     }
