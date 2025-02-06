@@ -171,6 +171,9 @@
     <string name="instruct_mode_setting_title">Instruct mode</string>
     <string name="instruct_mode_setting_description">Extended control over prompt-building strategy</string>
     <string name="default_instruct_mode_template_name">New template</string>
+    <string name="menu_item_delete_instruct_mode_template">Delete template</string>
+    <string name="alert_dialog_title_delete_instruct_mode_template">Delete template?</string>
+    <string name="alert_dialog_text_delete_instruct_mode_template">\"%1$s\" will be deleted forever</string>
 
     <string name="include_string_policy_setting_title">Include names</string>
     <string name="include_string_policy_never">Never</string>
@@ -225,6 +228,7 @@
     <string name="action_open">Open</string>
     <string name="action_search_hint">Search…</string>
     <string name="action_bar_up_description">Navigate up</string>
+    <string name="action_delete">Delete</string>
 
     <string name="restore_snackbar_action">Restore</string>
 

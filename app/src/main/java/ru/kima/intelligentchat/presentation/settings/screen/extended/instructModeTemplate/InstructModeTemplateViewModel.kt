@@ -37,18 +37,22 @@ class InstructModeTemplateViewModel(
     private val includeNamePolicyDialog = MutableStateFlow(false)
     private val renameTemplateDialog = MutableStateFlow(false)
     private val renameTemplateDialogValue = MutableStateFlow("")
+    private val deleteTemplateDialog = MutableStateFlow(false)
 
     private val dialogs = combine(
         includeNamePolicyDialog,
         renameTemplateDialog,
-        renameTemplateDialogValue
+        renameTemplateDialogValue,
+        deleteTemplateDialog
     ) { includeNamePolicyDialog,
         renameTemplateDialog,
-        renameTemplateDialogValue ->
+        renameTemplateDialogValue,
+        deleteTemplateDialog ->
         InstructModeTemplateScreenState.Dialogs(
             includeNamePolicyDialog = includeNamePolicyDialog,
             renameTemplateDialog = renameTemplateDialog,
-            renameTemplateDialogValue = renameTemplateDialogValue
+            renameTemplateDialogValue = renameTemplateDialogValue,
+            deleteTemplateDialog = deleteTemplateDialog
         )
     }
 
@@ -104,6 +108,9 @@ class InstructModeTemplateViewModel(
             UserEvent.DismissSelectIncludeNamePolicyDialog -> onDismissSelectIncludeNamePolicyDialog()
             is UserEvent.SelectIncludeNamePolicy -> onSelectIncludeNamePolicy(event.policy)
             is UserEvent.CreateTemplate -> onCreateTemplate(event.name)
+            UserEvent.DeleteTemplate -> onDeleteTemplate()
+            UserEvent.AcceptDeleteTemplate -> onAcceptDeleteTemplate()
+            UserEvent.DismissDeleteTemplate -> onDismissDeleteTemplate()
             UserEvent.OpenRenameTemplateDialog -> onOpenRenameTemplateDialog()
             UserEvent.AcceptRenameTemplateDialog -> onAcceptRenameTemplateDialog()
             UserEvent.DismissRenameTemplateDialog -> onDismissRenameTemplateDialog()
@@ -163,6 +170,18 @@ class InstructModeTemplateViewModel(
             selectInstructModeTemplate(id)
             getCurrentTemplate()
         }
+    }
+
+    private fun onDeleteTemplate() {
+        deleteTemplateDialog.value = true
+    }
+
+    private fun onAcceptDeleteTemplate() {
+        deleteTemplateDialog.value = false
+    }
+
+    private fun onDismissDeleteTemplate() {
+        deleteTemplateDialog.value = false
     }
 
     private fun onOpenRenameTemplateDialog() {

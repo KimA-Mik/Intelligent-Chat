@@ -12,7 +12,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +52,7 @@ import ru.kima.intelligentchat.presentation.common.components.clearFocusOnSoftKe
 import ru.kima.intelligentchat.presentation.settings.screen.components.SettingsGroupTitle
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.SwitchSettingWidget
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.TextSettingWidget
+import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.DeleteInstructModeTemplateDialog
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.IncludeNamePolicySelectDialog
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.dialogs.RenameTemplateDialog
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events.UserEvent
@@ -60,6 +63,7 @@ import ru.kima.intelligentchat.presentation.ui.LocalNavController
 import ru.kima.intelligentchat.presentation.ui.components.DropdownTextField
 import ru.kima.intelligentchat.presentation.ui.components.FoldableSection
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
+import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.util.preview.ICPreview
 
 const val MAX_TEMPLATE_TITLE_LINES = 2
@@ -104,6 +108,13 @@ fun InstructModeTemplateScreen(
                 onValueChange = { onEvent(UserEvent.UpdateRenameTemplateDialog(it)) },
                 allowDismiss = false
             )
+
+        state.dialogs.deleteTemplateDialog ->
+            DeleteInstructModeTemplateDialog(
+                templateName = state.currentTemplate.name,
+                onConfirm = { onEvent(UserEvent.AcceptDeleteTemplate) },
+                onDismiss = { onEvent(UserEvent.DismissDeleteTemplate) }
+            )
     }
 
     val nacController = LocalNavController.current
@@ -115,7 +126,13 @@ fun InstructModeTemplateScreen(
             AppBar(
                 titleContent = { Text(stringResource(R.string.instruct_mode_setting_title)) },
                 navigateUp = { nacController.popBackStack() },
-                scrollBehavior = sb
+                scrollBehavior = sb,
+                actions = {
+                    SimpleDropdownMenu(
+                        menuItems = dropdownMenuItems(onEvent),
+                        iconVector = Icons.Default.MoreVert
+                    )
+                }
             )
         }
     ) { paddingValues ->
@@ -434,6 +451,17 @@ fun AnotherFormating(
         label = {
             Text(text = stringResource(R.string.last_assistant_prefix_setting_label))
         }
+    )
+}
+
+@Composable
+private fun dropdownMenuItems(onEvent: (UserEvent) -> Unit) = remember {
+    listOf(
+        SimpleDropDownMenuItem(
+            string = ComposeString.Resource(R.string.menu_item_delete_instruct_mode_template),
+            onClick = { onEvent(UserEvent.DeleteTemplate) },
+            iconVector = Icons.Default.DeleteForever
+        )
     )
 }
 

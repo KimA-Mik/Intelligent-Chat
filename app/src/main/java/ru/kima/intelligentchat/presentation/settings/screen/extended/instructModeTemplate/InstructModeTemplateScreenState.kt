@@ -16,7 +16,8 @@ data class InstructModeTemplateScreenState(
     data class Dialogs(
         val includeNamePolicyDialog: Boolean = false,
         val renameTemplateDialog: Boolean = false,
-        val renameTemplateDialogValue: String = ""
+        val renameTemplateDialogValue: String = "",
+        val deleteTemplateDialog: Boolean = false
     )
 
     data class Sections(
