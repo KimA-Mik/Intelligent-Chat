@@ -3,15 +3,15 @@ package ru.kima.intelligentchat.presentation.settings.screen.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.flowOf
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.presentation.android.preferences.ICPreference
 import ru.kima.intelligentchat.presentation.settings.Setting
 import ru.kima.intelligentchat.presentation.settings.screen.components.widgets.RootWidget
-import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
+import ru.kima.intelligentchat.util.preview.ICPreview
 
 @Composable
 fun <T> SettingItem(
@@ -29,22 +29,21 @@ fun <T> SettingItem(
 @Preview
 @Composable
 private fun SwitchSettingItemPreview() {
-    IntelligentChatTheme {
-        Surface {
-            SettingItem(
-                item = Setting.SettingItem.SwitchSetting(
-                    pref = ICPreference(
-                        initialValue = true,
-                        flow = flowOf(true),
-                        setter = {}
-                    ),
-                    title = "Title",
-                    enabled = true,
-                    subtitle = "Subtitle",
-                    icon = Icons.Default.Settings,
-                    onValueChanged = { true }
-                )
+    ICPreview {
+        SettingItem(
+            item = Setting.SettingItem.SwitchSetting(
+                pref = ICPreference(
+                    initialValue = true,
+                    flow = flowOf(true),
+                    setter = {}
+                ),
+                title = ComposeString.Raw("Title"),
+                enabled = true,
+                subtitle = ComposeString.Raw("Subtitle"),
+                icon = Icons.Default.Settings,
+                onValueChanged = { true }
             )
-        }
+        )
+
     }
 }

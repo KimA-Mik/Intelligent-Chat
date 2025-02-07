@@ -12,6 +12,7 @@ import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent.get
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
+import ru.kima.intelligentchat.data.chat.instructMode.InstructModeTemplateRepositoryImpl
 import ru.kima.intelligentchat.data.chat.repository.ChatRepositoryImpl
 import ru.kima.intelligentchat.data.chat.repository.MessageRepositoryImpl
 import ru.kima.intelligentchat.data.chat.repository.SwipeRepositoryImpl
@@ -64,6 +65,13 @@ import ru.kima.intelligentchat.domain.messaging.generation.savingResult.DefaultS
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.instructMode.InstructModeTemplateRepository
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.CreateInstructModeTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.DeleteInstructModeTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.GetSelectedInstructTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SelectInstructTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
+import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.UpdateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
@@ -80,6 +88,7 @@ import ru.kima.intelligentchat.domain.persona.useCase.SelectedPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
+import ru.kima.intelligentchat.domain.preferences.advancedFormatting.AdvancedFormattingRepository
 import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
@@ -101,6 +110,7 @@ import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetU
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 import ru.kima.intelligentchat.presentation.android.implementation.messaging.repositoty.MessagingRepositoryImpl
+import ru.kima.intelligentchat.presentation.android.preferences.advancedFormatting.AdvancedFormattingRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.preferences.appPreferences.AppPreferencesRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.preferences.chatSettings.ChatSettingsRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.preferences.hordeState.HordeStateRepositoryImpl
@@ -115,6 +125,7 @@ fun domain() = module {
     singleOf(::MessageRepositoryImpl) bind MessageRepository::class
     singleOf(::SwipeRepositoryImpl) bind SwipeRepository::class
     singleOf(::MessagingRepositoryImpl) bind MessagingRepository::class
+    singleOf(::InstructModeTemplateRepositoryImpl) bind InstructModeTemplateRepository::class
 
     singleOf(::AppPreferencesRepositoryImpl) bind AppPreferencesRepository::class
     singleOf(::ChatSettingsRepositoryImpl) {
@@ -122,6 +133,7 @@ fun domain() = module {
         createdAtStart()
     } bind ChatSettingsRepository::class
     singleOf(::HordeStateRepositoryImpl) bind HordeStateRepository::class
+    singleOf(::AdvancedFormattingRepositoryImpl) bind AdvancedFormattingRepository::class
 
     factoryOf(::CleanUpUseCase)
 
@@ -201,6 +213,13 @@ fun domain() = module {
     singleOf(::LoadMessagingDataUseCase)
     singleOf(::SendMessageUseCase)
     singleOf(::SubscribeToMessagingStatus)
+
+    singleOf(::CreateInstructModeTemplateUseCase)
+    singleOf(::DeleteInstructModeTemplateUseCase)
+    singleOf(::GetSelectedInstructTemplateUseCase)
+    singleOf(::SelectInstructTemplateUseCase)
+    singleOf(::SubscribeToInstructModeTemplatesUseCase)
+    singleOf(::UpdateInstructModeTemplateUseCase)
 
     singleOf(::HordeGenerationStrategy)
     singleOf(::KoboldAiGenerationStrategy)

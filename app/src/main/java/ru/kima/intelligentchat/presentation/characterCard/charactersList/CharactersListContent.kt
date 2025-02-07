@@ -20,6 +20,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.components.CardItem
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.events.CharactersListUserEvent
 import ru.kima.intelligentchat.presentation.characterCard.charactersList.model.ImmutableCardEntry
@@ -60,12 +61,12 @@ private fun itemDropDownMenuItems(
 ) = remember {
     persistentListOf(
         SimpleDropDownMenuItem(
-            textId = R.string.menu_item_edit_card,
+            string = ComposeString.Resource(R.string.menu_item_edit_card),
             onClick = { onEvent(CharactersListUserEvent.EditCardClicked(id)) },
             iconVector = Icons.Default.Create
         ),
         SimpleDropDownMenuItem(
-            textId = R.string.menu_item_delete_card,
+            string = ComposeString.Resource(R.string.menu_item_delete_card),
             onClick = { onEvent(CharactersListUserEvent.DeleteCardClicked(id)) },
             iconVector = Icons.Default.Delete
         )

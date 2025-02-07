@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.chat.cardChatList.events.UiEvent
@@ -196,17 +197,17 @@ private fun listDropdownMenuItems(
 ) = remember {
     listOf(
         SimpleDropDownMenuItem(
-            textId = R.string.menu_item_select_chat,
+            string = ComposeString.Resource(R.string.menu_item_select_chat),
             onClick = { onEvent(UserEvent.SelectChat(chatId)) },
             iconVector = Icons.Default.Check
         ),
         SimpleDropDownMenuItem(
-            textId = R.string.menu_item_rename_chat,
+            string = ComposeString.Resource(R.string.menu_item_rename_chat),
             onClick = { onEvent(UserEvent.RenameChat(chatId)) },
             iconVector = Icons.Default.EditNote
         ),
         SimpleDropDownMenuItem(
-            textId = R.string.menu_item_delete_chat,
+            string = ComposeString.Resource(R.string.menu_item_delete_chat),
             onClick = { onEvent(UserEvent.DeleteChat(chatId)) },
             iconVector = Icons.Default.Delete
         )

@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -16,6 +15,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.presentation.android.preferences.appAppearance.AppAppearance
 import ru.kima.intelligentchat.presentation.android.preferences.appAppearance.AppAppearanceStore
 import ru.kima.intelligentchat.presentation.android.preferences.appAppearance.setDarkMode
@@ -58,18 +58,18 @@ object AppearanceSettingsScreen : SettingsScreen, KoinComponent {
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
             },
-            title = "",
+            title = ComposeString.Empty,
             enabled = true,
         )
 
         val darkModePureBlackSetting = Setting.SettingItem.SwitchSetting(
             pref = appearance.darkModePureBlack(),
-            title = stringResource(R.string.appearance_setting_dark_mode_pure_black_title),
+            title = ComposeString.Resource(R.string.appearance_setting_dark_mode_pure_black_title),
             enabled = darkMode.currentValue() != AppAppearance.DarkMode.OFF,
         )
 
         return Setting.SettingGroup(
-            title = stringResource(R.string.appearance_setting_theme_group_title),
+            title = ComposeString.Resource(R.string.appearance_setting_theme_group_title),
             enabled = true,
             settingsItems = persistentListOf(
                 darkThemeSelector,

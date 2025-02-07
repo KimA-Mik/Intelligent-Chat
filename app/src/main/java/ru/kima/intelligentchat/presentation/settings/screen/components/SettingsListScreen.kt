@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -12,9 +11,10 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.flowOf
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.presentation.android.preferences.ICPreference
 import ru.kima.intelligentchat.presentation.settings.Setting
-import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
+import ru.kima.intelligentchat.util.preview.ICPreview
 
 @Composable
 fun SettingsListScreen(
@@ -41,7 +41,7 @@ fun SettingsListScreen(
 @Composable
 private fun SettingsListScreenPreview() {
     val group = Setting.SettingGroup(
-        title = "Group",
+        title = ComposeString.Raw("Group"),
         enabled = true,
         settingsItems = persistentListOf(
             Setting.SettingItem.SwitchSetting(
@@ -50,7 +50,7 @@ private fun SettingsListScreenPreview() {
                     flow = flowOf(true),
                     setter = {}
                 ),
-                title = "One"
+                title = ComposeString.Raw("One")
             ),
             Setting.SettingItem.SwitchSetting(
                 pref = ICPreference(
@@ -58,18 +58,16 @@ private fun SettingsListScreenPreview() {
                     flow = flowOf(false),
                     setter = {}
                 ),
-                title = "Two"
+                title = ComposeString.Raw("Two")
             ),
         )
     )
 
-    IntelligentChatTheme {
-        Surface {
-            SettingsListScreen(
-                settings = persistentListOf(
-                    group
-                ),
-            )
-        }
+    ICPreview {
+        SettingsListScreen(
+            settings = persistentListOf(
+                group
+            ),
+        )
     }
 }

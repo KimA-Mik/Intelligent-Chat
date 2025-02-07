@@ -1,5 +1,6 @@
 package ru.kima.intelligentchat.presentation.settings.screen.components.widgets
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +18,17 @@ fun <T> RootWidget(
 ) {
     val scope = rememberCoroutineScope()
     when (item) {
+        is Setting.SettingItem.LabelSetting -> TextSettingWidget(
+            title = item.title,
+            modifier = modifier.clickable {
+                scope.launch {
+                    item.onValueChanged(Unit)
+                }
+            },
+            subtitle = item.subtitle,
+            icon = item.icon,
+        )
+
         is Setting.SettingItem.SwitchSetting -> {
             val checked by item.pref.collectAsState()
             SwitchSettingWidget(

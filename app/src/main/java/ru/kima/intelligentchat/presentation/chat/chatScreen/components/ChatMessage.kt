@@ -61,6 +61,7 @@ import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.common.formatAndTrim
 import ru.kima.intelligentchat.presentation.characterCard.cardDetails.components.AsyncCardImage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ChatDefaults
@@ -189,7 +190,7 @@ private fun dropdownMenuItems(
     buildList {
         add(
             SimpleDropDownMenuItem(
-                textId = R.string.menu_item_edit_message,
+                string = ComposeString.Resource(R.string.menu_item_edit_message),
                 onClick = onEditClicked,
                 iconVector = Icons.Default.Edit
             )
@@ -197,7 +198,7 @@ private fun dropdownMenuItems(
 
         add(
             SimpleDropDownMenuItem(
-                textId = R.string.menu_item_delete_message,
+                string = ComposeString.Resource(R.string.menu_item_delete_message),
                 onClick = onDeleteClicked,
                 iconVector = Icons.Default.Delete
             )
@@ -206,7 +207,7 @@ private fun dropdownMenuItems(
         if (addDeleteSwipe)
             add(
                 SimpleDropDownMenuItem(
-                    textId = R.string.menu_item_delete_swipe,
+                    string = ComposeString.Resource(R.string.menu_item_delete_swipe),
                     onClick = onDeleteSwipeClicked,
                     iconVector = Icons.Default.DeleteSweep
                 )
@@ -214,7 +215,7 @@ private fun dropdownMenuItems(
 
         add(
             SimpleDropDownMenuItem(
-                textId = R.string.menu_item_move_message_up,
+                string = ComposeString.Resource(R.string.menu_item_move_message_up),
                 onClick = onMoveUpClicked,
                 iconVector = Icons.Default.ArrowUpward
             )
@@ -222,7 +223,7 @@ private fun dropdownMenuItems(
 
         add(
             SimpleDropDownMenuItem(
-                textId = R.string.menu_item_move_message_down,
+                string = ComposeString.Resource(R.string.menu_item_move_message_down),
                 onClick = onMoveDownClicked,
                 iconVector = Icons.Default.ArrowDownward
             )
@@ -230,7 +231,7 @@ private fun dropdownMenuItems(
 
         add(
             SimpleDropDownMenuItem(
-                textId = R.string.menu_item_branch_chat,
+                string = ComposeString.Resource(R.string.menu_item_branch_chat),
                 onClick = onBranchChatClicked,
                 iconVector = Icons.AutoMirrored.Default.AltRoute
             )

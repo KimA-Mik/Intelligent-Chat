@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
+import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.presentation.common.util.dpToPx
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
@@ -126,7 +127,7 @@ private fun dropDownMenuItems(
 ) = remember {
     listOf(
         SimpleDropDownMenuItem(
-            R.string.save_preset,
+            ComposeString.Resource(R.string.save_preset),
             onClick = { onEvent(UserEvent.SavePreset) },
             iconVector = Icons.Filled.Save
         )

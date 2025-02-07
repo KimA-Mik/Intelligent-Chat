@@ -14,8 +14,11 @@ import ru.kima.intelligentchat.data.chat.dao.ChatDao
 import ru.kima.intelligentchat.data.chat.entities.ChatEntity
 import ru.kima.intelligentchat.data.chat.entities.MessageEntity
 import ru.kima.intelligentchat.data.chat.entities.SwipeEntity
+import ru.kima.intelligentchat.data.chat.instructMode.InstructModeTemplateDao
+import ru.kima.intelligentchat.data.chat.instructMode.InstructModeTemplateEntity
 import ru.kima.intelligentchat.data.kobold.preset.dao.KoboldPresetDao
 import ru.kima.intelligentchat.data.kobold.preset.entities.KoboldPresetEntity
+import ru.kima.intelligentchat.data.migrations.Migration3_4
 import ru.kima.intelligentchat.data.persona.PersonaDao
 import ru.kima.intelligentchat.data.persona.PersonaEntity
 
@@ -29,12 +32,14 @@ import ru.kima.intelligentchat.data.persona.PersonaEntity
         KoboldPresetEntity::class,
         ChatEntity::class,
         MessageEntity::class,
-        SwipeEntity::class
+        SwipeEntity::class,
+        InstructModeTemplateEntity::class
     ],
-    version = 3,
+    version = 4,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
-        AutoMigration(from = 2, to = 3)
+        AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4, spec = Migration3_4::class)
     ]
 )
 abstract class Database : RoomDatabase() {
@@ -44,4 +49,5 @@ abstract class Database : RoomDatabase() {
     abstract fun personaDao(): PersonaDao
     abstract fun koboldPresetDao(): KoboldPresetDao
     abstract fun chatDao(): ChatDao
+    abstract fun instructModeTemplateDao(): InstructModeTemplateDao
 }

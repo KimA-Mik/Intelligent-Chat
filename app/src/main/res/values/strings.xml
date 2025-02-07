@@ -167,6 +167,36 @@
     <string name="setting_show_message_number_title">Show message number</string>
     <string name="setting_show_swipe_date_title">Show swipe date</string>
 
+    <!--  Advanced Formating Screen  -->
+    <string name="instruct_mode_setting_title">Instruct mode</string>
+    <string name="instruct_mode_setting_description">Extended control over prompt-building strategy</string>
+    <string name="default_instruct_mode_template_name">New template</string>
+    <string name="menu_item_delete_instruct_mode_template">Delete template</string>
+    <string name="alert_dialog_title_delete_instruct_mode_template">Delete template?</string>
+    <string name="alert_dialog_text_delete_instruct_mode_template">\"%1$s\" will be deleted forever</string>
+
+    <string name="include_string_policy_setting_title">Include names</string>
+    <string name="include_string_policy_never">Never</string>
+    <string name="include_string_policy_always">Always</string>
+
+    <string name="tooltip_instruct_mode_template_rename">Rename template</string>
+    <string name="rename_template_dialog_input_label">Name</string>
+
+    <string name="wrap_sequences_with_new_line_setting_title">Wrap sequences with new line</string>
+
+    <string name="user_strings_settings_group_title">User strings</string>
+    <string name="user_prefix_setting_label">User prefix</string>
+    <string name="user_postfix_setting_label">User postfix</string>
+
+    <string name="assistant_strings_settings_group_title">Assistant strings</string>
+    <string name="assistant_prefix_setting_label">Assistant prefix</string>
+    <string name="assistant_postfix_setting_label">Assistant postfix</string>
+
+    <string name="another_strings_setting_group_title">Another strings</string>
+    <string name="first_user_prefix_setting_label">First user prefix</string>
+    <string name="last_user_prefix_setting_label">Last user prefix</string>
+    <string name="first_assistant_prefix_setting_label">First assistant prefix</string>
+    <string name="last_assistant_prefix_setting_label">Last assistant prefix</string>
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>
@@ -198,6 +228,7 @@
     <string name="action_open">Open</string>
     <string name="action_search_hint">Search…</string>
     <string name="action_bar_up_description">Navigate up</string>
+    <string name="action_delete">Delete</string>
 
     <string name="restore_snackbar_action">Restore</string>
 

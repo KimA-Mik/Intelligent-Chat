@@ -1,6 +1,5 @@
 package ru.kima.intelligentchat.presentation.ui.components
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -16,11 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
+import ru.kima.intelligentchat.common.ComposeString
 
 data class SimpleDropDownMenuItem(
-    @StringRes
-    val textId: Int,
+    val string: ComposeString,
     val onClick: () -> Unit,
     val iconVector: ImageVector? = null
 )
@@ -42,7 +40,7 @@ fun SimpleDropdownMenu(
 
         DropdownMenu(expanded = dropdownMenu, onDismissRequest = { dropdownMenu = false }) {
             menuItems.forEach { item ->
-                val text = stringResource(id = item.textId)
+                val text = item.string.unwrap()
                 DropdownMenuItem(
                     text = { Text(text = text) },
                     onClick = {
