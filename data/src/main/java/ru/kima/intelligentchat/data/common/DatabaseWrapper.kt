@@ -13,9 +13,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import ru.kima.intelligentchat.data.DATABASE_NAME
 import ru.kima.intelligentchat.data.Database
-import ru.kima.intelligentchat.data.chat.instructMode.toEntity
+import ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode.toEntity
 import ru.kima.intelligentchat.data.kobold.preset.entities.KoboldPresetEntity
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeTemplate
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.InstructModeTemplate
 
 class DatabaseWrapper(context: Context) {
     @OptIn(ExperimentalSerializationApi::class, DelicateCoroutinesApi::class)

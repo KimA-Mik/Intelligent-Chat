@@ -1,6 +1,6 @@
 package ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events
 
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.IncludeNamePolicy
 
 sealed interface UserEvent {
     data class SelectTemplate(val id: Long) : UserEvent

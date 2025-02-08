@@ -46,7 +46,7 @@ import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.common.StringCallback
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.common.components.clearFocusOnSoftKeyboardHide
 import ru.kima.intelligentchat.presentation.settings.screen.components.SettingsGroupTitle

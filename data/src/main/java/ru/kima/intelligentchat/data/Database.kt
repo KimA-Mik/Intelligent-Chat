@@ -14,8 +14,8 @@ import ru.kima.intelligentchat.data.chat.dao.ChatDao
 import ru.kima.intelligentchat.data.chat.entities.ChatEntity
 import ru.kima.intelligentchat.data.chat.entities.MessageEntity
 import ru.kima.intelligentchat.data.chat.entities.SwipeEntity
-import ru.kima.intelligentchat.data.chat.instructMode.InstructModeTemplateDao
-import ru.kima.intelligentchat.data.chat.instructMode.InstructModeTemplateEntity
+import ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode.InstructModeTemplateDao
+import ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode.InstructModeTemplateEntity
 import ru.kima.intelligentchat.data.kobold.preset.dao.KoboldPresetDao
 import ru.kima.intelligentchat.data.kobold.preset.entities.KoboldPresetEntity
 import ru.kima.intelligentchat.data.migrations.Migration3_4

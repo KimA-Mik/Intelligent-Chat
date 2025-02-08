@@ -1,6 +1,6 @@
-package ru.kima.intelligentchat.domain.messaging.instructMode.useCase
+package ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase
 
-import ru.kima.intelligentchat.domain.messaging.instructMode.InstructModeTemplateRepository
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.InstructModeTemplateRepository
 
 class SubscribeToInstructModeTemplatesUseCase(
     private val instructModeTemplateRepository: InstructModeTemplateRepository,

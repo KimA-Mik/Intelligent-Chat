@@ -2,7 +2,7 @@ package ru.kima.intelligentchat.presentation.settings.util
 
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.IncludeNamePolicy
 
 fun IncludeNamePolicy.composeSting(): ComposeString {
     return when (this) {

@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.domain.messaging.instructMode.model
+package ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model
 
 data class InstructModeTemplate(
     val id: Long,
