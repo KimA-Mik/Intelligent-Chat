@@ -1,10 +1,18 @@
-## Intelligent Chat
+<div align="center">
+  
+# Intelligent Chat
 
-Universal frontend for managing and chatting with different AI bots.
+Universal frontend for chatting with different AI bots.
 
-![Preview](.github/assets/preview.png)
+<img src=".github/assets/preview.png" width="400">
 
-### Features
+</div>
+
+<div align="center">
+  
+## Features
+
+</div>
 
 - **Character cards**: A character card is a collection of prompts that set the behavior of the LLM.
 - **User personas**: Let the AI know a bit about you for greater immersion.
@@ -12,12 +20,20 @@ Universal frontend for managing and chatting with different AI bots.
 - **Advanced text generation settings**: With support for presets.
 - **AI Horde as a backend**: More backends coming later.
 
-### Requirements
+<div align="center">
+  
+## Requirements
+
+</div>
 
 Intelligent chat supports Android version down to 7 and can be built with the latest Android Studio
 2024.2.2.
 
-### Future features
+<div align="center">
+
+## Roadmap
+
+</div>
 
 - [ ] Backups
 - [ ] Export of character cards
