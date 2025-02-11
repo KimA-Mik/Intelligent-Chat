@@ -7,6 +7,13 @@ import ru.kima.intelligentchat.domain.preferences.advancedFormatting.AdvancedFor
 class AdvancedFormattingRepositoryImpl(context: Context) : AdvancedFormattingRepository {
     private val dataStore = context.advancedFormattingDataStore
     override fun preferences() = dataStore.data.map { it.toAdvancedFormatting() }
+    override suspend fun updateSelectedContextTemplate(id: Long) {
+        updateData {
+            it.copy(
+                selectedContextTemplate = id
+            )
+        }
+    }
 
     override suspend fun updateSelectedInstructModeTemplate(id: Long) {
         updateData {
