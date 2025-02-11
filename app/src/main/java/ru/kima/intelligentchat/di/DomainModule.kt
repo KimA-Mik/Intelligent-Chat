@@ -63,6 +63,8 @@ import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
 import ru.kima.intelligentchat.domain.images.useCase.GetFreeImageNameUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.ContextTemplateRepository
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.GetSelectedContextTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.SubscribeToContextTemplatesUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.InstructModeTemplateRepository
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.CreateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.DeleteInstructModeTemplateUseCase
@@ -216,6 +218,9 @@ fun domain() = module {
     singleOf(::LoadMessagingDataUseCase)
     singleOf(::SendMessageUseCase)
     singleOf(::SubscribeToMessagingStatus)
+
+    singleOf(::GetSelectedContextTemplateUseCase)
+    singleOf(::SubscribeToContextTemplatesUseCase)
 
     singleOf(::CreateInstructModeTemplateUseCase)
     singleOf(::DeleteInstructModeTemplateUseCase)
