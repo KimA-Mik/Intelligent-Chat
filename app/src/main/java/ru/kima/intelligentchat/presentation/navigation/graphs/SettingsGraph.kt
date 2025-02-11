@@ -10,10 +10,12 @@ import androidx.navigation.navigation
 import ru.kima.intelligentchat.presentation.navigation.NavItem
 import ru.kima.intelligentchat.presentation.navigation.NavigationLayout
 import ru.kima.intelligentchat.presentation.settings.root.SettingsRoot
+import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.ContextTemplateRoot
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.InstructModeTemplateRoot
 
 private const val ROOT_DESTINATION = "root"
 private const val INSTRUCT_MODE_DESTINATION = "instruct_mode"
+private const val CONTEXT_TEMPLATE_DESTINATION = "context_template"
 
 fun NavGraphBuilder.settingsGraph(
     expanded: Boolean,
@@ -40,7 +42,12 @@ fun NavGraphBuilder.settingsGraph(
         composable(INSTRUCT_MODE_DESTINATION) {
             InstructModeTemplateRoot()
         }
+
+        composable(CONTEXT_TEMPLATE_DESTINATION) {
+            ContextTemplateRoot()
+        }
     }
 }
 
 fun NavController.navigateToInstructMode() = navigate(INSTRUCT_MODE_DESTINATION)
+fun NavController.navigateToContextTemplate() = navigate(CONTEXT_TEMPLATE_DESTINATION)

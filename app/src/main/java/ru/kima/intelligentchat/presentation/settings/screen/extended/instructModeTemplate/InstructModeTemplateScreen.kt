@@ -458,7 +458,7 @@ fun AnotherFormating(
 private fun dropdownMenuItems(onEvent: (UserEvent) -> Unit) = remember {
     listOf(
         SimpleDropDownMenuItem(
-            string = ComposeString.Resource(R.string.menu_item_delete_instruct_mode_template),
+            string = ComposeString.Resource(R.string.menu_item_delete_template),
             onClick = { onEvent(UserEvent.DeleteTemplate) },
             iconVector = Icons.Default.DeleteForever
         )
