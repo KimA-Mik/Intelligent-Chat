@@ -42,6 +42,8 @@ import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.model.ContextTemplate
 import ru.kima.intelligentchat.presentation.common.components.AppBar
+import ru.kima.intelligentchat.presentation.common.components.clearFocusOnSoftKeyboardHide
+import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.DisplayContextTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.toDisplay
 import ru.kima.intelligentchat.presentation.ui.LocalNavController
@@ -51,12 +53,21 @@ import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.components.TooltipIconButton
 import ru.kima.intelligentchat.util.preview.ICPreview
 
+private typealias OnEvent = (UserEvent) -> Unit
+
 @Composable
 fun ContextTemplateRoot() {
     val viewModel: ContextTemplateViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val onEvent = remember<OnEvent> {
+        {
+            viewModel.onEvent(it)
+        }
+    }
+
     ContextTemplateScreen(
         state = state,
+        onEvent = onEvent,
         modifier = Modifier.fillMaxSize()
     )
 }
@@ -65,6 +76,7 @@ fun ContextTemplateRoot() {
 @Composable
 fun ContextTemplateScreen(
     state: ContextTemplateScreenState,
+    onEvent: OnEvent,
     modifier: Modifier = Modifier
 ) {
     val navController = LocalNavController.current
@@ -91,6 +103,7 @@ fun ContextTemplateScreen(
         ContextTemplateScreenBody(
             templates = state.templates,
             currentTemplate = state.currentTemplate,
+            onEvent = onEvent,
             modifier = Modifier
                 .padding(paddingValues)
                 .nestedScroll(sb.nestedScrollConnection)
@@ -98,11 +111,11 @@ fun ContextTemplateScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContextTemplateScreenBody(
     templates: ImmutableList<DisplayContextTemplate>,
     currentTemplate: DisplayContextTemplate,
+    onEvent: OnEvent,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -138,6 +151,7 @@ fun ContextTemplateScreenBody(
                 storyString = currentTemplate.storyString,
                 chatStart = currentTemplate.chatStart,
                 exampleSeparator = currentTemplate.exampleSeparator,
+                onEvent = onEvent,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
@@ -153,6 +167,7 @@ fun CardBody(
     storyString: String,
     chatStart: String,
     exampleSeparator: String,
+    onEvent: OnEvent,
     modifier: Modifier = Modifier
 ) = Column(
     modifier = modifier,
@@ -166,8 +181,8 @@ fun CardBody(
     )
     OutlinedTextField(
         value = storyString,
-        onValueChange = {},
-        modifier = inner
+        onValueChange = { onEvent(UserEvent.UpdateStoryString(it)) },
+        modifier = inner.clearFocusOnSoftKeyboardHide()
     )
 
     Title(
@@ -176,8 +191,8 @@ fun CardBody(
         modifier = inner
     )
     OutlinedTextField(
-        value = exampleSeparator, onValueChange = {},
-        modifier = inner
+        value = exampleSeparator, onValueChange = { onEvent(UserEvent.UpdateExampleSeparator(it)) },
+        modifier = inner.clearFocusOnSoftKeyboardHide()
     )
 
     Title(
@@ -186,8 +201,8 @@ fun CardBody(
         modifier = inner
     )
     OutlinedTextField(
-        value = chatStart, onValueChange = {},
-        modifier = inner
+        value = chatStart, onValueChange = { onEvent(UserEvent.UpdateChatStart(it)) },
+        modifier = inner.clearFocusOnSoftKeyboardHide()
     )
 }
 
@@ -248,6 +263,7 @@ private fun ContextTemplateScreenPreview() = ICPreview {
         state = ContextTemplateScreenState(
             currentTemplate = ContextTemplate.default(name = "Current Template").toDisplay()
         ),
+        onEvent = {},
         modifier = Modifier.fillMaxSize()
     )
 }

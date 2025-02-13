@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.model.ContextTemplate
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.GetSelectedContextTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.SubscribeToContextTemplatesUseCase
+import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.DisplayContextTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.toDisplay
 
@@ -62,6 +63,26 @@ class ContextTemplateViewModel(
             dialogBuffer = dialogBuffer
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ContextTemplateScreenState())
+
+    fun onEvent(event: UserEvent) {
+        when (event) {
+            is UserEvent.UpdateStoryString -> onUpdateStoryString(event.value)
+            is UserEvent.UpdateExampleSeparator -> onUpdateExampleSeparator(event.value)
+            is UserEvent.UpdateChatStart -> onUpdateChatStart(event.value)
+        }
+    }
+
+    private fun onUpdateStoryString(value: String) {
+        savedStateHandle[CURRENT_TEMPLATE_STORY_STRING] = value
+    }
+
+    private fun onUpdateExampleSeparator(value: String) {
+        savedStateHandle[CURRENT_TEMPLATE_EXAMPLE_SEPARATOR] = value
+    }
+
+    private fun onUpdateChatStart(value: String) {
+        savedStateHandle[CURRENT_TEMPLATE_CHAT_START] = value
+    }
 
     private suspend fun getCurrentTemplate() {
         val currentContextTemplate = currentContextTemplate()
