@@ -202,6 +202,13 @@
     <string name="last_user_prefix_setting_label">Last user prefix</string>
     <string name="first_assistant_prefix_setting_label">First assistant prefix</string>
     <string name="last_assistant_prefix_setting_label">Last assistant prefix</string>
+
+    <string name="label_story_string_setting">Story string</string>
+    <string name="tooltip_story_string_setting">This field is a template for pre-chat character data. This is the main way to format your character card for text completion and instruct models.\nThe template supports Handlebars syntax and any custom text injections or formatting.\nWe provide the following parameters to the Handlebars evaluator (wrap them into double-curly braces):\n\ndescription - character\'s Description\nscenario - character\'s Scenario\npersonality - character\'s Personality\npersona - selected persona description\nchar - character\'s name\nuser - selected persona name</string>
+    <string name="label_example_separator_setting">Example separator</string>
+    <string name="tooltip_example_separator_setting">Used as a block header and a separator between the example dialogue blocks. Any instance of <![CDATA[<]]>START<![CDATA[>]]> tags in the example dialogues will be replaced with the contents of this field.</string>
+    <string name="label_chat_start_setting">Chat start</string>
+    <string name="tooltip_chat_start_setting">Inserted as a separator after the rendered story string and after the example dialogues blocks, but before the first message in context.</string>
     <!--  Notifications  -->
     <string name="awaiting_for_message_notification_channel_name">Character is typing</string>
     <string name="awaiting_for_message_notification_channel_description">Notifies when awaiting for response from a character.</string>
