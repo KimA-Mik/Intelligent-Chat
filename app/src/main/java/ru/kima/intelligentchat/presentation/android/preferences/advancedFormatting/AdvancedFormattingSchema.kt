@@ -19,7 +19,7 @@ val Context.advancedFormattingDataStore: DataStore<AdvancedFormattingSchema> by 
 
 fun AdvancedFormattingSchema.toAdvancedFormatting(): AdvancedFormatting {
     return AdvancedFormatting(
-        selectedContextTemplate = selectedInstructModeTemplate,
+        selectedContextTemplate = selectedContextTemplate,
         selectedInstructModeTemplate = selectedInstructModeTemplate
     )
 }
