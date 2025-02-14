@@ -48,6 +48,7 @@ import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemp
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.toDisplay
 import ru.kima.intelligentchat.presentation.ui.LocalNavController
 import ru.kima.intelligentchat.presentation.ui.components.DropdownTextField
+import ru.kima.intelligentchat.presentation.ui.components.EditTextDialog
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
 import ru.kima.intelligentchat.presentation.ui.components.TooltipIconButton
@@ -79,6 +80,16 @@ fun ContextTemplateScreen(
     onEvent: OnEvent,
     modifier: Modifier = Modifier
 ) {
+    when {
+        state.renameDialog -> EditTextDialog(
+            value = state.dialogBuffer,
+            onValueChange = { onEvent(UserEvent.UpdateDialogBuffer(it)) },
+            onAccept = { onEvent(UserEvent.AcceptRenameTemplateDialog) },
+            onDismiss = { onEvent(UserEvent.DismissRenameTemplateDialog) },
+            textFieldLabel = remember { ComposeString.Resource(R.string.rename_template_dialog_input_label) }
+        )
+    }
+
     val navController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val sb = remember { scrollBehavior }
@@ -92,7 +103,7 @@ fun ContextTemplateScreen(
                 navigateUp = { navController.popBackStack() },
                 actions = {
                     SimpleDropdownMenu(
-                        menuItems = dropdownMenuItems(),
+                        menuItems = dropdownMenuItems(onEvent),
                         iconVector = Icons.Default.MoreVert
                     )
                 },
@@ -230,11 +241,11 @@ private fun Title(
 }
 
 @Composable
-private fun dropdownMenuItems() = remember {
+private fun dropdownMenuItems(onEvent: OnEvent) = remember(onEvent) {
     listOf(
         SimpleDropDownMenuItem(
             string = ComposeString.Resource(R.string.menu_item_rename_template),
-            onClick = {},
+            onClick = { onEvent(UserEvent.RenameTemplate) },
             iconVector = Icons.Default.Edit
         ),
         SimpleDropDownMenuItem(

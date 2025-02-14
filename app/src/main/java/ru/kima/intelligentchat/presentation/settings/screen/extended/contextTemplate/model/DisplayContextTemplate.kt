@@ -19,3 +19,11 @@ fun ContextTemplate.toDisplay() = DisplayContextTemplate(
     exampleSeparator = exampleSeparator,
     chatStart = chatStart
 )
+
+fun DisplayContextTemplate.toModel() = ContextTemplate(
+    id = id,
+    name = name,
+    storyString = storyString,
+    exampleSeparator = exampleSeparator,
+    chatStart = chatStart
+)
