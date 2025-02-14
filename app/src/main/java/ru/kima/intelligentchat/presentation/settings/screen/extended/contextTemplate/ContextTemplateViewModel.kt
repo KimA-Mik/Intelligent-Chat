@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.model.ContextTemplate
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.GetSelectedContextTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.InsertContextTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.SelectContextTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.SubscribeToContextTemplatesUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.UpdateContextTemplateUseCase
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.events.UserEvent
@@ -23,6 +25,8 @@ class ContextTemplateViewModel(
     subscribeToContextTemplates: SubscribeToContextTemplatesUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val currentContextTemplate: GetSelectedContextTemplateUseCase,
+    private val insertContextTemplate: InsertContextTemplateUseCase,
+    private val selectContextTemplate: SelectContextTemplateUseCase,
     private val updateContextTemplate: UpdateContextTemplateUseCase,
 ) : ViewModel() {
     private val renameDialog = MutableStateFlow(false)
@@ -69,6 +73,7 @@ class ContextTemplateViewModel(
 
     fun onEvent(event: UserEvent) {
         when (event) {
+            is UserEvent.SelectTemplate -> onSelectTemplate(event.id)
             is UserEvent.UpdateStoryString -> onUpdateStoryString(event.value)
             is UserEvent.UpdateExampleSeparator -> onUpdateExampleSeparator(event.value)
             is UserEvent.UpdateChatStart -> onUpdateChatStart(event.value)
@@ -77,7 +82,33 @@ class ContextTemplateViewModel(
             UserEvent.RenameTemplate -> onRenameTemplate()
             UserEvent.AcceptRenameTemplateDialog -> onAcceptRenameTemplateDialog()
             UserEvent.DismissRenameTemplateDialog -> onDismissRenameTemplateDialog()
+            UserEvent.SaveAs -> onSaveAs()
+            UserEvent.AcceptSaveAsDialog -> onAcceptSaveAsDialog()
+            UserEvent.DismissSaveAsDialog -> onDismissSaveAsDialog()
         }
+    }
+
+    private fun onDismissSaveAsDialog() {
+        saveAsDialog.value = false
+    }
+
+    private fun onAcceptSaveAsDialog() {
+        saveAsDialog.value = false
+        viewModelScope.launch {
+            val newId = insertContextTemplate(
+                state.value.currentTemplate.copy(
+                    id = 0L,
+                    name = dialogBuffer.value
+                ).toModel()
+            )
+            selectContextTemplate(newId)
+            getCurrentTemplate()
+        }
+    }
+
+    private fun onSaveAs() {
+        dialogBuffer.value = state.value.currentTemplate.name
+        saveAsDialog.value = true
     }
 
     private fun onDismissRenameTemplateDialog() {
@@ -117,6 +148,11 @@ class ContextTemplateViewModel(
 
     private fun onUpdateChatStart(value: String) {
         savedStateHandle[CURRENT_TEMPLATE_CHAT_START] = value
+    }
+
+    private fun onSelectTemplate(id: Long) = viewModelScope.launch {
+        selectContextTemplate(id)
+        getCurrentTemplate()
     }
 
     private suspend fun getCurrentTemplate() {

@@ -86,6 +86,16 @@ fun ContextTemplateScreen(
             onValueChange = { onEvent(UserEvent.UpdateDialogBuffer(it)) },
             onAccept = { onEvent(UserEvent.AcceptRenameTemplateDialog) },
             onDismiss = { onEvent(UserEvent.DismissRenameTemplateDialog) },
+            icon = Icons.Default.Edit,
+            textFieldLabel = remember { ComposeString.Resource(R.string.rename_template_dialog_input_label) }
+        )
+
+        state.saveAsDialog -> EditTextDialog(
+            value = state.dialogBuffer,
+            onValueChange = { onEvent(UserEvent.UpdateDialogBuffer(it)) },
+            onAccept = { onEvent(UserEvent.AcceptSaveAsDialog) },
+            onDismiss = { onEvent(UserEvent.DismissSaveAsDialog) },
+            icon = Icons.Default.SaveAs,
             textFieldLabel = remember { ComposeString.Resource(R.string.rename_template_dialog_input_label) }
         )
     }
@@ -141,7 +151,7 @@ fun ContextTemplateScreenBody(
                 templates.map {
                     SimpleDropDownMenuItem(
                         string = ComposeString.Raw(it.name),
-                        onClick = {}
+                        onClick = { onEvent(UserEvent.SelectTemplate(it.id)) }
                     )
                 }.toImmutableList()
             },
@@ -217,7 +227,6 @@ fun CardBody(
     )
 }
 
-
 @Composable
 private fun Title(
     text: String,
@@ -255,7 +264,7 @@ private fun dropdownMenuItems(onEvent: OnEvent) = remember(onEvent) {
         ),
         SimpleDropDownMenuItem(
             string = ComposeString.Resource(R.string.manu_item_save_template_as),
-            onClick = {},
+            onClick = { onEvent(UserEvent.SaveAs) },
             iconVector = Icons.Default.SaveAs
         ),
         SimpleDropDownMenuItem(
