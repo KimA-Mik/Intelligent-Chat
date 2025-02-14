@@ -11,11 +11,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.model.ContextTemplate
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.DeleteContextTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.GetSelectedContextTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.InsertContextTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.SelectContextTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.SubscribeToContextTemplatesUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.UpdateContextTemplateUseCase
+import ru.kima.intelligentchat.domain.utils.combine
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.DisplayContextTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.toDisplay
@@ -24,6 +26,7 @@ import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemp
 class ContextTemplateViewModel(
     subscribeToContextTemplates: SubscribeToContextTemplatesUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val deleteContextTemplate: DeleteContextTemplateUseCase,
     private val currentContextTemplate: GetSelectedContextTemplateUseCase,
     private val insertContextTemplate: InsertContextTemplateUseCase,
     private val selectContextTemplate: SelectContextTemplateUseCase,
@@ -32,6 +35,7 @@ class ContextTemplateViewModel(
     private val renameDialog = MutableStateFlow(false)
     private val saveAsDialog = MutableStateFlow(false)
     private val dialogBuffer = MutableStateFlow("")
+    private val deleteDialog = MutableStateFlow(false)
 
     init {
         val currentTemplateId = savedStateHandle.get<Long>(CURRENT_TEMPLATE_ID)
@@ -60,14 +64,15 @@ class ContextTemplateViewModel(
 
     val state = combine(
         subscribeToContextTemplates().map { it.map(ContextTemplate::toDisplay).toImmutableList() },
-        currentTemplate, renameDialog, saveAsDialog, dialogBuffer
-    ) { templates, currentTemplate, renameDialog, saveAsDialog, dialogBuffer ->
+        currentTemplate, renameDialog, saveAsDialog, dialogBuffer, deleteDialog
+    ) { templates, currentTemplate, renameDialog, saveAsDialog, dialogBuffer, deleteDialog ->
         ContextTemplateScreenState(
             templates = templates,
             currentTemplate = currentTemplate,
             renameDialog = renameDialog,
             saveAsDialog = saveAsDialog,
-            dialogBuffer = dialogBuffer
+            dialogBuffer = dialogBuffer,
+            deleteDialog = deleteDialog
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ContextTemplateScreenState())
 
@@ -85,7 +90,26 @@ class ContextTemplateViewModel(
             UserEvent.SaveAs -> onSaveAs()
             UserEvent.AcceptSaveAsDialog -> onAcceptSaveAsDialog()
             UserEvent.DismissSaveAsDialog -> onDismissSaveAsDialog()
+            UserEvent.DeleteTemplate -> onDeleteTemplate()
+            UserEvent.AcceptDeleteTemplateDialog -> onAcceptDeleteTemplateDialog()
+            UserEvent.DismissDeleteTemplateDialog -> onDismissDeleteTemplateDialog()
         }
+    }
+
+    private fun onDeleteTemplate() {
+        deleteDialog.value = true
+    }
+
+    private fun onAcceptDeleteTemplateDialog() {
+        deleteDialog.value = false
+        viewModelScope.launch {
+            deleteContextTemplate(state.value.currentTemplate.id)
+            getCurrentTemplate()
+        }
+    }
+
+    private fun onDismissDeleteTemplateDialog() {
+        deleteDialog.value = false
     }
 
     private fun onDismissSaveAsDialog() {

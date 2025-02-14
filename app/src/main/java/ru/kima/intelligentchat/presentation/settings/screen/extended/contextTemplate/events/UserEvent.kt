@@ -13,4 +13,7 @@ sealed interface UserEvent {
     data object SaveAs : UserEvent
     data object AcceptSaveAsDialog : UserEvent
     data object DismissSaveAsDialog : UserEvent
+    data object DeleteTemplate : UserEvent
+    data object AcceptDeleteTemplateDialog : UserEvent
+    data object DismissDeleteTemplateDialog : UserEvent
 }

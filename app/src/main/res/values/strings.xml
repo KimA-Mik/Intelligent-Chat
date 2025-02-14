@@ -177,8 +177,9 @@
     <string name="manu_item_save_template_as">Save template as</string>
     <string name="menu_item_rename_template">Rename template</string>
     <string name="menu_item_delete_template">Delete template</string>
-    <string name="alert_dialog_title_delete_instruct_mode_template">Delete template?</string>
+    <string name="alert_dialog_title_delete_template">Delete template?</string>
     <string name="alert_dialog_text_delete_instruct_mode_template">\"%1$s\" will be deleted forever</string>
+    <string name="alert_dialog_text_delete_context_template">\"%1$s\" will be deleted forever</string>
 
     <string name="include_string_policy_setting_title">Include names</string>
     <string name="include_string_policy_never">Never</string>

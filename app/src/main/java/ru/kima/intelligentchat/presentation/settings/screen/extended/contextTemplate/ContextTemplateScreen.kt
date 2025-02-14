@@ -43,6 +43,7 @@ import ru.kima.intelligentchat.common.ComposeString
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.model.ContextTemplate
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.common.components.clearFocusOnSoftKeyboardHide
+import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.events.UserEvent
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.DisplayContextTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.model.toDisplay
@@ -98,8 +99,20 @@ fun ContextTemplateScreen(
             icon = Icons.Default.SaveAs,
             textFieldLabel = remember { ComposeString.Resource(R.string.rename_template_dialog_input_label) }
         )
-    }
 
+        state.deleteDialog -> SimpleAlertDialog(
+            onConfirm = { onEvent(UserEvent.AcceptDeleteTemplateDialog) },
+            onDismiss = { onEvent(UserEvent.DismissDeleteTemplateDialog) },
+            title = stringResource(R.string.alert_dialog_title_delete_template),
+            text = stringResource(
+                R.string.alert_dialog_text_delete_context_template,
+                state.currentTemplate.name
+            ),
+            icon = Icons.Default.DeleteForever,
+            confirmText = stringResource(R.string.action_delete),
+            dismissText = stringResource(R.string.action_cancel)
+        )
+    }
     val navController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val sb = remember { scrollBehavior }
@@ -269,7 +282,7 @@ private fun dropdownMenuItems(onEvent: OnEvent) = remember(onEvent) {
         ),
         SimpleDropDownMenuItem(
             string = ComposeString.Resource(R.string.menu_item_delete_template),
-            onClick = {},
+            onClick = { onEvent(UserEvent.DeleteTemplate) },
             iconVector = Icons.Default.DeleteForever
         )
     )

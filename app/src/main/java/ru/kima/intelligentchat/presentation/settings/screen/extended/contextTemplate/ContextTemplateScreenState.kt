@@ -14,4 +14,5 @@ data class ContextTemplateScreenState(
     val renameDialog: Boolean = false,
     val saveAsDialog: Boolean = false,
     val dialogBuffer: String = "",
+    val deleteDialog: Boolean = false
 )
