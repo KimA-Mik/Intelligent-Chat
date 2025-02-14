@@ -73,19 +73,15 @@ class ContextTemplateViewModel(
             is UserEvent.UpdateExampleSeparator -> onUpdateExampleSeparator(event.value)
             is UserEvent.UpdateChatStart -> onUpdateChatStart(event.value)
             is UserEvent.UpdateDialogBuffer -> onUpdateDialogBuffer(event.value)
+            UserEvent.SaveCurrentTemplate -> onSaveCurrentTemplate()
             UserEvent.RenameTemplate -> onRenameTemplate()
             UserEvent.AcceptRenameTemplateDialog -> onAcceptRenameTemplateDialog()
             UserEvent.DismissRenameTemplateDialog -> onDismissRenameTemplateDialog()
         }
     }
 
-    private fun onUpdateDialogBuffer(value: String) {
-        dialogBuffer.value = value
-    }
-
-    private fun onRenameTemplate() {
-        dialogBuffer.value = state.value.currentTemplate.name
-        renameDialog.value = true
+    private fun onDismissRenameTemplateDialog() {
+        renameDialog.value = false
     }
 
     private fun onAcceptRenameTemplateDialog() {
@@ -98,8 +94,17 @@ class ContextTemplateViewModel(
         }
     }
 
-    private fun onDismissRenameTemplateDialog() {
-        renameDialog.value = false
+    private fun onRenameTemplate() {
+        dialogBuffer.value = state.value.currentTemplate.name
+        renameDialog.value = true
+    }
+
+    private fun onSaveCurrentTemplate() = viewModelScope.launch {
+        updateContextTemplate(state.value.currentTemplate.toModel())
+    }
+
+    private fun onUpdateDialogBuffer(value: String) {
+        dialogBuffer.value = value
     }
 
     private fun onUpdateStoryString(value: String) {

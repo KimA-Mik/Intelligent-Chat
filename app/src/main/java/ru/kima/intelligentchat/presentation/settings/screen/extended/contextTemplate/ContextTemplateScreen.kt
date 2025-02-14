@@ -250,7 +250,7 @@ private fun dropdownMenuItems(onEvent: OnEvent) = remember(onEvent) {
         ),
         SimpleDropDownMenuItem(
             string = ComposeString.Resource(R.string.menu_item_update_current_template),
-            onClick = {},
+            onClick = { onEvent(UserEvent.SaveCurrentTemplate) },
             iconVector = Icons.Default.Save
         ),
         SimpleDropDownMenuItem(

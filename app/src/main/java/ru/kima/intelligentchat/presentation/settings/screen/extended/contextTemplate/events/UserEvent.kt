@@ -5,6 +5,7 @@ sealed interface UserEvent {
     data class UpdateExampleSeparator(val value: String) : UserEvent
     data class UpdateChatStart(val value: String) : UserEvent
     data class UpdateDialogBuffer(val value: String) : UserEvent
+    data object SaveCurrentTemplate : UserEvent
     data object RenameTemplate : UserEvent
     data object AcceptRenameTemplateDialog : UserEvent
     data object DismissRenameTemplateDialog : UserEvent
