@@ -8,7 +8,7 @@ import ru.kima.intelligentchat.domain.preferences.advancedFormatting.AdvancedFor
 
 @Serializable
 data class AdvancedFormattingSchema(
-    val selectedContextTemplate: Long = 0L,
+    val selectedContextTemplate: Long = 1L,
     val selectedInstructModeTemplate: Long = 0L
 )
 
