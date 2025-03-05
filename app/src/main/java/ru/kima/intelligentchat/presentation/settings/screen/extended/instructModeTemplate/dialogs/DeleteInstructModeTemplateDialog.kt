@@ -22,7 +22,7 @@ fun DeleteInstructModeTemplateDialog(
     SimpleAlertDialog(
         onConfirm = onConfirm,
         onDismiss = onDismiss,
-        title = stringResource(R.string.alert_dialog_title_delete_instruct_mode_template),
+        title = stringResource(R.string.alert_dialog_title_delete_template),
         text = stringResource(
             R.string.alert_dialog_text_delete_instruct_mode_template,
             templateName

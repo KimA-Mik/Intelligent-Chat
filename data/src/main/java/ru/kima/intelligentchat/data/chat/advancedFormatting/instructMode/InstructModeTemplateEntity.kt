@@ -1,4 +1,4 @@
-package ru.kima.intelligentchat.data.chat.instructMode
+package ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kima.intelligentchat.R
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.IncludeNamePolicy
 import ru.kima.intelligentchat.presentation.settings.util.composeSting
 import ru.kima.intelligentchat.util.preview.ICPreview
 

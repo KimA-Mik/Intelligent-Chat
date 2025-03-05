@@ -12,7 +12,8 @@ import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent.get
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.data.card.repository.CharacterCardRepositoryImpl
-import ru.kima.intelligentchat.data.chat.instructMode.InstructModeTemplateRepositoryImpl
+import ru.kima.intelligentchat.data.chat.advancedFormatting.contextTemplate.ContextTemplateRepositoryImpl
+import ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode.InstructModeTemplateRepositoryImpl
 import ru.kima.intelligentchat.data.chat.repository.ChatRepositoryImpl
 import ru.kima.intelligentchat.data.chat.repository.MessageRepositoryImpl
 import ru.kima.intelligentchat.data.chat.repository.SwipeRepositoryImpl
@@ -61,17 +62,24 @@ import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
 import ru.kima.intelligentchat.domain.images.useCase.GetFreeImageNameUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.ContextTemplateRepository
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.DeleteContextTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.GetSelectedContextTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.InsertContextTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.SelectContextTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.SubscribeToContextTemplatesUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.UpdateContextTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.InstructModeTemplateRepository
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.CreateInstructModeTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.DeleteInstructModeTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.GetSelectedInstructTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.SelectInstructTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.UpdateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.DefaultSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
-import ru.kima.intelligentchat.domain.messaging.instructMode.InstructModeTemplateRepository
-import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.CreateInstructModeTemplateUseCase
-import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.DeleteInstructModeTemplateUseCase
-import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.GetSelectedInstructTemplateUseCase
-import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SelectInstructTemplateUseCase
-import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
-import ru.kima.intelligentchat.domain.messaging.instructMode.useCase.UpdateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
@@ -126,6 +134,7 @@ fun domain() = module {
     singleOf(::SwipeRepositoryImpl) bind SwipeRepository::class
     singleOf(::MessagingRepositoryImpl) bind MessagingRepository::class
     singleOf(::InstructModeTemplateRepositoryImpl) bind InstructModeTemplateRepository::class
+    singleOf(::ContextTemplateRepositoryImpl) bind ContextTemplateRepository::class
 
     singleOf(::AppPreferencesRepositoryImpl) bind AppPreferencesRepository::class
     singleOf(::ChatSettingsRepositoryImpl) {
@@ -213,6 +222,13 @@ fun domain() = module {
     singleOf(::LoadMessagingDataUseCase)
     singleOf(::SendMessageUseCase)
     singleOf(::SubscribeToMessagingStatus)
+
+    singleOf(::DeleteContextTemplateUseCase)
+    singleOf(::GetSelectedContextTemplateUseCase)
+    singleOf(::InsertContextTemplateUseCase)
+    singleOf(::SelectContextTemplateUseCase)
+    singleOf(::SubscribeToContextTemplatesUseCase)
+    singleOf(::UpdateContextTemplateUseCase)
 
     singleOf(::CreateInstructModeTemplateUseCase)
     singleOf(::DeleteInstructModeTemplateUseCase)

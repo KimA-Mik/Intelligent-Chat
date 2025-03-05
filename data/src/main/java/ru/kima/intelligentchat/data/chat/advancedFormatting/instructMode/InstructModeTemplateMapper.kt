@@ -1,7 +1,7 @@
-package ru.kima.intelligentchat.data.chat.instructMode
+package ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode
 
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.IncludeNamePolicy
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeTemplate
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.IncludeNamePolicy
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.InstructModeTemplate
 
 fun InstructModeTemplate.toEntity() = InstructModeTemplateEntity(
     id = id,

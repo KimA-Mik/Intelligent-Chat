@@ -1,8 +1,8 @@
-package ru.kima.intelligentchat.domain.messaging.instructMode.useCase
+package ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase
 
 import kotlinx.coroutines.flow.first
-import ru.kima.intelligentchat.domain.messaging.instructMode.InstructModeTemplateRepository
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeTemplate
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.InstructModeTemplateRepository
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.InstructModeTemplate
 import ru.kima.intelligentchat.domain.preferences.advancedFormatting.AdvancedFormattingRepository
 
 class GetSelectedInstructTemplateUseCase(

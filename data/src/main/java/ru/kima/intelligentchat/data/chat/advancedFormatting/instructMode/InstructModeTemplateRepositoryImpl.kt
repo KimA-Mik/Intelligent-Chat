@@ -1,10 +1,10 @@
-package ru.kima.intelligentchat.data.chat.instructMode
+package ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.kima.intelligentchat.data.common.DatabaseWrapper
-import ru.kima.intelligentchat.domain.messaging.instructMode.InstructModeTemplateRepository
-import ru.kima.intelligentchat.domain.messaging.instructMode.model.InstructModeTemplate
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.InstructModeTemplateRepository
+import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.InstructModeTemplate
 
 class InstructModeTemplateRepositoryImpl(
     wrapper: DatabaseWrapper

@@ -19,6 +19,7 @@ import ru.kima.intelligentchat.presentation.personas.details.PersonaDetailsViewM
 import ru.kima.intelligentchat.presentation.personas.list.PersonasListViewModel
 import ru.kima.intelligentchat.presentation.service.horde.HordeConfigService
 import ru.kima.intelligentchat.presentation.settings.root.SettingsRootViewModel
+import ru.kima.intelligentchat.presentation.settings.screen.extended.contextTemplate.ContextTemplateViewModel
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.InstructModeTemplateViewModel
 import ru.kima.intelligentchat.presentation.showImage.ShowImageViewModel
 
@@ -48,4 +49,5 @@ fun presentation() = module {
 
     viewModelOf(::SettingsRootViewModel)
     viewModelOf(::InstructModeTemplateViewModel)
+    viewModelOf(::ContextTemplateViewModel)
 }

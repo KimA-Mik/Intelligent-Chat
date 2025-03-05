@@ -10,15 +10,18 @@ import ru.kima.intelligentchat.data.card.entities.AltGreetingEntity
 import ru.kima.intelligentchat.data.card.entities.CardTagEntity
 import ru.kima.intelligentchat.data.card.entities.CharacterEntity
 import ru.kima.intelligentchat.data.card.entities.TagEntity
+import ru.kima.intelligentchat.data.chat.advancedFormatting.contextTemplate.ContextTemplateDao
+import ru.kima.intelligentchat.data.chat.advancedFormatting.contextTemplate.ContextTemplateEntity
+import ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode.InstructModeTemplateDao
+import ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode.InstructModeTemplateEntity
 import ru.kima.intelligentchat.data.chat.dao.ChatDao
 import ru.kima.intelligentchat.data.chat.entities.ChatEntity
 import ru.kima.intelligentchat.data.chat.entities.MessageEntity
 import ru.kima.intelligentchat.data.chat.entities.SwipeEntity
-import ru.kima.intelligentchat.data.chat.instructMode.InstructModeTemplateDao
-import ru.kima.intelligentchat.data.chat.instructMode.InstructModeTemplateEntity
 import ru.kima.intelligentchat.data.kobold.preset.dao.KoboldPresetDao
 import ru.kima.intelligentchat.data.kobold.preset.entities.KoboldPresetEntity
 import ru.kima.intelligentchat.data.migrations.Migration3_4
+import ru.kima.intelligentchat.data.migrations.Migration4_5
 import ru.kima.intelligentchat.data.persona.PersonaDao
 import ru.kima.intelligentchat.data.persona.PersonaEntity
 
@@ -33,13 +36,15 @@ import ru.kima.intelligentchat.data.persona.PersonaEntity
         ChatEntity::class,
         MessageEntity::class,
         SwipeEntity::class,
-        InstructModeTemplateEntity::class
+        InstructModeTemplateEntity::class,
+        ContextTemplateEntity::class
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4, spec = Migration3_4::class)
+        AutoMigration(from = 3, to = 4, spec = Migration3_4::class),
+        AutoMigration(from = 4, to = 5, spec = Migration4_5::class)
     ]
 )
 abstract class Database : RoomDatabase() {
@@ -50,4 +55,5 @@ abstract class Database : RoomDatabase() {
     abstract fun koboldPresetDao(): KoboldPresetDao
     abstract fun chatDao(): ChatDao
     abstract fun instructModeTemplateDao(): InstructModeTemplateDao
+    abstract fun contextTemplateDao(): ContextTemplateDao
 }
