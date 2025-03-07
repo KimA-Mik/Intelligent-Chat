@@ -81,7 +81,7 @@ dependencies {
     implementation(libs.multiplatform.markdown.renderer.m3)
     implementation(libs.multiplatform.markdown.renderer.code)
 
-
+    implementation(libs.handlebars.java)
 
     testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)

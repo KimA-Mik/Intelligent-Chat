@@ -18,6 +18,7 @@ multiplatformMarkdownRenderer = "0.27.0"
 navigation = "2.8.8"
 retrofit = "2.11.0"
 room = "2.6.1"
+handlebars = "4.3.0" #Version 4.4.0 and onvards require java 17
 
 
 [libraries]
@@ -53,6 +54,7 @@ multiplatform-markdown-renderer-code = { module = "com.mikepenz:multiplatform-ma
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+handlebars-java = { group = "com.github.jknack", name = "handlebars", version.ref = "handlebars" }
 
 
 [plugins]
