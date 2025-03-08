@@ -15,8 +15,9 @@ interface TemplateResolver {
     data class FullInputData(
         val system: String?,
         val user: String,
-        val persona: String?,
+        val persona: String,
         val char: String,
+        val personality: String?,
         val description: String?,
         val scenario: String?,
     ) {
@@ -25,8 +26,9 @@ interface TemplateResolver {
                 return FullInputData(
                     system = card.systemPrompt.ifBlank { null },
                     user = persona.name,
-                    persona = persona.description.ifBlank { null },
+                    persona = persona.description,
                     char = card.name,
+                    personality = card.personality.ifBlank { null },
                     description = card.description.ifBlank { null },
                     scenario = card.scenario.ifBlank { null },
                 )
