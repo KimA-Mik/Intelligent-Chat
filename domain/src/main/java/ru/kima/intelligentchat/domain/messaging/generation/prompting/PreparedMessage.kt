@@ -29,11 +29,13 @@ data class PreparedMessage(
     ) {
         when (senderType) {
             SenderType.Character -> {
+                if (instructMode.firstAssistantPrefix.isBlank()) return
                 prefix = instructMode.firstAssistantPrefix
                 additionalTokenPrice = budget.firstAssistantPrefix + budget.assistantMessagePostfix
             }
 
             SenderType.Persona -> {
+                if (instructMode.firstUserPrefix.isBlank()) return
                 prefix = instructMode.firstUserPrefix
                 additionalTokenPrice = budget.firstUserPrefix + budget.userMessagePostfix
             }
@@ -41,16 +43,23 @@ data class PreparedMessage(
     }
 
     fun makeLast(
+        generateFor: SenderType,
         instructMode: ResolvedInstructMode,
         budget: ResolvedInstructModeBudget
     ) {
+        if (senderType == generateFor) {
+            return
+        }
+
         when (senderType) {
             SenderType.Character -> {
+                if (instructMode.firstAssistantPrefix.isBlank()) return
                 prefix = instructMode.lastAssistantPrefix
                 additionalTokenPrice = budget.lastAssistantPrefix + budget.assistantMessagePostfix
             }
 
             SenderType.Persona -> {
+                if (instructMode.firstUserPrefix.isBlank()) return
                 prefix = instructMode.lastUserPrefix
                 additionalTokenPrice = budget.lastUserPrefix + budget.userMessagePostfix
             }
@@ -59,11 +68,12 @@ data class PreparedMessage(
 }
 
 fun List<PreparedMessage>.startDifferentiatingMessages(
+    generateFor: SenderType,
     instructMode: ResolvedInstructMode,
     budget: ResolvedInstructModeBudget
 ) {
     if (isEmpty()) return
-    first().makeLast(instructMode, budget)
+    first().makeLast(generateFor, instructMode, budget)
     differentiateMessages(instructMode, budget)
 }
 

@@ -10,6 +10,14 @@ class HandlebarsTemplateResolverImpl : TemplateResolver {
         template: String,
         inputData: TemplateResolver.BasicInputData
     ): String {
+//        val context = Context
+//            .newBuilder(inputData)
+//            .resolver(
+//                FieldValueResolver.INSTANCE,
+//                JavaBeanValueResolver.INSTANCE
+//            )
+//            .build()
+//        return handlebars.compileInline(template).apply(context)
         return resolve<BasicTemplate, TemplateResolver.BasicInputData>(template, inputData)
     }
 
@@ -17,6 +25,14 @@ class HandlebarsTemplateResolverImpl : TemplateResolver {
         template: String,
         inputData: TemplateResolver.FullInputData
     ): String {
+//        val context = Context
+//            .newBuilder(inputData)
+//            .resolver(
+//                FieldValueResolver.INSTANCE,
+//                JavaBeanValueResolver.INSTANCE
+//            )
+//            .build()
+//        return handlebars.compileInline(template).apply(context)
         return resolve<FullTemplate, TemplateResolver.FullInputData>(template, inputData)
     }
 
@@ -24,7 +40,12 @@ class HandlebarsTemplateResolverImpl : TemplateResolver {
         template: String,
         data: D
     ): String {
-        return handlebars.compileInline(template).`as`(T::class.java).apply(data)
+//        val context = Context.newBuilder(data).resolver(
+//            FieldValueResolver.INSTANCE,
+//            JavaBeanValueResolver.INSTANCE
+//        ).build()
+        return handlebars.compileInline(template)//.apply(context)
+            .`as`(T::class.java).apply(data)
     }
 
     interface BasicTemplate : TypeSafeTemplate<TemplateResolver.BasicInputData>

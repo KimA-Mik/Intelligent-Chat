@@ -18,7 +18,7 @@ multiplatformMarkdownRenderer = "0.27.0"
 navigation = "2.8.8"
 retrofit = "2.11.0"
 room = "2.6.1"
-handlebars = "4.3.0" #Version 4.4.0 and onvards require java 17
+handlebars = "4.2.1" #Next versions have problems on Android
 
 
 [libraries]
