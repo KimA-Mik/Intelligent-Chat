@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -70,6 +71,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(project(mapOf("path" to ":domain")))
     implementation(project(mapOf("path" to ":data")))
+    implementation(libs.konvert.api)
+    ksp(libs.konvert)
 
     implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.serialization.protobuf)
