@@ -33,7 +33,7 @@ fun InstructModeTemplate.toDisplay() =
         firstAssistantPrefix = firstAssistantPrefix,
         lastAssistantPrefix = lastAssistantPrefix,
         firstUserPrefix = firstUserPrefix,
-        lastUserPrefix = lastAssistantPrefix
+        lastUserPrefix = lastUserPrefix
     )
 
 fun DisplayInstructModeTemplate.toModel() =
@@ -50,5 +50,5 @@ fun DisplayInstructModeTemplate.toModel() =
         firstAssistantPrefix = firstAssistantPrefix,
         lastAssistantPrefix = lastAssistantPrefix,
         firstUserPrefix = firstUserPrefix,
-        lastUserPrefix = lastAssistantPrefix
+        lastUserPrefix = lastUserPrefix
     )
