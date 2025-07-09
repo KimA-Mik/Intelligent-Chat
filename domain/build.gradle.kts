@@ -36,6 +36,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlin.compilerOptions {
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
         jvmTarget = JvmTarget.JVM_11
     }
 }
