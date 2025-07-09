@@ -352,19 +352,19 @@ fun AnimatedText(
                     MarkdownCodeBlock(
                         markdownComponentModel.content,
                         markdownComponentModel.node
-                    ) { code, language, style ->
-                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder(), style)
+                    ) { code, language ->
+                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
                     }
                 },
                 codeFence = { markdownComponentModel ->
                     MarkdownCodeFence(
                         markdownComponentModel.content,
                         markdownComponentModel.node
-                    ) { code, language, style ->
-                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder(), style)
+                    ) { code, language ->
+                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
                     }
                 },
-            )
+            ),
         )
     }
 }
