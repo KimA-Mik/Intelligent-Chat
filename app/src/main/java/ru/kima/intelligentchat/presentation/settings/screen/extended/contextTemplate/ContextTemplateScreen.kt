@@ -136,6 +136,7 @@ fun ContextTemplateScreen(
     ) { paddingValues ->
         ContextTemplateScreenBody(
             templates = state.templates,
+            storyStringCompileState = state.storyStringCompileState,
             currentTemplate = state.currentTemplate,
             onEvent = onEvent,
             modifier = Modifier
@@ -149,6 +150,7 @@ fun ContextTemplateScreen(
 fun ContextTemplateScreenBody(
     templates: ImmutableList<DisplayContextTemplate>,
     currentTemplate: DisplayContextTemplate,
+    storyStringCompileState: ContextTemplateScreenState.StoryStringCompileState,
     onEvent: OnEvent,
     modifier: Modifier = Modifier
 ) {
@@ -183,6 +185,7 @@ fun ContextTemplateScreenBody(
         ) {
             CardBody(
                 storyString = currentTemplate.storyString,
+                storyStringCompileState = storyStringCompileState,
                 chatStart = currentTemplate.chatStart,
                 exampleSeparator = currentTemplate.exampleSeparator,
                 onEvent = onEvent,
@@ -199,6 +202,7 @@ private const val MAX_TITLE_LINES = 3
 @Composable
 fun CardBody(
     storyString: String,
+    storyStringCompileState: ContextTemplateScreenState.StoryStringCompileState,
     chatStart: String,
     exampleSeparator: String,
     onEvent: OnEvent,
@@ -216,7 +220,8 @@ fun CardBody(
     OutlinedTextField(
         value = storyString,
         onValueChange = { onEvent(UserEvent.UpdateStoryString(it)) },
-        modifier = inner.clearFocusOnSoftKeyboardHide()
+        modifier = inner.clearFocusOnSoftKeyboardHide(),
+        isError = storyStringCompileState == ContextTemplateScreenState.StoryStringCompileState.ERROR
     )
 
     Title(

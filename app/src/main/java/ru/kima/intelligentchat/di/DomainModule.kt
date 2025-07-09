@@ -99,6 +99,7 @@ import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
 import ru.kima.intelligentchat.domain.preferences.advancedFormatting.AdvancedFormattingRepository
+import ru.kima.intelligentchat.domain.preferences.advancedFormatting.useCase.ValidateTemplateUseCase
 import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
@@ -233,6 +234,7 @@ fun domain() = module {
     singleOf(::SelectContextTemplateUseCase)
     singleOf(::SubscribeToContextTemplatesUseCase)
     singleOf(::UpdateContextTemplateUseCase)
+    singleOf(::ValidateTemplateUseCase)
 
     singleOf(::CreateInstructModeTemplateUseCase)
     singleOf(::DeleteInstructModeTemplateUseCase)
