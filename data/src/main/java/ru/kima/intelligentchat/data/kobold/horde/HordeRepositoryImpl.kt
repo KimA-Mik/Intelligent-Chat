@@ -2,7 +2,7 @@ package ru.kima.intelligentchat.data.kobold.horde
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -37,7 +37,7 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
     private val requestValidationErrorConverter: Converter<ResponseBody, RequestValidationError>
 
     init {
-        val contentType = MediaType.get("application/json")
+        val contentType = "application/json".toMediaType()
         val retrofit = Retrofit.Builder()
             .baseUrl("https://stablehorde.net/api/v2/")
             .addConverterFactory(json.toConverterFactory(contentType))
