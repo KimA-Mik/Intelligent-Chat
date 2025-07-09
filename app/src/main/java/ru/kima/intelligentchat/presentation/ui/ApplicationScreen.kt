@@ -12,7 +12,6 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.compose.koinInject
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.presentation.android.notifications.NotificationHandler
@@ -27,36 +26,34 @@ fun ApplicationScreen(
     windowSizeClass: WindowSizeClass,
     applicationEvent: Event<ApplicationEvent>
 ) {
-    KoinAndroidContext {
-        val navController = rememberNavController()
-        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-        val snackbarHostState = remember { SnackbarHostState() }
+    val navController = rememberNavController()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val snackbarHostState = remember { SnackbarHostState() }
 
-        val expanded = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+    val expanded = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
 
-        val navigationHandler = koinInject<NotificationHandler>()
-        LaunchedEffect(applicationEvent) {
-            applicationEvent.consume { event ->
-                when (event) {
-                    is ApplicationEvent.NotificationNavigation -> {
-                        if (event.notificationId != 0) {
-                            navigationHandler.cancelNotification(event.notificationId)
-                        }
-                        navController.navigate(event.deeplink)
+    val navigationHandler = koinInject<NotificationHandler>()
+    LaunchedEffect(applicationEvent) {
+        applicationEvent.consume { event ->
+            when (event) {
+                is ApplicationEvent.NotificationNavigation -> {
+                    if (event.notificationId != 0) {
+                        navigationHandler.cancelNotification(event.notificationId)
                     }
+                    navController.navigate(event.deeplink)
                 }
             }
         }
+    }
 
-        CompositionLocalProvider(
-            LocalNavController provides navController
-        ) {
-            ChatNavHost(
-                navController = navController,
-                snackbarHostState = snackbarHostState,
-                drawerState = drawerState,
-                expanded = expanded
-            )
-        }
+    CompositionLocalProvider(
+        LocalNavController provides navController
+    ) {
+        ChatNavHost(
+            navController = navController,
+            snackbarHostState = snackbarHostState,
+            drawerState = drawerState,
+            expanded = expanded
+        )
     }
 }
