@@ -16,9 +16,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
     }
 
     buildTypes {
@@ -38,6 +35,10 @@ android {
         freeCompilerArgs.add("-Xannotation-default-target=param-property")
         jvmTarget = JvmTarget.JVM_11
     }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
