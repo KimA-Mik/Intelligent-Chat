@@ -46,7 +46,9 @@ class ContextTemplateViewModel(
     private val dialogBuffer = MutableStateFlow("")
     private val deleteDialog = MutableStateFlow(false)
     private val storyStringCompileState =
-        MutableStateFlow(ContextTemplateScreenState.StoryStringCompileState.OK)
+        MutableStateFlow<ContextTemplateScreenState.StoryStringCompileState>(
+            ContextTemplateScreenState.StoryStringCompileState.Ok
+        )
 
     private val storyString = savedStateHandle.getStateFlow(CURRENT_TEMPLATE_STORY_STRING, "")
 
@@ -58,9 +60,11 @@ class ContextTemplateViewModel(
             }
 
             storyString.debounce(500L).onEach {
-                storyStringCompileState.value = when (validateTemplate(it)) {
-                    is ValidateTemplateUseCase.Result.Error -> ContextTemplateScreenState.StoryStringCompileState.ERROR
-                    ValidateTemplateUseCase.Result.Success -> ContextTemplateScreenState.StoryStringCompileState.OK
+                storyStringCompileState.value = when (val res = validateTemplate(it)) {
+                    is ValidateTemplateUseCase.Result.Error ->
+                        ContextTemplateScreenState.StoryStringCompileState.Error(res.message)
+
+                    ValidateTemplateUseCase.Result.Success -> ContextTemplateScreenState.StoryStringCompileState.Ok
                 }
             }.flowOn(Dispatchers.Default).launchIn(viewModelScope)
         }

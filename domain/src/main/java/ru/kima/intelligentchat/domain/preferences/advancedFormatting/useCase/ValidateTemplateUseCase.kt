@@ -9,8 +9,8 @@ class ValidateTemplateUseCase(
         return try {
             templateResolver.constructFullTemplate(template, mockInputData)
             Result.Success
-        } catch (_: Exception) {
-            Result.Error
+        } catch (e: Exception) {
+            Result.Error(e.localizedMessage ?: e.message ?: e.toString())
         }
     }
 
@@ -26,6 +26,6 @@ class ValidateTemplateUseCase(
 
     sealed interface Result {
         data object Success : Result
-        data object Error : Result
+        data class Error(val message: String) : Result
     }
 }

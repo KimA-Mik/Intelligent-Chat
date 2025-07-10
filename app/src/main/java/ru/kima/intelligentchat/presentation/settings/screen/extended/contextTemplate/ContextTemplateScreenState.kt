@@ -15,9 +15,13 @@ data class ContextTemplateScreenState(
     val saveAsDialog: Boolean = false,
     val dialogBuffer: String = "",
     val deleteDialog: Boolean = false,
-    val storyStringCompileState: StoryStringCompileState = StoryStringCompileState.OK
+    val storyStringCompileState: StoryStringCompileState = StoryStringCompileState.Ok
 ) {
-    enum class StoryStringCompileState {
-        OK, ERROR
+
+    sealed interface StoryStringCompileState {
+        data object Ok : StoryStringCompileState
+
+        @Immutable
+        data class Error(val message: String) : StoryStringCompileState
     }
 }
