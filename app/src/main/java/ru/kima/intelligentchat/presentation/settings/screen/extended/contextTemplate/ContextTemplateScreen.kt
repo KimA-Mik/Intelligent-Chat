@@ -23,11 +23,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -37,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
@@ -116,6 +121,24 @@ fun ContextTemplateScreen(
     val navController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val sb = remember { scrollBehavior }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(state.storyStringCompileState) {
+        when (state.storyStringCompileState) {
+            is ContextTemplateScreenState.StoryStringCompileState.Error -> {
+                coroutineScope.launch {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar(
+                        state.storyStringCompileState.message,
+                        withDismissAction = true
+                    )
+                }
+            }
+
+            else -> snackbarHostState.currentSnackbarData?.dismiss()
+        }
+    }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -132,10 +155,12 @@ fun ContextTemplateScreen(
                 },
                 scrollBehavior = sb
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         ContextTemplateScreenBody(
             templates = state.templates,
+            storyStringCompileState = state.storyStringCompileState,
             currentTemplate = state.currentTemplate,
             onEvent = onEvent,
             modifier = Modifier
@@ -149,6 +174,7 @@ fun ContextTemplateScreen(
 fun ContextTemplateScreenBody(
     templates: ImmutableList<DisplayContextTemplate>,
     currentTemplate: DisplayContextTemplate,
+    storyStringCompileState: ContextTemplateScreenState.StoryStringCompileState,
     onEvent: OnEvent,
     modifier: Modifier = Modifier
 ) {
@@ -183,6 +209,7 @@ fun ContextTemplateScreenBody(
         ) {
             CardBody(
                 storyString = currentTemplate.storyString,
+                storyStringCompileState = storyStringCompileState,
                 chatStart = currentTemplate.chatStart,
                 exampleSeparator = currentTemplate.exampleSeparator,
                 onEvent = onEvent,
@@ -199,6 +226,7 @@ private const val MAX_TITLE_LINES = 3
 @Composable
 fun CardBody(
     storyString: String,
+    storyStringCompileState: ContextTemplateScreenState.StoryStringCompileState,
     chatStart: String,
     exampleSeparator: String,
     onEvent: OnEvent,
@@ -216,7 +244,8 @@ fun CardBody(
     OutlinedTextField(
         value = storyString,
         onValueChange = { onEvent(UserEvent.UpdateStoryString(it)) },
-        modifier = inner.clearFocusOnSoftKeyboardHide()
+        modifier = inner.clearFocusOnSoftKeyboardHide(),
+        isError = storyStringCompileState is ContextTemplateScreenState.StoryStringCompileState.Error
     )
 
     Title(

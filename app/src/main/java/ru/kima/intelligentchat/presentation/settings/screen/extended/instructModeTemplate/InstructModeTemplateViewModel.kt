@@ -22,7 +22,8 @@ import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.UpdateInstructModeTemplateUseCase
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.events.UserEvent
-import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.toDisplay
+import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplate
+import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.fromModel
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.toListItem
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.toModel
 
@@ -35,7 +36,9 @@ class InstructModeTemplateViewModel(
     private val updateInstructModeTemplate: UpdateInstructModeTemplateUseCase
 ) : ViewModel() {
     private val currentTemplate =
-        MutableStateFlow(InstructModeTemplate.default().toDisplay())
+        MutableStateFlow(
+            DisplayInstructModeTemplate.fromModel(InstructModeTemplate.default())
+        )
     private val includeNamePolicyDialog = MutableStateFlow(false)
     private val renameTemplateDialog = MutableStateFlow(false)
     private val renameTemplateDialogValue = MutableStateFlow("")
@@ -296,7 +299,8 @@ class InstructModeTemplateViewModel(
     private fun getCurrentTemplate() {
         updateJob?.cancel()
         updateJob = viewModelScope.launch {
-            currentTemplate.value = getSelectedInstructTemplate().toDisplay()
+            currentTemplate.value =
+                DisplayInstructModeTemplate.fromModel(getSelectedInstructTemplate())
             currentTemplate.debounce(SAVE_TIMEOUT).collect {
                 updateInstructModeTemplate(it.toModel())
             }

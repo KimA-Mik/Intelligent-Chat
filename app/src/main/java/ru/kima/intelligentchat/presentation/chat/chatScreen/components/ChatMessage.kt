@@ -364,7 +364,7 @@ fun AnimatedText(
                         CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
                     }
                 },
-            )
+            ),
         )
     }
 }

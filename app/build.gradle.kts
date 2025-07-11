@@ -1,18 +1,21 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "ru.kima.intelligentchat"
-    compileSdk = 35
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "ru.kima.intelligentchat"
-        minSdk = 24
-        targetSdk = 35
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 13
         versionName = "0.88.2"
 
@@ -36,8 +39,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin.compilerOptions {
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
+        jvmTarget = JvmTarget.JVM_11
     }
     buildFeatures {
         compose = true
@@ -70,6 +74,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(project(mapOf("path" to ":domain")))
     implementation(project(mapOf("path" to ":data")))
+    implementation(libs.konvert.api)
+    ksp(libs.konvert)
 
     implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.serialization.protobuf)
@@ -81,7 +87,7 @@ dependencies {
     implementation(libs.multiplatform.markdown.renderer.m3)
     implementation(libs.multiplatform.markdown.renderer.code)
 
-
+    implementation(libs.handlebars.java)
 
     testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)

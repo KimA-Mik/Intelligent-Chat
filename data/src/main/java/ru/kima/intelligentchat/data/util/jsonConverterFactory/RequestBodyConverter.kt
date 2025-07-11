@@ -4,6 +4,7 @@ import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Converter
 
 class RequestBodyConverter<T>(
@@ -13,6 +14,6 @@ class RequestBodyConverter<T>(
 ) : Converter<T & Any, RequestBody?> {
     override fun convert(p0: T & Any): RequestBody? {
         val string = json.encodeToString(strategy, p0)
-        return RequestBody.create(contentType, string)
+        return string.toRequestBody(contentType)
     }
 }

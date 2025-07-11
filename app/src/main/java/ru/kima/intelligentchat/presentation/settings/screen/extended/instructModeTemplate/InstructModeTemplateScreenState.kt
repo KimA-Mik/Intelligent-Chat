@@ -5,10 +5,11 @@ import kotlinx.collections.immutable.persistentListOf
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.InstructModeTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplate
 import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.DisplayInstructModeTemplateListItem
-import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.toDisplay
+import ru.kima.intelligentchat.presentation.settings.screen.extended.instructModeTemplate.model.fromModel
 
 data class InstructModeTemplateScreenState(
-    val currentTemplate: DisplayInstructModeTemplate = InstructModeTemplate.default().toDisplay(),
+    val currentTemplate: DisplayInstructModeTemplate =
+        DisplayInstructModeTemplate.fromModel(InstructModeTemplate.default()),
     val templates: ImmutableList<DisplayInstructModeTemplateListItem> = persistentListOf(),
     val dialogs: Dialogs = Dialogs(),
     val sections: Sections = Sections()

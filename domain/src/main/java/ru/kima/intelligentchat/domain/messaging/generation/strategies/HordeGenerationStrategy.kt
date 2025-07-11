@@ -13,12 +13,14 @@ import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationRequest
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.prompting.TemplateResolver
 import ru.kima.intelligentchat.domain.messaging.generation.prompting.constructPrompt
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 import kotlin.random.Random
 
 class HordeGenerationStrategy(
+    private val templateResolver: TemplateResolver,
     private val hordeRepository: HordeRepository,
     private val getHordePreferences: GetHordePreferencesUseCase,
     private val getKoboldPreset: GetKoboldPresetUseCase
@@ -57,7 +59,7 @@ class HordeGenerationStrategy(
         val generationInput = GenerationInput(
             models = hordeState.selectedModels,
             params = params,
-            prompt = request.constructPrompt(),
+            prompt = request.constructPrompt(templateResolver),
             trustedWorkers = hordeState.trustedWorkers
         )
 

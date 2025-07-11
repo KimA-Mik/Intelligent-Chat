@@ -14,5 +14,14 @@ data class ContextTemplateScreenState(
     val renameDialog: Boolean = false,
     val saveAsDialog: Boolean = false,
     val dialogBuffer: String = "",
-    val deleteDialog: Boolean = false
-)
+    val deleteDialog: Boolean = false,
+    val storyStringCompileState: StoryStringCompileState = StoryStringCompileState.Ok
+) {
+
+    sealed interface StoryStringCompileState {
+        data object Ok : StoryStringCompileState
+
+        @Immutable
+        data class Error(val message: String) : StoryStringCompileState
+    }
+}

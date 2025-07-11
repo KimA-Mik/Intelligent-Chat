@@ -20,6 +20,7 @@ import ru.kima.intelligentchat.data.chat.repository.SwipeRepositoryImpl
 import ru.kima.intelligentchat.data.kobold.horde.HordeRepositoryImpl
 import ru.kima.intelligentchat.data.kobold.preset.repository.KoboldPresetRepositoryImpl
 import ru.kima.intelligentchat.data.persona.PersonaRepositoryImpl
+import ru.kima.intelligentchat.di.domain.messaging.HandlebarsTemplateResolverImpl
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
 import ru.kima.intelligentchat.domain.card.useCase.AddCardFromPngUseCase
 import ru.kima.intelligentchat.domain.card.useCase.CreateAlternateGreetingUseCase
@@ -76,6 +77,7 @@ import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.SelectInstructTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.SubscribeToInstructModeTemplatesUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.useCase.UpdateInstructModeTemplateUseCase
+import ru.kima.intelligentchat.domain.messaging.generation.prompting.TemplateResolver
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.DefaultSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
@@ -97,6 +99,7 @@ import ru.kima.intelligentchat.domain.persona.useCase.SubscribeToPersonaUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaImageUseCase
 import ru.kima.intelligentchat.domain.persona.useCase.UpdatePersonaUseCase
 import ru.kima.intelligentchat.domain.preferences.advancedFormatting.AdvancedFormattingRepository
+import ru.kima.intelligentchat.domain.preferences.advancedFormatting.useCase.ValidateTemplateUseCase
 import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 import ru.kima.intelligentchat.domain.preferences.app.useCase.GetPreferencesUseCase
 import ru.kima.intelligentchat.domain.preferences.app.useCase.SetSelectedPersonaIdUseCase
@@ -143,6 +146,8 @@ fun domain() = module {
     } bind ChatSettingsRepository::class
     singleOf(::HordeStateRepositoryImpl) bind HordeStateRepository::class
     singleOf(::AdvancedFormattingRepositoryImpl) bind AdvancedFormattingRepository::class
+
+    singleOf(::HandlebarsTemplateResolverImpl) bind TemplateResolver::class
 
     factoryOf(::CleanUpUseCase)
 
@@ -229,6 +234,7 @@ fun domain() = module {
     singleOf(::SelectContextTemplateUseCase)
     singleOf(::SubscribeToContextTemplatesUseCase)
     singleOf(::UpdateContextTemplateUseCase)
+    singleOf(::ValidateTemplateUseCase)
 
     singleOf(::CreateInstructModeTemplateUseCase)
     singleOf(::DeleteInstructModeTemplateUseCase)
