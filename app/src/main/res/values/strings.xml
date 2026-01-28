@@ -138,6 +138,9 @@
     <string name="menu_item_rename_chat">Rename</string>
     <string name="menu_item_delete_chat">Delete</string>
 
+    <string name="fab_button_import_from_png">Import from png</string>
+    <string name="fab_button_create_card">Create</string>
+
     <string name="rename_chat_dialog_title">Choose new name</string>
     <string name="delete_chat_alert_dialog_title">Delete chat</string>
     <string name="delete_chat_alert_dialog_text">The chat will be deleted forever</string>
@@ -147,6 +150,8 @@
 
     <string name="open_uri_request_dialog_title">Open link</string>
     <string name="open_uri_request_dialog_text">Do you want to open %1$s?</string>
+
+    <string name="tooltip_add_character">Add character</string>
 
     <!--  Settings Root Screen  -->
     <string name="settings_nav_item_appearance_title">Appearance</string>

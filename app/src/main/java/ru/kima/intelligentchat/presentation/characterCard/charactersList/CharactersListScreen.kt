@@ -402,7 +402,7 @@ private fun FabMenu(
                             TooltipAnchorPosition.Above
                         }
                     ),
-                tooltip = { PlainTooltip { Text("Toggle menu") } },
+                tooltip = { PlainTooltip { Text(stringResource(R.string.tooltip_add_character)) } },
                 state = rememberTooltipState(),
             ) {
                 ToggleFloatingActionButton(
@@ -431,16 +431,18 @@ private fun FabMenu(
         },
         modifier = modifier
     ) {
+        var string = stringResource(R.string.fab_button_import_from_png)
         FloatingActionButtonMenuItem(
             onClick = onImageButtonClick,
-            text = { Text("Import from png") },
-            icon = { Icon(Icons.Filled.Image, contentDescription = "From image") }
+            text = { Text(string) },
+            icon = { Icon(Icons.Filled.Image, contentDescription = string) }
         )
 
+        string = stringResource(R.string.fab_button_create_card)
         FloatingActionButtonMenuItem(
             onClick = onCreateButtonClick,
-            text = { Text("Create") },
-            icon = { Icon(Icons.Filled.Create, contentDescription = "Create Card") }
+            text = { Text(string) },
+            icon = { Icon(Icons.Filled.Create, contentDescription = string) }
         )
     }
 }
