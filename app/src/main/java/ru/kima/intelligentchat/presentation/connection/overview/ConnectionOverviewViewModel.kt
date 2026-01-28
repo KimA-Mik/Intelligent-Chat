@@ -4,6 +4,7 @@ import androidx.compose.ui.util.fastFirstOrNull
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -76,6 +77,8 @@ class ConnectionOverviewViewModel(
                 ?: HordePreset(0, "0_o")
         }
 
+    private val areModelsLoading = MutableStateFlow(false)
+
     init {
         hordeState.onEach {
             selectedHordePresetId.value = it.selectedPreset
@@ -96,7 +99,8 @@ class ConnectionOverviewViewModel(
         showSelectHordeModelsDialog,
         hordeDialogActiveModels,
         hordePresets,
-        selectedHordePreset
+        selectedHordePreset,
+        areModelsLoading
     ) { args ->
         val preferences = args[0] as AppPreferences
         val hordeState = args[1] as HordeState
@@ -106,6 +110,7 @@ class ConnectionOverviewViewModel(
         val hordeDialogActiveModels = args[5] as List<HordeDialogActiveModel>
         val hordePresets = args[6] as List<HordePreset>
         val selectedHordePreset = args[7] as HordePreset
+        val areModelsLoading = args[8] as Boolean
         ConnectionOverviewState(
             selectedApiType = preferences.selectedApiType,
             hordeFragmentState = ConnectionOverviewState.HordeFragmentState(
@@ -126,6 +131,7 @@ class ConnectionOverviewViewModel(
                     presets = hordePresets,
                     preset = selectedHordePreset
                 ),
+                areModelsLoading = areModelsLoading
             )
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())
@@ -219,6 +225,7 @@ class ConnectionOverviewViewModel(
     }
 
     private fun onRefreshModels() = viewModelScope.launch {
+        areModelsLoading.value = true
         val event = when (val result = loadActiveModels()) {
             LoadHordeModelsUseCase.LoadHordeModelsResult.NoInternet -> COUiEvent.ShowSnackbar(
                 COUiEvent.COSnackbar.NoInternet
@@ -233,20 +240,29 @@ class ConnectionOverviewViewModel(
             )
         }
 
+        areModelsLoading.value = false
         _uiEvents.value = ComposeEvent(event)
+        //)))
+        delay(10)
+        updateHordeDialogActiveModels()
     }
 
     private fun onDismissSelectHordeModelsDialog() {
         showSelectHordeModelsDialog.value = false
     }
 
-    private fun onOpenSelectHordeModelsDialog() = viewModelScope.launch {
+    //TODO: Lazy hack
+    private suspend fun updateHordeDialogActiveModels() {
         val modelsInfo = getHordePreferences().first().modelsInfo
         hordeDialogActiveModels.value =
             getDialogActiveModes(
                 modelsInfo.values.toList(),
                 state.value.hordeFragmentState.selectedModelsWrapper.selectedModels
             )
+    }
+
+    private fun onOpenSelectHordeModelsDialog() = viewModelScope.launch {
+        updateHordeDialogActiveModels()
         showSelectHordeModelsDialog.value = true
     }
 

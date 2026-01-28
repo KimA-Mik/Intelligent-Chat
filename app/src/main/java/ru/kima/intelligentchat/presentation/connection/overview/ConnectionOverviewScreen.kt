@@ -32,7 +32,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -126,7 +125,7 @@ fun ConnectionOverviewScreen(
 }
 
 @Composable
-fun ConsumeEvent(
+private fun ConsumeEvent(
     event: ComposeEvent<COUiEvent>,
     snackbarHostState: SnackbarHostState,
     scope: CoroutineScope,
@@ -135,11 +134,19 @@ fun ConsumeEvent(
     val value = event.value
     value?.let {
         when (it) {
-            is COUiEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(it.message) }
-            is COUiEvent.ShowSnackbar -> ShowSnackbar(
-                snackbar = it.snackbar,
-                snackbarHostState = snackbarHostState,
-            )
+            is COUiEvent.ShowMessage -> scope.launch {
+                snackbarHostState.showSnackbar(
+                    it.message,
+                    withDismissAction = true
+                )
+            }
+
+            is COUiEvent.ShowSnackbar -> {
+                val message = getSnackbarMessage(it.snackbar)
+                scope.launch {
+                    snackbarHostState.showSnackbar(message, withDismissAction = true)
+                }
+            }
 
             is COUiEvent.EditPreset -> navController.navigateToHordePreset(it.presetId)
         }
@@ -147,37 +154,30 @@ fun ConsumeEvent(
 }
 
 @Composable
-fun ShowSnackbar(
+private fun getSnackbarMessage(
     snackbar: COUiEvent.COSnackbar,
-    snackbarHostState: SnackbarHostState,
-) {
-    val message = when (snackbar) {
-        COUiEvent.COSnackbar.ErrorGetKudos -> stringResource(R.string.error_get_kudos_snackbar)
-        COUiEvent.COSnackbar.NoUser -> stringResource(R.string.no_horde_user_snackbar)
-        is COUiEvent.COSnackbar.ShowKudos -> stringResource(
-            R.string.kudos_template_snackbar,
-            snackbar.kudos.toInt()
-        )
+) = when (snackbar) {
+    COUiEvent.COSnackbar.ErrorGetKudos -> stringResource(R.string.error_get_kudos_snackbar)
+    COUiEvent.COSnackbar.NoUser -> stringResource(R.string.no_horde_user_snackbar)
+    is COUiEvent.COSnackbar.ShowKudos -> stringResource(
+        R.string.kudos_template_snackbar,
+        snackbar.kudos.toInt()
+    )
 
-        COUiEvent.COSnackbar.ApiKeySaved -> stringResource(R.string.horde_api_key_is_saved_snackbar)
-        COUiEvent.COSnackbar.HordeUserNotFound -> stringResource(R.string.horde_user_not_found_snackbar)
-        COUiEvent.COSnackbar.HordeValidationError -> stringResource(R.string.horde_validation_error_snackbar)
-        COUiEvent.COSnackbar.NoInternet -> stringResource(R.string.no_internet_connection_snackbar)
-        COUiEvent.COSnackbar.EmptyHordeKey -> stringResource(R.string.horde_key_empty_snackbar)
-        is COUiEvent.COSnackbar.HordeUnknownError -> stringResource(
-            R.string.unknown_horde_error_snackbar,
-            snackbar.message
-        )
+    COUiEvent.COSnackbar.ApiKeySaved -> stringResource(R.string.horde_api_key_is_saved_snackbar)
+    COUiEvent.COSnackbar.HordeUserNotFound -> stringResource(R.string.horde_user_not_found_snackbar)
+    COUiEvent.COSnackbar.HordeValidationError -> stringResource(R.string.horde_validation_error_snackbar)
+    COUiEvent.COSnackbar.NoInternet -> stringResource(R.string.no_internet_connection_snackbar)
+    COUiEvent.COSnackbar.EmptyHordeKey -> stringResource(R.string.horde_key_empty_snackbar)
+    is COUiEvent.COSnackbar.HordeUnknownError -> stringResource(
+        R.string.unknown_horde_error_snackbar,
+        snackbar.message
+    )
 
-        is COUiEvent.COSnackbar.ModelsUpdated -> stringResource(
-            R.string.load_models_snackbar,
-            snackbar.modelsCount
-        )
-    }
-
-    LaunchedEffect(snackbar) {
-        snackbarHostState.showSnackbar(message)
-    }
+    is COUiEvent.COSnackbar.ModelsUpdated -> stringResource(
+        R.string.load_models_snackbar,
+        snackbar.modelsCount
+    )
 }
 
 @Composable

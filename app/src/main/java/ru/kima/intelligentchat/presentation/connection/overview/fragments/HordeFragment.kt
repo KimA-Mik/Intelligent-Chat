@@ -36,6 +36,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +72,8 @@ fun HordeFragment(
     when {
         state.showSelectHordeModelsDialog -> SelectHordeModelsAlertDialog(
             dialogActiveModels = state.dialogSelectedModels,
+            areModelsLoading = state.areModelsLoading,
+            onRefresh = { onEvent(COUserEvent.RefreshModels) },
             onEvent = onEvent
         )
     }
@@ -205,7 +208,7 @@ fun GenerationConfig(
             title = stringResource(R.string.context_label),
             value = userContextSize,
             leftBorder = 512,
-            rightBorder = 8196,
+            rightBorder = 16384,
             updateValue = {
                 onEvent(COUserEvent.UpdateHordeContextSize(it))
             },
@@ -329,6 +332,8 @@ fun Models(
 @Composable
 fun SelectHordeModelsAlertDialog(
     dialogActiveModels: List<HordeDialogActiveModel>,
+    areModelsLoading: Boolean,
+    onRefresh: () -> Unit,
     onEvent: (COUserEvent) -> Unit
 ) {
     AlertDialog(
@@ -347,12 +352,21 @@ fun SelectHordeModelsAlertDialog(
             Text(text = "Select horde models")
         },
         text = {
-            LazyColumn {
-                items(dialogActiveModels, key = { it.name }) {
-                    ActiveModelItem(
-                        model = it,
-                        onEvent = onEvent
-                    )
+            PullToRefreshBox(
+                isRefreshing = areModelsLoading,
+                onRefresh = onRefresh,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(dialogActiveModels, key = { it.name }) {
+                        ActiveModelItem(
+                            model = it,
+                            modifier = Modifier.animateItem(),
+                            onEvent = onEvent
+                        )
+                    }
                 }
             }
         },
@@ -444,9 +458,11 @@ fun GenPresetSelector(
 @Composable
 fun ActiveModelItem(
     model: HordeDialogActiveModel,
+    modifier: Modifier = Modifier,
     onEvent: (COUserEvent) -> Unit
 ) {
     ListItem(
+        modifier = modifier,
         trailingContent = {
             Checkbox(
                 checked = model.selected,

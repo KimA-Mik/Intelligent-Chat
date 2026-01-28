@@ -27,6 +27,7 @@ data class ConnectionOverviewState(
         val selectedModelsWrapper: HordeModelsWrapper = HordeModelsWrapper(),
         val dialogSelectedModels: List<HordeDialogActiveModel> = emptyList(),
         val presetsWrapper: HordePresetsWrapper = HordePresetsWrapper(),
+        val areModelsLoading: Boolean = false
     )
 }
 
