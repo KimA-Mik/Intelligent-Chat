@@ -9,6 +9,7 @@ import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -194,9 +195,6 @@ private fun CharactersListScreen(
         )
     }
 
-    var isExpanded by retain { mutableStateOf(false) }
-    BackHandler(isExpanded) { isExpanded = false }
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
@@ -209,20 +207,6 @@ private fun CharactersListScreen(
             )
         },
         floatingActionButton = {
-            FabMenu(
-                isExpanded,
-                fabVisible = true,
-                onImageButtonClick = {
-                    onEvent(CharactersListUserEvent.AddCardFromImageClicked)
-                },
-                onCreateButtonClick = {
-                    onEvent(CharactersListUserEvent.CreateCardClicked)
-                },
-                onControlButtonClick = {
-                    isExpanded = !isExpanded
-                }
-            )
-
 //            ActionButtons(
 //                isExpanded,
 //                onImageButtonClick = {
@@ -236,14 +220,34 @@ private fun CharactersListScreen(
 //                })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
-        CharactersList(
-            cards = state.cards,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            onEvent = onEvent
-        )
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            CharactersList(
+                cards = state.cards,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                onEvent = onEvent
+            )
+
+            var isExpanded by retain { mutableStateOf(false) }
+            BackHandler(isExpanded) { isExpanded = false }
+            FabMenu(
+                isExpanded,
+                fabVisible = true,
+                modifier = Modifier.align(Alignment.BottomEnd),
+                onImageButtonClick = {
+                    onEvent(CharactersListUserEvent.AddCardFromImageClicked)
+                },
+                onCreateButtonClick = {
+                    onEvent(CharactersListUserEvent.CreateCardClicked)
+                },
+                onControlButtonClick = {
+                    isExpanded = !isExpanded
+                }
+            )
+        }
     }
 }
 
