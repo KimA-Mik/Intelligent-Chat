@@ -68,6 +68,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -133,7 +134,7 @@ private fun CharactersListScreen(
     imagePicker: ImagePicker,
     expanded: Boolean
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     imagePicker.registerPicker { imageBytes ->
         onEvent(CharactersListUserEvent.AddCardFromImage(imageBytes))
     }
@@ -159,7 +160,7 @@ private fun CharactersListScreen(
                     navController.navigateToCardImage(event.cardId)
 
                 is CharactersListUiEvent.Message -> scope.launch {
-                    snackbarHostState.showSnackbar(context.getString(event.messageId))
+                    snackbarHostState.showSnackbar(resources.getString(event.messageId))
                 }
 
                 CharactersListUiEvent.OpenNavigationDrawer -> scope.launch {
@@ -169,11 +170,11 @@ private fun CharactersListScreen(
                 is CharactersListUiEvent.CardDeleted -> scope.launch {
                     runSnackbar(
                         snackbarHostState = snackbarHostState,
-                        message = context.getString(R.string.message_deleted_snackbar_message),
+                        message = resources.getString(R.string.message_deleted_snackbar_message),
                         onActionPerformed = {
                             onEvent(CharactersListUserEvent.RestoreCardClicked(event.cardId))
                         },
-                        actionLabel = context.getString(R.string.restore_snackbar_action),
+                        actionLabel = resources.getString(R.string.restore_snackbar_action),
                     )
                 }
             }
