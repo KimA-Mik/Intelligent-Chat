@@ -174,7 +174,7 @@ class HordeRepositoryImpl(json: Json) : HordeRepository {
         } catch (_: NullPointerException) {
             ICResult.Error(HordeError.UnknownError("Unable to deserialize result of check request"))
         } catch (e: Exception) {
-            val message = e.message ?: e.toString()
+            val message = e.localizedMessage ?: e.message ?: e.toString()
             ICResult.Error(HordeError.UnknownError(message))
         }
     }
