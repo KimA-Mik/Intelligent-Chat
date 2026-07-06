@@ -1,14 +1,17 @@
 package ru.kima.intelligentchat.domain.messaging.generation.strategies
 
+import android.util.Log
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import ru.kima.intelligentchat.domain.common.ICResult
-import ru.kima.intelligentchat.domain.common.valueOr
+import ru.kima.intelligentchat.domain.common.errors.HordeError
 import ru.kima.intelligentchat.domain.horde.model.GenerationInput
+import ru.kima.intelligentchat.domain.horde.model.HordeAsyncRequest
 import ru.kima.intelligentchat.domain.horde.model.HordeDefaults
 import ru.kima.intelligentchat.domain.horde.model.HordeGenerationParams
+import ru.kima.intelligentchat.domain.horde.model.HordeRequestStatus
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationRequest
 import ru.kima.intelligentchat.domain.messaging.generation.model.GenerationStatus
@@ -18,6 +21,8 @@ import ru.kima.intelligentchat.domain.messaging.generation.prompting.constructPr
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.GetHordePreferencesUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 import kotlin.random.Random
+
+private const val TAG = "HordeGenerationStrategy"
 
 class HordeGenerationStrategy(
     private val templateResolver: TemplateResolver,
@@ -63,16 +68,45 @@ class HordeGenerationStrategy(
             trustedWorkers = hordeState.trustedWorkers
         )
 
-        val hordeRequest = hordeRepository.requestGeneration(apiKey, generationInput).valueOr {
-            emit(GenerationStatus.Error(it))
-            return@flow
+        val retrial = Retrial()
+
+        val hordeRequest: HordeAsyncRequest
+        while (true) {
+            retrial.retry()
+            val result = hordeRepository.requestGeneration(apiKey, generationInput)
+            if (result is ICResult.Error) {
+                if (retrial.shouldEndRetrial() || result.data != HordeError.NoConnection) {
+                    Log.e(TAG, result.data.toString())
+                    emit(GenerationStatus.Error(result.data))
+                    return@flow
+                }
+                retrial.incrementErrorCount()
+            } else if (result is ICResult.Success) {
+                hordeRequest = result.data
+                break
+            }
         }
+
 
         val id = hordeRequest.id
         emit(GenerationStatus.Started(id))
-        var status = hordeRepository.getGenerationRequestStatus(id).valueOr {
-            emit(GenerationStatus.Error(it))
-            return@flow
+        var status: HordeRequestStatus
+        retrial.clear()
+        while (true) {
+            retrial.retry()
+            val result = hordeRepository.getGenerationRequestStatus(id)
+            if (result is ICResult.Error) {
+                if (retrial.shouldEndRetrial() || result.data != HordeError.NoConnection) {
+                    Log.e(TAG, result.data.toString())
+                    emit(GenerationStatus.Error(result.data))
+                    return@flow
+                }
+                retrial.incrementErrorCount()
+
+            } else if (result is ICResult.Success) {
+                status = result.data
+                break
+            }
         }
 
         while (!cancelled && !status.done && !status.faulted && status.isPossible) {
@@ -83,9 +117,22 @@ class HordeGenerationStrategy(
             }
 
             delay(getDelayTime())
-            status = hordeRepository.getGenerationRequestStatus(id).valueOr {
-                emit(GenerationStatus.Error(it))
-                return@flow
+
+            while (true) {
+                retrial.retry()
+                val result = hordeRepository.getGenerationRequestStatus(id)
+                if (result is ICResult.Error) {
+                    if (retrial.shouldEndRetrial() || result.data != HordeError.NoConnection) {
+                        Log.e(TAG, result.data.toString())
+                        emit(GenerationStatus.Error(result.data))
+                        return@flow
+                    }
+                    retrial.incrementErrorCount()
+                } else if (result is ICResult.Success) {
+                    retrial.clear()
+                    status = result.data
+                    break
+                }
             }
         }
 
