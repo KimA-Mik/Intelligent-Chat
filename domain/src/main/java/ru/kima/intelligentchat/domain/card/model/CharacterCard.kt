@@ -4,6 +4,7 @@ data class CharacterCard(
     val id: Long,
 
     val photoName: String? = null,
+    val showImages: Boolean? = null,
 
     val name: String,
     val description: String,
@@ -33,6 +34,7 @@ data class CharacterCard(
         fun default(
             id: Long = 0,
             photoName: String? = null,
+            showImages: Boolean? = null,
             name: String = String(),
             description: String = String(),
             personality: String = String(),
@@ -53,6 +55,7 @@ data class CharacterCard(
             return CharacterCard(
                 id = id,
                 photoName = photoName,
+                showImages = showImages,
                 name = name,
                 description = description,
                 personality = personality,

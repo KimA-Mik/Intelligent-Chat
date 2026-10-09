@@ -5,5 +5,6 @@ import ru.kima.intelligentchat.domain.common.ApiType
 data class AppPreferences(
     val selectedPersonaId: Long,
     val selectedApiType: ApiType,
-    val generationPending: Boolean
+    val generationPending: Boolean,
+    val showImages: Boolean = false
 )

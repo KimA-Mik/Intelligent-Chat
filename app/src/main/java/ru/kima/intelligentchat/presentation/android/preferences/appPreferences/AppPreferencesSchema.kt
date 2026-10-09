@@ -11,7 +11,8 @@ import ru.kima.intelligentchat.domain.preferences.app.AppPreferences
 data class AppPreferencesSchema(
     val selectedPersonaId: Long = 0,
     val selectedApiType: ApiType = ApiType.HORDE,
-    val generationPending: Boolean = false
+    val generationPending: Boolean = false,
+    val showImages: Boolean = false
 )
 
 val Context.preferencesDataStore: DataStore<AppPreferencesSchema> by dataStore(
@@ -24,5 +25,6 @@ fun AppPreferencesSchema.toPreferences(): AppPreferences {
         selectedPersonaId = selectedPersonaId,
         selectedApiType = selectedApiType,
         generationPending = generationPending,
+        showImages = showImages,
     )
 }

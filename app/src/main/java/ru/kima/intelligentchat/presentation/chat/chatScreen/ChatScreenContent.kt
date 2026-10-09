@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
@@ -173,7 +174,10 @@ fun ChatScreenContent(
                 navigateUp = popBackStack,
                 actions = {
                     SimpleDropdownMenu(
-                        menuItems = dropdownMenuItems(onEvent),
+                        menuItems = dropdownMenuItems(
+                            showImagesOverride = state.chatAppearance.showImagesOverride,
+                            onEvent = onEvent
+                        ),
                         iconVector = Icons.Default.MoreVert
                     )
                 },
@@ -266,12 +270,35 @@ private fun consumeEvent(
 }
 
 @Composable
-private fun dropdownMenuItems(onEvent: (UserEvent) -> Unit) = remember {
+private fun dropdownMenuItems(
+    showImagesOverride: Boolean?,
+    onEvent: (UserEvent) -> Unit
+) = remember(showImagesOverride, onEvent) {
     listOf(
         SimpleDropDownMenuItem(
             ComposeString.Resource(R.string.menu_item_chat_instances),
             onClick = { onEvent(UserEvent.OpenChatList) },
             iconVector = Icons.Default.Feedback
+        ),
+        SimpleDropDownMenuItem(
+            string = ComposeString.Resource(R.string.chat_menu_images),
+            subMenuItems = listOf(
+                SimpleDropDownMenuItem(
+                    string = ComposeString.Resource(R.string.chat_menu_images_default),
+                    onClick = { onEvent(UserEvent.UpdateShowImages(null)) },
+                    iconVector = if (showImagesOverride == null) Icons.Default.Check else null
+                ),
+                SimpleDropDownMenuItem(
+                    string = ComposeString.Resource(R.string.chat_menu_images_show),
+                    onClick = { onEvent(UserEvent.UpdateShowImages(true)) },
+                    iconVector = if (showImagesOverride == true) Icons.Default.Check else null
+                ),
+                SimpleDropDownMenuItem(
+                    string = ComposeString.Resource(R.string.chat_menu_images_hide),
+                    onClick = { onEvent(UserEvent.UpdateShowImages(false)) },
+                    iconVector = if (showImagesOverride == false) Icons.Default.Check else null
+                )
+            )
         ),
     )
 }

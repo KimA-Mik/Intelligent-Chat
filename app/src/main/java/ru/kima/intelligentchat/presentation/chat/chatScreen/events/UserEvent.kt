@@ -21,4 +21,5 @@ sealed interface UserEvent {
     data class OpenUriRequest(val uri: String) : UserEvent
     data object AcceptOpenUriRequest : UserEvent
     data object DismissOpenUriRequest : UserEvent
+    data class UpdateShowImages(val showImages: Boolean?) : UserEvent
 }

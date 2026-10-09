@@ -10,6 +10,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import ru.kima.intelligentchat.R
 import ru.kima.intelligentchat.common.ComposeString
+import ru.kima.intelligentchat.domain.preferences.app.AppPreferencesRepository
 import ru.kima.intelligentchat.domain.preferences.chatSettings.ChatSettingsRepository
 import ru.kima.intelligentchat.presentation.settings.Setting
 
@@ -23,6 +24,7 @@ object ChatSettingsScreen : SettingsScreen, KoinComponent {
     @Composable
     override fun settings(): ImmutableList<Setting> {
         val settings = remember { get<ChatSettingsRepository>() }
+        val appPreferences = remember { get<AppPreferencesRepository>() }
 
         val showNumber = settings.showNumber()
         val showDate = settings.showDate()
@@ -45,6 +47,10 @@ object ChatSettingsScreen : SettingsScreen, KoinComponent {
                         showDate.set(it)
                         true
                     }
+                ),
+                Setting.SettingItem.SwitchSetting(
+                    pref = appPreferences.showImages(),
+                    title = ComposeString.Resource(R.string.setting_show_images_title)
                 )
             )
         )

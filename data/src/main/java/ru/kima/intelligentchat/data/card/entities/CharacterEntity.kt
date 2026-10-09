@@ -10,6 +10,7 @@ data class CharacterEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val photoFilePath: String? = null,
+    val showImages: Boolean? = null,
     val name: String = String(),
     val description: String = String(),
     val personality: String = String(),
@@ -31,4 +32,3 @@ data class CharacterEntity(
     @Ignore
     var alternateGreetings: List<String> = emptyList()
 }
-

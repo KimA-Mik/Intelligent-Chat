@@ -69,6 +69,7 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.common.components.conditional
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
+import ru.kima.intelligentchat.presentation.common.markdown.CoilMarkdownImageTransformer
 import ru.kima.intelligentchat.presentation.common.markdown.CustomMarkdownHighlightedCode
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
@@ -164,7 +165,8 @@ fun ChatMessage(
             currentSwipe = message.currentSwipe,
             modifier = Modifier
                 .weight(1f)
-                .conditional(!message.showSwipeInfo) { padding(horizontal = 8.dp) }
+                .conditional(!message.showSwipeInfo) { padding(horizontal = 8.dp) },
+            showImages = chatAppearance.showImages
         )
 
         if (message.showSwipeInfo) {
@@ -243,6 +245,7 @@ private fun dropdownMenuItems(
 fun AnimatedText(
     text: String,
     currentSwipe: Int,
+    showImages: Boolean,
     modifier: Modifier = Modifier
 ) {
     val swipeRight = remember {
@@ -301,6 +304,9 @@ fun AnimatedText(
             colors = markdownColor(),
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
+            imageTransformer = remember(showImages) {
+                CoilMarkdownImageTransformer(showImages)
+            },
             annotator = markdownAnnotator { content, child ->
                 if (parent != child.parent) {
                     parent = child.parent

@@ -120,6 +120,10 @@
     <!--    Chat Screen    -->
     <!--  TopBar Dropdown Menu  -->
     <string name="menu_item_chat_instances">All chats</string>
+    <string name="chat_menu_images">Message images</string>
+    <string name="chat_menu_images_default">Default</string>
+    <string name="chat_menu_images_show">Show</string>
+    <string name="chat_menu_images_hide">Don\'t show</string>
 
     <!--  Message Dropdown Menu  -->
     <string name="menu_item_edit_message">Edit</string>
@@ -171,6 +175,7 @@
     <!--  Chat Appearance Settings Screen  -->
     <string name="setting_show_message_number_title">Show message number</string>
     <string name="setting_show_swipe_date_title">Show swipe date</string>
+    <string name="setting_show_images_title">Show images in messages</string>
 
     <!--  Advanced Formating Screen  -->
     <string name="context_template_setting_title">Context template</string>
