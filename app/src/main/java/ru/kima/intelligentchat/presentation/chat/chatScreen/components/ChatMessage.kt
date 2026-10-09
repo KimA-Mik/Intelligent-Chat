@@ -301,7 +301,7 @@ fun AnimatedText(
             colors = markdownColor(),
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
-            annotator = markdownAnnotator { _, child ->
+            annotator = markdownAnnotator { content, child ->
                 if (parent != child.parent) {
                     parent = child.parent
                     italicIndex = -1
@@ -309,11 +309,6 @@ fun AnimatedText(
                 }
 
                 when {
-                    child.type == MarkdownTokenTypes.WHITE_SPACE -> {
-                        italicIndex = -1
-                        quoteIndex = -1
-                    }
-
                     child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset == 1 -> {
                         if (italicIndex < 0) {
                             italicIndex = pushStyle(italicStyle)
@@ -321,17 +316,20 @@ fun AnimatedText(
                             pop()
                             italicIndex = -1
                         }
+                        return@markdownAnnotator true
                     }
 
                     child.type == MarkdownTokenTypes.DOUBLE_QUOTE -> {
+                        val quote = content.substring(child.startOffset, child.endOffset)
                         if (quoteIndex < 0) {
+                            append(quote)
                             quoteIndex = pushStyle(quoteStyle)
                         } else {
-                            append(MarkdownTokenTypes.DOUBLE_QUOTE.name)
                             pop()
                             quoteIndex = -1
-                            return@markdownAnnotator true
+                            append(quote)
                         }
+                        return@markdownAnnotator true
                     }
                 }
 
