@@ -277,14 +277,14 @@ fun AnimatedText(
 
     val colorScheme = MaterialTheme.colorScheme
     //TODO: Factor out colors
-    val italicStyle = remember {
+    val italicStyle = remember(colorScheme) {
         SpanStyle(
             fontStyle = FontStyle.Italic,
             fontWeight = FontWeight.Bold,
             color = colorScheme.onPrimaryContainer
         )
     }
-    val quoteStyle = remember {
+    val quoteStyle = remember(colorScheme) {
         SpanStyle(
             fontWeight = FontWeight.Normal,
             fontStyle = FontStyle.Normal,
@@ -297,15 +297,18 @@ fun AnimatedText(
     var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
     val imageTransformer = LocalImageTransformer.current
     AnimatedContent(
-        targetState = text, label = "",
+        targetState = text to currentSwipe,
+        contentKey = { it.second },
+        label = "",
         modifier = modifier,
         transitionSpec = { animationSpec }) {
         Markdown(
-            it,
+            it.first,
             colors = markdownColor(),
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
             imageTransformer = imageTransformer,
+            retainState = true,
             annotator = markdownAnnotator { content, child ->
                 if (parent != child.parent) {
                     parent = child.parent
@@ -355,16 +358,26 @@ fun AnimatedText(
                     MarkdownCodeBlock(
                         markdownComponentModel.content,
                         markdownComponentModel.node
-                    ) { code, language ->
-                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
+                    ) { code, language, style ->
+                        CustomMarkdownHighlightedCode(
+                            code,
+                            language,
+                            Highlights.Builder(),
+                            style
+                        )
                     }
                 },
                 codeFence = { markdownComponentModel ->
                     MarkdownCodeFence(
                         markdownComponentModel.content,
                         markdownComponentModel.node
-                    ) { code, language ->
-                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
+                    ) { code, language, style ->
+                        CustomMarkdownHighlightedCode(
+                            code,
+                            language,
+                            Highlights.Builder(),
+                            style
+                        )
                     }
                 },
             ),

@@ -23,19 +23,26 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.mikepenz.markdown.model.ImageData
 import com.mikepenz.markdown.model.ImageTransformer
+import com.mikepenz.markdown.model.ImageWidth
 import com.mikepenz.markdown.model.PlaceholderConfig
 
 class Coil3ImageTransformerImpl(
     private val showImage: Boolean
 ) : ImageTransformer {
     override fun placeholderConfig(
+        link: String,
         density: Density,
         containerSize: Size,
-        intrinsicImageSize: Size
+        imageWidth: ImageWidth,
+        imageSize: Size,
+        imageSizeChanged: ((link: String, Size) -> Unit)?
     ): PlaceholderConfig = super.placeholderConfig(
+        link = link,
         density = density,
         containerSize = containerSize,
-        intrinsicImageSize = intrinsicImageSize
+        imageWidth = imageWidth,
+        imageSize = imageSize,
+        imageSizeChanged = imageSizeChanged
     ).copy(verticalAlign = PlaceholderVerticalAlign.AboveBaseline)
 
     @Composable
