@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.compose.LocalImageTransformer
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.MarkdownCodeBlock
@@ -69,7 +70,6 @@ import ru.kima.intelligentchat.presentation.chat.chatScreen.model.DisplayMessage
 import ru.kima.intelligentchat.presentation.chat.chatScreen.model.ImmutableChatAppearance
 import ru.kima.intelligentchat.presentation.common.components.conditional
 import ru.kima.intelligentchat.presentation.common.image.rememberVectorPainter
-import ru.kima.intelligentchat.presentation.common.markdown.CoilMarkdownImageTransformer
 import ru.kima.intelligentchat.presentation.common.markdown.CustomMarkdownHighlightedCode
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropdownMenu
@@ -295,6 +295,7 @@ fun AnimatedText(
     var italicIndex by remember(text) { mutableIntStateOf(-1) }
     var quoteIndex by remember(text) { mutableIntStateOf(-1) }
     var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
+    val imageTransformer = LocalImageTransformer.current
     AnimatedContent(
         targetState = text, label = "",
         modifier = modifier,
@@ -304,9 +305,7 @@ fun AnimatedText(
             colors = markdownColor(),
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
-            imageTransformer = remember(showImages) {
-                CoilMarkdownImageTransformer(showImages)
-            },
+            imageTransformer = imageTransformer,
             annotator = markdownAnnotator { content, child ->
                 if (parent != child.parent) {
                     parent = child.parent

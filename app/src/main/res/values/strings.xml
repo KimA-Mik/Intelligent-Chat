@@ -124,6 +124,8 @@
     <string name="chat_menu_images_default">Default</string>
     <string name="chat_menu_images_show">Show</string>
     <string name="chat_menu_images_hide">Don\'t show</string>
+    <string name="chat_image_hidden">Image hidden</string>
+    <string name="chat_image_retry">Retry loading image</string>
 
     <!--  Message Dropdown Menu  -->
     <string name="menu_item_edit_message">Edit</string>

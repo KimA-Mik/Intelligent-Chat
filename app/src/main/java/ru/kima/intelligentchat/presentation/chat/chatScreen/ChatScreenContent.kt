@@ -62,6 +62,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.mikepenz.markdown.compose.LocalImageTransformer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
@@ -83,6 +84,7 @@ import ru.kima.intelligentchat.presentation.common.components.AnimatedFab
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.common.components.SimpleUriHandler
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
+import ru.kima.intelligentchat.presentation.common.markdown.Coil3ImageTransformerImpl
 import ru.kima.intelligentchat.presentation.common.util.runSnackbar
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChatList
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
@@ -145,6 +147,10 @@ fun ChatScreenContent(
         }
     }
 
+    val imageTransformer = remember(state.chatAppearance.showImages) {
+        Coil3ImageTransformerImpl(showImage = state.chatAppearance.showImages)
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -205,7 +211,8 @@ fun ChatScreenContent(
         }
     ) { padding ->
         CompositionLocalProvider(
-            LocalUriHandler provides uriHandler
+            LocalUriHandler provides uriHandler,
+            LocalImageTransformer provides imageTransformer
         ) {
             Messages(
                 state = state.info,
