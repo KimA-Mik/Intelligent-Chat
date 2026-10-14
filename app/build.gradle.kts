@@ -15,8 +15,8 @@ android {
         applicationId = "ru.kima.intelligentchat"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 14
-        versionName = "0.88.6"
+        versionCode = 15
+        versionName = "0.88.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
