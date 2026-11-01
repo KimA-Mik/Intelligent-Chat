@@ -33,6 +33,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -302,90 +303,92 @@ fun AnimatedText(
         var italicStart = -1
         var quoteStart = -1
         var parent: ASTNode? = null
-        Markdown(
-            it.first,
-            colors = markdownColor(),
-            typography = markdownTypography(),
-            flavour = CommonMarkFlavourDescriptor(),
-            imageTransformer = imageTransformer,
-            retainState = true,
-            annotator = markdownAnnotator { content, child ->
-                if (parent != child.parent) {
-                    parent = child.parent
-                    italicStart = -1
-                    quoteStart = -1
-                }
+        key(it.first) {
+            Markdown(
+                it.first,
+                colors = markdownColor(),
+                typography = markdownTypography(),
+                flavour = CommonMarkFlavourDescriptor(),
+                imageTransformer = imageTransformer,
+                immediate = true,
+                annotator = markdownAnnotator { content, child ->
+                    if (parent != child.parent) {
+                        parent = child.parent
+                        italicStart = -1
+                        quoteStart = -1
+                    }
 
-                when {
-                    child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset == 1 -> {
-                        if (italicStart < 0) {
-                            italicStart = length
-                        } else {
-                            if (italicStart < length) {
-                                addStyle(italicStyle, italicStart, length)
+                    when {
+                        child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset == 1 -> {
+                            if (italicStart < 0) {
+                                italicStart = length
+                            } else {
+                                if (italicStart < length) {
+                                    addStyle(italicStyle, italicStart, length)
+                                }
+                                italicStart = -1
                             }
-                            italicStart = -1
+                            return@markdownAnnotator true
                         }
-                        return@markdownAnnotator true
-                    }
 
-                    child.type == MarkdownTokenTypes.DOUBLE_QUOTE -> {
-                        val quote = content.substring(child.startOffset, child.endOffset)
-                        if (quoteStart < 0) {
-                            append(quote)
-                            quoteStart = length
-                        } else {
-                            if (quoteStart < length) {
-                                addStyle(quoteStyle, quoteStart, length)
+                        child.type == MarkdownTokenTypes.DOUBLE_QUOTE -> {
+                            val quote = content.substring(child.startOffset, child.endOffset)
+                            if (quoteStart < 0) {
+                                append(quote)
+                                quoteStart = length
+                            } else {
+                                if (quoteStart < length) {
+                                    addStyle(quoteStyle, quoteStart, length)
+                                }
+                                quoteStart = -1
+                                append(quote)
                             }
-                            quoteStart = -1
-                            append(quote)
+                            return@markdownAnnotator true
                         }
-                        return@markdownAnnotator true
                     }
-                }
 
-                return@markdownAnnotator false
-            },
-            components = markdownComponents(
-                paragraph = { markdownComponentModel ->
-                    MarkdownParagraph(
-                        markdownComponentModel.content,
-                        markdownComponentModel.node,
-                        modifier = Modifier
-                            .conditional(markdownComponentModel.node.endOffset != markdownComponentModel.content.length)
-                            { padding(bottom = 8.dp) },
-                        style = markdownComponentModel.typography.paragraph
-                    )
+                    return@markdownAnnotator false
                 },
-                codeBlock = { markdownComponentModel ->
-                    MarkdownCodeBlock(
-                        markdownComponentModel.content,
-                        markdownComponentModel.node
-                    ) { code, language, style ->
-                        CustomMarkdownHighlightedCode(
-                            code,
-                            language,
-                            Highlights.Builder(),
-                            style
+                components = markdownComponents(
+                    paragraph = { markdownComponentModel ->
+                        MarkdownParagraph(
+                            markdownComponentModel.content,
+                            markdownComponentModel.node,
+                            modifier = Modifier
+                                .conditional(markdownComponentModel.node.endOffset != markdownComponentModel.content.length)
+                                { padding(bottom = 8.dp) },
+                            style = markdownComponentModel.typography.paragraph
                         )
-                    }
-                },
-                codeFence = { markdownComponentModel ->
-                    MarkdownCodeFence(
-                        markdownComponentModel.content,
-                        markdownComponentModel.node
-                    ) { code, language, style ->
-                        CustomMarkdownHighlightedCode(
-                            code,
-                            language,
-                            Highlights.Builder(),
-                            style
-                        )
-                    }
-                },
-            ),
-        )
+                    },
+                    codeBlock = { markdownComponentModel ->
+                        MarkdownCodeBlock(
+                            markdownComponentModel.content,
+                            markdownComponentModel.node
+                        ) { code, language, style ->
+                            CustomMarkdownHighlightedCode(
+                                code,
+                                language,
+                                Highlights.Builder(),
+                                style
+                            )
+                        }
+                    },
+                    codeFence = { markdownComponentModel ->
+                        MarkdownCodeFence(
+                            markdownComponentModel.content,
+                            markdownComponentModel.node
+                        ) { code, language, style ->
+                            CustomMarkdownHighlightedCode(
+                                code,
+                                language,
+                                Highlights.Builder(),
+                                style
+                            )
+                        }
+                    },
+                ),
+            )
+        }
     }
 }
 
