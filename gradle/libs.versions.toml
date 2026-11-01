@@ -5,11 +5,11 @@ android-minSdk = "24"
 android-targetSdk = "37"
 
 activityCompose = "1.13.0"
-agp = "9.4.1"
+agp = "9.5.0"
 coilCompose = "3.6.3"
 composeBom = "2026.09.00"
 coreKtx = "1.19.1"
-datastore = "1.2.1"
+datastore = "1.3.0"
 espressoCore = "3.7.0"
 junit = "1.3.0"
 junitJupiter = "6.1.3"
@@ -18,15 +18,15 @@ konvert = "4.5.1"
 kotlin = "2.4.21"
 kotlinxCollectionsImmutable = "0.5.2"
 kotlinxCoroutines = "1.11.0"
-kotlinxSerialization = "1.11.0"
+kotlinxSerialization = "1.12.0"
 ksp = "2.3.10"
-multiplatformMarkdownRenderer = "0.45.0"
+multiplatformMarkdownRenderer = "0.46.0"
 navigation = "2.10.2"
 retrofit = "3.0.0"
 room = "2.8.5"
 handlebars = "4.2.1" #Next versions have problems on Android
 
-tempMaterialExpressive = "1.5.0-beta01"
+tempMaterialExpressive = "1.5.0-beta02"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
