@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
 import ru.kima.intelligentchat.domain.card.useCase.GetCardUseCase
+import ru.kima.intelligentchat.domain.card.useCase.UpdateCardUseCase
 import ru.kima.intelligentchat.domain.chat.model.FullChat
 import ru.kima.intelligentchat.domain.chat.model.SwipeDirection
 import ru.kima.intelligentchat.domain.chat.useCase.CreateAndSelectChatUseCase
@@ -56,6 +57,7 @@ class ChatScreenViewModel(
     private val sendMessage: SendMessageUseCase,
     private val moveMessage: MoveMessageUseCase,
     private val getCharacterCard: GetCardUseCase,
+    private val updateCharacterCard: UpdateCardUseCase,
     private val swipeMessage: SwipeMessageUseCase,
     private val restoreSwipe: RestoreSwipeUseCase,
     private val cancelMessage: CancelMessageUseCase,
@@ -133,11 +135,15 @@ class ChatScreenViewModel(
 
         val chat = combine(
             chatSettingsRepository.showDate().subscribe(),
-            chatSettingsRepository.showNumber().subscribe()
-        ) { showDate, showNumber ->
+            chatSettingsRepository.showNumber().subscribe(),
+            preferences().map { it.showImages },
+            characterCard
+        ) { showDate, showNumber, globalShowImages, card ->
             ImmutableChatAppearance(
                 showDate = showDate,
-                showNumber = showNumber
+                showNumber = showNumber,
+                showImages = card.showImages ?: globalShowImages,
+                showImagesOverride = card.showImages
             )
         }
 
@@ -211,12 +217,20 @@ class ChatScreenViewModel(
             is UserEvent.OpenUriRequest -> onOpenUriRequest(event.uri)
             UserEvent.AcceptOpenUriRequest -> onAcceptOpenUriRequest()
             UserEvent.DismissOpenUriRequest -> onDismissOpenUriRequest()
+            is UserEvent.UpdateShowImages -> onUpdateShowImages(event.showImages)
         }
     }
 
     private fun onDismissOpenUriRequest() {
         savedStateHandle[OPEN_URI_REQUEST] = false
         savedStateHandle[URI_TO_OPEN] = ""
+    }
+
+    private fun onUpdateShowImages(showImages: Boolean?) = viewModelScope.launch {
+        val card = characterCard.value
+        if (card.id > 0L) {
+            updateCharacterCard(card.copy(showImages = showImages))
+        }
     }
 
     private fun onAcceptOpenUriRequest() {

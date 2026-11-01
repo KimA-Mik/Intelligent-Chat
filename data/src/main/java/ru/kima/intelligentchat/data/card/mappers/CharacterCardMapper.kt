@@ -10,6 +10,7 @@ fun CardEntity.toCharacterCard(
     return CharacterCard(
         id = character.id,
         photoName = character.photoFilePath,
+        showImages = character.showImages,
         name = character.name,
         description = character.description,
         personality = character.personality,
@@ -33,6 +34,7 @@ fun CharacterCard.toEntity(): CardEntity {
     return CardEntity(character = CharacterEntity(
         id = id,
         photoFilePath = photoName,
+        showImages = showImages,
         name = name,
         description = description,
         personality = personality,

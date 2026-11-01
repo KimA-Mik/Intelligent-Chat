@@ -179,7 +179,7 @@ fun CustomMarkdownHighlightedCode(
                         )
                     }
             },
-            color = LocalMarkdownColors.current.codeText,
+            color = style.color,
             modifier = Modifier
                 .conditional(highlights.language != SyntaxLanguage.DEFAULT) {
                     horizontalScroll(rememberScrollState())

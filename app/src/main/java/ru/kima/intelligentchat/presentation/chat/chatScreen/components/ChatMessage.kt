@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.compose.LocalImageTransformer
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.MarkdownCodeBlock
@@ -164,7 +165,8 @@ fun ChatMessage(
             currentSwipe = message.currentSwipe,
             modifier = Modifier
                 .weight(1f)
-                .conditional(!message.showSwipeInfo) { padding(horizontal = 8.dp) }
+                .conditional(!message.showSwipeInfo) { padding(horizontal = 8.dp) },
+            showImages = chatAppearance.showImages
         )
 
         if (message.showSwipeInfo) {
@@ -243,6 +245,7 @@ private fun dropdownMenuItems(
 fun AnimatedText(
     text: String,
     currentSwipe: Int,
+    showImages: Boolean,
     modifier: Modifier = Modifier
 ) {
     val swipeRight = remember {
@@ -274,14 +277,14 @@ fun AnimatedText(
 
     val colorScheme = MaterialTheme.colorScheme
     //TODO: Factor out colors
-    val italicStyle = remember {
+    val italicStyle = remember(colorScheme) {
         SpanStyle(
             fontStyle = FontStyle.Italic,
             fontWeight = FontWeight.Bold,
             color = colorScheme.onPrimaryContainer
         )
     }
-    val quoteStyle = remember {
+    val quoteStyle = remember(colorScheme) {
         SpanStyle(
             fontWeight = FontWeight.Normal,
             fontStyle = FontStyle.Normal,
@@ -292,16 +295,21 @@ fun AnimatedText(
     var italicIndex by remember(text) { mutableIntStateOf(-1) }
     var quoteIndex by remember(text) { mutableIntStateOf(-1) }
     var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
+    val imageTransformer = LocalImageTransformer.current
     AnimatedContent(
-        targetState = text, label = "",
+        targetState = text to currentSwipe,
+        contentKey = { it.second },
+        label = "",
         modifier = modifier,
         transitionSpec = { animationSpec }) {
         Markdown(
-            it,
+            it.first,
             colors = markdownColor(),
             typography = markdownTypography(),
             flavour = CommonMarkFlavourDescriptor(),
-            annotator = markdownAnnotator { _, child ->
+            imageTransformer = imageTransformer,
+            retainState = true,
+            annotator = markdownAnnotator { content, child ->
                 if (parent != child.parent) {
                     parent = child.parent
                     italicIndex = -1
@@ -309,11 +317,6 @@ fun AnimatedText(
                 }
 
                 when {
-                    child.type == MarkdownTokenTypes.WHITE_SPACE -> {
-                        italicIndex = -1
-                        quoteIndex = -1
-                    }
-
                     child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset == 1 -> {
                         if (italicIndex < 0) {
                             italicIndex = pushStyle(italicStyle)
@@ -321,17 +324,20 @@ fun AnimatedText(
                             pop()
                             italicIndex = -1
                         }
+                        return@markdownAnnotator true
                     }
 
                     child.type == MarkdownTokenTypes.DOUBLE_QUOTE -> {
+                        val quote = content.substring(child.startOffset, child.endOffset)
                         if (quoteIndex < 0) {
+                            append(quote)
                             quoteIndex = pushStyle(quoteStyle)
                         } else {
-                            append(MarkdownTokenTypes.DOUBLE_QUOTE.name)
                             pop()
                             quoteIndex = -1
-                            return@markdownAnnotator true
+                            append(quote)
                         }
+                        return@markdownAnnotator true
                     }
                 }
 
@@ -352,16 +358,26 @@ fun AnimatedText(
                     MarkdownCodeBlock(
                         markdownComponentModel.content,
                         markdownComponentModel.node
-                    ) { code, language ->
-                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
+                    ) { code, language, style ->
+                        CustomMarkdownHighlightedCode(
+                            code,
+                            language,
+                            Highlights.Builder(),
+                            style
+                        )
                     }
                 },
                 codeFence = { markdownComponentModel ->
                     MarkdownCodeFence(
                         markdownComponentModel.content,
                         markdownComponentModel.node
-                    ) { code, language ->
-                        CustomMarkdownHighlightedCode(code, language, Highlights.Builder())
+                    ) { code, language, style ->
+                        CustomMarkdownHighlightedCode(
+                            code,
+                            language,
+                            Highlights.Builder(),
+                            style
+                        )
                     }
                 },
             ),

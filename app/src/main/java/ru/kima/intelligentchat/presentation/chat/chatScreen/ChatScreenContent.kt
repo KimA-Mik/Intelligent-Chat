@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
@@ -61,6 +62,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.mikepenz.markdown.compose.LocalImageTransformer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.R
@@ -82,6 +84,7 @@ import ru.kima.intelligentchat.presentation.common.components.AnimatedFab
 import ru.kima.intelligentchat.presentation.common.components.AppBar
 import ru.kima.intelligentchat.presentation.common.components.SimpleUriHandler
 import ru.kima.intelligentchat.presentation.common.dialogs.SimpleAlertDialog
+import ru.kima.intelligentchat.presentation.common.markdown.Coil3ImageTransformerImpl
 import ru.kima.intelligentchat.presentation.common.util.runSnackbar
 import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToCardChatList
 import ru.kima.intelligentchat.presentation.ui.components.SimpleDropDownMenuItem
@@ -144,6 +147,10 @@ fun ChatScreenContent(
         }
     }
 
+    val imageTransformer = remember(state.chatAppearance.showImages) {
+        Coil3ImageTransformerImpl(showImage = state.chatAppearance.showImages)
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -173,7 +180,10 @@ fun ChatScreenContent(
                 navigateUp = popBackStack,
                 actions = {
                     SimpleDropdownMenu(
-                        menuItems = dropdownMenuItems(onEvent),
+                        menuItems = dropdownMenuItems(
+                            showImagesOverride = state.chatAppearance.showImagesOverride,
+                            onEvent = onEvent
+                        ),
                         iconVector = Icons.Default.MoreVert
                     )
                 },
@@ -201,7 +211,8 @@ fun ChatScreenContent(
         }
     ) { padding ->
         CompositionLocalProvider(
-            LocalUriHandler provides uriHandler
+            LocalUriHandler provides uriHandler,
+            LocalImageTransformer provides imageTransformer
         ) {
             Messages(
                 state = state.info,
@@ -266,12 +277,35 @@ private fun consumeEvent(
 }
 
 @Composable
-private fun dropdownMenuItems(onEvent: (UserEvent) -> Unit) = remember {
+private fun dropdownMenuItems(
+    showImagesOverride: Boolean?,
+    onEvent: (UserEvent) -> Unit
+) = remember(showImagesOverride, onEvent) {
     listOf(
         SimpleDropDownMenuItem(
             ComposeString.Resource(R.string.menu_item_chat_instances),
             onClick = { onEvent(UserEvent.OpenChatList) },
             iconVector = Icons.Default.Feedback
+        ),
+        SimpleDropDownMenuItem(
+            string = ComposeString.Resource(R.string.chat_menu_images),
+            subMenuItems = listOf(
+                SimpleDropDownMenuItem(
+                    string = ComposeString.Resource(R.string.chat_menu_images_default),
+                    onClick = { onEvent(UserEvent.UpdateShowImages(null)) },
+                    iconVector = if (showImagesOverride == null) Icons.Default.Check else null
+                ),
+                SimpleDropDownMenuItem(
+                    string = ComposeString.Resource(R.string.chat_menu_images_show),
+                    onClick = { onEvent(UserEvent.UpdateShowImages(true)) },
+                    iconVector = if (showImagesOverride == true) Icons.Default.Check else null
+                ),
+                SimpleDropDownMenuItem(
+                    string = ComposeString.Resource(R.string.chat_menu_images_hide),
+                    onClick = { onEvent(UserEvent.UpdateShowImages(false)) },
+                    iconVector = if (showImagesOverride == false) Icons.Default.Check else null
+                )
+            )
         ),
     )
 }

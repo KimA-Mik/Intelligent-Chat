@@ -8,6 +8,7 @@ data class ImmutableCard(
     val id: Long = 0,
 
     val photoName: String? = null,
+    val showImages: Boolean? = null,
 
     val name: String = String(),
     val description: String = String(),
@@ -37,6 +38,7 @@ data class ImmutableCard(
         return CharacterCard(
             id = id,
             photoName = photoName,
+            showImages = showImages,
             name = name.trimIndent(),
             description = description.trimIndent(),
             personality = personality.trimIndent(),
@@ -61,6 +63,7 @@ fun CharacterCard.toImmutable(): ImmutableCard {
     return ImmutableCard(
         id = id,
         photoName = photoName,
+        showImages = showImages,
         name = name,
         description = description,
         personality = personality,
@@ -79,5 +82,4 @@ fun CharacterCard.toImmutable(): ImmutableCard {
         selectedGreeting = selectedGreeting
     )
 }
-
 
