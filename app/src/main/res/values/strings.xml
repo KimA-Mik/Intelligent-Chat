@@ -73,6 +73,11 @@
     <string name="apiTypeLabel">API Type</string>
     <string name="api_type_kobold">Kobold AI</string>
     <string name="api_type_kobold_horde">Kobold AI Horde</string>
+    <string name="api_type_text_completion">Text Completion (KoboldCpp)</string>
+    <string name="koboldcpp_connection_title">KoboldCpp connection</string>
+    <string name="koboldcpp_base_url">KoboldCpp base URL</string>
+    <string name="koboldcpp_base_url_hint">Enter the server address; generation uses /api/v1/generate.</string>
+    <string name="edit_preset">Edit preset</string>
     <string name="horde_api_token">Horde API token</string>
     <string name="adjust_context_size">Adjust context size to worker capabilities</string>
     <string name="adjust_response_length">Adjust response length to worker capabilities</string>

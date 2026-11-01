@@ -1,9 +1,11 @@
 package ru.kima.intelligentchat.presentation.connection.overview.events
 
+import ru.kima.intelligentchat.domain.common.ApiType
+
 sealed interface COUiEvent {
     data class ShowMessage(val message: String) : COUiEvent
     data class ShowSnackbar(val snackbar: COSnackbar) : COUiEvent
-    data class EditPreset(val presetId: Long) : COUiEvent
+    data class EditPreset(val presetId: Long, val apiType: ApiType) : COUiEvent
 
     sealed interface COSnackbar {
         data object NoUser : COSnackbar

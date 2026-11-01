@@ -55,7 +55,8 @@ import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.fragments.HordeFragment
 import ru.kima.intelligentchat.presentation.connection.overview.fragments.KoboldAiFragment
-import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToHordePreset
+import ru.kima.intelligentchat.presentation.connection.overview.fragments.TextCompletionFragment
+import ru.kima.intelligentchat.presentation.navigation.graphs.navigateToPreset
 import ru.kima.intelligentchat.presentation.ui.theme.IntelligentChatTheme
 
 
@@ -148,7 +149,7 @@ private fun ConsumeEvent(
                 }
             }
 
-            is COUiEvent.EditPreset -> navController.navigateToHordePreset(it.presetId)
+            is COUiEvent.EditPreset -> navController.navigateToPreset(it.presetId, it.apiType)
         }
     }
 }
@@ -225,6 +226,12 @@ fun ConnectionOverviewContent(
                         isApiMenuExpanded = false
                     })
                 DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.api_type_text_completion)) },
+                    onClick = {
+                        onEvent(COUserEvent.UpdateSelectedApi(ApiType.TEXT_COMPLETION))
+                        isApiMenuExpanded = false
+                    })
+                DropdownMenuItem(
                     text = { Text(text = stringResource(id = R.string.api_type_kobold)) },
                     onClick = {
                         onEvent(COUserEvent.UpdateSelectedApi(ApiType.KOBOLD_AI))
@@ -243,6 +250,11 @@ fun ConnectionOverviewContent(
                     state = state.hordeFragmentState,
                     modifier = Modifier, onEvent = onEvent
                 )
+                ApiType.TEXT_COMPLETION -> TextCompletionFragment(
+                    state = state.textCompletionFragmentState,
+                    modifier = Modifier,
+                    onEvent = onEvent
+                )
             }
         }
     }
@@ -253,6 +265,7 @@ fun apiTypeStringResource(apiType: ApiType): String {
     return when (apiType) {
         ApiType.KOBOLD_AI -> stringResource(id = R.string.api_type_kobold)
         ApiType.HORDE -> stringResource(id = R.string.api_type_kobold_horde)
+        ApiType.TEXT_COMPLETION -> stringResource(id = R.string.api_type_text_completion)
     }
 }
 

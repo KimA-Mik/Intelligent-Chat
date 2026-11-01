@@ -11,8 +11,5 @@ class KoboldAiGenerationStrategy : GenerationStrategy {
     override fun generation(request: GenerationRequest): Flow<GenerationStatus> =
         flowOf(GenerationStatus.Error(GenerationError.NotImplemented))
 
-
-    override suspend fun cancelGeneration(requestId: String): Boolean {
-        return true
-    }
+    override suspend fun cancelGeneration(requestId: String): Boolean = true
 }

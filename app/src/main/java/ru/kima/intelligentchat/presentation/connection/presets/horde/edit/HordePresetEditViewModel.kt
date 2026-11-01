@@ -6,9 +6,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.kima.intelligentchat.domain.common.ApiType
 import ru.kima.intelligentchat.domain.presets.kobold.model.KoboldPreset
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetUseCase
+import ru.kima.intelligentchat.domain.presets.textCompletion.useCase.GetTextCompletionPresetUseCase
+import ru.kima.intelligentchat.domain.presets.textCompletion.useCase.UpdateTextCompletionPresetUseCase
 import ru.kima.intelligentchat.domain.utils.clipIntToRange
 import ru.kima.intelligentchat.domain.utils.swap
 import ru.kima.intelligentchat.presentation.connection.presets.horde.edit.events.UserEvent
@@ -18,7 +21,9 @@ import kotlin.math.sign
 class HordePresetEditViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val updateKoboldPreset: UpdateKoboldPresetUseCase,
-    getKoboldPreset: GetKoboldPresetUseCase
+    getKoboldPreset: GetKoboldPresetUseCase,
+    private val updateTextCompletionPreset: UpdateTextCompletionPresetUseCase,
+    getTextCompletionPreset: GetTextCompletionPresetUseCase
 ) : ViewModel() {
     private val _preset = MutableStateFlow(KoboldPreset())
     val state = _preset.map {
@@ -31,9 +36,16 @@ class HordePresetEditViewModel(
 
     init {
         val id = savedStateHandle.get<String>("presetId")?.toLongOrNull()
+        val apiType = savedStateHandle.get<String>("apiType")
+            ?.let(ApiType::fromString)
+            ?: ApiType.HORDE
         id?.let {
             viewModelScope.launch {
-                val preset = getKoboldPreset(it)
+                val preset = if (apiType == ApiType.TEXT_COMPLETION) {
+                    getTextCompletionPreset(it)
+                } else {
+                    getKoboldPreset(it)
+                }
                     ?: return@launch
                 _preset.value = preset
             }
@@ -63,7 +75,11 @@ class HordePresetEditViewModel(
     }
 
     private fun onSavePreset() = viewModelScope.launch {
-        updateKoboldPreset(_preset.value)
+        if (savedStateHandle.get<String>("apiType") == ApiType.TEXT_COMPLETION.name) {
+            updateTextCompletionPreset(_preset.value)
+        } else {
+            updateKoboldPreset(_preset.value)
+        }
     }
 
     private fun onEditTitle(newTitle: String) {

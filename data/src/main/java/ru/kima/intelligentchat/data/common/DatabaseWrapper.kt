@@ -17,6 +17,7 @@ import ru.kima.intelligentchat.data.Database
 import ru.kima.intelligentchat.data.chat.advancedFormatting.contextTemplate.ContextTemplateEntity
 import ru.kima.intelligentchat.data.chat.advancedFormatting.instructMode.toEntity
 import ru.kima.intelligentchat.data.kobold.preset.entities.KoboldPresetEntity
+import ru.kima.intelligentchat.data.kobold.preset.mappers.toTextCompletionPresetEntity
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.instructMode.model.InstructModeTemplate
 
 class DatabaseWrapper(context: Context) {
@@ -44,9 +45,8 @@ class DatabaseWrapper(context: Context) {
                 )
 
                 koboldConfigs.await().forEach { preset ->
-                    database
-                        .koboldPresetDao()
-                        .insert(preset)
+                    database.koboldPresetDao().insert(preset)
+                    database.textCompletionPresetDao().insert(preset.toTextCompletionPresetEntity())
                 }
 
                 contextTemplates.await().forEach { contextTemplate ->

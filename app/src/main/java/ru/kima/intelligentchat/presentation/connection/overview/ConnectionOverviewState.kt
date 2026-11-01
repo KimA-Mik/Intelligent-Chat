@@ -9,8 +9,15 @@ import ru.kima.intelligentchat.presentation.connection.overview.model.HordePrese
 @Immutable
 data class ConnectionOverviewState(
     val selectedApiType: ApiType = ApiType.HORDE,
-    val hordeFragmentState: HordeFragmentState = HordeFragmentState()
+    val hordeFragmentState: HordeFragmentState = HordeFragmentState(),
+    val textCompletionFragmentState: TextCompletionFragmentState = TextCompletionFragmentState()
 ) {
+    @Immutable
+    data class TextCompletionFragmentState(
+        val baseUrl: String = "",
+        val presetsWrapper: HordePresetsWrapper = HordePresetsWrapper()
+    )
+
     @Immutable
     data class HordeFragmentState(
         val currentApiToken: String = String(),
@@ -30,4 +37,3 @@ data class ConnectionOverviewState(
         val areModelsLoading: Boolean = false
     )
 }
-

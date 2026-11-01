@@ -31,6 +31,7 @@ import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SavingSt
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.TextCompletionGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingDataUseCase
@@ -43,9 +44,11 @@ class MessagingService : Service(), KoinComponent {
     init {
         val hordeStrategy: HordeGenerationStrategy by inject()
         val koboldStrategy: KoboldAiGenerationStrategy by inject()
+        val textCompletionStrategy: TextCompletionGenerationStrategy by inject()
         strategies = mapOf(
             ApiType.HORDE to hordeStrategy,
-            ApiType.KOBOLD_AI to koboldStrategy
+            ApiType.KOBOLD_AI to koboldStrategy,
+            ApiType.TEXT_COMPLETION to textCompletionStrategy
         )
     }
 

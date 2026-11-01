@@ -19,9 +19,12 @@ import ru.kima.intelligentchat.data.chat.entities.ChatEntity
 import ru.kima.intelligentchat.data.chat.entities.MessageEntity
 import ru.kima.intelligentchat.data.chat.entities.SwipeEntity
 import ru.kima.intelligentchat.data.kobold.preset.dao.KoboldPresetDao
+import ru.kima.intelligentchat.data.kobold.preset.dao.TextCompletionPresetDao
 import ru.kima.intelligentchat.data.kobold.preset.entities.KoboldPresetEntity
+import ru.kima.intelligentchat.data.kobold.preset.entities.TextCompletionPresetEntity
 import ru.kima.intelligentchat.data.migrations.Migration3_4
 import ru.kima.intelligentchat.data.migrations.Migration4_5
+import ru.kima.intelligentchat.data.migrations.Migration7_8
 import ru.kima.intelligentchat.data.persona.PersonaDao
 import ru.kima.intelligentchat.data.persona.PersonaEntity
 
@@ -33,20 +36,22 @@ import ru.kima.intelligentchat.data.persona.PersonaEntity
         PersonaEntity::class,
         AltGreetingEntity::class,
         KoboldPresetEntity::class,
+        TextCompletionPresetEntity::class,
         ChatEntity::class,
         MessageEntity::class,
         SwipeEntity::class,
         InstructModeTemplateEntity::class,
         ContextTemplateEntity::class
     ],
-    version = 7,
+    version = 8,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4, spec = Migration3_4::class),
         AutoMigration(from = 4, to = 5, spec = Migration4_5::class),
         AutoMigration(from = 5, to = 6),
-        AutoMigration(from = 6, to = 7)
+        AutoMigration(from = 6, to = 7),
+        AutoMigration(from = 7, to = 8, spec = Migration7_8::class)
     ]
 )
 abstract class Database : RoomDatabase() {
@@ -55,6 +60,7 @@ abstract class Database : RoomDatabase() {
     abstract fun cardTagDao(): CardTagDao
     abstract fun personaDao(): PersonaDao
     abstract fun koboldPresetDao(): KoboldPresetDao
+    abstract fun textCompletionPresetDao(): TextCompletionPresetDao
     abstract fun chatDao(): ChatDao
     abstract fun instructModeTemplateDao(): InstructModeTemplateDao
     abstract fun contextTemplateDao(): ContextTemplateDao

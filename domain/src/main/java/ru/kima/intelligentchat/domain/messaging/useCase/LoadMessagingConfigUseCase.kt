@@ -20,22 +20,33 @@ class LoadMessagingConfigUseCase(
         personaName: String,
         cardName: String
     ) = when (apiType) {
-        ApiType.KOBOLD_AI -> loadHordeConfig(senderType, personaName, cardName)
-        ApiType.HORDE -> loadHordeConfig(senderType, personaName, cardName)
+        ApiType.KOBOLD_AI, ApiType.HORDE ->
+            loadConfig(senderType, personaName, cardName, useUserGenerationDetails = false)
+
+        ApiType.TEXT_COMPLETION ->
+            loadConfig(senderType, personaName, cardName, useUserGenerationDetails = true)
     }
 
-
     //TODO: Properly handle stop-sequences
-    private suspend fun loadHordeConfig(
+    private suspend fun loadConfig(
         senderType: SenderType,
         personaName: String,
-        cardName: String
+        cardName: String,
+        useUserGenerationDetails: Boolean
     ): MessagingConfig {
         val state = hordeStateRepository.hordeState().first()
         val instructModeTemplate = getSelectedInstructTemplate()
         return MessagingConfig(
-            maxResponseLength = state.actualResponseLength,
-            maxContextLength = state.actualContextSize,
+            maxResponseLength = if (useUserGenerationDetails) {
+                state.userResponseLength
+            } else {
+                state.actualResponseLength
+            },
+            maxContextLength = if (useUserGenerationDetails) {
+                state.userContextSize
+            } else {
+                state.actualContextSize
+            },
             stopSequence = getStopSequence(senderType, personaName, cardName, instructModeTemplate),
             contextTemplate = getSelectedContextTemplate(),
             instructModeTemplate = instructModeTemplate

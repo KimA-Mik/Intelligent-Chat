@@ -32,8 +32,12 @@ import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateContextToW
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateUserGenerationDetailsUseCase
+import ru.kima.intelligentchat.domain.preferences.textCompletion.useCase.GetTextCompletionPreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.textCompletion.useCase.SelectTextCompletionPresetUseCase
+import ru.kima.intelligentchat.domain.preferences.textCompletion.useCase.UpdateTextCompletionBaseUrlUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.model.KoboldPreset
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.SubscribeToKoboldPresetsUseCase
+import ru.kima.intelligentchat.domain.presets.textCompletion.useCase.SubscribeToTextCompletionPresetsUseCase
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUiEvent
 import ru.kima.intelligentchat.presentation.connection.overview.events.COUserEvent
 import ru.kima.intelligentchat.presentation.connection.overview.mappers.toDialogActiveModel
@@ -47,6 +51,7 @@ class ConnectionOverviewViewModel(
     private val savedStateHandle: SavedStateHandle,
     getPreferences: GetPreferencesUseCase,
     subscribeToHordePresetsUse: SubscribeToKoboldPresetsUseCase,
+    subscribeToTextCompletionPresets: SubscribeToTextCompletionPresetsUseCase,
     private val updateSelectedApi: UpdateSelectedApiUseCase,
     private val getHordePreferences: GetHordePreferencesUseCase,
     private val updateContextToWorker: UpdateContextToWorkerUseCase,
@@ -57,7 +62,10 @@ class ConnectionOverviewViewModel(
     private val loadActiveModels: LoadHordeModelsUseCase,
     private val selectHordeModels: SelectHordeModelsUseCase,
     private val updateGenerationDetails: UpdateUserGenerationDetailsUseCase,
-    private val selectActiveHordePreset: SelectActiveHordePresetUseCase
+    private val selectActiveHordePreset: SelectActiveHordePresetUseCase,
+    getTextCompletionPreferences: GetTextCompletionPreferencesUseCase,
+    private val selectTextCompletionPreset: SelectTextCompletionPresetUseCase,
+    private val updateTextCompletionBaseUrl: UpdateTextCompletionBaseUrlUseCase
 ) : ViewModel() {
     private val preferences = getPreferences()
     private val hordeState = getHordePreferences()
@@ -69,6 +77,10 @@ class ConnectionOverviewViewModel(
     private val hordePresets = subscribeToHordePresetsUse().map { list ->
         list.map(KoboldPreset::toHordePreset)
     }
+    private val textCompletionPresets = subscribeToTextCompletionPresets().map { list ->
+        list.map(KoboldPreset::toHordePreset)
+    }
+    private val textCompletionPreferences = getTextCompletionPreferences()
 
     private val selectedHordePresetId = MutableStateFlow(0L)
     private val selectedHordePreset =
@@ -91,7 +103,7 @@ class ConnectionOverviewViewModel(
     }
 
     @Suppress("UNCHECKED_CAST")
-    val state = combine(
+    private val hordeStateFlow = combine(
         preferences,
         hordeState,
         currentHordeApiToken,
@@ -127,11 +139,29 @@ class ConnectionOverviewViewModel(
                 showSelectHordeModelsDialog = showSelectHordeModelsDialog,
                 selectedModelsWrapper = HordeModelsWrapper(hordeState.selectedModels),
                 dialogSelectedModels = hordeDialogActiveModels,
-                presetsWrapper = HordePresetsWrapper(
-                    presets = hordePresets,
-                    preset = selectedHordePreset
-                ),
+                presetsWrapper = HordePresetsWrapper(selectedHordePreset, hordePresets),
                 areModelsLoading = areModelsLoading
+            )
+        )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    val state = combine(
+        hordeStateFlow,
+        textCompletionPreferences,
+        textCompletionPresets
+    ) { args ->
+        val current = args[0] as ConnectionOverviewState
+        val preferences =
+            args[1] as ru.kima.intelligentchat.domain.preferences.textCompletion.TextCompletionPreferences
+        val presets = args[2] as List<HordePreset>
+        val selectedPreset = presets.fastFirstOrNull { it.id == preferences.selectedPreset }
+            ?: presets.firstOrNull()
+            ?: HordePreset(0, "No presets")
+        current.copy(
+            textCompletionFragmentState = ConnectionOverviewState.TextCompletionFragmentState(
+                baseUrl = preferences.baseUrl,
+                presetsWrapper = HordePresetsWrapper(selectedPreset, presets)
             )
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionOverviewState())
@@ -157,7 +187,10 @@ class ConnectionOverviewViewModel(
             is COUserEvent.UpdateHordeContextSize -> onUpdateHordeContextSize(event.newSize)
             is COUserEvent.UpdateHordeResponseLength -> onUpdateHordeResponseLength(event.newLength)
             is COUserEvent.SelectHordePreset -> onSelectHordePreset(event.presetId)
+            is COUserEvent.UpdateTextCompletionBaseUrl -> onUpdateTextCompletionBaseUrl(event.baseUrl)
+            is COUserEvent.SelectTextCompletionPreset -> onSelectTextCompletionPreset(event.presetId)
             COUserEvent.EditPreset -> onEditPreset()
+            COUserEvent.EditTextCompletionPreset -> onEditTextCompletionPreset()
         }
     }
 
@@ -304,9 +337,23 @@ class ConnectionOverviewViewModel(
         selectActiveHordePreset(presetId)
     }
 
+    private fun onUpdateTextCompletionBaseUrl(baseUrl: String) = viewModelScope.launch {
+        updateTextCompletionBaseUrl(baseUrl)
+    }
+
+    private fun onSelectTextCompletionPreset(presetId: Long) = viewModelScope.launch {
+        selectTextCompletionPreset(presetId)
+    }
+
     private fun onEditPreset() = viewModelScope.launch {
         val selectedPreset = selectedHordePreset.first()
-        val event = COUiEvent.EditPreset(selectedPreset.id)
+        val event = COUiEvent.EditPreset(selectedPreset.id, ApiType.HORDE)
+        _uiEvents.value = ComposeEvent(event)
+    }
+
+    private fun onEditTextCompletionPreset() = viewModelScope.launch {
+        val selectedPreset = state.value.textCompletionFragmentState.presetsWrapper.preset
+        val event = COUiEvent.EditPreset(selectedPreset.id, ApiType.TEXT_COMPLETION)
         _uiEvents.value = ComposeEvent(event)
     }
 

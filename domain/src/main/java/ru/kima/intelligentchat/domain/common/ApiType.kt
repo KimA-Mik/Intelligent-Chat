@@ -2,7 +2,8 @@ package ru.kima.intelligentchat.domain.common
 
 enum class ApiType {
     KOBOLD_AI,
-    HORDE;
+    HORDE,
+    TEXT_COMPLETION;
 
     companion object {
         fun fromString(string: String): ApiType? {

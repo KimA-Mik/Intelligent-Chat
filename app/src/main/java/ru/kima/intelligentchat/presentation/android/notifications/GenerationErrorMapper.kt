@@ -9,6 +9,7 @@ fun GenerationError.getDescription(context: Context): String {
     return when (this) {
         is HordeError -> hordeErrorDescription(context, this)
         GenerationError.NotImplemented -> context.getString(R.string.generation_error_description_not_implemented)
+        is GenerationError.Failure -> message
     }
 }
 

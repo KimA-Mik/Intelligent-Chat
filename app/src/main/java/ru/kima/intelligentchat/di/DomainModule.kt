@@ -19,6 +19,8 @@ import ru.kima.intelligentchat.data.chat.repository.MessageRepositoryImpl
 import ru.kima.intelligentchat.data.chat.repository.SwipeRepositoryImpl
 import ru.kima.intelligentchat.data.kobold.horde.HordeRepositoryImpl
 import ru.kima.intelligentchat.data.kobold.preset.repository.KoboldPresetRepositoryImpl
+import ru.kima.intelligentchat.data.kobold.preset.repository.TextCompletionPresetRepositoryImpl
+import ru.kima.intelligentchat.data.koboldcpp.KoboldCppRepositoryImpl
 import ru.kima.intelligentchat.data.persona.PersonaRepositoryImpl
 import ru.kima.intelligentchat.di.domain.messaging.HandlebarsTemplateResolverImpl
 import ru.kima.intelligentchat.domain.card.repository.CharacterCardRepository
@@ -63,6 +65,7 @@ import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SaveApiKeyUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.SelectActiveHordePresetUseCase
 import ru.kima.intelligentchat.domain.images.useCase.GetFreeImageNameUseCase
+import ru.kima.intelligentchat.domain.koboldcpp.KoboldCppRepository
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.ContextTemplateRepository
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.DeleteContextTemplateUseCase
 import ru.kima.intelligentchat.domain.messaging.advancedFormatting.contextTemplate.useCase.GetSelectedContextTemplateUseCase
@@ -82,6 +85,7 @@ import ru.kima.intelligentchat.domain.messaging.generation.savingResult.DefaultS
 import ru.kima.intelligentchat.domain.messaging.generation.savingResult.SwipeSavingStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.HordeGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.generation.strategies.KoboldAiGenerationStrategy
+import ru.kima.intelligentchat.domain.messaging.generation.strategies.TextCompletionGenerationStrategy
 import ru.kima.intelligentchat.domain.messaging.repositoty.MessagingRepository
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.LoadMessagingConfigUseCase
@@ -114,10 +118,18 @@ import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateHordeUserD
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateResponseToWorkerUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateTrustedWorkersUseCase
 import ru.kima.intelligentchat.domain.preferences.horde.useCase.UpdateUserGenerationDetailsUseCase
+import ru.kima.intelligentchat.domain.preferences.textCompletion.TextCompletionPreferencesRepository
+import ru.kima.intelligentchat.domain.preferences.textCompletion.useCase.GetTextCompletionPreferencesUseCase
+import ru.kima.intelligentchat.domain.preferences.textCompletion.useCase.SelectTextCompletionPresetUseCase
+import ru.kima.intelligentchat.domain.preferences.textCompletion.useCase.UpdateTextCompletionBaseUrlUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.repository.KoboldPresetRepository
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.GetKoboldPresetUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.SubscribeToKoboldPresetsUseCase
 import ru.kima.intelligentchat.domain.presets.kobold.useCase.UpdateKoboldPresetUseCase
+import ru.kima.intelligentchat.domain.presets.textCompletion.repository.TextCompletionPresetRepository
+import ru.kima.intelligentchat.domain.presets.textCompletion.useCase.GetTextCompletionPresetUseCase
+import ru.kima.intelligentchat.domain.presets.textCompletion.useCase.SubscribeToTextCompletionPresetsUseCase
+import ru.kima.intelligentchat.domain.presets.textCompletion.useCase.UpdateTextCompletionPresetUseCase
 import ru.kima.intelligentchat.domain.tokenizer.LlamaTokenizer
 import ru.kima.intelligentchat.domain.tokenizer.useCase.TokenizeTextUseCase
 import ru.kima.intelligentchat.presentation.android.implementation.messaging.repositoty.MessagingRepositoryImpl
@@ -125,13 +137,16 @@ import ru.kima.intelligentchat.presentation.android.preferences.advancedFormatti
 import ru.kima.intelligentchat.presentation.android.preferences.appPreferences.AppPreferencesRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.preferences.chatSettings.ChatSettingsRepositoryImpl
 import ru.kima.intelligentchat.presentation.android.preferences.hordeState.HordeStateRepositoryImpl
+import ru.kima.intelligentchat.presentation.android.preferences.textCompletion.TextCompletionPreferencesRepositoryImpl
 
 @OptIn(ExperimentalSerializationApi::class)
 fun domain() = module {
     singleOf(::CharacterCardRepositoryImpl) bind CharacterCardRepository::class
     singleOf(::PersonaRepositoryImpl) bind PersonaRepository::class
     singleOf(::HordeRepositoryImpl) bind HordeRepository::class
+    singleOf(::KoboldCppRepositoryImpl) bind KoboldCppRepository::class
     singleOf(::KoboldPresetRepositoryImpl) bind KoboldPresetRepository::class
+    singleOf(::TextCompletionPresetRepositoryImpl) bind TextCompletionPresetRepository::class
     singleOf(::ChatRepositoryImpl) bind ChatRepository::class
     singleOf(::MessageRepositoryImpl) bind MessageRepository::class
     singleOf(::SwipeRepositoryImpl) bind SwipeRepository::class
@@ -145,6 +160,7 @@ fun domain() = module {
         createdAtStart()
     } bind ChatSettingsRepository::class
     singleOf(::HordeStateRepositoryImpl) bind HordeStateRepository::class
+    singleOf(::TextCompletionPreferencesRepositoryImpl) bind TextCompletionPreferencesRepository::class
     singleOf(::AdvancedFormattingRepositoryImpl) bind AdvancedFormattingRepository::class
 
     singleOf(::HandlebarsTemplateResolverImpl) bind TemplateResolver::class
@@ -156,6 +172,9 @@ fun domain() = module {
     singleOf(::UpdateSelectedApiUseCase)
 
     singleOf(::GetHordePreferencesUseCase)
+    singleOf(::GetTextCompletionPreferencesUseCase)
+    singleOf(::UpdateTextCompletionBaseUrlUseCase)
+    singleOf(::SelectTextCompletionPresetUseCase)
     singleOf(::UpdateContextToWorkerUseCase)
     singleOf(::UpdateHordeUserDataUseCase)
     singleOf(::UpdateResponseToWorkerUseCase)
@@ -198,8 +217,11 @@ fun domain() = module {
     singleOf(::GetFreeImageNameUseCase)
 
     singleOf(::GetKoboldPresetUseCase)
+    singleOf(::GetTextCompletionPresetUseCase)
     singleOf(::SubscribeToKoboldPresetsUseCase)
+    singleOf(::SubscribeToTextCompletionPresetsUseCase)
     singleOf(::UpdateKoboldPresetUseCase)
+    singleOf(::UpdateTextCompletionPresetUseCase)
 
     singleOf(::CreateAndSelectChatUseCase)
     singleOf(::CreateChatUseCase)
@@ -245,6 +267,7 @@ fun domain() = module {
 
     singleOf(::HordeGenerationStrategy)
     singleOf(::KoboldAiGenerationStrategy)
+    singleOf(::TextCompletionGenerationStrategy)
 
     factoryOf(::DefaultSavingStrategy)
     factoryOf(::SwipeSavingStrategy)

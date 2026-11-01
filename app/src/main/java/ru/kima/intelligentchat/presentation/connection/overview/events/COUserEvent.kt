@@ -19,5 +19,8 @@ sealed interface COUserEvent {
     data class UpdateHordeContextSize(val newSize: Int) : COUserEvent
     data class UpdateHordeResponseLength(val newLength: Int) : COUserEvent
     data class SelectHordePreset(val presetId: Long) : COUserEvent
+    data class UpdateTextCompletionBaseUrl(val baseUrl: String) : COUserEvent
+    data class SelectTextCompletionPreset(val presetId: Long) : COUserEvent
     data object EditPreset : COUserEvent
+    data object EditTextCompletionPreset : COUserEvent
 }

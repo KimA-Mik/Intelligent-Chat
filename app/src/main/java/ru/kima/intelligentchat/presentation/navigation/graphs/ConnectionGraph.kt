@@ -9,7 +9,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import org.koin.androidx.compose.koinViewModel
 import ru.kima.intelligentchat.presentation.connection.overview.ConnectionOverviewScreen
@@ -55,7 +57,10 @@ fun NavGraphBuilder.connectionGraph(
             }
         }
 
-        composable("presets/{presetId}") {
+        composable(
+            route = "presets/{presetId}/{apiType}",
+            arguments = listOf(navArgument("apiType") { type = NavType.StringType })
+        ) {
             val viewModel: HordePresetEditViewModel = koinViewModel()
             val state by viewModel.state.collectAsStateWithLifecycle(HordePresetEditScreenState.NoPreset)
             val onEvent = remember<(UserEvent) -> Unit> {
@@ -79,5 +84,7 @@ fun NavGraphBuilder.connectionGraph(
     }
 }
 
-fun NavController.navigateToHordePreset(presetId: Long) =
-    this.navigate("presets/${presetId}") { launchSingleTop = true }
+fun NavController.navigateToPreset(
+    presetId: Long,
+    apiType: ru.kima.intelligentchat.domain.common.ApiType
+) = this.navigate("presets/$presetId/${apiType.name}") { launchSingleTop = true }

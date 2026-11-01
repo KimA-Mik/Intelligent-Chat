@@ -122,6 +122,7 @@ class MessagingRepositoryImpl(
         when (currentApi) {
             ApiType.HORDE -> initHorde()
             ApiType.KOBOLD_AI -> {}
+            ApiType.TEXT_COMPLETION -> {}
         }
     }
 
