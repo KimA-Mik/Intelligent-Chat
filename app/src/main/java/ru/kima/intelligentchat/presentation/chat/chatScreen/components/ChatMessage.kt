@@ -292,9 +292,6 @@ fun AnimatedText(
         )
     }
 
-    var italicIndex by remember(text) { mutableIntStateOf(-1) }
-    var quoteIndex by remember(text) { mutableIntStateOf(-1) }
-    var parent by remember(text) { mutableStateOf<ASTNode?>(null) }
     val imageTransformer = LocalImageTransformer.current
     AnimatedContent(
         targetState = text to currentSwipe,
@@ -302,6 +299,9 @@ fun AnimatedText(
         label = "",
         modifier = modifier,
         transitionSpec = { animationSpec }) {
+        var italicStart = -1
+        var quoteStart = -1
+        var parent: ASTNode? = null
         Markdown(
             it.first,
             colors = markdownColor(),
@@ -312,29 +312,33 @@ fun AnimatedText(
             annotator = markdownAnnotator { content, child ->
                 if (parent != child.parent) {
                     parent = child.parent
-                    italicIndex = -1
-                    quoteIndex = -1
+                    italicStart = -1
+                    quoteStart = -1
                 }
 
                 when {
                     child.type == MarkdownTokenTypes.EMPH && child.endOffset - child.startOffset == 1 -> {
-                        if (italicIndex < 0) {
-                            italicIndex = pushStyle(italicStyle)
+                        if (italicStart < 0) {
+                            italicStart = length
                         } else {
-                            pop()
-                            italicIndex = -1
+                            if (italicStart < length) {
+                                addStyle(italicStyle, italicStart, length)
+                            }
+                            italicStart = -1
                         }
                         return@markdownAnnotator true
                     }
 
                     child.type == MarkdownTokenTypes.DOUBLE_QUOTE -> {
                         val quote = content.substring(child.startOffset, child.endOffset)
-                        if (quoteIndex < 0) {
+                        if (quoteStart < 0) {
                             append(quote)
-                            quoteIndex = pushStyle(quoteStyle)
+                            quoteStart = length
                         } else {
-                            pop()
-                            quoteIndex = -1
+                            if (quoteStart < length) {
+                                addStyle(quoteStyle, quoteStart, length)
+                            }
+                            quoteStart = -1
                             append(quote)
                         }
                         return@markdownAnnotator true
