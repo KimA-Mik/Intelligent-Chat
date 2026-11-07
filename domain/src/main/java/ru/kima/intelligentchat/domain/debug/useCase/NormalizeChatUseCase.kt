@@ -12,7 +12,7 @@ class NormalizeChatUseCase(
             ?: return Result.failure(IllegalStateException("No messages found for chatId: $chatId"))
         val normalized = messages.mapIndexed { index, message ->
             message.copy(
-                sender = if (index % 2 == 0) SenderType.Persona else SenderType.Character,
+                sender = if (index % 2 == 0) SenderType.Character else SenderType.Persona,
             )
         }
 
