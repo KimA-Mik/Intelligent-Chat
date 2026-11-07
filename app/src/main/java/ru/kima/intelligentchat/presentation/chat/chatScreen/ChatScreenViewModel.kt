@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.kima.intelligentchat.common.Event
 import ru.kima.intelligentchat.domain.card.model.CharacterCard
@@ -30,6 +31,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.common.valueOr
+import ru.kima.intelligentchat.domain.debug.useCase.NormalizeChatUseCase
 import ru.kima.intelligentchat.domain.messaging.model.MessagingIndicator
 import ru.kima.intelligentchat.domain.messaging.useCase.CancelMessageUseCase
 import ru.kima.intelligentchat.domain.messaging.useCase.SendMessageUseCase
@@ -62,6 +64,7 @@ class ChatScreenViewModel(
     private val restoreSwipe: RestoreSwipeUseCase,
     private val cancelMessage: CancelMessageUseCase,
     private val deleteMessage: DeleteMessageUseCase,
+    private val normalizeChat: NormalizeChatUseCase,
     private val restoreMessage: RestoreMessageUseCase,
     private val messagingStatus: SubscribeToMessagingStatus,
     private val swipeFirstMessage: SwipeFirstMessageUseCase,
@@ -69,7 +72,7 @@ class ChatScreenViewModel(
     private val subscribeToFullChat: SubscribeToFullChatUseCase,
     private val createAndSelectChat: CreateAndSelectChatUseCase,
     private val branchChatFromMessage: BranchChatFromMessageUseCase,
-    private val chatSettingsRepository: ChatSettingsRepository,
+    private val chatSettingsRepository: ChatSettingsRepository
 ) : ViewModel() {
     private val characterCard = MutableStateFlow(CharacterCard.default())
     private val displayCard = MutableStateFlow(DisplayCard())
@@ -82,6 +85,8 @@ class ChatScreenViewModel(
 
     private var chatJob: Job? = null
     private val _fullChat = MutableStateFlow(FullChat())
+
+    private val normalizeChatDialog = MutableStateFlow(false)
 
     init {
         initialize()
@@ -137,7 +142,7 @@ class ChatScreenViewModel(
             chatSettingsRepository.showDate().subscribe(),
             chatSettingsRepository.showNumber().subscribe(),
             preferences().map { it.showImages },
-            characterCard
+            characterCard,
         ) { showDate, showNumber, globalShowImages, card ->
             ImmutableChatAppearance(
                 showDate = showDate,
@@ -157,7 +162,8 @@ class ChatScreenViewModel(
             savedStateHandle.getStateFlow(OPEN_URI_REQUEST, false),
             savedStateHandle.getStateFlow(URI_TO_OPEN, ""),
             chat,
-        ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId, openUriRequest, uriToOpen, chatAppearance ->
+            normalizeChatDialog
+        ) { info, messagingStatus, inputMessageBuffer, editMessageBuffer, editMessageId, openUriRequest, uriToOpen, chatAppearance, normalizeChatDialog ->
             ChatState(
                 info = info,
                 inputMessageBuffer = inputMessageBuffer,
@@ -166,7 +172,8 @@ class ChatScreenViewModel(
                 status = messagingStatus.toImmutable(),
                 openUriRequestDialog = openUriRequest,
                 uriToOpen = uriToOpen,
-                chatAppearance = chatAppearance
+                chatAppearance = chatAppearance,
+                showNormalizeChatDialog = normalizeChatDialog
             )
         }
 
@@ -218,8 +225,12 @@ class ChatScreenViewModel(
             UserEvent.AcceptOpenUriRequest -> onAcceptOpenUriRequest()
             UserEvent.DismissOpenUriRequest -> onDismissOpenUriRequest()
             is UserEvent.UpdateShowImages -> onUpdateShowImages(event.showImages)
+            UserEvent.NormalizeChatClicked -> opNormalizeChatClicked()
+            UserEvent.NormalizeChatAccepted -> opNormalizeChatAccepted()
+            UserEvent.NormalizeChatDismissed -> opNormalizeChatDismissed()
         }
     }
+
 
     private fun onDismissOpenUriRequest() {
         savedStateHandle[OPEN_URI_REQUEST] = false
@@ -389,6 +400,15 @@ class ChatScreenViewModel(
             )
         }
     }
+
+    private fun opNormalizeChatClicked() = normalizeChatDialog.update { true }
+
+    private fun opNormalizeChatAccepted() = viewModelScope.launch {
+        normalizeChatDialog.update { false }
+        normalizeChat(_fullChat.value.chatId)
+    }
+
+    private fun opNormalizeChatDismissed() = normalizeChatDialog.update { false }
 
     companion object {
         private const val MESSAGE_INPUT_BUFFER = "MESSAGE_INPUT_BUFFER"

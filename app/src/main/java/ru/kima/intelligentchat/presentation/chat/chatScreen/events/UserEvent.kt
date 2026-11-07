@@ -22,4 +22,8 @@ sealed interface UserEvent {
     data object AcceptOpenUriRequest : UserEvent
     data object DismissOpenUriRequest : UserEvent
     data class UpdateShowImages(val showImages: Boolean?) : UserEvent
+
+    data object NormalizeChatClicked : UserEvent
+    data object NormalizeChatAccepted : UserEvent
+    data object NormalizeChatDismissed : UserEvent
 }

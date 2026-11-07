@@ -57,6 +57,7 @@ import ru.kima.intelligentchat.domain.chat.useCase.inChat.RestoreSwipeUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeFirstMessageUseCase
 import ru.kima.intelligentchat.domain.chat.useCase.inChat.SwipeMessageUseCase
 import ru.kima.intelligentchat.domain.common.useCase.CleanUpUseCase
+import ru.kima.intelligentchat.domain.debug.useCase.NormalizeChatUseCase
 import ru.kima.intelligentchat.domain.horde.repositoty.HordeRepository
 import ru.kima.intelligentchat.domain.horde.useCase.GetKudosUseCase
 import ru.kima.intelligentchat.domain.horde.useCase.LoadHordeModelsUseCase
@@ -154,6 +155,8 @@ fun domain() = module {
     singleOf(::GetPreferencesUseCase)
     singleOf(::SetSelectedPersonaIdUseCase)
     singleOf(::UpdateSelectedApiUseCase)
+
+    singleOf(::NormalizeChatUseCase)
 
     singleOf(::GetHordePreferencesUseCase)
     singleOf(::UpdateContextToWorkerUseCase)

@@ -13,7 +13,8 @@ data class ChatState(
     val status: ImmutableMessagingIndicator = ImmutableMessagingIndicator.None,
     val openUriRequestDialog: Boolean = false,
     val uriToOpen: String = "",
-    val chatAppearance: ImmutableChatAppearance = ImmutableChatAppearance.default
+    val chatAppearance: ImmutableChatAppearance = ImmutableChatAppearance.default,
+    val showNormalizeChatDialog: Boolean = false
 ) {
     data class ChatInfo(
         val characterCard: DisplayCard = DisplayCard(),

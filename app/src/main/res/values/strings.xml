@@ -254,9 +254,12 @@
     <string name="action_search_hint">Search…</string>
     <string name="action_bar_up_description">Navigate up</string>
     <string name="action_delete">Delete</string>
+    <string name="action_ok">OK</string>
 
     <string name="restore_snackbar_action">Restore</string>
 
     <string name="not_implemented_placeholder">Not implemented yet…</string>
+    <string name="dialog_title_normalize_chat">Normalize chat?</string>
+    <string name="debug_normalize_chat">Debug: Normalize chat</string>
 
 </resources>

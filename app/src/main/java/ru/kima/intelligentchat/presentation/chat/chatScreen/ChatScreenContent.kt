@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -117,6 +118,16 @@ fun ChatScreenContent(
             text = stringResource(R.string.open_uri_request_dialog_text, state.uriToOpen),
             icon = Icons.Default.OpenInBrowser,
             confirmText = stringResource(R.string.action_open),
+            dismissText = stringResource(R.string.action_cancel)
+        )
+
+        state.showNormalizeChatDialog -> SimpleAlertDialog(
+            onConfirm = { onEvent(UserEvent.NormalizeChatAccepted) },
+            onDismiss = { onEvent(UserEvent.NormalizeChatDismissed) },
+            title = stringResource(R.string.dialog_title_normalize_chat),
+            text = "",
+            icon = Icons.Default.Numbers,
+            confirmText = stringResource(R.string.action_ok),
             dismissText = stringResource(R.string.action_cancel)
         )
     }
@@ -307,6 +318,11 @@ private fun dropdownMenuItems(
                 )
             )
         ),
+        SimpleDropDownMenuItem(
+            string = ComposeString.Resource(R.string.debug_normalize_chat),
+            onClick = { onEvent(UserEvent.NormalizeChatClicked) },
+            iconVector = Icons.Default.BugReport
+        )
     )
 }
 
@@ -439,8 +455,8 @@ fun ChatBottomBar(
         IconButton(onClick = onMessageButtonClicked) {
             Icon(
                 imageVector =
-                if (messagingIndicator == ImmutableMessagingIndicator.None) Icons.AutoMirrored.Default.Send
-                else Icons.Default.StopCircle,
+                    if (messagingIndicator == ImmutableMessagingIndicator.None) Icons.AutoMirrored.Default.Send
+                    else Icons.Default.StopCircle,
                 contentDescription = null
             )
         }
